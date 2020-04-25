@@ -1,3 +1,3 @@
 # Toms-Storage
 Simple vanilla style storage mod for Minecraft
-![Banner](https://media.forgecdn.net/attachments/288/563/2020-04-24_18.png)
+![Banner](https://github.com/tom5454/Toms-Storage/blob/master/banner.png)
