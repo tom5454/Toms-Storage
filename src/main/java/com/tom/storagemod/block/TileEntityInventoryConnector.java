@@ -52,7 +52,9 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < 256) {
 						checkedBlocks.add(p);
 						TileEntity te = world.getTileEntity(p);
-						if(te != null) {
+						if (te instanceof TileEntityInventoryConnector) {
+							continue;
+						} else if(te != null) {
 							LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
 							if(te instanceof ChestTileEntity) {//Check for double chests
 								BlockState state = world.getBlockState(p);
