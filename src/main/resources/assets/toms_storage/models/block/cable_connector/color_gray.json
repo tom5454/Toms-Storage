@@ -1,0 +1,6 @@
+{
+  "parent": "toms_storage:block/cable_connector/color_base",
+  "textures": {
+    "tex": "block/gray_wool"
+  }
+}

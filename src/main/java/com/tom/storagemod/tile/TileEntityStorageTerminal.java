@@ -1,4 +1,4 @@
-package com.tom.storagemod.block;
+package com.tom.storagemod.tile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -23,15 +24,23 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
+import com.tom.storagemod.block.StorageTerminalBase;
+import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
+import com.tom.storagemod.item.ItemWirelessTerminal;
 
 public class TileEntityStorageTerminal extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 	private IItemHandler itemHandler;
 	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
 	public TileEntityStorageTerminal() {
 		super(StorageMod.terminalTile);
+	}
+
+	public TileEntityStorageTerminal(TileEntityType<?> tileEntityTypeIn) {
+		super(tileEntityTypeIn);
 	}
 
 	@Override
@@ -41,7 +50,7 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	@Override
 	public ITextComponent getDisplayName() {
-		return new TranslationTextComponent("ts.storage_terminal.name");
+		return new TranslationTextComponent("ts.storage_terminal");
 	}
 
 	public List<StoredItemStack> getStacks() {
@@ -81,7 +90,10 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 	public void tick() {
 		if(!world.isRemote) {
 			BlockState st = world.getBlockState(pos);
-			Direction d = st.get(StorageTerminal.FACING);
+			Direction d = st.get(StorageTerminalBase.FACING);
+			TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
+			if(p == TerminalPos.UP)d = Direction.UP;
+			if(p == TerminalPos.DOWN)d = Direction.DOWN;
 			TileEntity invTile = world.getTileEntity(pos.offset(d));
 			items.clear();
 			if(invTile != null) {
@@ -96,4 +108,9 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 		}
 	}
 
+	public boolean canInteractWith(PlayerEntity player) {
+		if(world.getTileEntity(pos) != this)return false;
+		double dist = ItemWirelessTerminal.isPlayerHolding(player) ? Config.wirelessRange*2*Config.wirelessRange*2 : 64;
+		return !(player.getDistanceSq(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > dist);
+	}
 }

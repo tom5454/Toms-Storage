@@ -2,5 +2,36 @@
 	"block.toms_storage.ts.inventory_connector": "Inventory Connector",
 	"block.toms_storage.ts.storage_terminal": "Storage Terminal",
 	"block.toms_storage.ts.trim": "Inventory Trim",
-	"block.toms_storage.ts.open_crate": "Open Crate"
+	"block.toms_storage.ts.painted_trim": "Inventory Trim",
+	"block.toms_storage.ts.open_crate": "Open Crate",
+	"block.toms_storage.ts.inventory_cable": "Inventory Cable",
+	"block.toms_storage.ts.inventory_cable_framed": "Framed Inventory Cable",
+	"block.toms_storage.ts.inventory_cable_connector": "Inventory Cable Connector",
+	"block.toms_storage.ts.inventory_proxy": "Inventory Proxy",
+	"block.toms_storage.ts.crafting_terminal": "Crafting Terminal",
+	
+	"item.toms_storage.ts.paint_kit": "Paint Kit",
+	"item.toms_storage.ts.wireless_terminal": "Wireless Terminal",
+	
+	"itemGroup.toms_storage": "Tom's Simple Storage",
+	
+	"tooltip.toms_storage.hold_shift_for_info": "Hold SHIFT for more info.",
+	"tooltip.toms_storage.paintable": "Can be painted",
+	"tooltip.toms_storage.inventory_cable_connector": "Connects the inventory to the\\Inventory Cable System. Useful for longer\\range item access. Can be colored using\\dyes to select the channel.\\Two connectors with the same color\\will link together.",
+	"tooltip.toms_storage.trim": "Connects inventories with the Inventory Connector.",
+	"tooltip.toms_storage.crafting_terminal": "Gives access to your items.\\Place it on an inventory.\\Has a builtin crafting table.",
+	"tooltip.toms_storage.storage_terminal": "Gives access to your items.\\Place it on an inventory.",
+	"tooltip.toms_storage.wireless_terminal": "Extends your reach for the terminal.",
+	"tooltip.toms_storage.paint_kit": "Paint blocks to match\\their surroundings!",
+	"tooltip.toms_storage.open_crate": "Converts the block in front of it\\into an inventory.\\Beware: Creates Item Entities",
+	"tooltip.toms_storage.inventory_connector": "Connects all of the touching inventories into one.\\Use the Storage Terminal to access\\all of your items. Trims can connect the gaps.",
+	"tooltip.toms_storage.inventory_proxy": "Extends the face of the block its pointing at.",
+	"tooltip.toms_storage.inventory_cable": "Connects inventories across\\long distances. Inventory Cable Connectors\\link the two ends.",
+	"tooltip.toms_storage.loop": "Loop detected in your storage system",
+	"tooltip.toms_storage.amount": "Item Amount: %d",
+	
+	"tomsstorage.config.inventory_connector_range": "Inventory Connector Range",
+	"tomsstorage.config.only_trims_connect": "Only Allow Trims to Connect Inventories",
+	"tomsstorage.config.inv_cable_connector_max_scan": "Inventory Cable Connector Maximum number of cables",
+	"tomsstorage.config.wireless_reach": "Wireless terminal reach"
 }

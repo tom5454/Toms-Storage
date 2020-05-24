@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"SPS",
+    "TcT",
+    "SPS"
+  ],
+  "key": {
+  	"P": {
+      "tag": "minecraft:planks"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    },
+    "c": {
+      "tag": "forge:chests/wooden"
+    },
+    "T": {
+      "tag": "minecraft:trapdoors"
+    }
+  },
+  "result": {
+    "item": "toms_storage:ts.inventory_cable",
+    "count": 6
+  }
+}

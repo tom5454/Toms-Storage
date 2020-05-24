@@ -1,4 +1,4 @@
-package com.tom.storagemod.block;
+package com.tom.storagemod.tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,5 +139,12 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 
 	private IItemHandlerModifiable createHandler() {
 		return new InvWrapper(this);
+	}
+
+	@Override
+	public void remove() {
+		super.remove();
+		if (chestHandler != null)
+			chestHandler.invalidate();
 	}
 }

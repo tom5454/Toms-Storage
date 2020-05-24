@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+          	{
+              "function": "minecraft:copy_state",
+              "block": "toms_storage:ts.inventory_cable_connector",
+              "properties": [
+              	"color"
+              ]
+            }
+          ],
+          "name": "toms_storage:ts.inventory_cable_connector"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}

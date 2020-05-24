@@ -1,19 +1,29 @@
 package com.tom.storagemod.block;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockReader;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
+
+import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.tile.TileEntityOpenCrate;
 
 public class BlockOpenCrate extends ContainerBlock {
 
@@ -25,6 +35,13 @@ public class BlockOpenCrate extends ContainerBlock {
 	@Override
 	public TileEntity createNewTileEntity(IBlockReader worldIn) {
 		return new TileEntityOpenCrate();
+	}
+
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+			ITooltipFlag flagIn) {
+		ClientProxy.tooltip("open_crate", tooltip);
 	}
 
 	@Override

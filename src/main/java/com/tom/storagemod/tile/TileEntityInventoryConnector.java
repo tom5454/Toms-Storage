@@ -1,4 +1,4 @@
-package com.tom.storagemod.block;
+package com.tom.storagemod.tile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,7 +23,9 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.block.ITrim;
 
 public class TileEntityInventoryConnector extends TileEntity implements ITickableTileEntity {
 	private List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
@@ -37,7 +39,7 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 
 	@Override
 	public void tick() {
-		if(world.getGameTime() % 20 == 0) {
+		if(!world.isRemote && world.getGameTime() % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			//Set<List<ItemStack>> equalCheck = new HashSet<>();
@@ -49,12 +51,12 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
 					BlockPos p = cp.offset(d);
-					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < 256) {
+					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < Config.invRange) {
 						checkedBlocks.add(p);
 						TileEntity te = world.getTileEntity(p);
-						if (te instanceof TileEntityInventoryConnector) {
+						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy) {
 							continue;
-						} else if(te != null) {
+						} else if(te != null && !Config.onlyTrims) {
 							LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
 							if(te instanceof ChestTileEntity) {//Check for double chests
 								BlockState state = world.getBlockState(p);
@@ -76,12 +78,20 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 							}
 							if(inv.isPresent()) {
 								//System.out.println("Checking pos: " + p + " " + inv.orElse(null));
+								IItemHandler ihr = IProxy.resolve(inv.orElse(null));
+								if(ihr instanceof InvHandler) {
+									InvHandler ih = (InvHandler) ihr;
+									if(checkHandlers(ih, 0)) {
+										if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+										continue;
+									}
+								}
 								toCheck.add(p);
 								handlers.add(inv);
 							}
 						} else {
 							BlockState state = world.getBlockState(p);
-							if(state.getBlock() == StorageMod.inventoryTrim) {
+							if(state.getBlock() instanceof ITrim) {
 								toCheck.add(p);
 							}
 						}
@@ -101,70 +111,122 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 			}
 		}
 	}
+	private boolean checkHandlers(InvHandler ih, int depth) {
+		if(depth > 3)return true;
+		for (LazyOptional<IItemHandler> lo : ih.getHandlers()) {
+			IItemHandler ihr = IProxy.resolve(lo.orElse(null));
+			if(ihr instanceof InvHandler) {
+				if(checkHandlers((InvHandler) ihr, depth+1))return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if (this.invHandler == null)
-				this.invHandler = LazyOptional.of(this::createHandler);
+				this.invHandler = LazyOptional.of(InvHandler::new);
 			return this.invHandler.cast();
 		}
 		return super.getCapability(cap, side);
 	}
 
-	private IItemHandler createHandler() {
-		return new IItemHandler() {
+	private class InvHandler implements IItemHandler {
+		private boolean calling;
 
-			@Override
-			public boolean isItemValid(int slot, ItemStack stack) {
-				for (int i = 0; i < invSizes.length; i++) {
-					if(slot >= invSizes[i])slot -= invSizes[i];
-					else return handlers.get(i).orElse(EmptyHandler.INSTANCE).isItemValid(slot, stack);
+		@Override
+		public boolean isItemValid(int slot, ItemStack stack) {
+			if(calling)return false;
+			calling = true;
+			for (int i = 0; i < invSizes.length; i++) {
+				if(slot >= invSizes[i])slot -= invSizes[i];
+				else {
+					boolean r = handlers.get(i).orElse(EmptyHandler.INSTANCE).isItemValid(slot, stack);
+					calling = false;
+					return r;
 				}
-				return false;
 			}
+			calling = false;
+			return false;
+		}
 
-			@Override
-			public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-				for (int i = 0; i < invSizes.length; i++) {
-					if(slot >= invSizes[i])slot -= invSizes[i];
-					else return handlers.get(i).orElse(EmptyHandler.INSTANCE).insertItem(slot, stack, simulate);
+		@Override
+		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+			if(calling)return stack;
+			calling = true;
+			for (int i = 0; i < invSizes.length; i++) {
+				if(slot >= invSizes[i])slot -= invSizes[i];
+				else {
+					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).insertItem(slot, stack, simulate);
+					calling = false;
+					return s;
 				}
-				return stack;
 			}
+			calling = false;
+			return stack;
+		}
 
-			@Override
-			public ItemStack getStackInSlot(int slot) {
-				for (int i = 0; i < invSizes.length; i++) {
-					if(slot >= invSizes[i])slot -= invSizes[i];
-					else return handlers.get(i).orElse(EmptyHandler.INSTANCE).getStackInSlot(slot);
+		@Override
+		public ItemStack getStackInSlot(int slot) {
+			if(calling)return ItemStack.EMPTY;
+			calling = true;
+			for (int i = 0; i < invSizes.length; i++) {
+				if(slot >= invSizes[i])slot -= invSizes[i];
+				else {
+					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).getStackInSlot(slot);
+					calling = false;
+					return s;
 				}
-				return ItemStack.EMPTY;
 			}
+			calling = false;
+			return ItemStack.EMPTY;
+		}
 
-			@Override
-			public int getSlots() {
-				return invSize;
-			}
+		@Override
+		public int getSlots() {
+			return invSize;
+		}
 
-			@Override
-			public int getSlotLimit(int slot) {
-				for (int i = 0; i < invSizes.length; i++) {
-					if(slot >= invSizes[i])slot -= invSizes[i];
-					else return handlers.get(i).orElse(EmptyHandler.INSTANCE).getSlotLimit(slot);
+		@Override
+		public int getSlotLimit(int slot) {
+			if(calling)return 0;
+			calling = true;
+			for (int i = 0; i < invSizes.length; i++) {
+				if(slot >= invSizes[i])slot -= invSizes[i];
+				else {
+					int r = handlers.get(i).orElse(EmptyHandler.INSTANCE).getSlotLimit(slot);
+					calling = false;
+					return r;
 				}
-				return 0;
 			}
+			calling = false;
+			return 0;
+		}
 
-			@Override
-			public ItemStack extractItem(int slot, int amount, boolean simulate) {
-				for (int i = 0; i < invSizes.length; i++) {
-					if(slot >= invSizes[i])slot -= invSizes[i];
-					else return handlers.get(i).orElse(EmptyHandler.INSTANCE).extractItem(slot, amount, simulate);
+		@Override
+		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+			if(calling)return ItemStack.EMPTY;
+			calling = true;
+			for (int i = 0; i < invSizes.length; i++) {
+				if(slot >= invSizes[i])slot -= invSizes[i];
+				else {
+					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).extractItem(slot, amount, simulate);
+					calling = false;
+					return s;
 				}
-				return ItemStack.EMPTY;
 			}
-		};
+			calling = false;
+			return ItemStack.EMPTY;
+		}
+
+		public TileEntityInventoryConnector getThis() {
+			return TileEntityInventoryConnector.this;
+		}
+
+		public List<LazyOptional<IItemHandler>> getHandlers() {
+			return handlers;
+		}
 	}
 
 	@Override

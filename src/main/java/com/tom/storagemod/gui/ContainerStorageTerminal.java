@@ -12,13 +12,17 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 
@@ -31,9 +35,9 @@ import com.google.common.collect.Lists;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
-import com.tom.storagemod.block.TileEntityStorageTerminal;
+import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
-public class ContainerStorageTerminal extends Container {
+public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInventory> {
 	private static final int DIVISION_BASE = 1000;
 	private static final char[] ENCODED_POSTFIXES = "KMGTPE".toCharArray();
 	public static final Format format;
@@ -49,7 +53,7 @@ public class ContainerStorageTerminal extends Container {
 		format = format_;
 	}
 
-	private TileEntityStorageTerminal te;
+	protected TileEntityStorageTerminal te;
 	protected int playerSlotsStart;
 	protected List<SlotStorage> storageSlotList = new ArrayList<>();
 	public List<StoredItemStack> itemList = Lists.<StoredItemStack>newArrayList();
@@ -57,12 +61,22 @@ public class ContainerStorageTerminal extends Container {
 	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
 	private int lines;
 	private int syncSlotID;
+	private PlayerInventory pinv;
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv, TileEntityStorageTerminal te) {
-		super(StorageMod.storageTerminal, id);
-		this.te = te;
-		addStorageSlots(5, 8, 18);
+		this(StorageMod.storageTerminal, id, inv, te);
+		addSyncSlot();
 		this.addPlayerSlots(inv, 8, 120);
+	}
+
+	public ContainerStorageTerminal(ContainerType<?> type, int id, PlayerInventory inv, TileEntityStorageTerminal te) {
+		super(type, id);
+		this.te = te;
+		this.pinv = inv;
+		addStorageSlots();
+	}
+
+	protected void addSyncSlot() {
 		syncSlotID = addSlot(new Slot(syncInv, 0, -16, -16) {
 			@Override
 			public boolean canTakeStack(PlayerEntity playerIn) {
@@ -78,11 +92,21 @@ public class ContainerStorageTerminal extends Container {
 				return false;
 			}
 		}).slotNumber;
-		syncInv.setInventorySlotContents(0, new ItemStack(Items.REDSTONE));
+		syncInv.setInventorySlotContents(0, new ItemStack(Items.BARRIER));
+	}
+
+	public ContainerStorageTerminal(ContainerType<?> type, int id, PlayerInventory inv) {
+		this(type, id, inv, null);
+	}
+
+	protected void addStorageSlots() {
+		addStorageSlots(5, 8, 18);
 	}
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv) {
-		this(id, inv, null);
+		this(StorageMod.storageTerminal, id, inv);
+		addSyncSlot();
+		this.addPlayerSlots(inv, 8, 120);
 	}
 
 	protected void addPlayerSlots(PlayerInventory playerInventory, int x, int y) {
@@ -155,7 +179,7 @@ public class ContainerStorageTerminal extends Container {
 		}
 
 		@OnlyIn(Dist.CLIENT)
-		public void drawSlot(GuiStorageTerminal gui, int mouseX, int mouseY) {
+		public void drawSlot(GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (mouseX >= gui.getGuiLeft() + xDisplayPosition - 1 && mouseY >= gui.getGuiTop() + yDisplayPosition - 1 && mouseX < gui.getGuiLeft() + xDisplayPosition + 17 && mouseY < gui.getGuiTop() + yDisplayPosition + 17) {
 				//RenderUtil.setColourWithAlphaPercent(0xFFFFFF, 60);
 				int l = gui.getGuiLeft() + xDisplayPosition;
@@ -174,10 +198,10 @@ public class ContainerStorageTerminal extends Container {
 		}
 
 		@OnlyIn(Dist.CLIENT)
-		public boolean drawTooltip(GuiStorageTerminal gui, int mouseX, int mouseY) {
+		public boolean drawTooltip(GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (stack != null) {
 				if (stack.getQuantity() > 9999) {
-					gui.renderItemInGui(stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.format("tomsmod.gui.amount", stack.getQuantity()));
+					gui.renderItemInGui(stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.format("tooltip.toms_storage.amount", stack.getQuantity()));
 				} else {
 					gui.renderItemInGui(stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
 				}
@@ -240,7 +264,7 @@ public class ContainerStorageTerminal extends Container {
 
 	@Override
 	public boolean canInteractWith(PlayerEntity playerIn) {
-		return true;
+		return te.canInteractWith(playerIn);
 	}
 
 	public final void scrollTo(float p_148329_1_) {
@@ -269,7 +293,7 @@ public class ContainerStorageTerminal extends Container {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public int drawSlots(GuiStorageTerminal gui, int mouseX, int mouseY) {
+	public int drawSlots(GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 		for (int i = 0;i < storageSlotList.size();i++) {
 			storageSlotList.get(i).drawSlot(gui, mouseX, mouseY);
 		}
@@ -296,6 +320,7 @@ public class ContainerStorageTerminal extends Container {
 
 	@Override
 	public void detectAndSendChanges() {
+		if(te == null)return;
 		//List<StoredItemStack> itemListOld = itemList;
 		itemList = te.getStacks();
 		ListNBT list = new ListNBT();
@@ -314,10 +339,10 @@ public class ContainerStorageTerminal extends Container {
 		mainTag.put("l", list);
 		mainTag.putBoolean("r", false);
 		ItemStack is = syncInv.getStackInSlot(0);
-		boolean t = is.getItem() == Items.REDSTONE;
+		boolean t = is.getItem() == Items.BARRIER;
 		if(!mainTag.equals(is.getTag()) && !skipUpdateTick) {
 			//System.out.println(itemList);
-			is = new ItemStack(t ? Blocks.REDSTONE_BLOCK : Items.REDSTONE);
+			is = new ItemStack(t ? Blocks.STRUCTURE_VOID : Items.BARRIER);
 			syncInv.setInventorySlotContents(0, is);
 		}
 		is.setTag(mainTag);
@@ -343,6 +368,7 @@ public class ContainerStorageTerminal extends Container {
 		}
 		//System.out.println(itemList);
 		itemListClient = new ArrayList<>(itemList);
+		pinv.markDirty();
 	}
 
 	@Override
@@ -502,9 +528,13 @@ public class ContainerStorageTerminal extends Container {
 						detectAndSendChanges();
 				}
 			} else {
-				return ItemStack.EMPTY;
+				return shiftClickItems(playerIn, index);
 			}
 		}
+		return ItemStack.EMPTY;
+	}
+
+	protected ItemStack shiftClickItems(PlayerEntity playerIn, int index) {
 		return ItemStack.EMPTY;
 	}
 
@@ -521,5 +551,39 @@ public class ContainerStorageTerminal extends Container {
 			}
 		}
 		return false;
+	}
+
+
+	@Override
+	public void fillStackedContents(RecipeItemHelper itemHelperIn) {
+	}
+
+	@Override
+	public void clear() {
+	}
+
+	@Override
+	public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
+		return false;
+	}
+
+	@Override
+	public int getOutputSlot() {
+		return 0;
+	}
+
+	@Override
+	public int getWidth() {
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		return 0;
+	}
+
+	@Override
+	public int getSize() {
+		return 0;
 	}
 }
