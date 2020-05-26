@@ -39,6 +39,7 @@ import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
 import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.proxy.IProxy;
 import com.tom.storagemod.proxy.ServerProxy;
@@ -52,8 +53,7 @@ import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
-public class StorageMod
-{
+public class StorageMod {
 	public static final String modid = "toms_storage";
 	public static IProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 	public static InventoryConnector connector;
@@ -104,6 +104,7 @@ public class StorageMod
 	private void setup(final FMLCommonSetupEvent event) {
 		LOGGER.info("Tom's Storage Setup starting");
 		proxy.setup();
+		NetworkHandler.init();
 	}
 
 	private void doClientStuff(final FMLClientSetupEvent event) {

@@ -1,10 +1,11 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage",
   "promos": {
-    "1.15.2-latest": "1.1.0",
-    "1.15.2-recommended": "1.1.0"
+    "1.15.2-latest": "1.1.1",
+    "1.15.2-recommended": "1.1.1"
   },
   "1.15.2": {
+  	"1.1.1": "Fixed Inventory Cable Connector not showing up in the creative inventory and JEI\nAdded JEI compatibility to crafting terminal\nFixed Storage Terminal recipe not using tags\nTerminals now emit light",
   	"1.1.0": "Added Crafting Terminal\nAdded the ability to paint some of the blocks\nAdded Inevntory Cable & Connector\nAdded Inventory Proxy\nAdded Wireless Terminal\nAdded config to change Inventory Connector range.",
     "1.0.2": "Fixed crash",
     "1.0.1": "Fixed loot tables",

@@ -334,4 +334,17 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		if(searchField.charTyped(p_charTyped_1_, p_charTyped_2_))return true;
 		return super.charTyped(p_charTyped_1_, p_charTyped_2_);
 	}
+
+	@Override
+	public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
+		if (!this.needsScrollBars()) {
+			return false;
+		} else {
+			int i = ((this.container).itemList.size() + 9 - 1) / 9 - 5;
+			this.currentScroll = (float)(this.currentScroll - p_mouseScrolled_5_ / i);
+			this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
+			this.container.scrollTo(this.currentScroll);
+			return true;
+		}
+	}
 }

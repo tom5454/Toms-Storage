@@ -8,7 +8,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 public class ItemBlockConnector extends BlockItem {
 
 	public ItemBlockConnector() {
-		super(StorageMod.invCableConnector, new Properties());
+		super(StorageMod.invCableConnector, new Properties().group(StorageMod.STORAGE_MOD_TAB));
 		setRegistryName(StorageMod.invCableConnector.getRegistryName());
 	}
 

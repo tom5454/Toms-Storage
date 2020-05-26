@@ -10,7 +10,7 @@
       "tag": "minecraft:planks"
     },
     "c": {
-      "item": "minecraft:chest"
+      "tag": "forge:chests/wooden"
     },
     "C": {
       "item": "minecraft:comparator"
@@ -19,7 +19,7 @@
       "item": "minecraft:glowstone"
     },
     "g": {
-      "item": "minecraft:glass"
+      "tag": "forge:glass"
     }
   },
   "result": {

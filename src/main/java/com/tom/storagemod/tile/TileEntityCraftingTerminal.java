@@ -192,12 +192,56 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
 			ItemStack st = craftMatrix.removeStackFromSlot(i);
 			if(!st.isEmpty()) {
-				st = pushStack(st);
-				if(!st.isEmpty()) {
-					InventoryHelper.spawnItemStack(world, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, st);
+				pushOrDrop(st);
+			}
+		}
+		onCraftingMatrixChanged();
+	}
+
+	private void pushOrDrop(ItemStack st) {
+		st = pushStack(st);
+		if(!st.isEmpty()) {
+			InventoryHelper.spawnItemStack(world, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, st);
+		}
+	}
+
+	public void handlerItemTransfer(PlayerEntity player, ItemStack[][] items) {
+		clear();
+		for (int i = 0;i < 9;i++) {
+			if (items[i] != null) {
+				ItemStack stack = ItemStack.EMPTY;
+				for (int j = 0;j < items[i].length;j++) {
+					ItemStack pulled = pullStack(items[i][j]);
+					if (!pulled.isEmpty()) {
+						stack = pulled;
+						break;
+					}
+				}
+				if (stack.isEmpty()) {
+					for (int j = 0;j < items[i].length;j++) {
+						boolean br = false;
+						for (int k = 0;k < player.inventory.getSizeInventory();k++) {
+							if(ItemStack.areItemsEqual(player.inventory.getStackInSlot(k), items[i][j])) {
+								stack = player.inventory.decrStackSize(k, 1);
+								br = true;
+								break;
+							}
+						}
+						if (br)
+							break;
+					}
+				}
+				if (!stack.isEmpty()) {
+					craftMatrix.setInventorySlotContents(i, stack);
 				}
 			}
 		}
 		onCraftingMatrixChanged();
+	}
+
+	private ItemStack pullStack(ItemStack itemStack) {
+		StoredItemStack is = pullStack(new StoredItemStack(itemStack), 1);
+		if(is == null)return ItemStack.EMPTY;
+		else return is.getActualStack();
 	}
 }

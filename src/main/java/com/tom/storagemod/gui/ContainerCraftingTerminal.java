@@ -18,6 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.item.crafting.ServerRecipePlacer;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.play.server.SSetSlotPacket;
 
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,9 +29,12 @@ import com.google.common.collect.Lists;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
+import com.tom.storagemod.jei.IJEIAutoFillTerminal;
+import com.tom.storagemod.network.IDataReceiver;
+import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 
-public class ContainerCraftingTerminal extends ContainerStorageTerminal {
+public class ContainerCraftingTerminal extends ContainerStorageTerminal implements IJEIAutoFillTerminal, IDataReceiver {
 	public static class SlotCrafting extends Slot {
 		public SlotCrafting(IInventory inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);
@@ -298,5 +303,27 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal {
 				this.recipeBookContainer.clear();
 			}
 		}).place(p_217056_3_, p_217056_2_, p_217056_1_);
+	}
+
+	@Override
+	public void sendMessage(CompoundNBT compound) {
+		NetworkHandler.sendDataToServer(compound);
+	}
+
+	@Override
+	public void receive(CompoundNBT message) {
+		ItemStack[][] stacks = new ItemStack[9][];
+		ListNBT list = message.getList("i", 10);
+		for (int i = 0;i < list.size();i++) {
+			CompoundNBT nbttagcompound = list.getCompound(i);
+			byte slot = nbttagcompound.getByte("s");
+			byte l = nbttagcompound.getByte("l");
+			stacks[slot] = new ItemStack[l];
+			for (int j = 0;j < l;j++) {
+				CompoundNBT tag = nbttagcompound.getCompound("i" + j);
+				stacks[slot][j] = ItemStack.read(tag);
+			}
+		}
+		((TileEntityCraftingTerminal) te).handlerItemTransfer(player, stacks);
 	}
 }
