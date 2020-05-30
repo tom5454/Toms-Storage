@@ -25,6 +25,10 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 		this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
 
+	public ResourceLocation getGui() {
+		return gui;
+	}
+
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground();

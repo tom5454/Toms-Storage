@@ -9,9 +9,11 @@ import java.util.stream.IntStream;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -35,6 +37,8 @@ import com.tom.storagemod.item.ItemWirelessTerminal;
 public class TileEntityStorageTerminal extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 	private IItemHandler itemHandler;
 	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
+	private int sort;
+	private String lastSearch = "";
 	public TileEntityStorageTerminal() {
 		super(StorageMod.terminalTile);
 	}
@@ -62,7 +66,7 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 		StoredItemStack ret = null;
 		for (int i = 0; i < itemHandler.getSlots(); i++) {
 			ItemStack s = itemHandler.getStackInSlot(i);
-			if(ItemStack.areItemsEqual(s, st)) {
+			if(ItemStack.areItemsEqual(s, st) && ItemStack.areItemStackTagsEqual(s, st)) {
 				ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
 				if(!pulled.isEmpty()) {
 					if(ret == null)ret = new StoredItemStack(pulled);
@@ -84,6 +88,19 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 			}
 		}
 		return stack;
+	}
+
+	public ItemStack pushStack(ItemStack itemstack) {
+		StoredItemStack is = pushStack(new StoredItemStack(itemstack));
+		return is == null ? ItemStack.EMPTY : is.getActualStack();
+	}
+
+	public void pushOrDrop(ItemStack st) {
+		if(st.isEmpty())return;
+		StoredItemStack st0 = pushStack(new StoredItemStack(st));
+		if(st0 != null) {
+			InventoryHelper.spawnItemStack(world, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, st0.getActualStack());
+		}
 	}
 
 	@Override
@@ -112,5 +129,33 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 		if(world.getTileEntity(pos) != this)return false;
 		double dist = ItemWirelessTerminal.isPlayerHolding(player) ? Config.wirelessRange*2*Config.wirelessRange*2 : 64;
 		return !(player.getDistanceSq(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > dist);
+	}
+
+	public int getSorting() {
+		return sort;
+	}
+
+	public void setSorting(int newC) {
+		sort = newC;
+	}
+
+	@Override
+	public CompoundNBT write(CompoundNBT compound) {
+		compound.putInt("sort", sort);
+		return super.write(compound);
+	}
+
+	@Override
+	public void read(CompoundNBT compound) {
+		sort = compound.getInt("sort");
+		super.read(compound);
+	}
+
+	public String getLastSearch() {
+		return lastSearch;
+	}
+
+	public void setLastSearch(String string) {
+		lastSearch = string;
 	}
 }

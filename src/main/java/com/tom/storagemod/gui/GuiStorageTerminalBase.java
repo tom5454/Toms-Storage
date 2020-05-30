@@ -1,5 +1,6 @@
 package com.tom.storagemod.gui;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -10,21 +11,29 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ClickType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
+import net.minecraftforge.fml.ModList;
+
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.StoredItemStack.ComparatorAmount;
+import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
+import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
+import com.tom.storagemod.jei.JEIHandler;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends ContainerScreen<T> {
 	protected Minecraft mc = Minecraft.getInstance();
@@ -39,14 +48,49 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	 */
 	protected boolean wasClicking;
 	protected TextFieldWidget searchField;
-	protected int slotIDUnderMouse = -1, sortData, controllMode, rowCount;
+	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	protected String searchLast = "";
-
-	private ComparatorAmount comparator = new ComparatorAmount(false);
+	protected boolean loadedSearch = false;
+	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
+	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode;
 
 	public GuiStorageTerminalBase(T screenContainer, PlayerInventory inv, ITextComponent titleIn) {
 		super(screenContainer, inv, titleIn);
+		screenContainer.onPacket = this::onPacket;
+	}
+
+	private void onPacket() {
+		int s = container.terminalData;
+		controllMode = (s & 0b000_00_0_11) % ControllMode.VALUES.length;
+		boolean rev = (s & 0b000_00_1_00) > 0;
+		int type = (s & 0b000_11_0_00) >> 3;
+		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
+		searchType = (s & 0b111_00_0_00) >> 5;
+		searchField.setCanLoseFocus((searchType & 1) == 0);
+		if(!searchField.isFocused() && (searchType & 1) > 0) {
+			searchField.setFocused2(true);
+		}
+		buttonSortingType.state = type;
+		buttonDirection.state = rev ? 1 : 0;
+		buttonSearchType.state = searchType;
+		buttonCtrlMode.state = controllMode;
+
+		if(!loadedSearch) {
+			loadedSearch = true;
+			if((searchType & 2) > 0)
+				searchField.setText(container.search);
+		}
+	}
+
+	private void sendUpdate() {
+		int d = 0;
+		d |= (controllMode & 0b00_0_11);
+		d |= ((comparator.isReversed() ? 1 : 0) << 2);
+		d |= (comparator.type() << 3);
+		d |= ((searchType & 0b111) << 5);
+		d = (d << 1) | 1;
+		this.minecraft.playerController.sendEnchantPacket((this.container).windowId, d);
 	}
 
 	@Override
@@ -60,6 +104,39 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.searchField.setVisible(true);
 		this.searchField.setTextColor(16777215);
 		buttons.add(searchField);
+		buttonSortingType = addButton(new GuiButton(guiLeft - 18, guiTop + 5, 0, b -> {
+			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());
+			sendUpdate();
+		}));
+		buttonDirection = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18, 1, b -> {
+			comparator.setReversed(!comparator.isReversed());
+			sendUpdate();
+		}));
+		buttonSearchType = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18*2, 2, b -> {
+			searchType = (searchType + 1) & ((ModList.get().isLoaded("jei") || this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);
+			sendUpdate();
+		}) {
+			@Override
+			public void renderButton(int mouseX, int mouseY, float pt) {
+				if (this.visible) {
+					mc.getTextureManager().bindTexture(getGui());
+					RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+					this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+					//int i = this.getYImage(this.isHovered);
+					RenderSystem.enableBlend();
+					RenderSystem.defaultBlendFunc();
+					RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+					this.blit(this.x, this.y, texX, texY + tile * 16, this.width, this.height);
+					if((state & 1) > 0)this.blit(this.x+1, this.y+1, texX + 16, texY + tile * 16, this.width-2, this.height-2);
+					if((state & 2) > 0)this.blit(this.x+1, this.y+1, texX + 16+14, texY + tile * 16, this.width-2, this.height-2);
+					if((state & 4) > 0)this.blit(this.x+1, this.y+1, texX + 16+14*2, texY + tile * 16, this.width-2, this.height-2);
+				}
+			}
+		});
+		buttonCtrlMode = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18*3, 3, b -> {
+			controllMode = (controllMode + 1) % ControllMode.VALUES.length;
+			sendUpdate();
+		}));
 		updateSearch();
 	}
 
@@ -106,6 +183,16 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		if (!searchLast.equals(searchString)) {
 			getContainer().scrollTo(0);
 			this.currentScroll = 0;
+			if ((searchType & 4) > 0) {
+				if(ModList.get().isLoaded("jei"))
+					JEIHandler.setJeiSearchText(searchString);
+			}
+			if ((searchType & 2) > 0) {
+				CompoundNBT nbt = new CompoundNBT();
+				nbt.putString("s", searchString);
+				container.sendMessage(nbt);
+			}
+			onUpdateSearch(searchString);
 		} else {
 			getContainer().scrollTo(this.currentScroll);
 		}
@@ -164,6 +251,16 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		slotIDUnderMouse = getContainer().drawSlots(this, mouseX, mouseY);
 		RenderSystem.popMatrix();
 		this.renderHoveredToolTip(mouseX, mouseY);
+
+		if (buttonSortingType.isHovered()) {
+			renderTooltip(Arrays.asList(I18n.format("tooltip.toms_storage.sorting_" + buttonSortingType.state)), mouseX, mouseY);
+		}
+		if (buttonSearchType.isHovered()) {
+			renderTooltip(Arrays.asList(I18n.format("tooltip.toms_storage.search_" + buttonSearchType.state)), mouseX, mouseY);
+		}
+		if (buttonCtrlMode.isHovered()) {
+			renderTooltip(Arrays.asList(I18n.format("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")), mouseX, mouseY);
+		}
 	}
 
 	protected boolean needsScrollBars() {
@@ -177,7 +274,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				if (getContainer().getSlotByID(slotIDUnderMouse).stack != null && getContainer().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
 					for (int i = 0;i < getContainer().itemList.size();i++) {
 						if (getContainer().getSlotByID(slotIDUnderMouse).stack.equals(getContainer().itemList.get(i))) {
-							windowClick(isTransferOne(mouseButton) ? -3 : -2, i, SlotAction.PULL_ONE);
+							//windowClick(isTransferOne(mouseButton) ? -3 : -2, i, SlotAction.PULL_ONE);
+							storageSlotClick(getContainer().getSlotByID(slotIDUnderMouse).stack.getStack(), SlotAction.PULL_ONE, isTransferOne(mouseButton) ? 1 : 0);
 							return true;
 						}
 					}
@@ -185,12 +283,14 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				return true;
 			} else if (pullHalf(mouseButton)) {
 				if (!mc.player.inventory.getItemStack().isEmpty()) {
-					windowClick(-2, 0, SlotAction.GET_HALF);
+					//windowClick(-2, 0, SlotAction.GET_HALF);
+					storageSlotClick(ItemStack.EMPTY, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
 				} else {
 					if (getContainer().getSlotByID(slotIDUnderMouse).stack != null && getContainer().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
 						for (int i = 0;i < getContainer().itemList.size();i++) {
 							if (getContainer().getSlotByID(slotIDUnderMouse).stack.equals(getContainer().itemList.get(i))) {
-								windowClick(-2, i, hasShiftDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF);
+								//windowClick(-2, i, hasShiftDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF);
+								storageSlotClick(getContainer().getSlotByID(slotIDUnderMouse).stack.getStack(), hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
 								return true;
 							}
 						}
@@ -198,13 +298,15 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			} else if (pullNormal(mouseButton)) {
 				if (!mc.player.inventory.getItemStack().isEmpty()) {
-					windowClick(-(slotIDUnderMouse + 2), 0, SlotAction.PULL_OR_PUSH_STACK);
+					//windowClick(-(slotIDUnderMouse + 2), 0, SlotAction.PULL_OR_PUSH_STACK);
+					storageSlotClick(ItemStack.EMPTY, SlotAction.PULL_OR_PUSH_STACK, 0);
 				} else {
 					if (getContainer().getSlotByID(slotIDUnderMouse).stack != null) {
 						if (getContainer().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
 							for (int i = 0;i < getContainer().itemList.size();i++) {
 								if (getContainer().getSlotByID(slotIDUnderMouse).stack.equals(getContainer().itemList.get(i))) {
-									windowClick(-2, i, hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK);
+									//windowClick(-2, i, hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK);
+									storageSlotClick(getContainer().getSlotByID(slotIDUnderMouse).stack.getStack(), hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK, 0);
 									return true;
 								}
 							}
@@ -213,7 +315,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			}
 		} else if (GLFW.glfwGetKey(mc.getMainWindow().getHandle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
-			windowClick(-1, 0, SlotAction.SPACE_CLICK);
+			//windowClick(-1, 0, SlotAction.SPACE_CLICK);
+			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
 		} else {
 			if (mouseButton == 1 && isPointInRegion(searchField.x - guiLeft, searchField.y - guiTop, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
 				searchField.setText("");
@@ -224,8 +327,18 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		return true;
 	}
 
-	protected void windowClick(int i, int j, SlotAction pullOne) {
+	/*protected void windowClick(int i, int j, SlotAction pullOne) {
 		mc.playerController.windowClick(this.getContainer().windowId, i, j, ClickType.values()[pullOne.ordinal()], this.mc.player);
+	}*/
+
+	protected void storageSlotClick(ItemStack slotStack, SlotAction act, int mod) {
+		CompoundNBT c = new CompoundNBT();
+		c.put("s", slotStack.write(new CompoundNBT()));
+		c.putInt("a", act.ordinal());
+		c.putByte("m", (byte) mod);
+		CompoundNBT msg = new CompoundNBT();
+		msg.put("a", c);
+		container.sendMessage(msg);
 	}
 
 	public boolean isPullOne(int mouseButton) {
@@ -347,4 +460,46 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return true;
 		}
 	}
+
+	public abstract ResourceLocation getGui();
+
+	@Override
+	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		mc.textureManager.bindTexture(getGui());
+		this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+	}
+
+	public class GuiButton extends Button {
+		protected int tile;
+		protected int state;
+		protected int texX = 194;
+		protected int texY = 30;
+		public GuiButton(int x, int y, int tile, IPressable pressable) {
+			super(x, y, 16, 16, "", pressable);
+			this.tile = tile;
+		}
+
+		public void setX(int i) {
+			x = i;
+		}
+
+		/**
+		 * Draws this button to the screen.
+		 */
+		@Override
+		public void renderButton(int mouseX, int mouseY, float pt) {
+			if (this.visible) {
+				mc.getTextureManager().bindTexture(getGui());
+				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				//int i = this.getYImage(this.isHovered);
+				RenderSystem.enableBlend();
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+				this.blit(this.x, this.y, texX + state * 16, texY + tile * 16, this.width, this.height);
+			}
+		}
+	}
+
+	protected void onUpdateSearch(String text) {}
 }

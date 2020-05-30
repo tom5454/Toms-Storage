@@ -1,6 +1,7 @@
 package com.tom.storagemod;
 
 import java.util.Comparator;
+import java.util.function.Function;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -46,7 +47,7 @@ public class StoredItemStack {
 		return !stack.stack.isEmpty() ? stack : null;
 	}
 
-	public static class ComparatorAmount implements Comparator<StoredItemStack> {
+	public static class ComparatorAmount implements IStoredItemStackComparator {
 		public boolean reversed;
 
 		public ComparatorAmount(boolean reversed) {
@@ -57,6 +58,71 @@ public class StoredItemStack {
 		public int compare(StoredItemStack in1, StoredItemStack in2) {
 			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getDisplayName().getUnformattedComponentText().compareTo(in2.getStack().getDisplayName().getUnformattedComponentText()) : -1);
 			return this.reversed ? -c : c;
+		}
+
+		@Override
+		public boolean isReversed() {
+			return reversed;
+		}
+
+		@Override
+		public int type() {
+			return 0;
+		}
+
+		@Override
+		public void setReversed(boolean rev) {
+			reversed  = rev;
+		}
+	}
+
+	public static class ComparatorName implements IStoredItemStackComparator {
+		public boolean reversed;
+
+		public ComparatorName(boolean reversed) {
+			this.reversed = reversed;
+		}
+
+		@Override
+		public int compare(StoredItemStack in1, StoredItemStack in2) {
+			int c = in1.getDisplayName().compareTo(in2.getDisplayName());
+			return this.reversed ? -c : c;
+		}
+
+		@Override
+		public boolean isReversed() {
+			return reversed;
+		}
+
+		@Override
+		public int type() {
+			return 1;
+		}
+
+		@Override
+		public void setReversed(boolean rev) {
+			reversed = rev;
+		}
+	}
+
+	public static interface IStoredItemStackComparator extends Comparator<StoredItemStack> {
+		boolean isReversed();
+		void setReversed(boolean rev);
+		int type();
+	}
+
+	public static enum SortingTypes {
+		AMOUNT(ComparatorAmount::new),
+		NAME(ComparatorName::new)
+		;
+		public static final SortingTypes[] VALUES = values();
+		private final Function<Boolean, IStoredItemStackComparator> factory;
+		private SortingTypes(Function<Boolean, IStoredItemStackComparator> factory) {
+			this.factory = factory;
+		}
+
+		public IStoredItemStackComparator create(boolean rev) {
+			return factory.apply(rev);
 		}
 	}
 
@@ -70,6 +136,10 @@ public class StoredItemStack {
 		return result;
 	}
 
+	public String getDisplayName() {
+		return stack.getDisplayName().getUnformattedComponentText();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -79,7 +149,7 @@ public class StoredItemStack {
 		//if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.areItemsEqual(stack, other.stack)) return false;
+		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areItemStackTagsEqual(stack, other.stack)) return false;
 		return true;
 	}
 
@@ -89,7 +159,7 @@ public class StoredItemStack {
 		if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.areItemsEqual(stack, other.stack)) return false;
+		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areItemStackTagsEqual(stack, other.stack)) return false;
 		return true;
 	}
 

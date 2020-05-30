@@ -157,11 +157,6 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		}
 	}
 
-	public ItemStack pushStack(ItemStack itemstack) {
-		StoredItemStack is = pushStack(new StoredItemStack(itemstack));
-		return is == null ? ItemStack.EMPTY : is.getActualStack();
-	}
-
 	public void unregisterCrafting(ContainerCraftingTerminal containerCraftingTerminal) {
 		craftingListeners.remove(containerCraftingTerminal);
 	}
@@ -196,13 +191,6 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 			}
 		}
 		onCraftingMatrixChanged();
-	}
-
-	private void pushOrDrop(ItemStack st) {
-		st = pushStack(st);
-		if(!st.isEmpty()) {
-			InventoryHelper.spawnItemStack(world, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, st);
-		}
 	}
 
 	public void handlerItemTransfer(PlayerEntity player, ItemStack[][] items) {

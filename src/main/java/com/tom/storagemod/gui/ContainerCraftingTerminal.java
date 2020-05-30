@@ -31,7 +31,6 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.jei.IJEIAutoFillTerminal;
 import com.tom.storagemod.network.IDataReceiver;
-import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 
 public class ContainerCraftingTerminal extends ContainerStorageTerminal implements IJEIAutoFillTerminal, IDataReceiver {
@@ -54,7 +53,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 		}
 	}
 
-	private final PlayerEntity player;
 	private final CraftingInventory craftMatrix;
 	private final CraftResultInventory craftResult;
 	private Slot craftingResultSlot;
@@ -74,7 +72,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 
 	public ContainerCraftingTerminal(int id, PlayerInventory inv, TileEntityCraftingTerminal te) {
 		super(StorageMod.craftingTerminalCont, id, inv, te);
-		this.player = inv.player;
 		craftMatrix = te.getCraftingInv();
 		craftResult = te.getCraftResult();
 		init();
@@ -84,7 +81,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 
 	public ContainerCraftingTerminal(int id, PlayerInventory inv) {
 		super(StorageMod.craftingTerminalCont, id, inv);
-		this.player = inv.player;
 		craftMatrix = new CraftingInventory(this, 3, 3);
 		craftResult = new CraftResultInventory();
 		init();
@@ -101,13 +97,13 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	private void init() {
 		int x = -4;
 		int y = 94;
-		this.addSlot(craftingResultSlot = new CraftingResultSlot(player, craftMatrix, craftResult, 0, x + 124, y + 35) {
+		this.addSlot(craftingResultSlot = new CraftingResultSlot(pinv.player, craftMatrix, craftResult, 0, x + 124, y + 35) {
 			@Override
 			public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
 				if (thePlayer.world.isRemote)
 					return ItemStack.EMPTY;
 				this.onCrafting(stack);
-				if (!player.getEntityWorld().isRemote) {
+				if (!pinv.player.getEntityWorld().isRemote) {
 					((TileEntityCraftingTerminal) te).craft(thePlayer);
 				}
 				return ItemStack.EMPTY;
@@ -174,8 +170,9 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 
 	@Override
 	public boolean enchantItem(PlayerEntity playerIn, int id) {
-		if(te != null)
+		if(te != null && id == 0)
 			((TileEntityCraftingTerminal) te).clear();
+		else super.enchantItem(playerIn, id);
 		return false;
 	}
 
@@ -192,7 +189,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 
 	@Override
 	public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
-		return recipeIn.matches(this.craftMatrix, this.player.world);
+		return recipeIn.matches(this.craftMatrix, this.pinv.player.world);
 	}
 
 	@Override
@@ -306,24 +303,22 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	public void sendMessage(CompoundNBT compound) {
-		NetworkHandler.sendDataToServer(compound);
-	}
-
-	@Override
 	public void receive(CompoundNBT message) {
-		ItemStack[][] stacks = new ItemStack[9][];
-		ListNBT list = message.getList("i", 10);
-		for (int i = 0;i < list.size();i++) {
-			CompoundNBT nbttagcompound = list.getCompound(i);
-			byte slot = nbttagcompound.getByte("s");
-			byte l = nbttagcompound.getByte("l");
-			stacks[slot] = new ItemStack[l];
-			for (int j = 0;j < l;j++) {
-				CompoundNBT tag = nbttagcompound.getCompound("i" + j);
-				stacks[slot][j] = ItemStack.read(tag);
+		super.receive(message);
+		if(message.contains("i")) {
+			ItemStack[][] stacks = new ItemStack[9][];
+			ListNBT list = message.getList("i", 10);
+			for (int i = 0;i < list.size();i++) {
+				CompoundNBT nbttagcompound = list.getCompound(i);
+				byte slot = nbttagcompound.getByte("s");
+				byte l = nbttagcompound.getByte("l");
+				stacks[slot] = new ItemStack[l];
+				for (int j = 0;j < l;j++) {
+					CompoundNBT tag = nbttagcompound.getCompound("i" + j);
+					stacks[slot][j] = ItemStack.read(tag);
+				}
 			}
+			((TileEntityCraftingTerminal) te).handlerItemTransfer(pinv.player, stacks);
 		}
-		((TileEntityCraftingTerminal) te).handlerItemTransfer(player, stacks);
 	}
 }

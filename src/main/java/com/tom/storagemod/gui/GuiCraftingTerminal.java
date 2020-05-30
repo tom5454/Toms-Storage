@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.entity.player.PlayerInventory;
@@ -13,18 +14,23 @@ import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
+import net.minecraftforge.fml.ModList;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftingTerminal> implements IRecipeShownListener {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/crafting_terminal.png");
-	private static Field stackedContentsField;
+	private static Field stackedContentsField, searchBarField;
 	static {
 		try {
 			for (Field f : RecipeBookGui.class.getDeclaredFields()) {
 				if(f.getType() == RecipeItemHelper.class) {
 					f.setAccessible(true);
 					stackedContentsField = f;
+				} else if(f.getType() == TextFieldWidget.class) {
+					f.setAccessible(true);
+					searchBarField = f;
 				}
 			}
 		} catch (Exception e) {
@@ -42,15 +48,23 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	};
 	private boolean widthTooNarrow;
 	private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
+	private TextFieldWidget searchField;
 
 	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, PlayerInventory inv, ITextComponent titleIn) {
 		super(screenContainer, inv, titleIn);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-		mc.textureManager.bindTexture(gui);
-		this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+	public ResourceLocation getGui() {
+		return gui;
+	}
+
+	@Override
+	protected void onUpdateSearch(String text) {
+		if(ModList.get().isLoaded("jei") || (searchType & 4) > 0) {
+			if(searchField != null)searchField.setText(text);
+			recipeBookGui.recipesUpdated();
+		}
 	}
 
 	@Override
@@ -68,12 +82,45 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		addButton(btnClr);
 		this.addButton(new ImageButton(this.guiLeft + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
 			this.recipeBookGui.initSearchBar(this.widthTooNarrow);
+			try {
+				searchField = (TextFieldWidget) searchBarField.get(recipeBookGui);
+			} catch (Exception e) {
+				searchField = null;
+			}
+
 			this.recipeBookGui.toggleVisibility();
 			this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
 			((ImageButton)p_214076_1_).setPosition(this.guiLeft + 4, this.height / 2);
-			searchField.setX(this.guiLeft + 82);
+			super.searchField.setX(this.guiLeft + 82);
 			btnClr.setX(this.guiLeft + 80);
+			buttonSortingType.setX(guiLeft - 18);
+			buttonDirection.setX(guiLeft - 18);
+			if(recipeBookGui.isVisible()) {
+				buttonSearchType.setX(guiLeft - 36);
+				buttonCtrlMode.setX(guiLeft - 36);
+				buttonSearchType.y = guiTop + 5;
+				buttonCtrlMode.y = guiTop + 5 + 18;
+			} else {
+				buttonSearchType.setX(guiLeft - 18);
+				buttonCtrlMode.setX(guiLeft - 18);
+				buttonSearchType.y = guiTop + 5 + 18*2;
+				buttonCtrlMode.y = guiTop + 5 + 18*3;
+			}
 		}));
+		if(recipeBookGui.isVisible()) {
+			buttonSortingType.setX(guiLeft - 18);
+			buttonDirection.setX(guiLeft - 18);
+			buttonSearchType.setX(guiLeft - 36);
+			buttonCtrlMode.setX(guiLeft - 36);
+			buttonSearchType.y = guiTop + 5;
+			buttonCtrlMode.y = guiTop + 5 + 18;
+			super.searchField.setX(this.guiLeft + 82);
+			try {
+				searchField = (TextFieldWidget) searchBarField.get(recipeBookGui);
+			} catch (Exception e) {
+				searchField = null;
+			}
+		}
 	}
 
 	@Override
