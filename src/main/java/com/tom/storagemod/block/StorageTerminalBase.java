@@ -46,7 +46,7 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 	private static final VoxelShape SHAPE_D = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public StorageTerminalBase() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE).lightValue(6));
-		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER));
+		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER).with(WATERLOGGED, false).with(FACING, Direction.NORTH));
 	}
 
 	@Override

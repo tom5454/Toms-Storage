@@ -58,6 +58,15 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).notSolid().harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable_connector");
 		this.shapes = this.makeShapes(0.125f);
+		setDefaultState(getDefaultState()
+				.with(DOWN, false)
+				.with(UP, false)
+				.with(NORTH, false)
+				.with(EAST, false)
+				.with(SOUTH, false)
+				.with(WEST, false)
+				.with(FACING, Direction.DOWN)
+				.with(COLOR, DyeColor.WHITE));
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -36,6 +37,7 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 	public BlockInventoryProxy() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_proxy");
+		setDefaultState(getDefaultState().with(FACING, Direction.DOWN));
 	}
 
 	@Override

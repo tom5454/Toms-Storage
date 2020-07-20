@@ -44,6 +44,14 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 	public BlockInventoryCable() {
 		super(0.125f, Block.Properties.create(Material.WOOD).hardnessAndResistance(2).harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable");
+		setDefaultState(getDefaultState()
+				.with(DOWN, false)
+				.with(UP, false)
+				.with(NORTH, false)
+				.with(EAST, false)
+				.with(SOUTH, false)
+				.with(WEST, false)
+				.with(WATERLOGGED, false));
 	}
 
 	@Override
