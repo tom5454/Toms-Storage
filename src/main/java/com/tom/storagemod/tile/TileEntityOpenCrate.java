@@ -14,7 +14,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -95,7 +95,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 		BlockPos p = pos.offset(f);
 		ItemEntity entityitem = new ItemEntity(world, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, stack);
 		entityitem.setDefaultPickupDelay();
-		entityitem.setMotion(Vec3d.ZERO);
+		entityitem.setMotion(Vector3d.ZERO);
 		world.addEntity(entityitem);
 		items.add(entityitem);
 	}

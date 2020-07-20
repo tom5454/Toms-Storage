@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.text.ITextComponent;
@@ -30,6 +31,7 @@ public class BlockOpenCrate extends ContainerBlock {
 	public BlockOpenCrate() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.open_crate");
+		setDefaultState(getDefaultState().with(BlockStateProperties.FACING, Direction.DOWN));
 	}
 
 	@Override

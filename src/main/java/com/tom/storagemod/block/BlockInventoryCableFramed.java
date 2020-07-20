@@ -44,6 +44,13 @@ public class BlockInventoryCableFramed extends ContainerBlock implements IInvent
 	public BlockInventoryCableFramed() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(2).notSolid().harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable_framed");
+		setDefaultState(getDefaultState()
+				.with(DOWN, false)
+				.with(UP, false)
+				.with(NORTH, false)
+				.with(EAST, false)
+				.with(SOUTH, false)
+				.with(WEST, false));
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageTerminal> {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/storage_terminal.png");
 
@@ -20,18 +22,19 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+	protected void func_230450_a_(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
 		mc.textureManager.bindTexture(gui);
-		this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+		this.blit(st, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
 
+	@Override
 	public ResourceLocation getGui() {
 		return gui;
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground();
-		super.render(mouseX, mouseY, partialTicks);
+	public void render(MatrixStack st, int mouseX, int mouseY, float partialTicks) {
+		this.renderBackground(st);
+		super.render(st, mouseX, mouseY, partialTicks);
 	}
 }

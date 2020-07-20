@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "toms_storage:ts.inventory_cable_connector"
+          "name": "toms_storage:ts.crafting_terminal"
         }
       ],
       "conditions": [

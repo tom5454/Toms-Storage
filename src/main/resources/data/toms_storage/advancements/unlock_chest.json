@@ -24,6 +24,7 @@
    "rewards":{
       "recipes":[
       	 "toms_storage:inventory_cable_framed",
+      	 "toms_storage:inventory_hopper_basic",
          "toms_storage:inventory_cable",
          "toms_storage:inventory_proxy",
          "toms_storage:open_crate",

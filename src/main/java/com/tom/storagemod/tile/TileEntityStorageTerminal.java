@@ -146,9 +146,9 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 	}
 
 	@Override
-	public void read(CompoundNBT compound) {
+	public void read(BlockState st, CompoundNBT compound) {
 		sort = compound.getInt("sort");
-		super.read(compound);
+		super.read(st, compound);
 	}
 
 	public String getLastSearch() {

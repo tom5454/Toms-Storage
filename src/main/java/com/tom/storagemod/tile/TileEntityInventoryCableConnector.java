@@ -6,7 +6,6 @@ import java.util.Stack;
 import java.util.function.Function;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -23,12 +22,13 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
+import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 
 public class TileEntityInventoryCableConnector extends TileEntity implements ITickableTileEntity {
-	private long foundTime;
-	private TileEntityInventoryCableConnector otherSide;
+	private TileEntityInventoryConnector master;
 	private LazyOptional<IItemHandler> invHandler;
 	private LazyOptional<IItemHandler> pointedAt;
+	private LinkedInv linv;
 	public TileEntityInventoryCableConnector() {
 		super(StorageMod.invCableConnectorTile);
 	}
@@ -38,36 +38,34 @@ public class TileEntityInventoryCableConnector extends TileEntity implements ITi
 		if(!world.isRemote && world.getGameTime() % 20 == 19) {
 			BlockState state = world.getBlockState(pos);
 			Direction facing = state.get(BlockInventoryCableConnector.FACING);
-			if(world.getGameTime() != foundTime) {
-				DyeColor color = state.get(BlockInventoryCableConnector.COLOR);
-				Stack<BlockPos> toCheck = new Stack<>();
-				Set<BlockPos> checkedBlocks = new HashSet<>();
-				checkedBlocks.add(pos);
-				toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, pos));
-				otherSide = null;
-				while(!toCheck.isEmpty()) {
-					BlockPos cp = toCheck.pop();
-					if(!checkedBlocks.contains(cp)) {
-						checkedBlocks.add(cp);
-						if(world.isBlockLoaded(cp)) {
-							state = world.getBlockState(cp);
-							if(state.getBlock() == StorageMod.invCableConnector) {
-								if(state.get(BlockInventoryCableConnector.COLOR) == color) {
-									TileEntity te = world.getTileEntity(cp);
-									if(te instanceof TileEntityInventoryCableConnector) {
-										otherSide = (TileEntityInventoryCableConnector) te;
-										otherSide.foundTime = world.getGameTime();
-										otherSide.otherSide = this;
-									}
-									break;
-								}
+			Stack<BlockPos> toCheck = new Stack<>();
+			Set<BlockPos> checkedBlocks = new HashSet<>();
+			checkedBlocks.add(pos);
+			toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, pos));
+			if(master != null)master.unLink(linv);
+			master = null;
+			linv = new LinkedInv();
+			while(!toCheck.isEmpty()) {
+				BlockPos cp = toCheck.pop();
+				if(!checkedBlocks.contains(cp)) {
+					checkedBlocks.add(cp);
+					if(world.isBlockLoaded(cp)) {
+						state = world.getBlockState(cp);
+						if(state.getBlock() == StorageMod.connector) {
+							TileEntity te = world.getTileEntity(cp);
+							if(te instanceof TileEntityInventoryConnector) {
+								master = (TileEntityInventoryConnector) te;
+								linv.time = world.getGameTime();
+								linv.handler = () -> (pointedAt == null ? LazyOptional.empty() : pointedAt);
+								master.addLinked(linv);
 							}
-							if(state.getBlock() instanceof IInventoryCable) {
-								toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
-							}
+							break;
 						}
-						if(checkedBlocks.size() > Config.invConnectorMax)break;
+						if(state.getBlock() instanceof IInventoryCable) {
+							toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+						}
 					}
+					if(checkedBlocks.size() > Config.invConnectorMax)break;
 				}
 			}
 			if(pointedAt == null || !pointedAt.isPresent()) {
@@ -95,8 +93,8 @@ public class TileEntityInventoryCableConnector extends TileEntity implements ITi
 		public <R> R call(Function<IItemHandler, R> func, R def) {
 			if(calling)return def;
 			calling = true;
-			if(otherSide != null && !otherSide.isRemoved() && otherSide.pointedAt != null) {
-				R r = func.apply(otherSide.pointedAt.orElse(EmptyHandler.INSTANCE));
+			if(master != null && !master.isRemoved()) {
+				R r = func.apply(master.getInventory().orElse(EmptyHandler.INSTANCE));
 				calling = false;
 				return r;
 			}
@@ -136,8 +134,8 @@ public class TileEntityInventoryCableConnector extends TileEntity implements ITi
 
 		@Override
 		public IItemHandler get() {
-			if(otherSide != null && !otherSide.isRemoved() && otherSide.pointedAt != null) {
-				return otherSide.pointedAt.orElse(null);
+			if(master != null && !master.isRemoved()) {
+				return master.getInventory().orElse(null);
 			}
 			return null;
 		}

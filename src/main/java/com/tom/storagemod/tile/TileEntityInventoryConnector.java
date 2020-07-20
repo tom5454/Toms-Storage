@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.function.Supplier;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -29,6 +30,7 @@ import com.tom.storagemod.block.ITrim;
 
 public class TileEntityInventoryConnector extends TileEntity implements ITickableTileEntity {
 	private List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
+	private List<LinkedInv> linkedInvs = new ArrayList<>();
 	private LazyOptional<IItemHandler> invHandler;
 	private int[] invSizes = new int[0];
 	private int invSize;
@@ -39,7 +41,8 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 
 	@Override
 	public void tick() {
-		if(!world.isRemote && world.getGameTime() % 20 == 0) {
+		long time = world.getGameTime();
+		if(!world.isRemote && time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			//Set<List<ItemStack>> equalCheck = new HashSet<>();
@@ -47,6 +50,15 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 			checkedBlocks.add(pos);
 			handlers.clear();
 			//System.out.println("Start checking invs");
+			Set<LinkedInv> toRM = new HashSet<>();
+			for (LinkedInv inv : linkedInvs) {
+				if(inv.time + 40 < time) {
+					toRM.add(inv);
+					continue;
+				}
+				handlers.add(inv.handler.get());
+			}
+			linkedInvs.removeAll(toRM);
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
@@ -125,11 +137,15 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			if (this.invHandler == null)
-				this.invHandler = LazyOptional.of(InvHandler::new);
-			return this.invHandler.cast();
+			return getInventory().cast();
 		}
 		return super.getCapability(cap, side);
+	}
+
+	public LazyOptional<IItemHandler> getInventory() {
+		if (this.invHandler == null)
+			this.invHandler = LazyOptional.of(InvHandler::new);
+		return this.invHandler;
 	}
 
 	private class InvHandler implements IItemHandler {
@@ -234,5 +250,18 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 		super.remove();
 		if (invHandler != null)
 			invHandler.invalidate();
+	}
+
+	public void addLinked(LinkedInv inv) {
+		linkedInvs.add(inv);
+	}
+
+	public static class LinkedInv {
+		public Supplier<LazyOptional<IItemHandler>> handler;
+		public long time;
+	}
+
+	public void unLink(LinkedInv linv) {
+		linkedInvs.remove(linv);
 	}
 }

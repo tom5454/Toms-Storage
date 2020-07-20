@@ -6,6 +6,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 
@@ -21,12 +22,12 @@ public class ItemBlockPainted extends BlockItem {
 
 	@Override
 	public ITextComponent getDisplayName(ItemStack is) {
-		ITextComponent tc = super.getDisplayName(is);
+		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
-			tc.appendText(" (");
-			tc.appendSibling(st.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
-			tc.appendText(")");
+			tc.func_240702_b_(" (");
+			tc.func_230529_a_(st.getBlock().getTranslatedName().func_240701_a_(TextFormatting.GREEN));
+			tc.func_240702_b_(")");
 		}
 		return tc;
 	}

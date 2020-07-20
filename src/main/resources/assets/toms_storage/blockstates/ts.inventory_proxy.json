@@ -1,10 +1,111 @@
 {
-	"variants": {
-	    "facing=down": {"model": "toms_storage:block/inventory_proxy"},
-		"facing=up": {"model": "toms_storage:block/inventory_proxy", "x": 180},
-		"facing=north": {"model": "toms_storage:block/inventory_proxy", "x": 90, "y": 180},
-		"facing=south": {"model": "toms_storage:block/inventory_proxy", "x": 90},
-		"facing=east": {"model": "toms_storage:block/inventory_proxy", "y": 270, "x": 90},
-		"facing=west": {"model": "toms_storage:block/inventory_proxy", "y": 90, "x": 90}
-	}
+	"multipart": [
+	    {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy"
+          },
+          "when": {
+            "facing": "down"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy",
+            "x": 180
+          },
+          "when": {
+            "facing": "up"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy",
+            "x": 90, "y": 180
+          },
+          "when": {
+            "facing": "north"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy",
+            "x": 90
+          },
+          "when": {
+            "facing": "south"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy",
+            "y": 270, "x": 90
+          },
+          "when": {
+            "facing": "east"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy",
+            "y": 90, "x": 90
+          },
+          "when": {
+            "facing": "west"
+          }
+        },
+        
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy_filter"
+          },
+          "when": {
+            "filter_facing": "down"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy_filter",
+            "x": 180
+          },
+          "when": {
+            "filter_facing": "up"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy_filter",
+            "x": 90, "y": 180
+          },
+          "when": {
+            "filter_facing": "north"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy_filter",
+            "x": 90
+          },
+          "when": {
+            "filter_facing": "south"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy_filter",
+            "y": 270, "x": 90
+          },
+          "when": {
+            "filter_facing": "east"
+          }
+        },
+        {
+          "apply": {
+            "model": "toms_storage:block/inventory_proxy_filter",
+            "y": 90, "x": 90
+          },
+          "when": {
+            "filter_facing": "west"
+          }
+        }
+	]
 }

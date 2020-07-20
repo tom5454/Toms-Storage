@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
 import com.google.common.base.Function;
 
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
@@ -44,7 +46,7 @@ public class CraftingTerminalTransferHandler implements IRecipeTransferHandler {
 	};
 	private static final IRecipeTransferError ERROR_INSTANCE = new IRecipeTransferError() {
 		@Override public IRecipeTransferError.Type getType() { return IRecipeTransferError.Type.INTERNAL; }
-		@Override public void showError(int mouseX, int mouseY, IRecipeLayout recipeLayout, int recipeX, int recipeY) {}
+		@Override public void showError(MatrixStack matrixStack, int mouseX, int mouseY, IRecipeLayout recipeLayout, int recipeX, int recipeY) {}
 	};
 	static {
 		containerClasses.add(ContainerCraftingTerminal.class);

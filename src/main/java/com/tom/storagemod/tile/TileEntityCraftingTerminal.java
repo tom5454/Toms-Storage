@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftResultInventory;
@@ -79,8 +80,8 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 	private boolean reading;
 	@Override
-	public void read(CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState st, CompoundNBT compound) {
+		super.read(st, compound);
 		reading = true;
 		ListNBT listnbt = compound.getList("CraftingTable", 10);
 

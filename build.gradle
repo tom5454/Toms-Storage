@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.1.1'
+version = '1.2.1'
 group = 'com.yourname.modid' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'toms_storage'
 
@@ -25,7 +25,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20200423-1.15.1'
+    mappings channel: 'snapshot', version: '20200707-1.16.1'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -87,7 +87,7 @@ minecraft {
 
 repositories {
     maven { url "http://dvs1.progwml6.com/files/maven" }
-    maven { url "https://tehnut.info/maven" }
+    //maven { url "https://tehnut.info/maven" }
     maven { // TOP
         name 'tterrag maven'
         url "http://maven.tterrag.com/"
@@ -100,9 +100,9 @@ repositories {
         url = "http://maven.covers1624.net"
     }
     jcenter()
-	maven {
+	/*maven {
 		url "http://maven.shadowfacts.net/"
-	}
+	}*/
 	maven {
 		url "http://chickenbones.net/maven/"
 	}
@@ -113,7 +113,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.15.2-31.1.1'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.70'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -134,14 +134,14 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
 	// compile against the JEI API but do not include it at runtime
-  	compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
+  	compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6:api")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6")
   	
   	// compile against the TOP API but do not include it at runtime
-  	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.0-3:api")
+  	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.1-beta-4:api")
   	// at runtime, use the full TOP jar
-  	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.15:1.15-2.0.0-3")
+  	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.1-beta-4")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

@@ -45,8 +45,8 @@ public class TileEntityPainted extends TileEntity {
 	}
 
 	@Override
-	public void read(@Nonnull CompoundNBT compound) {
-		super.read(compound);
+	public void read(BlockState st, @Nonnull CompoundNBT compound) {
+		super.read(st, compound);
 		blockState = NBTUtil.readBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
@@ -92,7 +92,7 @@ public class TileEntityPainted extends TileEntity {
 		BlockState old = getPaintedBlockState();
 		CompoundNBT tagCompound = packet.getNbtCompound();
 		super.onDataPacket(net, packet);
-		read(tagCompound);
+		read(world.getBlockState(pos), tagCompound);
 
 		if (world != null && world.isRemote) {
 			// If needed send a render update.

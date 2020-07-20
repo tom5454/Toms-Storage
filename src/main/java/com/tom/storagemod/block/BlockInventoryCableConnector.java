@@ -10,23 +10,17 @@ import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -50,7 +44,7 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
-	public static final EnumProperty<DyeColor> COLOR = EnumProperty.create("color", DyeColor.class);
+	//public static final EnumProperty<DyeColor> COLOR = EnumProperty.create("color", DyeColor.class);
 	private static final Direction[] FACING_VALUES = Direction.values();
 	protected VoxelShape[][] shapes;
 
@@ -58,6 +52,14 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).notSolid().harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable_connector");
 		this.shapes = this.makeShapes(0.125f);
+		setDefaultState(getDefaultState()
+				.with(DOWN, false)
+				.with(UP, false)
+				.with(NORTH, false)
+				.with(EAST, false)
+				.with(SOUTH, false)
+				.with(WEST, false)
+				.with(FACING, Direction.DOWN));
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, FACING, COLOR);
+		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, FACING);//COLOR
 	}
 
 	@Override
@@ -136,7 +138,7 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 		return (dir != f && IInventoryCable.canConnect(block, dir)) || (dir == f && !block.isAir());
 	}
 
-	@Override
+	/*@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
 			Hand handIn, BlockRayTraceResult hit) {
 		//this.shapes = this.makeShapes(0.125f);
@@ -148,7 +150,7 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 			return ActionResultType.SUCCESS;
 		}
 		return ActionResultType.PASS;
-	}
+	}*/
 
 	@Override
 	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {

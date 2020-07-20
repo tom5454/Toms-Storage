@@ -16,6 +16,7 @@ import net.minecraft.util.text.ITextComponent;
 
 import net.minecraftforge.fml.ModList;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -130,21 +131,21 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	}
 
 	@Override
-	public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
-		this.renderBackground();
+	public void render(MatrixStack st, int p_render_1_, int p_render_2_, float p_render_3_) {
+		this.renderBackground(st);
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-			this.drawGuiContainerBackgroundLayer(p_render_3_, p_render_1_, p_render_2_);
+			this.func_230450_a_(st, p_render_3_, p_render_1_, p_render_2_);
 			RenderSystem.disableLighting();
-			this.recipeBookGui.render(p_render_1_, p_render_2_, p_render_3_);
+			this.recipeBookGui.render(st, p_render_1_, p_render_2_, p_render_3_);
 		} else {
 			RenderSystem.disableLighting();
-			this.recipeBookGui.render(p_render_1_, p_render_2_, p_render_3_);
-			super.render(p_render_1_, p_render_2_, p_render_3_);
-			this.recipeBookGui.renderGhostRecipe(this.guiLeft, this.guiTop, true, p_render_3_);
+			this.recipeBookGui.render(st, p_render_1_, p_render_2_, p_render_3_);
+			super.render(st, p_render_1_, p_render_2_, p_render_3_);
+			this.recipeBookGui.func_230477_a_(st, this.guiLeft, this.guiTop, true, p_render_3_);
 		}
 
-		this.renderHoveredToolTip(p_render_1_, p_render_2_);
-		this.recipeBookGui.renderTooltip(this.guiLeft, this.guiTop, p_render_1_, p_render_2_);
+		this.func_230459_a_(st, p_render_1_, p_render_2_);
+		this.recipeBookGui.func_238924_c_(st, this.guiLeft, this.guiTop, p_render_1_, p_render_2_);
 		this.func_212932_b(this.recipeBookGui);
 	}
 
@@ -200,7 +201,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	public class GuiButtonClear extends Button {
 
 		public GuiButtonClear(int x, int y, IPressable pressable) {
-			super(x, y, 11, 11, "", pressable);
+			super(x, y, 11, 11, null, pressable);
 		}
 
 		public void setX(int i) {
@@ -211,7 +212,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderButton(int mouseX, int mouseY, float pt) {
+		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				mc.getTextureManager().bindTexture(gui);
 				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -220,7 +221,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				this.blit(this.x, this.y, 194 + i * 11, 10, this.width, this.height);
+				this.blit(st, this.x, this.y, 194 + i * 11, 10, this.width, this.height);
 			}
 		}
 	}

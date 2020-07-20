@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -20,11 +21,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import net.minecraftforge.fml.ModList;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -33,7 +38,6 @@ import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
-import com.tom.storagemod.jei.JEIHandler;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends ContainerScreen<T> {
 	protected Minecraft mc = Minecraft.getInstance();
@@ -97,8 +101,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	protected void init() {
 		children.clear();
 		buttons.clear();
+		field_238745_s_ = ySize - 92;
 		super.init();
-		this.searchField = new TextFieldWidget(font, this.guiLeft + 82, this.guiTop + 6, 89, this.font.FONT_HEIGHT, searchLast);
+		this.searchField = new TextFieldWidget(getFont(), this.guiLeft + 82, this.guiTop + 6, 89, this.getFont().FONT_HEIGHT, null);
 		this.searchField.setMaxStringLength(100);
 		this.searchField.setEnableBackgroundDrawing(false);
 		this.searchField.setVisible(true);
@@ -117,7 +122,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			sendUpdate();
 		}) {
 			@Override
-			public void renderButton(int mouseX, int mouseY, float pt) {
+			public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 				if (this.visible) {
 					mc.getTextureManager().bindTexture(getGui());
 					RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -126,10 +131,10 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 					RenderSystem.enableBlend();
 					RenderSystem.defaultBlendFunc();
 					RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-					this.blit(this.x, this.y, texX, texY + tile * 16, this.width, this.height);
-					if((state & 1) > 0)this.blit(this.x+1, this.y+1, texX + 16, texY + tile * 16, this.width-2, this.height-2);
-					if((state & 2) > 0)this.blit(this.x+1, this.y+1, texX + 16+14, texY + tile * 16, this.width-2, this.height-2);
-					if((state & 4) > 0)this.blit(this.x+1, this.y+1, texX + 16+14*2, texY + tile * 16, this.width-2, this.height-2);
+					this.blit(st, this.x, this.y, texX, texY + tile * 16, this.width, this.height);
+					if((state & 1) > 0)this.blit(st, this.x+1, this.y+1, texX + 16, texY + tile * 16, this.width-2, this.height-2);
+					if((state & 2) > 0)this.blit(st, this.x+1, this.y+1, texX + 16+14, texY + tile * 16, this.width-2, this.height-2);
+					if((state & 4) > 0)this.blit(st, this.x+1, this.y+1, texX + 16+14*2, texY + tile * 16, this.width-2, this.height-2);
 				}
 			}
 		});
@@ -184,8 +189,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			getContainer().scrollTo(0);
 			this.currentScroll = 0;
 			if ((searchType & 4) > 0) {
-				if(ModList.get().isLoaded("jei"))
-					JEIHandler.setJeiSearchText(searchString);
+				//if(ModList.get().isLoaded("jei"))
+				//JEIHandler.setJeiSearchText(searchString);
 			}
 			if ((searchType & 2) > 0) {
 				CompoundNBT nbt = new CompoundNBT();
@@ -214,7 +219,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack st, int mouseX, int mouseY, float partialTicks) {
 		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getMainWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 		int i = this.guiLeft;
 		int j = this.guiTop;
@@ -237,7 +242,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
 			getContainer().scrollTo(this.currentScroll);
 		}
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(st, mouseX, mouseY, partialTicks);
 
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderHelper.disableStandardItemLighting();
@@ -245,23 +250,27 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		i = k;
 		j = l;
 		k = j1;
-		this.blit(i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
-		RenderSystem.pushMatrix();
+		this.blit(st, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
+		st.push();
 		RenderHelper.enableStandardItemLighting();
-		slotIDUnderMouse = getContainer().drawSlots(this, mouseX, mouseY);
-		RenderSystem.popMatrix();
-		this.renderHoveredToolTip(mouseX, mouseY);
+		slotIDUnderMouse = getContainer().drawSlots(st, this, mouseX, mouseY);
+		st.pop();
+		this.func_230459_a_(st, mouseX, mouseY);
 
 		if (buttonSortingType.isHovered()) {
-			renderTooltip(Arrays.asList(I18n.format("tooltip.toms_storage.sorting_" + buttonSortingType.state)), mouseX, mouseY);
+			renderTooltip(st, new TranslationTextComponent("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
 		}
 		if (buttonSearchType.isHovered()) {
-			renderTooltip(Arrays.asList(I18n.format("tooltip.toms_storage.search_" + buttonSearchType.state)), mouseX, mouseY);
+			renderTooltip(st, new TranslationTextComponent("tooltip.toms_storage.search_" + buttonSearchType.state), mouseX, mouseY);
 		}
 		if (buttonCtrlMode.isHovered()) {
-			renderTooltip(Arrays.asList(I18n.format("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")), mouseX, mouseY);
+			renderTooltip(st, Arrays.stream(I18n.format("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(StringTextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
+
+	/*private void renderTooltip(MatrixStack p0, List<String> p1, int p2, int p3) {
+		func_238654_b_(p0, p1.stream().map(StringTextComponent::new).collect(Collectors.toList()), p2, p3);
+	}*/
 
 	protected boolean needsScrollBars() {
 		return this.getContainer().itemListClientSorted.size() > rowCount * 9;
@@ -389,41 +398,43 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		return ControllMode.VALUES[controllMode];
 	}
 
-	public final void renderItemInGui(ItemStack stack, int x, int y, int mouseX, int mouseY, boolean hasBg, int color, boolean tooltip, String... extraInfo) {
+	public final void renderItemInGui(MatrixStack st, ItemStack stack, int x, int y, int mouseX, int mouseY, boolean hasBg, int color, boolean tooltip, String... extraInfo) {
 		if (stack != null) {
 			if (!tooltip) {
 				if (hasBg) {
-					fill(x, y, 16, 16, color | 0x80000000);
+					fill(st, x, y, 16, 16, color | 0x80000000);
 				}
-				RenderSystem.translated(0.0F, 0.0F, 32.0F);
-				this.setBlitOffset(100);
-				this.itemRenderer.zLevel = 100.0F;
+				st.translate(0.0F, 0.0F, 32.0F);
+				//this.setBlitOffset(100);
+				//this.itemRenderer.zLevel = 100.0F;
 				FontRenderer font = null;
 				if (stack != null)
 					font = stack.getItem().getFontRenderer(stack);
 				if (font == null)
-					font = this.font;
+					font = this.getFont();
 				RenderSystem.enableDepthTest();
 				this.itemRenderer.renderItemAndEffectIntoGUI(stack, x, y);
 				this.itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, null);
-				this.setBlitOffset(0);
-				this.itemRenderer.zLevel = 0.0F;
+				//this.setBlitOffset(0);
+				//this.itemRenderer.zLevel = 0.0F;
 			} else if (mouseX >= x - 1 && mouseY >= y - 1 && mouseX < x + 17 && mouseY < y + 17) {
-				List<String> list = getTooltipFromItem(stack);
+				List<ITextComponent> list = getTooltipFromItem(stack);
 				// list.add(I18n.format("tomsmod.gui.amount", stack.stackSize));
 				if (extraInfo != null && extraInfo.length > 0) {
 					for (int i = 0; i < extraInfo.length; i++) {
-						list.add(extraInfo[i]);
+						list.add(new StringTextComponent(extraInfo[i]));
 					}
 				}
 				for (int i = 0;i < list.size();++i) {
+					ITextComponent t = list.get(i);
+					IFormattableTextComponent t2 = t instanceof IFormattableTextComponent ? (IFormattableTextComponent) t : t.deepCopy();
 					if (i == 0) {
-						list.set(i, stack.getRarity().color + list.get(i));
+						list.set(i, t2.func_240699_a_(stack.getRarity().color));
 					} else {
-						list.set(i, TextFormatting.GRAY + list.get(i));
+						list.set(i, t2.func_240699_a_(TextFormatting.GRAY));
 					}
 				}
-				this.renderTooltip(list, mouseX, mouseY);
+				this.renderTooltip(st, list, mouseX, mouseY);
 			}
 		}
 	}
@@ -464,9 +475,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	public abstract ResourceLocation getGui();
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+	protected void func_230450_a_(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
 		mc.textureManager.bindTexture(getGui());
-		this.blit(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+		this.blit(st, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
 
 	public class GuiButton extends Button {
@@ -475,7 +486,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		protected int texX = 194;
 		protected int texY = 30;
 		public GuiButton(int x, int y, int tile, IPressable pressable) {
-			super(x, y, 16, 16, "", pressable);
+			super(x, y, 16, 16, null, pressable);
 			this.tile = tile;
 		}
 
@@ -487,7 +498,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderButton(int mouseX, int mouseY, float pt) {
+		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				mc.getTextureManager().bindTexture(getGui());
 				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -496,10 +507,16 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				this.blit(this.x, this.y, texX + state * 16, texY + tile * 16, this.width, this.height);
+				this.blit(st, this.x, this.y, texX + state * 16, texY + tile * 16, this.width, this.height);
 			}
 		}
 	}
 
 	protected void onUpdateSearch(String text) {}
+
+	/*@Override
+	protected void func_230451_b_(MatrixStack p_230451_1_, int p_230451_2_, int p_230451_3_) {
+		this.font.func_238422_b_(p_230451_1_, this.title, this.field_238742_p_, this.field_238743_q_, 4210752);
+		this.font.func_238422_b_(p_230451_1_, this.playerInventory.getDisplayName(), this.field_238744_r_, this.field_238745_s_, 4210752);
+	}*/
 }

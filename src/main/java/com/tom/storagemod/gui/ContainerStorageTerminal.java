@@ -29,6 +29,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.google.common.collect.Lists;
@@ -192,38 +193,38 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		}
 
 		@OnlyIn(Dist.CLIENT)
-		public void drawSlot(GuiStorageTerminalBase gui, int mouseX, int mouseY) {
+		public void drawSlot(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (mouseX >= gui.getGuiLeft() + xDisplayPosition - 1 && mouseY >= gui.getGuiTop() + yDisplayPosition - 1 && mouseX < gui.getGuiLeft() + xDisplayPosition + 17 && mouseY < gui.getGuiTop() + yDisplayPosition + 17) {
 				//RenderUtil.setColourWithAlphaPercent(0xFFFFFF, 60);
 				int l = gui.getGuiLeft() + xDisplayPosition;
 				int t = gui.getGuiTop() + yDisplayPosition;
-				GuiStorageTerminal.fill(l, t, l+16, t+16, 0x80FFFFFF);
+				GuiStorageTerminal.fill(st, l, t, l+16, t+16, 0x80FFFFFF);
 
 			}
 			if (stack != null) {
-				RenderSystem.pushMatrix();
-				gui.renderItemInGui(stack.getStack().copy().split(1), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
+				st.push();
+				gui.renderItemInGui(st, stack.getStack().copy().split(1), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
 				FontRenderer r = stack.getStack().getItem().getFontRenderer(stack.getStack());
 				if(r == null)r = gui.getFont();
-				this.drawStackSize(r, stack.getQuantity(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition);
-				RenderSystem.popMatrix();
+				this.drawStackSize(st, r, stack.getQuantity(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition);
+				st.pop();
 			}
 		}
 
 		@OnlyIn(Dist.CLIENT)
-		public boolean drawTooltip(GuiStorageTerminalBase gui, int mouseX, int mouseY) {
+		public boolean drawTooltip(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (stack != null) {
 				if (stack.getQuantity() > 9999) {
-					gui.renderItemInGui(stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.format("tooltip.toms_storage.amount", stack.getQuantity()));
+					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.format("tooltip.toms_storage.amount", stack.getQuantity()));
 				} else {
-					gui.renderItemInGui(stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
+					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
 				}
 			}
 			return mouseX >= (gui.getGuiLeft() + xDisplayPosition) - 1 && mouseY >= (gui.getGuiTop() + yDisplayPosition) - 1 && mouseX < (gui.getGuiLeft() + xDisplayPosition) + 17 && mouseY < (gui.getGuiTop() + yDisplayPosition) + 17;
 		}
 
 		@OnlyIn(Dist.CLIENT)
-		private void drawStackSize(FontRenderer fr, long size, int x, int y) {
+		private void drawStackSize(MatrixStack st, FontRenderer fr, long size, int x, int y) {
 			float scaleFactor = 0.6f;
 			//boolean unicodeFlag = fr.getUnicodeFlag();
 			//fr.setUnicodeFlag(false);
@@ -231,14 +232,14 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			RenderSystem.disableDepthTest();
 			RenderSystem.disableBlend();
 			String stackSize = formatNumber(size);
-			RenderSystem.pushMatrix();
-			RenderSystem.scaled(scaleFactor, scaleFactor, scaleFactor);
-			RenderSystem.translated(0, 0, 450);
+			st.push();
+			st.scale(scaleFactor, scaleFactor, scaleFactor);
+			st.translate(0, 0, 450);
 			float inverseScaleFactor = 1.0f / scaleFactor;
 			int X = (int) (((float) x + 0 + 16.0f - fr.getStringWidth(stackSize) * scaleFactor) * inverseScaleFactor);
 			int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-			fr.drawStringWithShadow(stackSize, X, Y, 16777215);
-			RenderSystem.popMatrix();
+			fr.drawStringWithShadow(st, stackSize, X, Y, 16777215);
+			st.pop();
 			RenderSystem.enableLighting();
 			RenderSystem.enableDepthTest();
 			//fr.setUnicodeFlag(unicodeFlag);
@@ -306,19 +307,19 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public int drawSlots(GuiStorageTerminalBase gui, int mouseX, int mouseY) {
+	public int drawSlots(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 		for (int i = 0;i < storageSlotList.size();i++) {
-			storageSlotList.get(i).drawSlot(gui, mouseX, mouseY);
+			storageSlotList.get(i).drawSlot(st, gui, mouseX, mouseY);
 		}
 		RenderSystem.disableLighting();
 		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
-		RenderSystem.pushMatrix();
-		RenderSystem.translated(0, 0, 100);
+		st.push();
+		st.translate(0, 0, 100);
 		for (int i = 0;i < storageSlotList.size();i++) {
-			if (storageSlotList.get(i).drawTooltip(gui, mouseX, mouseY)) { RenderSystem.popMatrix(); return i; }
+			if (storageSlotList.get(i).drawTooltip(st, gui, mouseX, mouseY)) { st.pop(); return i; }
 		}
-		RenderSystem.popMatrix();
+		st.pop();
 		return -1;
 	}
 

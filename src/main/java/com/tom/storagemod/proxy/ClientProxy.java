@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BlockModelShapes;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -21,8 +20,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -102,7 +102,7 @@ public class ClientProxy implements IProxy {
 		BlockState state = mc.world.getBlockState(lookingAt.getPos());
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
 			BlockPos pos = lookingAt.getPos();
-			Vec3d renderPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
+			Vector3d renderPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
 			Tessellator.getInstance().getBuffer().begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 			MatrixStack ms = evt.getMatrixStack();
 			ms.translate(pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z);
@@ -129,7 +129,7 @@ public class ClientProxy implements IProxy {
 				tooltip.add(new StringTextComponent(sp[i]));
 			}
 		} else {
-			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").applyTextStyles(TextFormatting.ITALIC, TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").func_240701_a_(TextFormatting.ITALIC, TextFormatting.GRAY));
 		}
 	}
 }

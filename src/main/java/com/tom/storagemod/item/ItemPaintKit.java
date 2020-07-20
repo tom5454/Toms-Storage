@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -82,12 +83,12 @@ public class ItemPaintKit extends Item {
 
 	@Override
 	public ITextComponent getDisplayName(ItemStack is) {
-		ITextComponent tc = super.getDisplayName(is);
+		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
 		if(is.hasTag() && is.getTag().contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("block"));
-			tc.appendText(" (");
-			tc.appendSibling(st.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
-			tc.appendText(")");
+			tc.func_240702_b_(" (");
+			tc.func_230529_a_(st.getBlock().getTranslatedName().func_240701_a_(TextFormatting.GREEN));
+			tc.func_240702_b_(")");
 		}
 		return tc;
 	}

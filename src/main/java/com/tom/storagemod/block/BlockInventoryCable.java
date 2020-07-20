@@ -9,8 +9,8 @@ import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.SixWayBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
@@ -44,6 +44,14 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 	public BlockInventoryCable() {
 		super(0.125f, Block.Properties.create(Material.WOOD).hardnessAndResistance(2).harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable");
+		setDefaultState(getDefaultState()
+				.with(DOWN, false)
+				.with(UP, false)
+				.with(NORTH, false)
+				.with(EAST, false)
+				.with(SOUTH, false)
+				.with(WEST, false)
+				.with(WATERLOGGED, false));
 	}
 
 	@Override
@@ -59,7 +67,7 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 	}
 
 	@Override
-	public IFluidState getFluidState(BlockState state) {
+	public FluidState getFluidState(BlockState state) {
 		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
 	}
 
@@ -74,7 +82,7 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		IFluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
+		FluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
 		return withConnectionProperties(context.getWorld(), context.getPos()).
 				with(WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER));
 	}

@@ -7,8 +7,8 @@ import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.IWaterLoggable;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
@@ -45,8 +45,8 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 	private static final VoxelShape SHAPE_U = Block.makeCuboidShape(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 	private static final VoxelShape SHAPE_D = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public StorageTerminalBase() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE).lightValue(6));
-		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER));
+		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE).setLightLevel(s -> 6));
+		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER).with(WATERLOGGED, false).with(FACING, Direction.NORTH));
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		Direction direction = context.getFace().getOpposite();
-		IFluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
+		FluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
 		TerminalPos pos = TerminalPos.CENTER;
 		if(direction.getAxis() == Direction.Axis.Y) {
 			if(direction == Direction.UP)pos = TerminalPos.UP;
@@ -99,7 +99,7 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 	}
 
 	@Override
-	public IFluidState getFluidState(BlockState state) {
+	public FluidState getFluidState(BlockState state) {
 		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
 	}
 
@@ -154,7 +154,7 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 		}
 
 		@Override
-		public String getName() {
+		public String getString() {
 			return name;
 		}
 	}
