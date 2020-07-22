@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.tom.storagemod.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+  	"ClientRecipeBookMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

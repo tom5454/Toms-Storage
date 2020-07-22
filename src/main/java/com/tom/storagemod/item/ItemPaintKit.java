@@ -2,93 +2,94 @@ package com.tom.storagemod.item;
 
 import java.util.List;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
+import com.tom.fabriclibs.ext.IItem;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.IPaintable;
 import com.tom.storagemod.proxy.ClientProxy;
 
-public class ItemPaintKit extends Item {
+public class ItemPaintKit extends Item implements IItem {
 
 	public ItemPaintKit() {
-		super(new Properties().maxDamage(100).group(StorageMod.STORAGE_MOD_TAB));
+		super(new Settings().maxDamage(100).group(StorageMod.STORAGE_MOD_TAB));
 		setRegistryName("ts.paint_kit");
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	@Environment(EnvType.CLIENT)
+	public void appendTooltip(ItemStack stack, World worldIn, List<Text> tooltip, TooltipContext flagIn) {
 		ClientProxy.tooltip("paint_kit", tooltip);
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		if(!context.getWorld().isRemote) {
-			if(context.func_225518_g_()) {
-				BlockState state = context.getWorld().getBlockState(context.getPos());
-				TileEntity tile = context.getWorld().getTileEntity(context.getPos());
-				if(tile == null && state.isSolid()) {
-					ItemStack is = context.getItem();
-					if(!is.hasTag())is.setTag(new CompoundNBT());
-					is.getTag().put("block", NBTUtil.writeBlockState(state));
+	public ActionResult useOnBlock(ItemUsageContext context) {
+		if(!context.getWorld().isClient) {
+			if(context.shouldCancelInteraction()) {
+				BlockState state = context.getWorld().getBlockState(context.getBlockPos());
+				BlockEntity tile = context.getWorld().getBlockEntity(context.getBlockPos());
+				if(tile == null && state.isFullCube(context.getWorld(), context.getBlockPos())) {
+					ItemStack is = context.getStack();
+					if(!is.hasTag())is.setTag(new CompoundTag());
+					is.getTag().put("block", NbtHelper.fromBlockState(state));
 					//ITextComponent tc = new TranslationTextComponent("tooltip.toms_storage.set_paint", state.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
 					//context.getPlayer().sendStatusMessage(tc, true);
 				}
-				return ActionResultType.SUCCESS;
+				return ActionResult.SUCCESS;
 			} else {
-				BlockState state = context.getWorld().getBlockState(context.getPos());
-				ItemStack is = context.getItem();
+				BlockState state = context.getWorld().getBlockState(context.getBlockPos());
+				ItemStack is = context.getStack();
 				if(is.hasTag() && is.getTag().contains("block") && state.getBlock() instanceof IPaintable) {
-					if(((IPaintable)state.getBlock()).paint(context.getWorld(), context.getPos(), NBTUtil.readBlockState(is.getTag().getCompound("block")))) {
+					if(((IPaintable)state.getBlock()).paint(context.getWorld(), context.getBlockPos(), NbtHelper.toBlockState(is.getTag().getCompound("block")))) {
 						PlayerEntity playerentity = context.getPlayer();
-						context.getWorld().playSound(playerentity, context.getPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
+						context.getWorld().playSound(playerentity, context.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 						if(playerentity != null) {
-							is.damageItem(1, context.getPlayer(), p -> p.sendBreakAnimation(context.getHand()));
+							is.damage(1, context.getPlayer(), p -> p.sendToolBreakStatus(context.getHand()));
 							if(is.isEmpty()) {
-								playerentity.setHeldItem(context.getHand(), new ItemStack(Items.BUCKET));
+								playerentity.setStackInHand(context.getHand(), new ItemStack(Items.BUCKET));
 							}
 						}
 					}
-					return ActionResultType.SUCCESS;
+					return ActionResult.SUCCESS;
 				}
 			}
 		} else {
-			BlockState state = context.getWorld().getBlockState(context.getPos());
-			if(context.func_225518_g_())return ActionResultType.SUCCESS;
+			BlockState state = context.getWorld().getBlockState(context.getBlockPos());
+			if(context.shouldCancelInteraction())return ActionResult.SUCCESS;
 			if(state.getBlock() instanceof IPaintable) {
-				return ActionResultType.SUCCESS;
+				return ActionResult.SUCCESS;
 			}
 		}
-		return super.onItemUse(context);
+		return super.useOnBlock(context);
 	}
 
 	@Override
-	public ITextComponent getDisplayName(ItemStack is) {
-		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
+	public Text getName(ItemStack is) {
+		Text tcS = super.getName(is);
+		MutableText tc = (MutableText) tcS;
 		if(is.hasTag() && is.getTag().contains("block")) {
-			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("block"));
-			tc.func_240702_b_(" (");
-			tc.func_230529_a_(st.getBlock().getTranslatedName().func_240701_a_(TextFormatting.GREEN));
-			tc.func_240702_b_(")");
+			BlockState st = NbtHelper.toBlockState(is.getTag().getCompound("block"));
+			tc.append(" (");
+			tc.append(st.getBlock().getName().formatted(Formatting.GREEN));
+			tc.append(")");
 		}
 		return tc;
 	}

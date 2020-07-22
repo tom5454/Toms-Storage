@@ -1,37 +1,31 @@
 package com.tom.storagemod.block;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.text.Text;
+import net.minecraft.world.BlockView;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
-
+import com.tom.fabriclibs.ext.IBlock;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 
-public class InventoryConnector extends ContainerBlock implements IInventoryCable {
+public class InventoryConnector extends BlockWithEntity implements IBlock {
 
 	public InventoryConnector() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
 		setRegistryName("ts.inventory_connector");
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public BlockEntity createBlockEntity(BlockView worldIn) {
 		return new TileEntityInventoryConnector();
 	}
 
@@ -41,14 +35,9 @@ public class InventoryConnector extends ContainerBlock implements IInventoryCabl
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
-			ITooltipFlag flagIn) {
+	//@OnlyIn(Dist.CLIENT)
+	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+			TooltipContext flagIn) {
 		ClientProxy.tooltip("inventory_connector", tooltip);
-	}
-
-	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
-		return Collections.emptyList();
 	}
 }

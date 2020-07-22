@@ -7,7 +7,7 @@
   ],
   "key": {
   	"d": {
-      "tag": "forge:gems/diamond"
+      "item": "minecraft:diamond"
     },
     "c": {
       "item": "minecraft:crafting_table"

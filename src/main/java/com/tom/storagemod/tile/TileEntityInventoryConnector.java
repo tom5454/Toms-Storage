@@ -5,33 +5,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.function.Supplier;
+import java.util.function.BiFunction;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.enums.ChestType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.ChestType;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.util.Tickable;
+import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.EmptyHandler;
-
-import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.ITrim;
 
-public class TileEntityInventoryConnector extends TileEntity implements ITickableTileEntity {
-	private List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
-	private List<LinkedInv> linkedInvs = new ArrayList<>();
-	private LazyOptional<IItemHandler> invHandler;
+public class TileEntityInventoryConnector extends BlockEntity implements Tickable, Inventory {
+	private List<InventoryWrapper> handlers = new ArrayList<>();
 	private int[] invSizes = new int[0];
 	private int invSize;
 
@@ -41,8 +35,7 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 
 	@Override
 	public void tick() {
-		long time = world.getGameTime();
-		if(!world.isRemote && time % 20 == 0) {
+		if(!world.isClient && world.getTime() % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			//Set<List<ItemStack>> equalCheck = new HashSet<>();
@@ -50,36 +43,28 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 			checkedBlocks.add(pos);
 			handlers.clear();
 			//System.out.println("Start checking invs");
-			Set<LinkedInv> toRM = new HashSet<>();
-			for (LinkedInv inv : linkedInvs) {
-				if(inv.time + 40 < time) {
-					toRM.add(inv);
-					continue;
-				}
-				handlers.add(inv.handler.get());
-			}
-			linkedInvs.removeAll(toRM);
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
 					BlockPos p = cp.offset(d);
-					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < Config.invRange) {
+					if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < StorageMod.CONFIG.invRange) {
 						checkedBlocks.add(p);
-						TileEntity te = world.getTileEntity(p);
+						BlockEntity te = world.getBlockEntity(p);
 						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy) {
 							continue;
-						} else if(te != null && !Config.onlyTrims) {
-							LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
-							if(te instanceof ChestTileEntity) {//Check for double chests
+						} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
+							Inventory ihr = null;
+							if(te instanceof ChestBlockEntity) {//Check for double chests
 								BlockState state = world.getBlockState(p);
 								Block block = state.getBlock();
 								if(block instanceof ChestBlock) {
-									ChestType type = state.get(ChestBlock.TYPE);
+									ihr = ChestBlock.getInventory((ChestBlock)block, state, world, p, true);
+									ChestType type = state.get(ChestBlock.CHEST_TYPE);
 									if (type != ChestType.SINGLE) {
-										BlockPos opos = p.offset(ChestBlock.getDirectionToAttached(state));
+										BlockPos opos = p.offset(ChestBlock.getFacing(state));
 										BlockState ostate = this.getWorld().getBlockState(opos);
 										if (state.getBlock() == ostate.getBlock()) {
-											ChestType otype = ostate.get(ChestBlock.TYPE);
+											ChestType otype = ostate.get(ChestBlock.CHEST_TYPE);
 											if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
 												toCheck.add(opos);
 												checkedBlocks.add(opos);
@@ -87,20 +72,19 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 										}
 									}
 								}
-							}
-							if(inv.isPresent()) {
+							}else if(te instanceof Inventory) {
 								//System.out.println("Checking pos: " + p + " " + inv.orElse(null));
-								IItemHandler ihr = IProxy.resolve(inv.orElse(null));
-								if(ihr instanceof InvHandler) {
-									InvHandler ih = (InvHandler) ihr;
+								ihr = IProxy.resolve((Inventory) te);
+								if(ihr instanceof TileEntityInventoryConnector) {
+									TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
 									if(checkHandlers(ih, 0)) {
 										if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
 										continue;
 									}
 								}
 								toCheck.add(p);
-								handlers.add(inv);
 							}
+							if(ihr != null)handlers.add(new InventoryWrapper(ihr, d.getOpposite()));
 						} else {
 							BlockState state = world.getBlockState(p);
 							if(state.getBlock() instanceof ITrim) {
@@ -113,155 +97,82 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 			if(invSizes.length != handlers.size())invSizes = new int[handlers.size()];
 			invSize = 0;
 			for (int i = 0; i < invSizes.length; i++) {
-				IItemHandler ih = handlers.get(i).orElse(null);
+				InventoryWrapper ih = handlers.get(i);
 				if(ih == null)invSizes[i] = 0;
 				else {
-					int s = ih.getSlots();
+					int s = ih.size();
 					invSizes[i] = s;
 					invSize += s;
 				}
 			}
 		}
 	}
-	private boolean checkHandlers(InvHandler ih, int depth) {
+	private boolean checkHandlers(TileEntityInventoryConnector ih, int depth) {
 		if(depth > 3)return true;
-		for (LazyOptional<IItemHandler> lo : ih.getHandlers()) {
-			IItemHandler ihr = IProxy.resolve(lo.orElse(null));
-			if(ihr instanceof InvHandler) {
-				if(checkHandlers((InvHandler) ihr, depth+1))return true;
+		for (InventoryWrapper lo : ih.handlers) {
+			Inventory ihr = IProxy.resolve(lo.getInventory());
+			if(ihr instanceof TileEntityInventoryConnector) {
+				if(checkHandlers((TileEntityInventoryConnector) ihr, depth+1))return true;
 			}
 		}
 		return false;
 	}
 
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return getInventory().cast();
-		}
-		return super.getCapability(cap, side);
-	}
-
-	public LazyOptional<IItemHandler> getInventory() {
-		if (this.invHandler == null)
-			this.invHandler = LazyOptional.of(InvHandler::new);
-		return this.invHandler;
-	}
-
-	private class InvHandler implements IItemHandler {
-		private boolean calling;
-
-		@Override
-		public boolean isItemValid(int slot, ItemStack stack) {
-			if(calling)return false;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					boolean r = handlers.get(i).orElse(EmptyHandler.INSTANCE).isItemValid(slot, stack);
-					calling = false;
-					return r;
-				}
+	private boolean calling;
+	public <R> R call(BiFunction<InventoryWrapper, Integer, R> func, int slot, R def) {
+		if(calling)return def;
+		calling = true;
+		for (int i = 0; i < invSizes.length; i++) {
+			if(slot >= invSizes[i])slot -= invSizes[i];
+			else {
+				R r = func.apply(handlers.get(i), slot);
+				calling = false;
+				return r;
 			}
-			calling = false;
-			return false;
 		}
-
-		@Override
-		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if(calling)return stack;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).insertItem(slot, stack, simulate);
-					calling = false;
-					return s;
-				}
-			}
-			calling = false;
-			return stack;
-		}
-
-		@Override
-		public ItemStack getStackInSlot(int slot) {
-			if(calling)return ItemStack.EMPTY;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).getStackInSlot(slot);
-					calling = false;
-					return s;
-				}
-			}
-			calling = false;
-			return ItemStack.EMPTY;
-		}
-
-		@Override
-		public int getSlots() {
-			return invSize;
-		}
-
-		@Override
-		public int getSlotLimit(int slot) {
-			if(calling)return 0;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					int r = handlers.get(i).orElse(EmptyHandler.INSTANCE).getSlotLimit(slot);
-					calling = false;
-					return r;
-				}
-			}
-			calling = false;
-			return 0;
-		}
-
-		@Override
-		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-			if(calling)return ItemStack.EMPTY;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).extractItem(slot, amount, simulate);
-					calling = false;
-					return s;
-				}
-			}
-			calling = false;
-			return ItemStack.EMPTY;
-		}
-
-		public TileEntityInventoryConnector getThis() {
-			return TileEntityInventoryConnector.this;
-		}
-
-		public List<LazyOptional<IItemHandler>> getHandlers() {
-			return handlers;
-		}
+		calling = false;
+		return def;
 	}
 
 	@Override
-	public void remove() {
-		super.remove();
-		if (invHandler != null)
-			invHandler.invalidate();
+	public void clear() {
 	}
 
-	public void addLinked(LinkedInv inv) {
-		linkedInvs.add(inv);
+	@Override
+	public int size() {
+		return invSize;
 	}
 
-	public static class LinkedInv {
-		public Supplier<LazyOptional<IItemHandler>> handler;
-		public long time;
+	@Override
+	public boolean isEmpty() {
+		return false;
 	}
 
-	public void unLink(LinkedInv linv) {
-		linkedInvs.remove(linv);
+	@Override
+	public ItemStack getStack(int paramInt) {
+		return call(InventoryWrapper::getStack, paramInt, ItemStack.EMPTY);
+	}
+
+	@Override
+	public ItemStack removeStack(int paramInt1, int paramInt2) {
+		return call((i, s) -> i.removeStack(s, paramInt2), paramInt1, ItemStack.EMPTY);
+	}
+
+	@Override
+	public ItemStack removeStack(int paramInt) {
+		return call(InventoryWrapper::removeStack, paramInt, ItemStack.EMPTY);
+	}
+
+	@Override
+	public void setStack(int paramInt, ItemStack paramItemStack) {
+		call((i, s) -> {
+			i.setStack(s, paramItemStack);
+			return Unit.INSTANCE;
+		}, paramInt, Unit.INSTANCE);
+	}
+
+	@Override
+	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
+		return false;
 	}
 }

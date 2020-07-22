@@ -4,29 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 
 import com.tom.storagemod.StorageMod;
 
-public class TileEntityOpenCrate extends TileEntity implements ITickableTileEntity, IInventory {
+public class TileEntityOpenCrate extends BlockEntity implements Tickable, Inventory {
 	private List<ItemEntity> items = new ArrayList<>();
-	private LazyOptional<IItemHandlerModifiable> chestHandler;
 
 	public TileEntityOpenCrate() {
 		super(StorageMod.openCrateTile);
@@ -34,16 +27,16 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 
 	@Override
 	public void tick() {
-		if(world.getGameTime() % 5 == 0){
+		if(world.getTime() % 5 == 0){
 			BlockState state = world.getBlockState(pos);
-			Direction f = state.get(BlockStateProperties.FACING);
+			Direction f = state.get(Properties.FACING);
 			BlockPos p = pos.offset(f);
-			items = world.getEntitiesWithinAABB(ItemEntity.class, new AxisAlignedBB(p));
+			items = world.getNonSpectatingEntities(ItemEntity.class, new Box(p));
 		}
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int size() {
 		return items.size() + 1;
 	}
 
@@ -53,21 +46,21 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getStack(int index) {
 		if(items.size() > index){
 			ItemEntity ent = items.get(index);
-			if(ent.isAlive())return ent.getItem();
+			if(ent.isAlive())return ent.getStack();
 			else return ItemStack.EMPTY;
 		}else return ItemStack.EMPTY;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
+	public ItemStack removeStack(int index, int count) {
 		if(items.size() > index){
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
-				ItemStack s = ent.getItem().split(count);
-				if(ent.getItem().isEmpty())ent.remove();
+				ItemStack s = ent.getStack().split(count);
+				if(ent.getStack().isEmpty())ent.remove();
 				return s;
 			}
 			else return ItemStack.EMPTY;
@@ -75,11 +68,11 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
+	public ItemStack removeStack(int index) {
 		if(items.size() > index){
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
-				ItemStack s = ent.getItem();
+				ItemStack s = ent.getStack();
 				ent.remove();
 				return s;
 			}
@@ -88,38 +81,20 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
+	public void setStack(int index, ItemStack stack) {
 		BlockState state = world.getBlockState(pos);
 		Direction f = Direction.UP;
-		if(state.getBlock() == StorageMod.openCrate)f = state.get(BlockStateProperties.FACING);
+		if(state.getBlock() == StorageMod.openCrate)f = state.get(Properties.FACING);
 		BlockPos p = pos.offset(f);
 		ItemEntity entityitem = new ItemEntity(world, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, stack);
-		entityitem.setDefaultPickupDelay();
-		entityitem.setMotion(Vector3d.ZERO);
-		world.addEntity(entityitem);
+		entityitem.setToDefaultPickupDelay();
+		entityitem.setVelocity(Vec3d.ZERO);
+		world.spawnEntity(entityitem);
 		items.add(entityitem);
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		return true;
-	}
-
-	@Override
-	public void openInventory(PlayerEntity player) {
-	}
-
-	@Override
-	public void closeInventory(PlayerEntity player) {
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean isValid(int index, ItemStack stack) {
 		return index == items.size();
 	}
 
@@ -128,23 +103,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			if (this.chestHandler == null)
-				this.chestHandler = LazyOptional.of(this::createHandler);
-			return this.chestHandler.cast();
-		}
-		return super.getCapability(cap, side);
-	}
-
-	private IItemHandlerModifiable createHandler() {
-		return new InvWrapper(this);
-	}
-
-	@Override
-	public void remove() {
-		super.remove();
-		if (chestHandler != null)
-			chestHandler.invalidate();
+	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
+		return true;
 	}
 }

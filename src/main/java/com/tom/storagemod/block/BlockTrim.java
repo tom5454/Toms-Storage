@@ -2,36 +2,34 @@ package com.tom.storagemod.block;
 
 import java.util.List;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.block.Material;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
-
+import com.tom.fabriclibs.ext.IBlock;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.proxy.ClientProxy;
 
-public class BlockTrim extends Block implements ITrim, IPaintable {
+public class BlockTrim extends Block implements ITrim, IPaintable, IBlock {
 
 	public BlockTrim() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
 		setRegistryName("ts.trim");
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
-			ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.paintable"));
+	@Environment(EnvType.CLIENT)
+	public void buildTooltip(ItemStack stack, BlockView world, List<Text> tooltip, TooltipContext options) {
+		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("trim", tooltip);
 	}
 

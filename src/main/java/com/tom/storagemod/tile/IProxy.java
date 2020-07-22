@@ -2,11 +2,11 @@ package com.tom.storagemod.tile;
 
 import java.util.function.Supplier;
 
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.inventory.Inventory;
 
-public interface IProxy extends Supplier<IItemHandler> {
+public interface IProxy extends Supplier<Inventory> {
 
-	public static IItemHandler resolve(IItemHandler in) {
+	public static Inventory resolve(Inventory in) {
 		if(in instanceof IProxy)
 			return resolve(((IProxy) in).get());
 		else

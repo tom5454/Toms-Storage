@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.util.Direction;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.math.Direction;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,7 +36,7 @@ public class CableConnectorModelGenerator {
 			{
 				Map<String, Object> part = new HashMap<>();
 				multipart.add(part);
-				part.put("when", Collections.singletonMap(side.getName2(), "false"));
+				part.put("when", Collections.singletonMap(side.getName(), "false"));
 				Map<String, Object> model = new HashMap<>();
 				part.put("apply", model);
 				model.put("model", "toms_storage:block/cable_closed");
@@ -44,7 +45,7 @@ public class CableConnectorModelGenerator {
 			}{
 				Map<String, Object> part = new HashMap<>();
 				multipart.add(part);
-				part.put("when", Collections.singletonMap(side.getName2(), "true"));
+				part.put("when", Collections.singletonMap(side.getName(), "true"));
 				Map<String, Object> model = new HashMap<>();
 				part.put("apply", model);
 				model.put("model", "toms_storage:block/cable_open");
@@ -56,7 +57,7 @@ public class CableConnectorModelGenerator {
 			{
 				Map<String, Object> part = new HashMap<>();
 				multipart.add(part);
-				part.put("when", Collections.singletonMap("facing", facing.getName2()));
+				part.put("when", Collections.singletonMap("facing", facing.getName()));
 				Map<String, Object> model = new HashMap<>();
 				part.put("apply", model);
 				model.put("model", "toms_storage:block/cable_connector/base");
@@ -67,23 +68,23 @@ public class CableConnectorModelGenerator {
 				multipart.add(part);
 				Map<String, Object> when = new HashMap<>();
 				part.put("when", when);
-				when.put("facing", facing.getName2());
-				when.put(facing.getName2(), "true");
+				when.put("facing", facing.getName());
+				when.put(facing.getName(), "true");
 				Map<String, Object> model = new HashMap<>();
 				part.put("apply", model);
 				model.put("model", "toms_storage:block/cable_connector/ext");
 				if(!ROT[facing.ordinal()].isEmpty())model.put(ROT[facing.ordinal()].substring(0, 1), Integer.parseInt(ROT[facing.ordinal()].substring(1)));
 			}
 		}
-		/*for (DyeColor color : DyeColor.values()) {
+		for (DyeColor color : DyeColor.values()) {
 			for (Direction facing : Direction.values()) {
 				{
 					Map<String, Object> part = new HashMap<>();
 					multipart.add(part);
 					Map<String, Object> when = new HashMap<>();
 					part.put("when", when);
-					when.put("facing", facing.getName2());
-					//when.put("color", color.getName());
+					when.put("facing", facing.getName());
+					when.put("color", color.getName());
 					Map<String, Object> model = new HashMap<>();
 					part.put("apply", model);
 					model.put("model", "toms_storage:block/cable_connector/color_" + color.getName());
@@ -99,7 +100,7 @@ public class CableConnectorModelGenerator {
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
-		}*/
+		}
 		File out = new File(blockstates, "ts.inventory_cable_connector.json");
 		try (PrintWriter wr = new PrintWriter(out)){
 			gson.toJson(Collections.singletonMap("multipart", multipart), wr);

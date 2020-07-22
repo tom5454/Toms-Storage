@@ -10,19 +10,19 @@
       "tag": "minecraft:planks"
     },
     "c": {
-      "tag": "forge:chests/wooden"
+      "item": "minecraft:chest"
     },
     "C": {
       "item": "minecraft:comparator"
     },
     "E": {
-      "tag": "forge:ender_pearls"
+      "item": "minecraft:ender_pearl"
     },
     "G": {
       "item": "minecraft:glowstone"
     },
     "g": {
-      "tag": "forge:glass"
+      "item": "minecraft:glass"
     }
   },
   "result": {

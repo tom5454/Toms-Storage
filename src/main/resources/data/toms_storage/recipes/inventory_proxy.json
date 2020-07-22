@@ -10,7 +10,7 @@
       "tag": "minecraft:planks"
     },
     "C": {
-      "tag": "forge:chests/wooden"
+      "item": "minecraft:chest"
     },
     "T": {
       "tag": "minecraft:trapdoors"

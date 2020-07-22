@@ -13,19 +13,19 @@
       "item": "minecraft:bucket"
     },
     "R": {
-      "tag": "forge:dyes/red"
+      "item": "minecraft:red_dye"
     },
     "G": {
-      "tag": "forge:dyes/green"
+      "item": "minecraft:green_dye"
     },
     "B": {
-      "tag": "forge:dyes/blue"
+      "item": "minecraft:blue_dye"
     },
     "W": {
     	"tag": "minecraft:wool"
     },
     "S": {
-    	"tag": "forge:rods/wooden"
+    	"item": "minecraft:stick"
     }
   },
   "result": {

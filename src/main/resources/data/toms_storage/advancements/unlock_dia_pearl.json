@@ -1,12 +1,5 @@
 {
-   "display":{
-      "description":"",
-      "title":"",
-      "icon":{
-         "item":"diamond"
-      },
-      "background":"minecraft:textures/blocks/stone.png"
-   },
+   "parent": "minecraft:recipes/root",
    "criteria":{
       "inv_changed-ender_pearl":{
          "trigger":"minecraft:inventory_changed",
@@ -31,7 +24,6 @@
    },
    "rewards":{
       "recipes":[
-         "toms_storage:inventory_cable_connector",
          "toms_storage:inventory_connector",
          "toms_storage:wireless_terminal"
       ]

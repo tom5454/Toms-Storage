@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class StoredItemStack {
 	private ItemStack stack;
@@ -34,16 +34,16 @@ public class StoredItemStack {
 		return s;
 	}
 
-	public void writeToNBT(CompoundNBT tag) {
+	public void writeToNBT(CompoundTag tag) {
 		tag.putLong(ITEM_COUNT_NAME, getQuantity());
-		tag.put(ITEMSTACK_NAME, stack.write(new CompoundNBT()));
+		tag.put(ITEMSTACK_NAME, stack.toTag(new CompoundTag()));
 		tag.getCompound(ITEMSTACK_NAME).remove("Count");
 	}
 
-	public static StoredItemStack readFromNBT(CompoundNBT tag) {
-		ItemStack cheat = ItemStack.read(tag);
+	public static StoredItemStack readFromNBT(CompoundTag tag) {
+		ItemStack cheat = ItemStack.fromTag(tag);
 		tag.getCompound(ITEMSTACK_NAME).putByte("Count", (byte) 1);
-		StoredItemStack stack = new StoredItemStack(!cheat.isEmpty() ? cheat : ItemStack.read(tag.getCompound(ITEMSTACK_NAME)), !cheat.isEmpty() ? cheat.getCount() : tag.getLong(ITEM_COUNT_NAME));
+		StoredItemStack stack = new StoredItemStack(!cheat.isEmpty() ? cheat : ItemStack.fromTag(tag.getCompound(ITEMSTACK_NAME)), !cheat.isEmpty() ? cheat.getCount() : tag.getLong(ITEM_COUNT_NAME));
 		return !stack.stack.isEmpty() ? stack : null;
 	}
 
@@ -56,7 +56,7 @@ public class StoredItemStack {
 
 		@Override
 		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getDisplayName().getUnformattedComponentText().compareTo(in2.getStack().getDisplayName().getUnformattedComponentText()) : -1);
+			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getName().asString().compareTo(in2.getStack().getName().asString()) : -1);
 			return this.reversed ? -c : c;
 		}
 
@@ -137,7 +137,7 @@ public class StoredItemStack {
 	}
 
 	public String getDisplayName() {
-		return stack.getDisplayName().getUnformattedComponentText();
+		return stack.getName().asString();
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class StoredItemStack {
 		//if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areItemStackTagsEqual(stack, other.stack)) return false;
+		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areTagsEqual(stack, other.stack)) return false;
 		return true;
 	}
 
@@ -159,7 +159,7 @@ public class StoredItemStack {
 		if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areItemStackTagsEqual(stack, other.stack)) return false;
+		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areTagsEqual(stack, other.stack)) return false;
 		return true;
 	}
 

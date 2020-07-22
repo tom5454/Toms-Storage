@@ -7,44 +7,43 @@ import java.text.Format;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.RecipeBookContainer;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeItemHelper;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.screen.AbstractRecipeScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.google.common.collect.Lists;
 
+import com.tom.fabriclibs.network.IDataReceiver;
+import com.tom.fabriclibs.network.NetworkHandler;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
-import com.tom.storagemod.network.IDataReceiver;
-import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
-public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInventory> implements IDataReceiver {
+public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<CraftingInventory> implements IDataReceiver {
 	private static final int DIVISION_BASE = 1000;
 	private static final char[] ENCODED_POSTFIXES = "KMGTPE".toCharArray();
 	public static final Format format;
-	private IInventory syncInv = new Inventory(1);
+	private Inventory syncInv = new SimpleInventory(1);
 	private boolean skipUpdateTick;
 
 	static {
@@ -75,7 +74,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
-	public ContainerStorageTerminal(ContainerType<?> type, int id, PlayerInventory inv, TileEntityStorageTerminal te) {
+	public ContainerStorageTerminal(ScreenHandlerType<?> type, int id, PlayerInventory inv, TileEntityStorageTerminal te) {
 		super(type, id);
 		this.te = te;
 		this.pinv = inv;
@@ -85,31 +84,32 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	protected void addSyncSlot() {
 		syncSlotID = addSlot(new Slot(syncInv, 0, -16, -16) {
 			@Override
-			public boolean canTakeStack(PlayerEntity playerIn) {
+			public boolean canTakeItems(PlayerEntity playerIn) {
 				return false;
 			}
 			@Override
-			public boolean isItemValid(ItemStack stack) {
+			public boolean canInsert(ItemStack stack) {
 				return false;
 			}
-			@OnlyIn(Dist.CLIENT)
+			@Environment(EnvType.CLIENT)
 			@Override
-			public boolean isEnabled() {
+			public boolean doDrawHoveringEffect() {
 				return false;
 			}
-		}).slotNumber;
-		syncInv.setInventorySlotContents(0, new ItemStack(Items.BARRIER));
+
+		}).id;
+		syncInv.setStack(0, new ItemStack(Items.BARRIER));
 	}
 
 	@Override
-	public boolean enchantItem(PlayerEntity playerIn, int id) {
+	public boolean onButtonClick(PlayerEntity playerIn, int id) {
 		if(id == 0)return false;
 		int newC = id >> 1;
 		te.setSorting(newC);
 		return false;
 	}
 
-	public ContainerStorageTerminal(ContainerType<?> type, int id, PlayerInventory inv) {
+	public ContainerStorageTerminal(ScreenHandlerType<?> type, int id, PlayerInventory inv) {
 		this(type, id, inv, null);
 	}
 
@@ -124,7 +124,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	protected void addPlayerSlots(PlayerInventory playerInventory, int x, int y) {
-		this.playerSlotsStart = inventorySlots.size() - 1;
+		this.playerSlotsStart = slots.size() - 1;
 		for (int i = 0;i < 3;++i) {
 			for (int j = 0;j < 9;++j) {
 				addSlot(new Slot(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
@@ -192,7 +192,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			return slotIndex;
 		}
 
-		@OnlyIn(Dist.CLIENT)
+		@Environment(EnvType.CLIENT)
 		public void drawSlot(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (mouseX >= gui.getGuiLeft() + xDisplayPosition - 1 && mouseY >= gui.getGuiTop() + yDisplayPosition - 1 && mouseX < gui.getGuiLeft() + xDisplayPosition + 17 && mouseY < gui.getGuiTop() + yDisplayPosition + 17) {
 				//RenderUtil.setColourWithAlphaPercent(0xFFFFFF, 60);
@@ -204,18 +204,17 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			if (stack != null) {
 				st.push();
 				gui.renderItemInGui(st, stack.getStack().copy().split(1), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
-				FontRenderer r = stack.getStack().getItem().getFontRenderer(stack.getStack());
-				if(r == null)r = gui.getFont();
+				TextRenderer r = gui.getFont();
 				this.drawStackSize(st, r, stack.getQuantity(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition);
 				st.pop();
 			}
 		}
 
-		@OnlyIn(Dist.CLIENT)
+		@Environment(EnvType.CLIENT)
 		public boolean drawTooltip(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (stack != null) {
 				if (stack.getQuantity() > 9999) {
-					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.format("tooltip.toms_storage.amount", stack.getQuantity()));
+					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.translate("tooltip.toms_storage.amount", stack.getQuantity()));
 				} else {
 					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
 				}
@@ -223,8 +222,8 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			return mouseX >= (gui.getGuiLeft() + xDisplayPosition) - 1 && mouseY >= (gui.getGuiTop() + yDisplayPosition) - 1 && mouseX < (gui.getGuiLeft() + xDisplayPosition) + 17 && mouseY < (gui.getGuiTop() + yDisplayPosition) + 17;
 		}
 
-		@OnlyIn(Dist.CLIENT)
-		private void drawStackSize(MatrixStack st, FontRenderer fr, long size, int x, int y) {
+		@Environment(EnvType.CLIENT)
+		private void drawStackSize(MatrixStack st, TextRenderer fr, long size, int x, int y) {
 			float scaleFactor = 0.6f;
 			//boolean unicodeFlag = fr.getUnicodeFlag();
 			//fr.setUnicodeFlag(false);
@@ -236,9 +235,9 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			st.scale(scaleFactor, scaleFactor, scaleFactor);
 			st.translate(0, 0, 450);
 			float inverseScaleFactor = 1.0f / scaleFactor;
-			int X = (int) (((float) x + 0 + 16.0f - fr.getStringWidth(stackSize) * scaleFactor) * inverseScaleFactor);
+			int X = (int) (((float) x + 0 + 16.0f - fr.getWidth(stackSize) * scaleFactor) * inverseScaleFactor);
 			int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-			fr.drawStringWithShadow(st, stackSize, X, Y, 16777215);
+			fr.draw(st, stackSize, X, Y, 16777215);
 			st.pop();
 			RenderSystem.enableLighting();
 			RenderSystem.enableDepthTest();
@@ -277,8 +276,8 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
-		return te.canInteractWith(playerIn);
+	public boolean isNotRestricted(PlayerEntity playerIn) {
+		return te == null ? true : te.canInteractWith(playerIn);
 	}
 
 	public final void scrollTo(float p_148329_1_) {
@@ -306,7 +305,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		storageSlotList.get(id).stack = stack;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public int drawSlots(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 		for (int i = 0;i < storageSlotList.size();i++) {
 			storageSlotList.get(i).drawSlot(st, gui, mouseX, mouseY);
@@ -333,55 +332,55 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	@Override
-	public void detectAndSendChanges() {
+	public void sendContentUpdates() {
 		if(te == null)return;
 		//List<StoredItemStack> itemListOld = itemList;
 		itemList = te.getStacks();
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (int i = 0;i < itemList.size();i++) {
 			StoredItemStack storedS = itemList.get(i);
 			//StoredItemStack storedSOld = itemListOld.size() > i ? itemListOld.get(i) : null;
 			if (storedS != null) {
-				CompoundNBT tag = new CompoundNBT();
+				CompoundTag tag = new CompoundTag();
 				//tag.putInt("slot", i);
 				if (storedS != null)
 					storedS.writeToNBT(tag);
 				list.add(tag);
 			}
 		}
-		CompoundNBT mainTag = new CompoundNBT();
+		CompoundTag mainTag = new CompoundTag();
 		mainTag.put("l", list);
 		mainTag.putInt("p", te.getSorting());
 		mainTag.putString("s", te.getLastSearch());
-		ItemStack is = syncInv.getStackInSlot(0);
+		ItemStack is = syncInv.getStack(0);
 		boolean t = is.getItem() == Items.BARRIER;
 		if(!mainTag.equals(is.getTag()) && !skipUpdateTick) {
 			//System.out.println(itemList);
 			is = new ItemStack(t ? Blocks.STRUCTURE_VOID : Items.BARRIER);
-			syncInv.setInventorySlotContents(0, is);
+			syncInv.setStack(0, is);
 			//System.out.println("Set Slot: " + mainTag);
 			is.setTag(mainTag);
-			((ServerPlayerEntity)pinv.player).isChangingQuantityOnly = false;
+			((ServerPlayerEntity)pinv.player).skipPacketSlotUpdates = false;
 		}
-		super.detectAndSendChanges();
+		super.sendContentUpdates();
 		if(skipUpdateTick)is.setTag(null);
 		skipUpdateTick = false;
 	}
 
 	@Override
-	public void putStackInSlot(int slotID, ItemStack stack) {
+	public void setStackInSlot(int slotID, ItemStack stack) {
 		if(slotID == syncSlotID && stack.hasTag()) {
-			receiveClientNBTPacket(stack.getTag());
+			receiveClientTagPacket(stack.getTag());
 		}
-		super.putStackInSlot(slotID, stack);
+		super.setStackInSlot(slotID, stack);
 	}
 
-	public final void receiveClientNBTPacket(CompoundNBT message) {
+	public final void receiveClientTagPacket(CompoundTag message) {
 		//System.out.println(message);
-		ListNBT list = message.getList("l", 10);
+		ListTag list = message.getList("l", 10);
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {
-			CompoundNBT tag = list.getCompound(i);
+			CompoundTag tag = list.getCompound(i);
 			itemList.add(StoredItemStack.readFromNBT(tag));
 			//System.out.println(tag);
 		}
@@ -393,161 +392,18 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		if(onPacket != null)onPacket.run();
 	}
 
-	/*@Override
-	public final ItemStack slotClick(int slotId, int clickedButton, ClickType clickTypeIn, PlayerEntity playerIn) {
-		skipUpdateTick = true;
-		SlotAction mode = SlotAction.VALUES[clickTypeIn.ordinal()];
-		if (slotId < -1 && slotId != -999 && mode != SlotAction.SPACE_CLICK) {
-			if(te == null)return new ItemStack(Blocks.BARRIER, 69);
-			if (mode == SlotAction.PULL_OR_PUSH_STACK) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					ItemStack itemstack = slot.pushStack(stack);
-					playerIn.inventory.setItemStack(itemstack);
-					return itemstack;
-				} else {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						if (slot.stack.getQuantity() == 0) {
-							// craft(playerIn, slot);
-							return ItemStack.EMPTY;
-						} else {
-							ItemStack itemstack = slot.pullFromSlot(64);
-							playerIn.inventory.setItemStack(itemstack);
-							return itemstack;
-						}
-					} else
-						return ItemStack.EMPTY;
-				}
-			} else if (mode == SlotAction.PULL_ONE) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (slotId == -3) {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						ItemStack itemstack = slot.pullFromSlot(1);
-						if (!itemstack.isEmpty()) {
-							this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
-							if (itemstack.getCount() > 0)
-								slot.pushStack(itemstack);
-						}
-						playerIn.inventory.markDirty();
-						return stack;
-					} else
-						return stack;
-				} else {
-					if (!stack.isEmpty()) {
-						slot.stack = itemList.get(clickedButton);
-						if (areItemStacksEqual(stack, slot.stack.getStack(), true) && stack.getCount() + 1 <= stack.getMaxStackSize()) {
-							ItemStack itemstack = slot.pullFromSlot(1);
-							if (!itemstack.isEmpty()) {
-								stack.grow(1);
-								return stack;
-							}
-						}
-					} else {
-						if (itemList.size() > clickedButton) {
-							slot.stack = itemList.get(clickedButton);
-							ItemStack itemstack = slot.pullFromSlot(1);
-							playerIn.inventory.setItemStack(itemstack);
-							return itemstack;
-						} else
-							return ItemStack.EMPTY;
-					}
-				}
-				return ItemStack.EMPTY;
-			} else if (mode == SlotAction.GET_HALF) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					ItemStack stack1 = stack.split(Math.min(stack.getCount(), stack.getMaxStackSize()) / 2);
-					ItemStack itemstack = slot.pushStack(stack1);
-					stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-					playerIn.inventory.setItemStack(stack);
-					return stack;
-				} else {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						ItemStack itemstack = slot.pullFromSlot(Math.min(slot.stack.getQuantity(), slot.stack.getStack().getMaxStackSize()) / 2);
-						playerIn.inventory.setItemStack(itemstack);
-						return itemstack;
-					} else
-						return ItemStack.EMPTY;
-				}
-			} else if (mode == SlotAction.GET_QUARTER) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					ItemStack stack1 = stack.split(Math.min(stack.getCount(), stack.getMaxStackSize()) / 4);
-					ItemStack itemstack = slot.pushStack(stack1);
-					stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-					playerIn.inventory.setItemStack(stack);
-					return stack;
-				} else {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						ItemStack itemstack = slot.pullFromSlot(Math.min(slot.stack.getQuantity(), slot.stack.getStack().getMaxStackSize()) / 4);
-						playerIn.inventory.setItemStack(itemstack);
-						return itemstack;
-					} else
-						return ItemStack.EMPTY;
-				}
-			} else if (mode == SlotAction.PULL_ONE) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					slot.stack = itemList.get(clickedButton);
-					// if(TomsModUtils.areItemStacksEqual(stack,
-					// slot.stack.stack, true, true, false)){
-					ItemStack s = stack.split(1);
-					ItemStack s2 = slot.pushStack(s);
-					if (!s2.isEmpty()) {
-						stack.grow(s2.getCount());
-					}
-					if (stack.isEmpty()) {
-						stack = ItemStack.EMPTY;
-					}
-					playerIn.inventory.setItemStack(stack);
-					return stack;
-					// }
-				}
-				return ItemStack.EMPTY;
-			} else {
-				SlotStorage slot = storageSlotList.get(0);
-				if (itemList.size() > clickedButton && !playerIn.world.isRemote) {
-					slot.stack = itemList.get(clickedButton);
-					ItemStack itemstack = slot.pullFromSlot(64);
-					if (!itemstack.isEmpty()) {
-						this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
-						if (itemstack.getCount() > 0)
-							slot.pushStack(itemstack);
-					}
-					playerIn.inventory.markDirty();
-				}
-				return ItemStack.EMPTY;
-			}
-		} else if (slotId == -1 && mode == SlotAction.SPACE_CLICK) {
-			for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
-				transferStackInSlot(playerIn, i);
-			}
-			return ItemStack.EMPTY;
-		} else
-			return super.slotClick(slotId, clickedButton, clickTypeIn, playerIn);
-	}*/
-
 	@Override
-	public final ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-		if (inventorySlots.size() > index) {
+	public final ItemStack transferSlot(PlayerEntity playerIn, int index) {
+		if (slots.size() > index) {
 			if (index > playerSlotsStart && te != null) {
-				if (inventorySlots.get(index) != null && inventorySlots.get(index).getHasStack()) {
-					Slot slot = inventorySlots.get(index);
+				if (slots.get(index) != null && slots.get(index).hasStack()) {
+					Slot slot = slots.get(index);
 					ItemStack slotStack = slot.getStack();
 					StoredItemStack c = te.pushStack(new StoredItemStack(slotStack, slotStack.getCount()));
 					ItemStack itemstack = c != null ? c.getActualStack() : ItemStack.EMPTY;
-					slot.putStack(itemstack);
-					if (!playerIn.world.isRemote)
-						detectAndSendChanges();
+					slot.setStack(itemstack);
+					if (!playerIn.world.isClient)
+						sendContentUpdates();
 				}
 			} else {
 				return shiftClickItems(playerIn, index);
@@ -560,14 +416,14 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		return ItemStack.EMPTY;
 	}
 
-	public static boolean areItemStacksEqual(ItemStack stack, ItemStack matchTo, boolean checkNBT) {
+	public static boolean areItemStacksEqual(ItemStack stack, ItemStack matchTo, boolean checkTag) {
 		if (stack.isEmpty() && matchTo.isEmpty())
 			return false;
 		if (!stack.isEmpty() && !matchTo.isEmpty()) {
 			if (stack.getItem() == matchTo.getItem()) {
 				boolean equals = true;
-				if (checkNBT) {
-					equals = equals && ItemStack.areItemStackTagsEqual(stack, matchTo);
+				if (checkTag) {
+					equals = equals && ItemStack.areItemsEqual(stack, matchTo);
 				}
 				return equals;
 			}
@@ -575,107 +431,73 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		return false;
 	}
 
-
-	@Override
-	public void fillStackedContents(RecipeItemHelper itemHelperIn) {
+	public void sendMessage(CompoundTag compound) {
+		NetworkHandler.sendToServer(compound);
 	}
 
 	@Override
-	public void clear() {
-	}
-
-	@Override
-	public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
-		return false;
-	}
-
-	@Override
-	public int getOutputSlot() {
-		return 0;
-	}
-
-	@Override
-	public int getWidth() {
-		return 0;
-	}
-
-	@Override
-	public int getHeight() {
-		return 0;
-	}
-
-	@Override
-	public int getSize() {
-		return 0;
-	}
-
-	public void sendMessage(CompoundNBT compound) {
-		NetworkHandler.sendDataToServer(compound);
-	}
-
-	@Override
-	public void receive(CompoundNBT message) {
+	public void receive(CompoundTag message) {
 		if(message.contains("s")) {
 			te.setLastSearch(message.getString("s"));
 		}
 		if(message.contains("a")) {
 			ServerPlayerEntity player = (ServerPlayerEntity) pinv.player;
-			player.markPlayerActive();
-			CompoundNBT d = message.getCompound("a");
-			ItemStack clicked = ItemStack.read(d.getCompound("s"));
+			player.updateLastActionTime();
+			CompoundTag d = message.getCompound("a");
+			ItemStack clicked = ItemStack.fromTag(d.getCompound("s"));
 			SlotAction act = SlotAction.VALUES[Math.abs(d.getInt("a")) % SlotAction.VALUES.length];
 			if(act == SlotAction.SPACE_CLICK) {
 				for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
-					transferStackInSlot(player, i);
+					transferSlot(player, i);
 				}
 			} else {
 				if (act == SlotAction.PULL_OR_PUSH_STACK) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCursorStack();
 					if (!stack.isEmpty()) {
 						StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
 						ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
-						player.inventory.setItemStack(itemstack);
+						player.inventory.setCursorStack(itemstack);
 					} else {
 						if (clicked.isEmpty())return;
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxStackSize());
+						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
 						if(pulled != null) {
-							player.inventory.setItemStack(pulled.getActualStack());
+							player.inventory.setCursorStack(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.PULL_ONE) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCursorStack();
 					if (clicked.isEmpty())return;
 					if (d.getBoolean("m")) {
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 						if(pulled != null) {
 							ItemStack itemstack = pulled.getActualStack();
-							this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
+							this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
 							if (itemstack.getCount() > 0)
 								te.pushOrDrop(itemstack);
 							player.inventory.markDirty();
 						}
 					} else {
 						if (!stack.isEmpty()) {
-							if (areItemStacksEqual(stack, clicked, true) && stack.getCount() + 1 <= stack.getMaxStackSize()) {
+							if (areItemStacksEqual(stack, clicked, true) && stack.getCount() + 1 <= stack.getMaxCount()) {
 								StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 								if (pulled != null) {
-									stack.grow(1);
+									stack.increment(1);
 								}
 							}
 						} else {
 							StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 							if (pulled != null) {
-								player.inventory.setItemStack(pulled.getActualStack());
+								player.inventory.setCursorStack(pulled.getActualStack());
 							}
 						}
 					}
 				} else if (act == SlotAction.GET_HALF) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCursorStack();
 					if (!stack.isEmpty()) {
-						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxStackSize()) / 2, 1));
+						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 2, 1));
 						ItemStack itemstack = te.pushStack(stack1);
-						stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						player.inventory.setItemStack(stack);
+						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
+						player.inventory.setCursorStack(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -685,18 +507,18 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 							if(e.equals((Object)clickedSt))
 								maxCount = e.getQuantity();
 						}
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 2, 1));
+						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 2, 1));
 						if(pulled != null) {
-							player.inventory.setItemStack(pulled.getActualStack());
+							player.inventory.setCursorStack(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.GET_QUARTER) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCursorStack();
 					if (!stack.isEmpty()) {
-						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxStackSize()) / 4, 1));
+						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 4, 1));
 						ItemStack itemstack = te.pushStack(stack1);
-						stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						player.inventory.setItemStack(stack);
+						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
+						player.inventory.setCursorStack(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -705,24 +527,63 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 							StoredItemStack e = itemList.get(i);
 							if(e.equals((Object)clickedSt))maxCount = e.getQuantity();
 						}
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 4, 1));
+						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 4, 1));
 						if(pulled != null) {
-							player.inventory.setItemStack(pulled.getActualStack());
+							player.inventory.setCursorStack(pulled.getActualStack());
 						}
 					}
 				} else {
 					if (clicked.isEmpty())return;
-					StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxStackSize());
+					StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
 					if(pulled != null) {
 						ItemStack itemstack = pulled.getActualStack();
-						this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
+						this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
 						if (itemstack.getCount() > 0)
 							te.pushOrDrop(itemstack);
 						player.inventory.markDirty();
 					}
 				}
 			}
-			player.updateHeldItem();
+			player.updateCursorStack();
 		}
+	}
+
+	@Override
+	public void populateRecipeFinder(RecipeFinder paramRecipeFinder) {
+	}
+
+	@Override
+	public void clearCraftingSlots() {
+	}
+
+	@Override
+	public boolean matches(Recipe<? super CraftingInventory> paramRecipe) {
+		return false;
+	}
+
+	@Override
+	public int getCraftingResultSlotIndex() {
+		return 0;
+	}
+
+	@Override
+	public int getCraftingWidth() {
+		return 0;
+	}
+
+	@Override
+	public int getCraftingHeight() {
+		return 0;
+	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public int getCraftingSlotCount() {
+		return 0;
+	}
+
+	@Override
+	public boolean canUse(PlayerEntity paramPlayerEntity) {
+		return te.canInteractWith(paramPlayerEntity);
 	}
 }

@@ -1,9 +1,11 @@
 package com.tom.storagemod;
 
 import net.minecraft.block.Block;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.Tag;
 
 public class StorageTags {
-	public static final ITag.INamedTag<Block> REMOTE_ACTIVATE = BlockTags.makeWrapperTag("toms_storage:remote_activate");
+	public static final Tag<Block> REMOTE_ACTIVATE = BlockTags.ACCESSOR.get("toms_storage:remote_activate");
+
+	public static void init() {}
 }

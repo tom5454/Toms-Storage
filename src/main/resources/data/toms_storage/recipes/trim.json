@@ -10,10 +10,10 @@
       "tag": "minecraft:planks"
     },
     "C": {
-      "tag": "forge:chests/wooden"
+      "item": "minecraft:chest"
     },
     "S": {
-      "tag": "forge:rods/wooden"
+      "item": "minecraft:stick"
     }
   },
   "result": {

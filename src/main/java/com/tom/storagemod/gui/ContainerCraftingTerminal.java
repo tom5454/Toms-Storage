@@ -1,71 +1,54 @@
 package com.tom.storagemod.gui;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
-import net.minecraft.client.util.RecipeBookCategories;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.CraftResultInventory;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.CraftingResultSlot;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.CraftingResultInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeItemHelper;
-import net.minecraft.item.crafting.ServerRecipePlacer;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.play.server.SSetSlotPacket;
-
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.recipe.InputSlotFiller;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.screen.ScreenHandlerListener;
+import net.minecraft.screen.slot.CraftingResultSlot;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ItemScatterer;
 
 import com.google.common.collect.Lists;
 
+import com.tom.fabriclibs.network.IDataReceiver;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
-import com.tom.storagemod.jei.IJEIAutoFillTerminal;
-import com.tom.storagemod.network.IDataReceiver;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 
-public class ContainerCraftingTerminal extends ContainerStorageTerminal implements IJEIAutoFillTerminal, IDataReceiver {
+public class ContainerCraftingTerminal extends ContainerStorageTerminal implements IDataReceiver {//IJEIAutoFillTerminal
 	public static class SlotCrafting extends Slot {
-		public SlotCrafting(IInventory inventoryIn, int index, int xPosition, int yPosition) {
+		public SlotCrafting(Inventory inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);
-		}
-	}
-	private static Field recipeItemHelperField;
-	static {
-		try {
-			for (Field f : ServerRecipePlacer.class.getDeclaredFields()) {
-				if(f.getType() == RecipeItemHelper.class) {
-					f.setAccessible(true);
-					recipeItemHelperField = f;
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
 	private final CraftingInventory craftMatrix;
-	private final CraftResultInventory craftResult;
+	private final CraftingResultInventory craftResult;
 	private Slot craftingResultSlot;
-	private final List<IContainerListener> listeners = Lists.newArrayList();
+	private final List<ScreenHandlerListener> listeners = Lists.newArrayList();
 
 	@Override
-	public void addListener(IContainerListener listener) {
+	public void addListener(ScreenHandlerListener listener) {
 		super.addListener(listener);
 		listeners.add(listener);
 	}
 
 	@Override
-	public void removeListener(IContainerListener listener) {
+	public void removeListener(ScreenHandlerListener listener) {
 		super.removeListener(listener);
 		listeners.remove(listener);
 	}
@@ -82,14 +65,14 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	public ContainerCraftingTerminal(int id, PlayerInventory inv) {
 		super(StorageMod.craftingTerminalCont, id, inv);
 		craftMatrix = new CraftingInventory(this, 3, 3);
-		craftResult = new CraftResultInventory();
+		craftResult = new CraftingResultInventory();
 		init();
 		this.addPlayerSlots(inv, 8, 174);
 	}
 
 	@Override
-	public void onContainerClosed(PlayerEntity playerIn) {
-		super.onContainerClosed(playerIn);
+	public void close(PlayerEntity playerIn) {
+		super.close(playerIn);
 		if(te != null)
 			((TileEntityCraftingTerminal) te).unregisterCrafting(this);
 	}
@@ -99,11 +82,11 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 		int y = 94;
 		this.addSlot(craftingResultSlot = new CraftingResultSlot(pinv.player, craftMatrix, craftResult, 0, x + 124, y + 35) {
 			@Override
-			public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
-				if (thePlayer.world.isRemote)
+			public ItemStack onTakeItem(PlayerEntity thePlayer, ItemStack stack) {
+				if (thePlayer.world.isClient)
 					return ItemStack.EMPTY;
-				this.onCrafting(stack);
-				if (!pinv.player.getEntityWorld().isRemote) {
+				this.onCrafted(stack);
+				if (!pinv.player.getEntityWorld().isClient) {
 					((TileEntityCraftingTerminal) te).craft(thePlayer);
 				}
 				return ItemStack.EMPTY;
@@ -125,43 +108,43 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	public boolean canMergeSlot(ItemStack stack, Slot slotIn) {
-		return slotIn.inventory != craftResult && super.canMergeSlot(stack, slotIn);
+	public boolean canInsertIntoSlot(ItemStack stack, Slot slotIn) {
+		return slotIn.inventory != craftResult && super.canInsertIntoSlot(stack, slotIn);
 	}
 
 	@Override
 	public ItemStack shiftClickItems(PlayerEntity playerIn, int index) {
 		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = this.inventorySlots.get(index);
-		if (slot != null && slot.getHasStack()) {
+		Slot slot = this.slots.get(index);
+		if (slot != null && slot.hasStack()) {
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 			if (index == 0) {
 				if(te == null)return ItemStack.EMPTY;
 				((TileEntityCraftingTerminal) te).craftShift(playerIn);
-				if (!playerIn.world.isRemote)
-					detectAndSendChanges();
+				if (!playerIn.world.isClient)
+					sendContentUpdates();
 				return ItemStack.EMPTY;
 			} else if (index > 0 && index < 10) {
 				if(te == null)return ItemStack.EMPTY;
 				ItemStack stack = ((TileEntityCraftingTerminal) te).pushStack(itemstack);
-				slot.putStack(stack);
-				if (!playerIn.world.isRemote)
-					detectAndSendChanges();
+				slot.setStack(stack);
+				if (!playerIn.world.isClient)
+					sendContentUpdates();
 			}
-			slot.onTake(playerIn, itemstack1);
+			slot.onTakeItem(playerIn, itemstack1);
 		}
 		return ItemStack.EMPTY;
 	}
 
 	public void onCraftMatrixChanged() {
-		for (int i = 0; i < inventorySlots.size(); ++i) {
-			Slot slot = inventorySlots.get(i);
+		for (int i = 0; i < slots.size(); ++i) {
+			Slot slot = slots.get(i);
 
 			if (slot instanceof SlotCrafting || slot == craftingResultSlot) {
-				for (IContainerListener listener : listeners) {
+				for (ScreenHandlerListener listener : listeners) {
 					if (listener instanceof ServerPlayerEntity) {
-						((ServerPlayerEntity) listener).connection.sendPacket(new SSetSlotPacket(windowId, i, slot.getStack()));
+						((ServerPlayerEntity) listener).networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, i, slot.getStack()));
 					}
 				}
 			}
@@ -169,94 +152,85 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	public boolean enchantItem(PlayerEntity playerIn, int id) {
+	public boolean onButtonClick(PlayerEntity playerIn, int id) {
 		if(te != null && id == 0)
 			((TileEntityCraftingTerminal) te).clear();
-		else super.enchantItem(playerIn, id);
+		else super.onButtonClick(playerIn, id);
 		return false;
 	}
 
 	@Override
-	public void fillStackedContents(RecipeItemHelper itemHelperIn) {
-		this.craftMatrix.fillStackedContents(itemHelperIn);
+	public void populateRecipeFinder(RecipeFinder itemHelperIn) {
+		this.craftMatrix.provideRecipeInputs(itemHelperIn);
 	}
 
 	@Override
-	public void clear() {
+	public void clearCraftingSlots() {
 		this.craftMatrix.clear();
 		this.craftResult.clear();
 	}
 
 	@Override
-	public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
+	public boolean matches(Recipe<? super CraftingInventory> recipeIn) {
 		return recipeIn.matches(this.craftMatrix, this.pinv.player.world);
 	}
 
 	@Override
-	public int getOutputSlot() {
+	public int getCraftingResultSlotIndex() {
 		return 0;
 	}
 
 	@Override
-	public int getWidth() {
+	public int getCraftingWidth() {
 		return this.craftMatrix.getWidth();
 	}
 
 	@Override
-	public int getHeight() {
+	public int getCraftingHeight() {
 		return this.craftMatrix.getHeight();
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public int getSize() {
+	@Environment(EnvType.CLIENT)
+	public int getCraftingSlotCount() {
 		return 10;
 	}
 
-	@Override
-	public java.util.List<net.minecraft.client.util.RecipeBookCategories> getRecipeBookCategories() {
-		return Lists.newArrayList(RecipeBookCategories.SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
-	}
-
-	public class TerminalRecipeItemHelper extends RecipeItemHelper {
+	public class TerminalRecipeItemHelper extends RecipeFinder {
 		@Override
 		public void clear() {
 			super.clear();
 			itemList.forEach(e -> {
-				accountPlainStack(e.getActualStack());
+				addNormalItem(e.getActualStack());
 			});
 		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void func_217056_a(boolean p_217056_1_, IRecipe<?> p_217056_2_, ServerPlayerEntity p_217056_3_) {
-		(new ServerRecipePlacer(this) {
+	public void fillInputSlots(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayerEntity p_217056_3_) {
+		(new InputSlotFiller(this) {
 			{
-				try {
-					recipeItemHelperField.set(this, new TerminalRecipeItemHelper());
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+				recipeFinder = new TerminalRecipeItemHelper();
 			}
 
 			@Override
-			protected void consumeIngredient(Slot slotToFill, ItemStack ingredientIn) {
-				int i = this.playerInventory.findSlotMatchingUnusedItem(ingredientIn);
+			protected void fillInputSlot(Slot slotToFill, ItemStack ingredientIn) {
+				int i = this.inventory.method_7371(ingredientIn);
 				if (i != -1) {
-					ItemStack itemstack = this.playerInventory.getStackInSlot(i).copy();
+					ItemStack itemstack = this.inventory.getStack(i).copy();
 					if (!itemstack.isEmpty()) {
 						if (itemstack.getCount() > 1) {
-							this.playerInventory.decrStackSize(i, 1);
+							this.inventory.removeStack(i, 1);
 						} else {
-							this.playerInventory.removeStackFromSlot(i);
+							this.inventory.removeStack(i);
 						}
 
 						itemstack.setCount(1);
 						if (slotToFill.getStack().isEmpty()) {
-							slotToFill.putStack(itemstack);
+							slotToFill.setStack(itemstack);
 						} else {
-							slotToFill.getStack().grow(1);
+							slotToFill.getStack().increment(1);
 						}
 
 					}
@@ -264,20 +238,20 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 					StoredItemStack st = te.pullStack(new StoredItemStack(ingredientIn), 1);
 					if(st != null) {
 						if (slotToFill.getStack().isEmpty()) {
-							slotToFill.putStack(st.getActualStack());
+							slotToFill.setStack(st.getActualStack());
 						} else {
-							slotToFill.getStack().grow(1);
+							slotToFill.getStack().increment(1);
 						}
 					}
 				}
 			}
 
 			@Override
-			protected void giveToPlayer(int slotIn) {
-				ItemStack itemstack = this.recipeBookContainer.getSlot(slotIn).getStack();
+			protected void returnSlot(int slotIn) {
+				ItemStack itemstack = this.craftingScreenHandler.getSlot(slotIn).getStack();
 				if (!itemstack.isEmpty()) {
-					PlayerEntity player = playerInventory.player;
-					InventoryHelper.spawnItemStack(player.world, player.getPosX(), player.getPosY()-5, player.getPosZ(), itemstack);
+					PlayerEntity player = inventory.player;
+					ItemScatterer.spawn(player.world, player.getX(), player.getY()-5, player.getZ(), itemstack);
 					/*
 					for(; itemstack.getCount() > 0; this.recipeBookContainer.getSlot(slotIn).decrStackSize(1)) {
 						int i = this.playerInventory.storeItemStack(itemstack);
@@ -295,27 +269,27 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			}
 
 			@Override
-			protected void clear() {
+			protected void returnInputs() {
 				((TileEntityCraftingTerminal) te).clear();
-				this.recipeBookContainer.clear();
+				this.craftingScreenHandler.clearCraftingSlots();
 			}
-		}).place(p_217056_3_, p_217056_2_, p_217056_1_);
+		}).fillInputSlots(p_217056_3_, p_217056_2_, p_217056_1_);
 	}
 
 	@Override
-	public void receive(CompoundNBT message) {
+	public void receive(CompoundTag message) {
 		super.receive(message);
 		if(message.contains("i")) {
 			ItemStack[][] stacks = new ItemStack[9][];
-			ListNBT list = message.getList("i", 10);
+			ListTag list = message.getList("i", 10);
 			for (int i = 0;i < list.size();i++) {
-				CompoundNBT nbttagcompound = list.getCompound(i);
+				CompoundTag nbttagcompound = list.getCompound(i);
 				byte slot = nbttagcompound.getByte("s");
 				byte l = nbttagcompound.getByte("l");
 				stacks[slot] = new ItemStack[l];
 				for (int j = 0;j < l;j++) {
-					CompoundNBT tag = nbttagcompound.getCompound("i" + j);
-					stacks[slot][j] = ItemStack.read(tag);
+					CompoundTag tag = nbttagcompound.getCompound("i" + j);
+					stacks[slot][j] = ItemStack.fromTag(tag);
 				}
 			}
 			((TileEntityCraftingTerminal) te).handlerItemTransfer(pinv.player, stacks);

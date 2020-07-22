@@ -5,29 +5,33 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
-public class ItemBlockPainted extends BlockItem {
+import com.tom.fabriclibs.ext.IItem;
+import com.tom.fabriclibs.ext.IRegistered;
 
-	public ItemBlockPainted(Block block, Item.Properties p) {
+public class ItemBlockPainted extends BlockItem implements IItem {
+
+	public ItemBlockPainted(Block block, Item.Settings p) {
 		super(block, p);
-		setRegistryName(block.getRegistryName());
+		setRegistryName(((IRegistered) block).getRegistryName());
 	}
 	public ItemBlockPainted(Block block) {
-		this(block, new Item.Properties());
+		this(block, new Item.Settings());
 	}
 
 	@Override
-	public ITextComponent getDisplayName(ItemStack is) {
-		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
+	public Text getName(ItemStack is) {
+		Text tcS = super.getName(is);
+		MutableText tc = (MutableText) tcS;
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
-			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
-			tc.func_240702_b_(" (");
-			tc.func_230529_a_(st.getBlock().getTranslatedName().func_240701_a_(TextFormatting.GREEN));
-			tc.func_240702_b_(")");
+			BlockState st = NbtHelper.toBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
+			tc.append(" (");
+			tc.append(st.getBlock().getName().formatted(Formatting.GREEN));
+			tc.append(")");
 		}
 		return tc;
 	}

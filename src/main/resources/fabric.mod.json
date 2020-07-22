@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "toms_storage",
+  "version": "${version}",
+
+  "name": "Tom's Simple Storage Mod",
+  "description": "Simple storage mod for Minecraft",
+  "authors": [
+    "tom5454"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "MIT",
+  "icon": "assets/toms_storage/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.tom.storagemod.StorageMod"
+    ],
+    "modmenu": [
+      "com.tom.storagemod.ModMenu"
+    ]
+  },
+  "mixins": [
+    "tomsstorage.mixins.json"
+  ],
+	"accessWidener" : "tomsstorage.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "tomsfabriclibs": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

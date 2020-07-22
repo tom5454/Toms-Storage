@@ -2,24 +2,21 @@ package com.tom.storagemod.tile;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-
+import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.ChunkPos;
 
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
-import net.minecraftforge.client.model.data.ModelProperty;
-
+import com.tom.fabriclibs.client.ModelProperty;
 import com.tom.storagemod.StorageMod;
 
-public class TileEntityPainted extends TileEntity {
+public class TileEntityPainted extends BlockEntity implements BlockEntityClientSerializable {
 	public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
 	private BlockState blockState;
 
@@ -27,7 +24,7 @@ public class TileEntityPainted extends TileEntity {
 		super(StorageMod.paintedTile);
 	}
 
-	public TileEntityPainted(TileEntityType<?> tileEntityTypeIn) {
+	public TileEntityPainted(BlockEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn);
 	}
 
@@ -40,47 +37,40 @@ public class TileEntityPainted extends TileEntity {
 	}
 
 	@Override
-	public IModelData getModelData() {
-		return new ModelDataMap.Builder().withInitial(FACADE_STATE, this::getPaintedBlockState).build();
-	}
-
-	@Override
-	public void read(BlockState st, @Nonnull CompoundNBT compound) {
-		super.read(st, compound);
-		blockState = NBTUtil.readBlockState(compound.getCompound("block"));
+	public void fromTag(BlockState st, CompoundTag compound) {
+		super.fromTag(st, compound);
+		blockState = NbtHelper.toBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
 
-	@Nonnull
 	@Override
-	public CompoundNBT write(@Nonnull CompoundNBT compound) {
+	public CompoundTag toTag(CompoundTag compound) {
 		if (blockState != null) {
-			compound.put("block", NBTUtil.writeBlockState(blockState));
+			compound.put("block", NbtHelper.fromBlockState(blockState));
 		}
-		return super.write(compound);
+		return super.toTag(compound);
 	}
 
 	private void markDirtyClient() {
 		markDirty();
 		if (getWorld() != null) {
 			BlockState state = getWorld().getBlockState(getPos());
-			getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+			getWorld().updateListeners(getPos(), state, state, 3);
+
+			ServerWorld world = (ServerWorld) getWorld();
+			world.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(getPos()), false).forEach(player -> {
+				player.networkHandler.sendPacket(toUpdatePacket());
+			});
+
+			sync();
 		}
 	}
 
-	@Nonnull
 	@Override
-	public CompoundNBT getUpdateTag() {
-		CompoundNBT updateTag = super.getUpdateTag();
-		write(updateTag);
-		return updateTag;
-	}
-
-	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		CompoundNBT nbtTag = new CompoundNBT();
-		write(nbtTag);
-		return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
+	public BlockEntityUpdateS2CPacket toUpdatePacket() {
+		CompoundTag nbtTag = new CompoundTag();
+		toTag(nbtTag);
+		return new BlockEntityUpdateS2CPacket(getPos(), 127, nbtTag);
 	}
 
 	public BlockState getPaintedBlockState() {
@@ -88,17 +78,21 @@ public class TileEntityPainted extends TileEntity {
 	}
 
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+	public void fromClientTag(CompoundTag tag) {
 		BlockState old = getPaintedBlockState();
-		CompoundNBT tagCompound = packet.getNbtCompound();
-		super.onDataPacket(net, packet);
-		read(world.getBlockState(pos), tagCompound);
-
-		if (world != null && world.isRemote) {
+		blockState = NbtHelper.toBlockState(tag.getCompound("block"));
+		if (world != null && world.isClient) {
 			// If needed send a render update.
 			if (! getPaintedBlockState().equals(old)) {
-				world.markChunkDirty(getPos(), this.getTileEntity());
+				world.markDirty(getPos(), this);
+				BlockState st = world.getBlockState(pos);
+				world.updateListeners(pos, st, st, 3);
 			}
 		}
+	}
+
+	@Override
+	public CompoundTag toClientTag(CompoundTag tag) {
+		return toTag(tag);
 	}
 }
