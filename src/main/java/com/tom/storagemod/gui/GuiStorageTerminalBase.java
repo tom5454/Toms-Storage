@@ -167,7 +167,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		for (int i = 0;i < getContainer().itemListClient.size();i++) {
 			StoredItemStack is = getContainer().itemListClient.get(i);
 			if (is != null && is.getStack() != null) {
-				String dspName = searchMod ? is.getStack().getItem().delegate.name().getNamespace() : is.getStack().getDisplayName().getUnformattedComponentText();
+				String dspName = searchMod ? is.getStack().getItem().delegate.name().getNamespace() : is.getStack().getDisplayName().getString();
 				notDone = true;
 				if (m.matcher(dspName.toLowerCase()).find()) {
 					addStackToClientList(is);
@@ -175,7 +175,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 				if (notDone) {
 					for (ITextComponent lp : is.getStack().getTooltip(mc.player, getTooltipFlag())) {
-						if (m.matcher(lp.getUnformattedComponentText()).find()) {
+						if (m.matcher(lp.getString()).find()) {
 							addStackToClientList(is);
 							notDone = false;
 							break;
