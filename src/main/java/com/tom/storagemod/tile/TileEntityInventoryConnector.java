@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -26,6 +27,7 @@ import com.tom.storagemod.block.ITrim;
 
 public class TileEntityInventoryConnector extends BlockEntity implements Tickable, Inventory {
 	private List<InventoryWrapper> handlers = new ArrayList<>();
+	private List<LinkedInv> linkedInvs = new ArrayList<>();
 	private int[] invSizes = new int[0];
 	private int invSize;
 
@@ -35,19 +37,31 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 
 	@Override
 	public void tick() {
-		if(!world.isClient && world.getTime() % 20 == 0) {
+		long time = world.getTime();
+		if(!world.isClient && time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			//Set<List<ItemStack>> equalCheck = new HashSet<>();
 			toCheck.add(pos);
 			checkedBlocks.add(pos);
 			handlers.clear();
+			Set<LinkedInv> toRM = new HashSet<>();
+			for (LinkedInv inv : linkedInvs) {
+				if(inv.time + 40 < time) {
+					toRM.add(inv);
+					continue;
+				}
+				InventoryWrapper w = inv.handler.get();
+				if(w != null)handlers.add(w);
+			}
+			linkedInvs.removeAll(toRM);
 			//System.out.println("Start checking invs");
+			int range = StorageMod.CONFIG.invRange * StorageMod.CONFIG.invRange;
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
 					BlockPos p = cp.offset(d);
-					if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < StorageMod.CONFIG.invRange) {
+					if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < range) {
 						checkedBlocks.add(p);
 						BlockEntity te = world.getBlockEntity(p);
 						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy) {
@@ -174,5 +188,22 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	@Override
 	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
 		return false;
+	}
+
+	public void addLinked(LinkedInv inv) {
+		linkedInvs.add(inv);
+	}
+
+	public static class LinkedInv {
+		public Supplier<InventoryWrapper> handler;
+		public long time;
+	}
+
+	public void unLink(LinkedInv linv) {
+		linkedInvs.remove(linv);
+	}
+
+	public InventoryWrapper getInventory() {
+		return new InventoryWrapper(this, Direction.DOWN);
 	}
 }

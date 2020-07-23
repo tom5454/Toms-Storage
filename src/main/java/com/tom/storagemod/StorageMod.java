@@ -26,6 +26,10 @@ import com.tom.fabriclibs.events.init.Register;
 import com.tom.fabriclibs.ext.IItem;
 import com.tom.fabriclibs.ext.IRegistered;
 import com.tom.fabriclibs.ext.IRegistryEntry;
+import com.tom.storagemod.block.BlockInventoryCable;
+import com.tom.storagemod.block.BlockInventoryCableConnector;
+import com.tom.storagemod.block.BlockInventoryCableFramed;
+import com.tom.storagemod.block.BlockInventoryHopperBasic;
 import com.tom.storagemod.block.BlockInventoryProxy;
 import com.tom.storagemod.block.BlockOpenCrate;
 import com.tom.storagemod.block.BlockPaintedTrim;
@@ -42,7 +46,9 @@ import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.proxy.IProxy;
 import com.tom.storagemod.proxy.ServerProxy;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
+import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
+import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 import com.tom.storagemod.tile.TileEntityPainted;
@@ -54,6 +60,9 @@ import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 // The value here should match an entry in the META-INF/mods.toml file
 //@Mod(StorageMod.modid)
 public class StorageMod implements ModInitializer {
+	// Directly reference a log4j logger.
+	public static final Logger LOGGER = LogManager.getLogger();
+
 	public static final String modid = "toms_storage";
 	public static IProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 	public static InventoryConnector connector;
@@ -61,11 +70,12 @@ public class StorageMod implements ModInitializer {
 	public static BlockTrim inventoryTrim;
 	public static BlockOpenCrate openCrate;
 	public static BlockPaintedTrim paintedTrim;
-	//public static BlockInventoryCable invCable;
-	//public static BlockInventoryCableFramed invCableFramed;
-	//public static BlockInventoryCableConnector invCableConnector;
+	public static BlockInventoryCable invCable;
+	public static BlockInventoryCableFramed invCableFramed;
+	public static BlockInventoryCableConnector invCableConnector;
 	public static BlockInventoryProxy invProxy;
 	public static CraftingTerminal craftingTerminal;
+	public static BlockInventoryHopperBasic invHopperBasic;
 
 	public static ItemPaintKit paintingKit;
 	public static ItemWirelessTerminal wirelessTerminal;
@@ -74,17 +84,15 @@ public class StorageMod implements ModInitializer {
 	public static BlockEntityType<TileEntityStorageTerminal> terminalTile;
 	public static BlockEntityType<TileEntityOpenCrate> openCrateTile;
 	public static BlockEntityType<TileEntityPainted> paintedTile;
-	//public static BlockEntityType<TileEntityInventoryCableConnector> invCableConnectorTile;
+	public static BlockEntityType<TileEntityInventoryCableConnector> invCableConnectorTile;
 	public static BlockEntityType<TileEntityInventoryProxy> invProxyTile;
 	public static BlockEntityType<TileEntityCraftingTerminal> craftingTerminalTile;
+	public static BlockEntityType<TileEntityInventoryHopperBasic> invHopperBasicTile;
 
 	public static ScreenHandlerType<ContainerStorageTerminal> storageTerminal;
 	public static ScreenHandlerType<ContainerCraftingTerminal> craftingTerminalCont;
 
 	public static Config CONFIG = AutoConfig.register(Config.class, GsonConfigSerializer::new).getConfig();
-
-	// Directly reference a log4j logger.
-	public static final Logger LOGGER = LogManager.getLogger();
 
 	public StorageMod() {
 		Events.setModid(modid);
@@ -118,21 +126,23 @@ public class StorageMod implements ModInitializer {
 			openCrate = new BlockOpenCrate();
 			inventoryTrim = new BlockTrim();
 			paintedTrim = new BlockPaintedTrim();
-			//invCable = new BlockInventoryCable();
-			//invCableFramed = new BlockInventoryCableFramed();
-			//invCableConnector = new BlockInventoryCableConnector();
+			invCable = new BlockInventoryCable();
+			invCableFramed = new BlockInventoryCableFramed();
+			invCableConnector = new BlockInventoryCableConnector();
 			invProxy = new BlockInventoryProxy();
 			craftingTerminal = new CraftingTerminal();
+			invHopperBasic = new BlockInventoryHopperBasic();
 			blockRegistryEvent.getRegistry().register(connector);
 			blockRegistryEvent.getRegistry().register(terminal);
 			blockRegistryEvent.getRegistry().register(openCrate);
 			blockRegistryEvent.getRegistry().register(inventoryTrim);
 			blockRegistryEvent.getRegistry().register(paintedTrim);
-			//blockRegistryEvent.getRegistry().register(invCable);
-			//blockRegistryEvent.getRegistry().register(invCableFramed);
-			//blockRegistryEvent.getRegistry().register(invCableConnector);
+			blockRegistryEvent.getRegistry().register(invCable);
+			blockRegistryEvent.getRegistry().register(invCableFramed);
+			blockRegistryEvent.getRegistry().register(invCableConnector);
 			blockRegistryEvent.getRegistry().register(invProxy);
 			blockRegistryEvent.getRegistry().register(craftingTerminal);
+			blockRegistryEvent.getRegistry().register(invHopperBasic);
 		}
 
 		@SubscribeEvent
@@ -145,11 +155,12 @@ public class StorageMod implements ModInitializer {
 			registerItemForBlock(itemRegistryEvent, openCrate);
 			registerItemForBlock(itemRegistryEvent, inventoryTrim);
 			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(paintedTrim));
-			//registerItemForBlock(itemRegistryEvent, invCable);
-			//itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invCableFramed, new Item.Settings().group(STORAGE_MOD_TAB)));
-			//itemRegistryEvent.getRegistry().register(new ItemBlockConnector());
+			registerItemForBlock(itemRegistryEvent, invCable);
+			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invCableFramed, new Item.Settings().group(STORAGE_MOD_TAB)));
+			registerItemForBlock(itemRegistryEvent, invCableConnector);
 			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invProxy, new Item.Settings().group(STORAGE_MOD_TAB)));
 			registerItemForBlock(itemRegistryEvent, craftingTerminal);
+			registerItemForBlock(itemRegistryEvent, invHopperBasic);
 
 			itemRegistryEvent.getRegistry().register(paintingKit);
 			itemRegistryEvent.getRegistry().register(wirelessTerminal);
@@ -169,19 +180,22 @@ public class StorageMod implements ModInitializer {
 			((IRegistryEntry<BlockEntityType<?>>) openCrateTile).setRegistryName("ts.open_crate.tile");
 			paintedTile = BlockEntityType.Builder.create(TileEntityPainted::new, paintedTrim).build(null);//invCableFramed
 			((IRegistryEntry<BlockEntityType<?>>) paintedTile).setRegistryName("ts.painted.tile");
-			//invCableConnectorTile = BlockEntityType.Builder.create(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
-			//invCableConnectorTile.setRegistryName("ts.inventory_cable_connector.tile");
+			invCableConnectorTile = BlockEntityType.Builder.create(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
+			((IRegistryEntry<BlockEntityType<?>>) invCableConnectorTile).setRegistryName("ts.inventory_cable_connector.tile");
 			invProxyTile = BlockEntityType.Builder.create(TileEntityInventoryProxy::new, invProxy).build(null);
 			((IRegistryEntry<BlockEntityType<?>>) invProxyTile).setRegistryName("ts.inventory_proxy.tile");
 			craftingTerminalTile = BlockEntityType.Builder.create(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
 			((IRegistryEntry<BlockEntityType<?>>) craftingTerminalTile).setRegistryName("ts.crafting_terminal.tile");
+			invHopperBasicTile = BlockEntityType.Builder.create(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
+			((IRegistryEntry<BlockEntityType<?>>) invHopperBasicTile).setRegistryName("ts.inventoty_hopper_basic.tile");
 			tileRegistryEvent.getRegistry().register(connectorTile);
 			tileRegistryEvent.getRegistry().register(terminalTile);
 			tileRegistryEvent.getRegistry().register(openCrateTile);
 			tileRegistryEvent.getRegistry().register(paintedTile);
-			//tileRegistryEvent.getRegistry().register(invCableConnectorTile);
+			tileRegistryEvent.getRegistry().register(invCableConnectorTile);
 			tileRegistryEvent.getRegistry().register(invProxyTile);
 			tileRegistryEvent.getRegistry().register(craftingTerminalTile);
+			tileRegistryEvent.getRegistry().register(invHopperBasicTile);
 		}
 
 		@SubscribeEvent

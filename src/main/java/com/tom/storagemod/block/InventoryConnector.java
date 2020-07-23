@@ -1,5 +1,6 @@
 package com.tom.storagemod.block;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -11,13 +12,15 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 
 import com.tom.fabriclibs.ext.IBlock;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 
-public class InventoryConnector extends BlockWithEntity implements IBlock {
+public class InventoryConnector extends BlockWithEntity implements IBlock, IInventoryCable {
 
 	public InventoryConnector() {
 		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
@@ -39,5 +42,10 @@ public class InventoryConnector extends BlockWithEntity implements IBlock {
 	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
 		ClientProxy.tooltip("inventory_connector", tooltip);
+	}
+
+	@Override
+	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+		return Collections.emptyList();
 	}
 }

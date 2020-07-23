@@ -1,5 +1,14 @@
 {
-   "parent": "minecraft:recipes/root",
+   "display":{
+      "description":"",
+      "title":"",
+      "show_toast":false,
+      "announce_to_chat":false,
+      "background":"minecraft:textures/blocks/stone.png",
+      "icon":{
+         "item":"chest"
+      }
+   },
    "criteria":{
       "inv_changed-chest":{
          "trigger":"minecraft:inventory_changed",
@@ -14,6 +23,9 @@
    },
    "rewards":{
       "recipes":[
+      	 "toms_storage:inventory_cable_framed",
+      	 "toms_storage:inventory_hopper_basic",
+         "toms_storage:inventory_cable",
          "toms_storage:inventory_proxy",
          "toms_storage:open_crate",
          "toms_storage:paint_kit",

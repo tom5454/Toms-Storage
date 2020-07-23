@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	" IP",
+    "CcE",
+    " DP"
+  ],
+  "key": {
+  	"P": {
+      "tag": "minecraft:planks"
+    },
+    "c": {
+      "item": "minecraft:chest"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "C": {
+      "item": "toms_storage:ts.inventory_cable"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "I": {
+    	"item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "toms_storage:ts.inventory_cable_connector"
+  }
+}
