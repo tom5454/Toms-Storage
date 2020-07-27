@@ -1,15 +1,19 @@
 {
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage",
   "promos": {
-    "1.15.2-latest": "1.1.3",
-    "1.15.2-recommended": "1.1.3",
-    "1.16.1-latest": "1.2.2",
-    "1.16.1-recommended": "1.2.2"
+    "1.15.2-latest": "1.1.4",
+    "1.15.2-recommended": "1.1.4",
+    "1.16.1-latest": "1.2.3",
+    "1.16.1-recommended": "1.2.3"
   },
-  "1.15.2": {
+  "1.16.1": {
+  	"1.2.3": "Added Simplified Chinese Translation",
   	"1.2.2": "Fixed search not working",
   	"1.2.1": "Fixed Crafting terminal not dropping when broken",
   	"1.2.0": "1.16 Port\nChanged inventory cable.\nAdded Inventory Hopper",
+  },
+  "1.15.2": {
+  	"1.1.4": "Added Simplified Chinese Translation",
   	"1.1.3": "Fixed Crafting terminal not dropping when broken",
   	"1.1.2": "Fixed items with tags merging\nAdded terminal sorting modes\nImproved terminal gui handler",
   	"1.1.1": "Fixed Inventory Cable Connector not showing up in the creative inventory and JEI\nAdded JEI compatibility to crafting terminal\nFixed Storage Terminal recipe not using tags\nTerminals now emit light",
