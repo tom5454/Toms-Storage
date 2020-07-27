@@ -68,17 +68,17 @@ public class ClientProxy implements IProxy {
 					}
 				}
 				return -1;
-			}, StorageMod.paintedTrim, StorageMod.invProxy);//StorageMod.invCableFramed
+			}, StorageMod.paintedTrim, StorageMod.invProxy, StorageMod.invCableFramed);
 		});
 		RenderTypeLookup.setRenderLayer(StorageMod.paintedTrim, RenderLayer.getTranslucent());
-		//RenderTypeLookup.setRenderLayer(StorageMod.invCableFramed, e -> true);
+		RenderTypeLookup.setRenderLayer(StorageMod.invCableFramed, RenderLayer.getTranslucent());
 		RenderTypeLookup.setRenderLayer(StorageMod.invProxy, RenderLayer.getTranslucent());
 		Events.EVENT_BUS.addListener(RenderWorldLastEvent.class, ClientProxy::renderWorldLastEvent);
 	}
 
 	private static void bakeModels(ModelBakeEvent event) {
 		bindPaintedModel(event, StorageMod.paintedTrim);
-		//bindPaintedModel(event, StorageMod.invCableFramed);
+		bindPaintedModel(event, StorageMod.invCableFramed);
 		bindPaintedModel(event, StorageMod.invProxy);
 	}
 

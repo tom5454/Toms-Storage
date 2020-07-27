@@ -27,9 +27,10 @@ import com.google.common.collect.Lists;
 import com.tom.fabriclibs.network.IDataReceiver;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
+import com.tom.storagemod.rei.IREIAutoFillTerminal;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 
-public class ContainerCraftingTerminal extends ContainerStorageTerminal implements IDataReceiver {//IJEIAutoFillTerminal
+public class ContainerCraftingTerminal extends ContainerStorageTerminal implements IDataReceiver, IREIAutoFillTerminal {
 	public static class SlotCrafting extends Slot {
 		public SlotCrafting(Inventory inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);

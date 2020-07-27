@@ -6,8 +6,11 @@ import java.util.Stack;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -21,9 +24,9 @@ import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 
-public class TileEntityInventoryCableConnector extends BlockEntity implements Tickable, Inventory {
+public class TileEntityInventoryCableConnector extends BlockEntity implements Tickable, Inventory, IProxy {
 	private TileEntityInventoryConnector master;
-	private InventoryWrapper pointedAt;
+	private InventoryWrapper pointedAt, masterW;
 	private LinkedInv linv;
 	public TileEntityInventoryCableConnector() {
 		super(StorageMod.invCableConnectorTile);
@@ -41,6 +44,7 @@ public class TileEntityInventoryCableConnector extends BlockEntity implements Ti
 			if(master != null)master.unLink(linv);
 			master = null;
 			linv = new LinkedInv();
+			masterW = null;
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				if(!checkedBlocks.contains(cp)) {
@@ -54,6 +58,7 @@ public class TileEntityInventoryCableConnector extends BlockEntity implements Ti
 								linv.time = world.getTime();
 								linv.handler = () -> pointedAt;
 								master.addLinked(linv);
+								masterW = new InventoryWrapper(master, facing);
 							}
 							break;
 						}
@@ -64,13 +69,20 @@ public class TileEntityInventoryCableConnector extends BlockEntity implements Ti
 					if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
 				}
 			}
-			if(pointedAt == null) {
-				BlockEntity te = world.getBlockEntity(pos.offset(facing));
-				if(te instanceof Inventory) {
-					pointedAt = new InventoryWrapper((Inventory) te, facing.getOpposite());
-				} else {
-					pointedAt = null;
+			BlockPos p = pos.offset(facing);
+			BlockEntity te = world.getBlockEntity(p);
+			if(te instanceof Inventory) {
+				Inventory ihr = (Inventory) te;
+				if(te instanceof ChestBlockEntity) {
+					state = world.getBlockState(p);
+					Block block = state.getBlock();
+					if(block instanceof ChestBlock) {
+						ihr = ChestBlock.getInventory((ChestBlock)block, state, world, p, true);
+					}
 				}
+				pointedAt = new InventoryWrapper(ihr, facing.getOpposite());
+			} else {
+				pointedAt = null;
 			}
 		}
 	}
@@ -79,8 +91,8 @@ public class TileEntityInventoryCableConnector extends BlockEntity implements Ti
 	public <R> R call(Function<InventoryWrapper, R> func, Predicate<InventoryWrapper> accessCheck, R def) {
 		if(calling)return def;
 		calling = true;
-		if(pointedAt != null && accessCheck.test(pointedAt)) {
-			R r = func.apply(pointedAt);
+		if(masterW != null && accessCheck.test(masterW)) {
+			R r = func.apply(masterW);
 			calling = false;
 			return r;
 		}
@@ -128,5 +140,10 @@ public class TileEntityInventoryCableConnector extends BlockEntity implements Ti
 	@Override
 	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
 		return false;
+	}
+
+	@Override
+	public Inventory get() {
+		return masterW != null ? masterW.getInventory() : null;
 	}
 }

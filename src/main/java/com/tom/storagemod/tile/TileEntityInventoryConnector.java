@@ -8,12 +8,8 @@ import java.util.Stack;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.enums.ChestType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -52,7 +48,17 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 					continue;
 				}
 				InventoryWrapper w = inv.handler.get();
-				if(w != null)handlers.add(w);
+				if(w != null) {
+					Inventory ihr = IProxy.resolve(w.getInventory());
+					if(ihr instanceof TileEntityInventoryConnector) {
+						TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
+						if(checkHandlers(ih, 0)) {
+							if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+							continue;
+						}
+					}
+					handlers.add(w);
+				}
 			}
 			linkedInvs.removeAll(toRM);
 			//System.out.println("Start checking invs");
@@ -68,7 +74,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 							continue;
 						} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
 							Inventory ihr = null;
-							if(te instanceof ChestBlockEntity) {//Check for double chests
+							/*if(te instanceof ChestBlockEntity) {//Check for double chests
 								BlockState state = world.getBlockState(p);
 								Block block = state.getBlock();
 								if(block instanceof ChestBlock) {
@@ -86,7 +92,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 										}
 									}
 								}
-							}else if(te instanceof Inventory) {
+							}else */if(te instanceof Inventory) {
 								//System.out.println("Checking pos: " + p + " " + inv.orElse(null));
 								ihr = IProxy.resolve((Inventory) te);
 								if(ihr instanceof TileEntityInventoryConnector) {
@@ -96,7 +102,8 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 										continue;
 									}
 								}
-								toCheck.add(p);
+								if(!(te instanceof TileEntityInventoryCableConnector))
+									toCheck.add(p);
 							}
 							if(ihr != null)handlers.add(new InventoryWrapper(ihr, d.getOpposite()));
 						} else {
@@ -125,6 +132,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 		if(depth > 3)return true;
 		for (InventoryWrapper lo : ih.handlers) {
 			Inventory ihr = IProxy.resolve(lo.getInventory());
+			if(ihr == this)return true;
 			if(ihr instanceof TileEntityInventoryConnector) {
 				if(checkHandlers((TileEntityInventoryConnector) ihr, depth+1))return true;
 			}

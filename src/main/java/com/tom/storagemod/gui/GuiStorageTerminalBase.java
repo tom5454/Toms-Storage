@@ -406,7 +406,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				TextRenderer font = this.textRenderer;
 				RenderSystem.enableDepthTest();
 				this.itemRenderer.renderGuiItemIcon(stack, x, y);
-				this.itemRenderer.renderGuiItemOverlay(font, stack, mouseX, mouseY);
+				this.itemRenderer.renderGuiItemOverlay(font, stack, x, y);
 				//this.setBlitOffset(0);
 				//this.itemRenderer.zLevel = 0.0F;
 			} else if (mouseX >= x - 1 && mouseY >= y - 1 && mouseX < x + 17 && mouseY < y + 17) {
