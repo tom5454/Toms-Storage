@@ -66,7 +66,7 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < Config.invRange) {
 						checkedBlocks.add(p);
 						TileEntity te = world.getTileEntity(p);
-						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy) {
+						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
 							continue;
 						} else if(te != null && !Config.onlyTrims) {
 							LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());

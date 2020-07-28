@@ -3,10 +3,11 @@
   "promos": {
     "1.15.2-latest": "1.1.4",
     "1.15.2-recommended": "1.1.4",
-    "1.16.1-latest": "1.2.3",
-    "1.16.1-recommended": "1.2.3"
+    "1.16.1-latest": "1.2.4",
+    "1.16.1-recommended": "1.2.4"
   },
   "1.16.1": {
+  	"1.2.4": "Fixed lag with Inventory Hoppers",
   	"1.2.3": "Added Simplified Chinese Translation",
   	"1.2.2": "Fixed search not working",
   	"1.2.1": "Fixed Crafting terminal not dropping when broken",
