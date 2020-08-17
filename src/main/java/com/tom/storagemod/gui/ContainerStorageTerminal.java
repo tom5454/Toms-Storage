@@ -22,6 +22,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.RecipeBookCategory;
 import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -724,5 +725,10 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			}
 			player.updateHeldItem();
 		}
+	}
+
+	@Override
+	public RecipeBookCategory func_241850_m() {
+		return RecipeBookCategory.CRAFTING;
 	}
 }

@@ -264,7 +264,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			renderTooltip(st, new TranslationTextComponent("tooltip.toms_storage.search_" + buttonSearchType.state), mouseX, mouseY);
 		}
 		if (buttonCtrlMode.isHovered()) {
-			renderTooltip(st, Arrays.stream(I18n.format("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(StringTextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+			func_243308_b(st, Arrays.stream(I18n.format("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(StringTextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
@@ -434,7 +434,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 						list.set(i, t2.func_240699_a_(TextFormatting.GRAY));
 					}
 				}
-				this.renderTooltip(st, list, mouseX, mouseY);
+				this.func_243308_b(st, list, mouseX, mouseY);
 			}
 		}
 	}

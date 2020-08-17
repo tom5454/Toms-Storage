@@ -4,7 +4,12 @@
     "1.15.2-latest": "1.1.4",
     "1.15.2-recommended": "1.1.4",
     "1.16.1-latest": "1.2.4",
-    "1.16.1-recommended": "1.2.4"
+    "1.16.1-recommended": "1.2.4",
+    "1.16.2-latest": "1.2.5",
+    "1.16.2-recommended": "1.2.5"
+  },
+  "1.16.2": {
+  	"1.2.5": "Updated to 1.16.2"
   },
   "1.16.1": {
   	"1.2.4": "Fixed lag with Inventory Hoppers",

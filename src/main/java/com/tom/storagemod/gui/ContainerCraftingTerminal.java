@@ -215,7 +215,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 
 	@Override
 	public java.util.List<net.minecraft.client.util.RecipeBookCategories> getRecipeBookCategories() {
-		return Lists.newArrayList(RecipeBookCategories.SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
+		return Lists.newArrayList(RecipeBookCategories.CRAFTING_SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
 	}
 
 	public class TerminalRecipeItemHelper extends RecipeItemHelper {
