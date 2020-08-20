@@ -5,10 +5,11 @@
     "1.15.2-recommended": "1.1.4",
     "1.16.1-latest": "1.2.4",
     "1.16.1-recommended": "1.2.4",
-    "1.16.2-latest": "1.2.5",
-    "1.16.2-recommended": "1.2.5"
+    "1.16.2-latest": "1.2.6",
+    "1.16.2-recommended": "1.2.6"
   },
   "1.16.2": {
+  	"1.2.6": "Fixed crash with latest version of forge",
   	"1.2.5": "Updated to 1.16.2"
   },
   "1.16.1": {
@@ -16,7 +17,7 @@
   	"1.2.3": "Added Simplified Chinese Translation",
   	"1.2.2": "Fixed search not working",
   	"1.2.1": "Fixed Crafting terminal not dropping when broken",
-  	"1.2.0": "1.16 Port\nChanged inventory cable.\nAdded Inventory Hopper",
+  	"1.2.0": "1.16 Port\nChanged inventory cable.\nAdded Inventory Hopper"
   },
   "1.15.2": {
   	"1.1.4": "Added Simplified Chinese Translation",
