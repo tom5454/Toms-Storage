@@ -327,7 +327,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			//windowClick(-1, 0, SlotAction.SPACE_CLICK);
 			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
 		} else {
-			if (mouseButton == 1 && isPointInRegion(searchField.x - guiLeft, searchField.y - guiTop, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
+			if (mouseButton == 1 && isPointInRegion(searchField.x - guiLeft, searchField.y - guiTop, 89, this.getFont().FONT_HEIGHT, mouseX, mouseY))
 				searchField.setText("");
 			else if(this.searchField.mouseClicked(mouseX, mouseY, mouseButton))return true;
 			else
