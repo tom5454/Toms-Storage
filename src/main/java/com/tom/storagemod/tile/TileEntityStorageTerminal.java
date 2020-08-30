@@ -62,21 +62,24 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 	}
 
 	public StoredItemStack pullStack(StoredItemStack stack, long max) {
-		ItemStack st = stack.getStack();
-		StoredItemStack ret = null;
-		for (int i = 0; i < itemHandler.getSlots(); i++) {
-			ItemStack s = itemHandler.getStackInSlot(i);
-			if(ItemStack.areItemsEqual(s, st) && ItemStack.areItemStackTagsEqual(s, st)) {
-				ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
-				if(!pulled.isEmpty()) {
-					if(ret == null)ret = new StoredItemStack(pulled);
-					else ret.grow(pulled.getCount());
-					max -= pulled.getCount();
-					if(max < 1)break;
+		if(stack != null && itemHandler != null && max > 0) {
+			ItemStack st = stack.getStack();
+			StoredItemStack ret = null;
+			for (int i = 0; i < itemHandler.getSlots(); i++) {
+				ItemStack s = itemHandler.getStackInSlot(i);
+				if(ItemStack.areItemsEqual(s, st) && ItemStack.areItemStackTagsEqual(s, st)) {
+					ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
+					if(!pulled.isEmpty()) {
+						if(ret == null)ret = new StoredItemStack(pulled);
+						else ret.grow(pulled.getCount());
+						max -= pulled.getCount();
+						if(max < 1)break;
+					}
 				}
 			}
+			return ret;
 		}
-		return ret;
+		return null;
 	}
 
 	public StoredItemStack pushStack(StoredItemStack stack) {
