@@ -5,10 +5,11 @@
     "1.15.2-recommended": "1.1.4",
     "1.16.1-latest": "1.2.4",
     "1.16.1-recommended": "1.2.4",
-    "1.16.2-latest": "1.2.7",
-    "1.16.2-recommended": "1.2.7"
+    "1.16.2-latest": "1.2.8",
+    "1.16.2-recommended": "1.2.8"
   },
   "1.16.2": {
+  	"1.2.8": "Fixed dupe bug with crafting terminal",
   	"1.2.7": "Fixed crash with Storage Terminals",
   	"1.2.6": "Fixed crash with latest version of forge",
   	"1.2.5": "Updated to 1.16.2"
