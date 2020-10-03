@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.2.5'
+version = '1.2.9'
 group = 'com.yourname.modid' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'toms_storage'
 
@@ -113,7 +113,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.5'
+    minecraft 'net.minecraftforge:forge:1.16.3-34.1.5'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -134,14 +134,14 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
 	// compile against the JEI API but do not include it at runtime
-  	compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6:api")
+  	compileOnly fg.deobf("mezz.jei:jei-1.16.3:7.3.2.36:api")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.0.6")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.16.3:7.3.2.36")
   	
   	// compile against the TOP API but do not include it at runtime
-  	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.1-beta-4:api")
+  	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.4-beta-7:api")
   	// at runtime, use the full TOP jar
-  	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.1-beta-4")
+  	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.0.4-beta-7")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
