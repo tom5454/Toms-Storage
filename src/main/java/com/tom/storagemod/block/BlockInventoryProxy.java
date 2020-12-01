@@ -23,7 +23,6 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -35,26 +34,23 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
-import com.tom.storagemod.tile.TileEntityPainted;
 
-public class BlockInventoryProxy extends BlockWithEntity implements IPaintable, IBlock {
+public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
 	public static final DirectionProperty FACING = Properties.FACING;
 	public static final EnumProperty<DirectionWithNull> FILTER_FACING = EnumProperty.of("filter_facing", DirectionWithNull.class);
 
 	public BlockInventoryProxy() {
 		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.inventory_proxy");
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("inventory_proxy", tooltip);
+		//tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
+		StorageModClient.tooltip("inventory_proxy", tooltip);
 	}
 
 	@Override
@@ -101,13 +97,14 @@ public class BlockInventoryProxy extends BlockWithEntity implements IPaintable, 
 		return BlockRenderType.MODEL;
 	}
 
-	@Override
+	/*@Override
 	public boolean paint(World world, BlockPos pos, BlockState to) {
 		BlockEntity te = world.getBlockEntity(pos);
+		world.setBlockState(pos, world.getBlockState(pos).with(BlockInventoryCableFramed.PAINTED, true), 2);
 		if(te != null && te instanceof TileEntityPainted)
 			return ((TileEntityPainted)te).setPaintedBlockState(to);
 		return false;
-	}
+	}*/
 
 	@Override
 	public List<ItemStack> getDroppedStacks(BlockState state, net.minecraft.loot.context.LootContext.Builder builder) {

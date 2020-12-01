@@ -10,14 +10,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.world.BlockView;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 
 public class CraftingTerminal extends StorageTerminalBase {
 
 	public CraftingTerminal() {
 		super();
-		setRegistryName("ts.crafting_terminal");
 	}
 
 	@Override
@@ -27,8 +26,8 @@ public class CraftingTerminal extends StorageTerminalBase {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("crafting_terminal", tooltip);
+		StorageModClient.tooltip("crafting_terminal", tooltip);
 	}
 }

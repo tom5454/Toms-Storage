@@ -15,27 +15,30 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import com.tom.fabriclibs.ext.IBlock;
 import com.tom.storagemod.StorageMod;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 
-public class BlockTrim extends Block implements ITrim, IPaintable, IBlock {
+public class BlockTrim extends Block implements ITrim, IPaintable {
 
 	public BlockTrim() {
 		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.trim");
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView world, List<Text> tooltip, TooltipContext options) {
+	public void appendTooltip(ItemStack stack, BlockView world, List<Text> tooltip, TooltipContext options) {
 		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("trim", tooltip);
+		StorageModClient.tooltip("trim", tooltip);
 	}
 
 	@Override
 	public boolean paint(World world, BlockPos pos, BlockState to) {
 		world.setBlockState(pos, StorageMod.paintedTrim.getDefaultState());
 		return StorageMod.paintedTrim.paint(world, pos, to);
+	}
+
+	@Override
+	public Block getPaintedBlock() {
+		return StorageMod.paintedTrim;
 	}
 }

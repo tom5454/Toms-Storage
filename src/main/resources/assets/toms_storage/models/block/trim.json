@@ -1,6 +1,6 @@
 {
 	"parent": "block/cube_all",
 	"textures": {
-		"all": "toms_storage:block/inventory_connector"
+		"all": "toms_storage:block/trim"
 	}
 }

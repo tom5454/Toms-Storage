@@ -30,10 +30,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-import com.tom.fabriclibs.ext.IBlock;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
-public abstract class StorageTerminalBase extends BlockWithEntity implements Waterloggable, IBlock {
+public abstract class StorageTerminalBase extends BlockWithEntity implements Waterloggable {
 	public static final EnumProperty<TerminalPos> TERMINAL_POS = EnumProperty.of("pos", TerminalPos.class);
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
@@ -44,7 +43,7 @@ public abstract class StorageTerminalBase extends BlockWithEntity implements Wat
 	private static final VoxelShape SHAPE_U = Block.createCuboidShape(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 	private static final VoxelShape SHAPE_D = Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public StorageTerminalBase() {
-		super(Block.Settings.of(Material.WOOD).strength(3).lightLevel(s -> 6));//.(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3).luminance(s -> 6));//.(ToolType.AXE)
 		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER));
 	}
 

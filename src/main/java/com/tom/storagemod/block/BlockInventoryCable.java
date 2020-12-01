@@ -27,10 +27,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 
-public class BlockInventoryCable extends ConnectingBlock implements Waterloggable, IInventoryCable, IBlock {
+public class BlockInventoryCable extends ConnectingBlock implements Waterloggable, IInventoryCable {
 	public static final BooleanProperty UP = Properties.UP;
 	public static final BooleanProperty DOWN = Properties.DOWN;
 	public static final BooleanProperty NORTH = Properties.NORTH;
@@ -42,7 +41,6 @@ public class BlockInventoryCable extends ConnectingBlock implements Waterloggabl
 
 	public BlockInventoryCable() {
 		super(0.125f, Block.Settings.of(Material.WOOD).strength(2));//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.inventory_cable");
 		setDefaultState(getDefaultState()
 				.with(DOWN, false)
 				.with(UP, false)
@@ -55,9 +53,9 @@ public class BlockInventoryCable extends ConnectingBlock implements Waterloggabl
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("inventory_cable", tooltip);
+		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override

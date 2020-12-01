@@ -3,6 +3,8 @@ package com.tom.storagemod.block;
 import java.util.Collections;
 import java.util.List;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -16,15 +18,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 
-public class InventoryConnector extends BlockWithEntity implements IBlock, IInventoryCable {
+public class InventoryConnector extends BlockWithEntity implements IInventoryCable {
 
 	public InventoryConnector() {
 		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.inventory_connector");
 	}
 
 	@Override
@@ -38,10 +38,10 @@ public class InventoryConnector extends BlockWithEntity implements IBlock, IInve
 	}
 
 	@Override
-	//@OnlyIn(Dist.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	@Environment(EnvType.CLIENT)
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("inventory_connector", tooltip);
+		StorageModClient.tooltip("inventory_connector", tooltip);
 	}
 
 	@Override

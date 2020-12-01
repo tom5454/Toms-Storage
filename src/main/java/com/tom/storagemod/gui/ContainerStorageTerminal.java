@@ -24,6 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -33,8 +34,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.google.common.collect.Lists;
 
-import com.tom.fabriclibs.network.IDataReceiver;
-import com.tom.fabriclibs.network.NetworkHandler;
+import com.tom.storagemod.NetworkHandler;
+import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
@@ -546,6 +547,10 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 			}
 			player.updateCursorStack();
 		}
+		if(message.contains("c")) {
+			CompoundTag d = message.getCompound("c");
+			te.setSorting(d.getInt("d"));
+		}
 	}
 
 	@Override
@@ -585,5 +590,10 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	@Override
 	public boolean canUse(PlayerEntity paramPlayerEntity) {
 		return te.canInteractWith(paramPlayerEntity);
+	}
+
+	@Override
+	public RecipeBookCategory getCategory() {
+		return RecipeBookCategory.CRAFTING;
 	}
 }

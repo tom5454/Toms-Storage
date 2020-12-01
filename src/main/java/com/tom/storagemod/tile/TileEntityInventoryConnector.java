@@ -70,7 +70,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 					if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < range) {
 						checkedBlocks.add(p);
 						BlockEntity te = world.getBlockEntity(p);
-						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy) {
+						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
 							continue;
 						} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
 							Inventory ihr = null;

@@ -4,23 +4,30 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import com.tom.fabriclibs.ext.IItem;
-import com.tom.fabriclibs.ext.IRegistered;
+import com.tom.storagemod.block.IPaintable;
 
-public class ItemBlockPainted extends BlockItem implements IItem {
+public class ItemBlockPainted extends BlockItem {
 
 	public ItemBlockPainted(Block block, Item.Settings p) {
 		super(block, p);
-		setRegistryName(((IRegistered) block).getRegistryName());
 	}
 	public ItemBlockPainted(Block block) {
 		this(block, new Item.Settings());
+	}
+
+	@Override
+	protected BlockState getPlacementState(ItemPlacementContext context) {
+		ItemStack is = context.getStack();
+		Block block = is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block") ? ((IPaintable)getBlock()).getPaintedBlock() : getBlock();
+		BlockState blockState = block.getPlacementState(context);
+		return (blockState != null && canPlace(context, blockState)) ? blockState : null;
 	}
 
 	@Override

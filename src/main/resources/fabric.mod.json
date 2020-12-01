@@ -18,6 +18,9 @@
 
   "environment": "*",
   "entrypoints": {
+  	"client": [
+      "com.tom.storagemod.StorageModClient"
+    ],
     "main": [
       "com.tom.storagemod.StorageMod"
     ],
@@ -29,13 +32,11 @@
     ]
   },
   "mixins": [
-    "tomsstorage.mixins.json"
   ],
 	"accessWidener" : "tomsstorage.accesswidener",
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric": "*",
-    "tomsfabriclibs": "*"
+    "fabric": "*"
   },
   "suggests": {
     "flamingo": "*"

@@ -1,15 +1,21 @@
 package com.tom.storagemod.gui;
 
+import org.lwjgl.glfw.GLFW;
+
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.screen.recipebook.RecipeBookGhostSlots;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -17,16 +23,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftingTerminal> implements RecipeBookProvider {
 	private static final Identifier gui = new Identifier("toms_storage", "textures/gui/crafting_terminal.png");
-	private final RecipeBookWidget recipeBookGui = new RecipeBookWidget() {
-		{
-			recipeFinder = handler.new TerminalRecipeItemHelper();
-		}
-	};
+	private final RecipeBookWidget recipeBookGui;
 	private boolean widthTooNarrow;
 	private static final Identifier RECIPE_BUTTON_TEXTURE = new Identifier("textures/gui/recipe_button.png");
+	private GuiButton buttonPullFromInv;
+	private boolean pullFromInv;
 
 	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, PlayerInventory inv, Text titleIn) {
 		super(screenContainer, inv, titleIn);
+		recipeBookGui = new RecipeBookWidget();
+		recipeBookGui.recipeFinder = handler.new TerminalRecipeItemHelper();
 	}
 
 	@Override
@@ -36,7 +42,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 
 	@Override
 	protected void onUpdateSearch(String text) {
-		if((searchType & 4) > 0) {//ModList.get().isLoaded("jei") ||
+		if(FabricLoader.getInstance().isModLoaded("rei") || (searchType & 4) > 0) {
 			if(recipeBookGui.searchField != null)recipeBookGui.searchField.setText(text);
 			recipeBookGui.refresh();
 		}
@@ -55,6 +61,10 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setInitialFocus(this.recipeBookGui);
 		GuiButtonClear btnClr = new GuiButtonClear(x + 80, y + 110, b -> clearGrid());
 		addButton(btnClr);
+		buttonPullFromInv = addButton(new GuiButton(x - 18, y + 5 + 18*4, 4, b -> {
+			pullFromInv = !pullFromInv;
+			sendUpdate();
+		}));
 		this.addButton(new TexturedButtonWidget(this.x + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (buttonWidget) -> {
 			this.recipeBookGui.reset(this.widthTooNarrow);
 			this.recipeBookGui.toggleOpen();
@@ -88,28 +98,47 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	}
 
 	@Override
+	protected void onPacket() {
+		super.onPacket();
+		int s = handler.terminalData;
+		pullFromInv = (s & (1 << 8)) != 0;
+		buttonPullFromInv.state = pullFromInv ? 1 : 0;
+	}
+
+	@Override
+	protected int updateData() {
+		int d = super.updateData();
+		d |= (pullFromInv ? 1 : 0) << 8;
+		return d;
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 		this.recipeBookGui.update();
 	}
 
 	@Override
-	public void render(MatrixStack st, int p_render_1_, int p_render_2_, float p_render_3_) {
+	public void render(MatrixStack st, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(st);
 		if (this.recipeBookGui.isOpen() && this.widthTooNarrow) {
-			this.drawBackground(st, p_render_3_, p_render_1_, p_render_2_);
+			this.drawBackground(st, partialTicks, mouseX, mouseY);
 			RenderSystem.disableLighting();
-			this.recipeBookGui.render(st, p_render_1_, p_render_2_, p_render_3_);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
 			RenderSystem.disableLighting();
-			this.recipeBookGui.render(st, p_render_1_, p_render_2_, p_render_3_);
-			super.render(st, p_render_1_, p_render_2_, p_render_3_);
-			this.recipeBookGui.drawGhostSlots(st, this.x, this.y, true, p_render_3_);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			super.render(st, mouseX, mouseY, partialTicks);
+			this.recipeBookGui.drawGhostSlots(st, this.x, this.y, true, partialTicks);
 		}
 
-		this.drawMouseoverTooltip(st, p_render_1_, p_render_2_);
-		this.recipeBookGui.drawTooltip(st, this.x, this.y, p_render_1_, p_render_2_);
+		this.drawMouseoverTooltip(st, mouseX, mouseY);
+		this.recipeBookGui.drawTooltip(st, this.x, this.y, mouseX, mouseY);
 		this.setFocused(this.recipeBookGui);
+
+		if (buttonPullFromInv.isHovered()) {
+			renderTooltip(st, new TranslatableText("tooltip.toms_storage.pull_" + buttonSearchType.state), mouseX, mouseY);
+		}
 	}
 
 	@Override
@@ -159,6 +188,28 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 
 	private void clearGrid() {
 		this.mc.interactionManager.clickButton((this.handler).syncId, 0);
+	}
+
+	@Override
+	public boolean keyPressed(int code, int p_231046_2_, int p_231046_3_) {
+		if(code == GLFW.GLFW_KEY_S && focusedSlot != null) {
+			ItemStack itemstack = null;
+
+			for (int i = 0; i < this.recipeBookGui.ghostSlots.getSlotCount(); ++i) {
+				RecipeBookGhostSlots.GhostInputSlot ghostrecipe$ghostingredient = this.recipeBookGui.ghostSlots.getSlot(i);
+				int j = ghostrecipe$ghostingredient.getX();
+				int k = ghostrecipe$ghostingredient.getY();
+				if (j == focusedSlot.x && k == focusedSlot.y) {
+					itemstack = ghostrecipe$ghostingredient.getCurrentItemStack();
+				}
+			}
+			if(itemstack != null) {
+				super.searchField.setText(itemstack.getName().getString());
+				super.searchField.setFocused(false);
+				return true;
+			}
+		}
+		return super.keyPressed(code, p_231046_2_, p_231046_3_);
 	}
 
 	public class GuiButtonClear extends ButtonWidget {

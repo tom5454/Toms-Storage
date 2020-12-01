@@ -28,11 +28,11 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityPainted;
 
-public class BlockInventoryCableFramed extends BlockWithEntity implements IInventoryCable, IPaintable, IBlock {
+public class BlockInventoryCableFramed extends BlockWithEntity implements IInventoryCable, IPaintable {
 	public static final BooleanProperty UP = Properties.UP;
 	public static final BooleanProperty DOWN = Properties.DOWN;
 	public static final BooleanProperty NORTH = Properties.NORTH;
@@ -42,7 +42,6 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 
 	public BlockInventoryCableFramed() {
 		super(Block.Settings.of(Material.WOOD).strength(2).nonOpaque());//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.inventory_cable_framed");
 		setDefaultState(getDefaultState()
 				.with(DOWN, false)
 				.with(UP, false)
@@ -54,10 +53,10 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
 		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("inventory_cable", tooltip);
+		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override
@@ -133,6 +132,7 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 
 	@Override
 	public boolean paint(World world, BlockPos pos, BlockState to) {
+		world.setBlockState(pos, StorageMod.invCablePainted.getDefaultState(), 2);
 		BlockEntity te = world.getBlockEntity(pos);
 		if(te != null && te instanceof TileEntityPainted)
 			return ((TileEntityPainted)te).setPaintedBlockState(to);
@@ -154,4 +154,8 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 		return false;
 	}
 
+	@Override
+	public Block getPaintedBlock() {
+		return StorageMod.invCablePainted;
+	}
 }

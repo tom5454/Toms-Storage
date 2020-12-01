@@ -10,14 +10,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.world.BlockView;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
 public class StorageTerminal extends StorageTerminalBase {
 
 	public StorageTerminal() {
 		super();
-		setRegistryName("ts.storage_terminal");
 	}
 
 	@Override
@@ -27,8 +26,8 @@ public class StorageTerminal extends StorageTerminalBase {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("storage_terminal", tooltip);
+		StorageModClient.tooltip("storage_terminal", tooltip);
 	}
 }

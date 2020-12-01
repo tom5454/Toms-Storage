@@ -1,7 +1,5 @@
 package com.tom.storagemod.tile;
 
-import java.util.function.Supplier;
-
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -13,11 +11,10 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.ChunkPos;
 
-import com.tom.fabriclibs.client.ModelProperty;
 import com.tom.storagemod.StorageMod;
 
 public class TileEntityPainted extends BlockEntity implements BlockEntityClientSerializable {
-	public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
+	//public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
 	private BlockState blockState;
 
 	public TileEntityPainted() {

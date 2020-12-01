@@ -31,11 +31,10 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
 
-public class BlockInventoryCableConnector extends BlockWithEntity implements IInventoryCable, IBlock {
+public class BlockInventoryCableConnector extends BlockWithEntity implements IInventoryCable {
 	public static final BooleanProperty UP = Properties.UP;
 	public static final BooleanProperty DOWN = Properties.DOWN;
 	public static final BooleanProperty NORTH = Properties.NORTH;
@@ -49,7 +48,6 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 
 	public BlockInventoryCableConnector() {
 		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.inventory_cable_connector");
 		this.shapes = this.makeShapes(0.125f);
 		setDefaultState(getDefaultState()
 				.with(DOWN, false)
@@ -63,9 +61,9 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("inventory_cable_connector", tooltip);
+		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override

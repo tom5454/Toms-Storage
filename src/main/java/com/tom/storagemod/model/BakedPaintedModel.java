@@ -1,48 +1,109 @@
 package com.tom.storagemod.model;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.block.Block;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.render.model.ModelBakeSettings;
+import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.ModelOverrideList;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 
-import com.tom.fabriclibs.client.DynamicBakedModel;
-import com.tom.fabriclibs.client.IModelData;
-import com.tom.fabriclibs.client.IModelData.ModelData;
+import com.mojang.datafixers.util.Pair;
+
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.tile.TileEntityPainted;
 
-public class BakedPaintedModel implements DynamicBakedModel {
-	private Block blockFor;
-	private BakedModel parent;
-	public BakedPaintedModel(Block blockFor, BakedModel parent) {
-		this.blockFor = blockFor;
-		this.parent = parent;
+public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedModel {
+	private static final SpriteIdentifier ID = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(StorageMod.modid, "block/trim"));
+	private Sprite sprite;
+	public BakedPaintedModel() {
 	}
 
 	@Override
-	public boolean useAmbientOcclusion() {
-		return true;
-	}
-
-	@Override
-	public boolean hasDepth() {
+	public boolean isVanillaAdapter() {
 		return false;
 	}
 
 	@Override
-	public boolean isSideLit() {
+	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos,
+			Supplier<Random> randomSupplier, RenderContext context) {
+		BlockEntity tile = blockView.getBlockEntity(pos);
+		if(tile instanceof TileEntityPainted) {
+			BlockState st = ((TileEntityPainted)tile).getPaintedBlockState();
+			BakedModel model = MinecraftClient.getInstance().getBlockRenderManager().getModel(st);
+			if(model instanceof FabricBakedModel)
+				((FabricBakedModel)model).emitBlockQuads(blockView, st, pos, randomSupplier, context);
+			else
+				context.fallbackConsumer().accept(model);
+			return;
+		}
+
+		QuadEmitter emitter = context.getEmitter();
+
+		for(Direction direction : Direction.values()) {
+			// Add a new face to the mesh
+			emitter.square(direction, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+			// Set the sprite of the face, must be called after .square()
+			// We haven't specified any UV coordinates, so we want to use the whole texture. BAKE_LOCK_UV does exactly that.
+			emitter.spriteBake(0, sprite, MutableQuadView.BAKE_LOCK_UV);
+			// Enable texture usage
+			emitter.spriteColor(0, -1, -1, -1, -1);
+			// Add the quad to the mesh
+			emitter.emit();
+		}
+	}
+
+	@Override
+	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
+
+	}
+
+	@Override
+	public ModelOverrideList getOverrides() {
+		return null;
+	}
+
+	@Override
+	public List<BakedQuad> getQuads(BlockState arg0, Direction arg1, Random arg2) {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Sprite getSprite() {
+		return sprite;
+	}
+
+	@Override
+	public ModelTransformation getTransformation() {
+		return null;
+	}
+
+	@Override
+	public boolean hasDepth() {
 		return false;
 	}
 
@@ -52,44 +113,30 @@ public class BakedPaintedModel implements DynamicBakedModel {
 	}
 
 	@Override
-	public Sprite getSprite() {
-		return parent.getSprite();
+	public boolean isSideLit() {
+		return false;
 	}
 
 	@Override
-	public ModelOverrideList getOverrides() {
-		return null;
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand, IModelData modelData) {
-		BakedModel model = null;
-		Supplier<BlockState> blockstateSupp = modelData.getData(TileEntityPainted.FACADE_STATE);
-		BlockState blockstate = null;
-		if(blockstateSupp != null)blockstate = blockstateSupp.get();
-		//RenderLayer layer = MinecraftForgeClient.getRenderLayer();
-		if (blockstate == null || blockstate == Blocks.AIR.getDefaultState()) {
-			blockstate = state;
-			model = parent;
-			//if(layer != null && layer != RenderLayer.getSolid())return Collections.emptyList();
-		}
-		/*if (layer != null && ! RenderTypeLookup.canRenderInLayer(blockstate, layer)) { // always render in the null layer or the block-breaking textures don't show up
-			return Collections.emptyList();
-		}*/
-		if(model == null)
-			model = MinecraftClient.getInstance().getBlockRenderManager().getModel(blockstate);
-		return model.getQuads(blockstate, side, rand);
+	public boolean useAmbientOcclusion() {
+		return true;
 	}
 
 	@Override
-	public IModelData getModelData(BlockRenderView world, BlockPos pos, BlockState state) {
-		BlockEntity te = world.getBlockEntity(pos);
-		return new ModelData().set(TileEntityPainted.FACADE_STATE, te instanceof TileEntityPainted ? ((TileEntityPainted)te)::getPaintedBlockState : null);
+	public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
+		sprite = textureGetter.apply(ID);
+		return this;
 	}
 
 	@Override
-	public ModelTransformation getTransformation() {
-		return ModelTransformation.NONE;
+	public Collection<Identifier> getModelDependencies() {
+		return Collections.emptyList();
 	}
+
+	@Override
+	public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter,
+			Set<Pair<String, String>> unresolvedTextureReferences) {
+		return Arrays.asList(ID);
+	}
+
 }

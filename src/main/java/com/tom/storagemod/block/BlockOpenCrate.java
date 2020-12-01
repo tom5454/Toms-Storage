@@ -20,15 +20,13 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.world.BlockView;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 
-public class BlockOpenCrate extends BlockWithEntity implements IBlock {
+public class BlockOpenCrate extends BlockWithEntity {
 
 	public BlockOpenCrate() {
 		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.open_crate");
 	}
 
 	@Override
@@ -38,9 +36,9 @@ public class BlockOpenCrate extends BlockWithEntity implements IBlock {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("open_crate", tooltip);
+		StorageModClient.tooltip("open_crate", tooltip);
 	}
 
 	@Override

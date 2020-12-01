@@ -33,25 +33,23 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import com.tom.fabriclibs.ext.IBlock;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 
-public class BlockInventoryHopperBasic extends BlockWithEntity implements IInventoryCable, IBlock {
+public class BlockInventoryHopperBasic extends BlockWithEntity implements IInventoryCable {
 	public static final DirectionProperty FACING = Properties.FACING;
 
 	public BlockInventoryHopperBasic() {
 		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
-		setRegistryName("ts.inventory_hopper_basic");
 		setDefaultState(getDefaultState()
 				.with(FACING, Direction.DOWN));
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void buildTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
+	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		ClientProxy.tooltip("inventory_hopper", tooltip);
+		StorageModClient.tooltip("inventory_hopper", tooltip);
 	}
 
 	@Override

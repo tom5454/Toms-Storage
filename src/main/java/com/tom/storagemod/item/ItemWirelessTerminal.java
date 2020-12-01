@@ -16,27 +16,25 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
-import com.tom.fabriclibs.ext.IItem;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.StorageTags;
-import com.tom.storagemod.proxy.ClientProxy;
 
-public class ItemWirelessTerminal extends Item implements IItem {
+public class ItemWirelessTerminal extends Item {
 
 	public ItemWirelessTerminal() {
 		super(new Settings().group(StorageMod.STORAGE_MOD_TAB));
-		setRegistryName("ts.wireless_terminal");
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, World worldIn, List<Text> tooltip, TooltipContext flagIn) {
-		ClientProxy.tooltip("wireless_terminal", tooltip);
+		StorageModClient.tooltip("wireless_terminal", tooltip);
 	}
 
 	@Override
 	public TypedActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
-		BlockHitResult lookingAt = (BlockHitResult) playerIn.rayTrace(StorageMod.CONFIG.wirelessRange, 0f, true);
+		BlockHitResult lookingAt = (BlockHitResult) playerIn.raycast(StorageMod.CONFIG.wirelessRange, 0f, true);
 		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
 			ActionResult r = state.onUse(worldIn, playerIn, handIn, lookingAt);

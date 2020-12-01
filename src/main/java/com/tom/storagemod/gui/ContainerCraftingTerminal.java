@@ -24,7 +24,7 @@ import net.minecraft.util.ItemScatterer;
 
 import com.google.common.collect.Lists;
 
-import com.tom.fabriclibs.network.IDataReceiver;
+import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.rei.IREIAutoFillTerminal;

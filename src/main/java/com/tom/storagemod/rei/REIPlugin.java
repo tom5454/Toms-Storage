@@ -6,10 +6,13 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Identifier;
 
 import me.shedaniel.rei.api.AutoTransferHandler;
+import me.shedaniel.rei.api.BuiltinPlugin;
 import me.shedaniel.rei.api.EntryStack;
+import me.shedaniel.rei.api.REIHelper;
 import me.shedaniel.rei.api.RecipeHelper;
+import me.shedaniel.rei.api.TransferRecipeDisplay;
 import me.shedaniel.rei.api.plugins.REIPluginV0;
-import me.shedaniel.rei.plugin.crafting.DefaultCraftingDisplay;
+import me.shedaniel.rei.impl.Internals;
 
 public class REIPlugin implements REIPluginV0 {
 
@@ -25,11 +28,12 @@ public class REIPlugin implements REIPluginV0 {
 			@Override
 			public Result handle(Context context) {
 				if(context.getContainer() instanceof IREIAutoFillTerminal) {
-					if (!(context.getRecipe() instanceof DefaultCraftingDisplay))
+					if (!(context.getRecipe() instanceof TransferRecipeDisplay) ||
+							!context.getRecipe().getRecipeCategory().equals(BuiltinPlugin.CRAFTING))
 						return Result.createNotApplicable();
 					if (!context.isActuallyCrafting())
 						return Result.createSuccessful();
-					DefaultCraftingDisplay recipe = (DefaultCraftingDisplay) context.getRecipe();
+					TransferRecipeDisplay recipe = (TransferRecipeDisplay) context.getRecipe();
 					ItemStack[][] stacks = recipe.getInputEntries().stream().map(l ->
 					l.stream().map(EntryStack::getItemStack).filter(e -> e != null).toArray(ItemStack[]::new)
 							).toArray(ItemStack[][]::new);
@@ -60,4 +64,21 @@ public class REIPlugin implements REIPluginV0 {
 		});
 	}
 
+	@Override
+	public void postRegister() {
+		try {
+			reiRuntime = Internals.getREIHelper();
+		} catch(Throwable e) {
+			reiRuntime = null;
+		}
+	}
+
+	private static REIHelper reiRuntime;
+	public static void setReiSearchText(String text) {
+		if (reiRuntime != null) {
+			if (reiRuntime.getSearchTextField() != null) {
+				reiRuntime.getSearchTextField().setText(text);
+			}
+		}
+	}
 }

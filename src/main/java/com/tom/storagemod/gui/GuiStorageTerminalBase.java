@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -27,16 +28,17 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import com.tom.fabriclibs.ext.IRegistered;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
+import com.tom.storagemod.rei.REIPlugin;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends HandledScreen<T> {
 	protected MinecraftClient mc = MinecraftClient.getInstance();
@@ -63,7 +65,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		screenContainer.onPacket = this::onPacket;
 	}
 
-	private void onPacket() {
+	protected void onPacket() {
 		int s = handler.terminalData;
 		controllMode = (s & 0b000_00_0_11) % ControllMode.VALUES.length;
 		boolean rev = (s & 0b000_00_1_00) > 0;
@@ -86,14 +88,21 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 	}
 
-	private void sendUpdate() {
+	protected void sendUpdate() {
+		CompoundTag c = new CompoundTag();
+		c.putInt("d", updateData());
+		CompoundTag msg = new CompoundTag();
+		msg.put("c", c);
+		handler.sendMessage(msg);
+	}
+
+	protected int updateData() {
 		int d = 0;
-		d |= (controllMode & 0b00_0_11);
+		d |= (controllMode & 0b000_0_11);
 		d |= ((comparator.isReversed() ? 1 : 0) << 2);
 		d |= (comparator.type() << 3);
 		d |= ((searchType & 0b111) << 5);
-		d = (d << 1) | 1;
-		this.mc.interactionManager.clickButton((this.handler).syncId, d);
+		return d;
 	}
 
 	@Override
@@ -167,7 +176,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		for (int i = 0;i < getScreenHandler().itemListClient.size();i++) {
 			StoredItemStack is = getScreenHandler().itemListClient.get(i);
 			if (is != null && is.getStack() != null) {
-				String dspName = searchMod ? ((IRegistered) is.getStack().getItem()).getRegistryName().getNamespace() : is.getStack().getName().getString();
+
+				String dspName = searchMod ? Registry.ITEM.getId(is.getStack().getItem()).getNamespace() : is.getStack().getName().getString();
 				notDone = true;
 				if (m.matcher(dspName.toLowerCase()).find()) {
 					addStackToClientList(is);
@@ -189,8 +199,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			getScreenHandler().scrollTo(0);
 			this.currentScroll = 0;
 			if ((searchType & 4) > 0) {
-				/*if(ModList.get().isLoaded("jei"))
-					JEIHandler.setJeiSearchText(searchString);*/
+				if(FabricLoader.getInstance().isModLoaded("rei"))
+					REIPlugin.setReiSearchText(searchString);
 			}
 			if ((searchType & 2) > 0) {
 				CompoundTag nbt = new CompoundTag();
@@ -352,6 +362,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return mouseButton == 1 && hasShiftDown();
 		case RS:
 			return mouseButton == 2;
+		case DEF:
+			return mouseButton == 1 && !mc.player.inventory.getCursorStack().isEmpty();
 		default:
 			return false;
 		}
@@ -363,6 +375,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return hasShiftDown() && hasControlDown();//not in AE
 		case RS:
 			return hasShiftDown() && mouseButton == 2;
+		case DEF:
+			return mouseButton == 1 && hasShiftDown();
 		default:
 			return false;
 		}
@@ -374,6 +388,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return mouseButton == 1;
 		case RS:
 			return mouseButton == 1;
+		case DEF:
+			return mouseButton == 1 && mc.player.inventory.getCursorStack().isEmpty();
 		default:
 			return false;
 		}
@@ -382,8 +398,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	public boolean pullNormal(int mouseButton) {
 		switch (ctrlm()) {
 		case AE:
-			return mouseButton == 0;
 		case RS:
+		case DEF:
 			return mouseButton == 0;
 		default:
 			return false;
@@ -512,11 +528,5 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	public int getGuiTop() {
 		return y;
-	}
-
-	@Override
-	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-		//this.textRenderer.draw(matrices, this.title, this.titleX, this.titleY, 4210752);
-		this.textRenderer.draw(matrices, this.playerInventory.getDisplayName(), this.playerInventoryTitleX, this.playerInventoryTitleY, 4210752);
 	}
 }

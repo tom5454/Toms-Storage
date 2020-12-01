@@ -22,22 +22,20 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 
-import com.tom.fabriclibs.ext.IItem;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.block.IPaintable;
-import com.tom.storagemod.proxy.ClientProxy;
 
-public class ItemPaintKit extends Item implements IItem {
+public class ItemPaintKit extends Item {
 
 	public ItemPaintKit() {
 		super(new Settings().maxDamage(100).group(StorageMod.STORAGE_MOD_TAB));
-		setRegistryName("ts.paint_kit");
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, World worldIn, List<Text> tooltip, TooltipContext flagIn) {
-		ClientProxy.tooltip("paint_kit", tooltip);
+		StorageModClient.tooltip("paint_kit", tooltip);
 	}
 
 	@Override

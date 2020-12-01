@@ -127,7 +127,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	public void craft(PlayerEntity thePlayer) {
 		if(currentRecipe != null) {
 			DefaultedList<ItemStack> remainder = currentRecipe.getRemainingStacks(craftMatrix);
-
+			boolean playerInvUpdate = false;
 			for (int i = 0; i < craftMatrix.size(); i++) {
 				ItemStack slot = craftMatrix.getStack(i);
 				if (i < remainder.size() && !remainder.get(i).isEmpty()) {
@@ -145,6 +145,19 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 				} else if (!slot.isEmpty()) {
 					if (slot.getCount() == 1) {
 						StoredItemStack is = pullStack(new StoredItemStack(slot), 1);
+						if(is == null && (getSorting() & (1 << 8)) != 0) {
+							for(int j = 0;j<thePlayer.inventory.size();j++) {
+								ItemStack st = thePlayer.inventory.getStack(j);
+								if(ItemStack.areItemsEqual(slot, st) && ItemStack.areTagsEqual(slot, st)) {
+									st = thePlayer.inventory.removeStack(j, 1);
+									if(!st.isEmpty()) {
+										is = new StoredItemStack(st, 1);
+										playerInvUpdate = true;
+										break;
+									}
+								}
+							}
+						}
 						if(is == null)craftMatrix.setStack(i, ItemStack.EMPTY);
 						else craftMatrix.setStack(i, is.getActualStack());
 					} else {
@@ -152,6 +165,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 					}
 				}
 			}
+			if(playerInvUpdate)thePlayer.currentScreenHandler.sendContentUpdates();
 			onCraftingMatrixChanged();
 		}
 	}

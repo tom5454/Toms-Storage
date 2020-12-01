@@ -5,7 +5,7 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.Tag;
 
 public class StorageTags {
-	public static final Tag<Block> REMOTE_ACTIVATE = BlockTags.ACCESSOR.get("toms_storage:remote_activate");
+	public static final Tag<Block> REMOTE_ACTIVATE = BlockTags.REQUIRED_TAGS.add("toms_storage:remote_activate");
 
 	public static void init() {}
 }

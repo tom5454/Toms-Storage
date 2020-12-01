@@ -2,10 +2,11 @@ accessWidener	v1	named
 accessible field net/minecraft/recipe/InputSlotFiller recipeFinder Lnet/minecraft/recipe/RecipeFinder;
 mutable field net/minecraft/recipe/InputSlotFiller recipeFinder Lnet/minecraft/recipe/RecipeFinder;
 
-accessible field net/minecraft/tag/BlockTags ACCESSOR Lnet/minecraft/tag/GlobalTagAccessor;
+accessible field net/minecraft/tag/BlockTags REQUIRED_TAGS Lnet/minecraft/tag/RequiredTagList;
 
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeFinder;
 mutable field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeFinder;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget searchField Lnet/minecraft/client/gui/widget/TextFieldWidget;
+accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget ghostSlots Lnet/minecraft/client/gui/screen/recipebook/RecipeBookGhostSlots;
 
 accessible method net/minecraft/client/gui/widget/AbstractButtonWidget setFocused (Z)V
