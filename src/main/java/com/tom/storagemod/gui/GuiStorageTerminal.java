@@ -22,7 +22,7 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 	}
 
 	@Override
-	protected void func_230450_a_(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
+	protected void drawGuiContainerBackgroundLayer(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
 		mc.textureManager.bindTexture(gui);
 		this.blit(st, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}

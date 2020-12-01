@@ -46,6 +46,9 @@
 	"tooltip.toms_storage.search_7": "JEI Synced Auto Search Keep",
 	"tooltip.toms_storage.ctrlMode_0": "AE Like Controls\\Pull one item: Shift+Right Click\\Transfer one item: Ctrl+Shift+Right Click",
 	"tooltip.toms_storage.ctrlMode_1": "Refined Storage Like Controls\\Pull one item: Middle Click\\Transfer one item: Shift+Middle Click",
+	"tooltip.toms_storage.ctrlMode_2": "Vanilla Like Controls\\Pull one item: Right Click\\Transfer one item: Shift+Right Click",
+	"tooltip.toms_storage.pull_0": "Don't pull from players inventory when crafting",
+	"tooltip.toms_storage.pull_1": "Pull missing items from players inventory when crafting",
 	"tooltip.toms_storage.filter_item": "Filter: %s",
 	"tooltip.toms_storage.empty": "Empty",
 	

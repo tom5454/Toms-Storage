@@ -129,7 +129,7 @@ public class ClientProxy implements IProxy {
 				tooltip.add(new StringTextComponent(sp[i]));
 			}
 		} else {
-			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").func_240701_a_(TextFormatting.ITALIC, TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY));
 		}
 	}
 }

@@ -44,7 +44,7 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	}
 
 	@Override
-	public boolean func_230044_c_() {
+	public boolean isSideLit() {
 		return false;
 	}
 
@@ -89,4 +89,5 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	public IModelData getModelData(IBlockDisplayReader world, BlockPos pos, BlockState state, IModelData tileData) {
 		return tileData;
 	}
+
 }

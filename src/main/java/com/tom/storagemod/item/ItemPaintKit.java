@@ -43,7 +43,7 @@ public class ItemPaintKit extends Item {
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
 		if(!context.getWorld().isRemote) {
-			if(context.func_225518_g_()) {
+			if(context.hasSecondaryUseForPlayer()) {
 				BlockState state = context.getWorld().getBlockState(context.getPos());
 				TileEntity tile = context.getWorld().getTileEntity(context.getPos());
 				if(tile == null && state.isSolid()) {
@@ -73,7 +73,7 @@ public class ItemPaintKit extends Item {
 			}
 		} else {
 			BlockState state = context.getWorld().getBlockState(context.getPos());
-			if(context.func_225518_g_())return ActionResultType.SUCCESS;
+			if(context.hasSecondaryUseForPlayer())return ActionResultType.SUCCESS;
 			if(state.getBlock() instanceof IPaintable) {
 				return ActionResultType.SUCCESS;
 			}
@@ -86,9 +86,9 @@ public class ItemPaintKit extends Item {
 		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
 		if(is.hasTag() && is.getTag().contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("block"));
-			tc.func_240702_b_(" (");
-			tc.func_230529_a_(st.getBlock().getTranslatedName().func_240701_a_(TextFormatting.GREEN));
-			tc.func_240702_b_(")");
+			tc.appendString(" (");
+			tc.append(st.getBlock().getTranslatedName().mergeStyle(TextFormatting.GREEN));
+			tc.appendString(")");
 		}
 		return tc;
 	}

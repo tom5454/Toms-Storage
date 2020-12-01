@@ -38,6 +38,7 @@ import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
+import com.tom.storagemod.jei.JEIHandler;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends ContainerScreen<T> {
 	protected Minecraft mc = Minecraft.getInstance();
@@ -64,7 +65,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		screenContainer.onPacket = this::onPacket;
 	}
 
-	private void onPacket() {
+	protected void onPacket() {
 		int s = container.terminalData;
 		controllMode = (s & 0b000_00_0_11) % ControllMode.VALUES.length;
 		boolean rev = (s & 0b000_00_1_00) > 0;
@@ -87,21 +88,28 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 	}
 
-	private void sendUpdate() {
+	protected void sendUpdate() {
+		CompoundNBT c = new CompoundNBT();
+		c.putInt("d", updateData());
+		CompoundNBT msg = new CompoundNBT();
+		msg.put("c", c);
+		container.sendMessage(msg);
+	}
+
+	protected int updateData() {
 		int d = 0;
-		d |= (controllMode & 0b00_0_11);
+		d |= (controllMode & 0b000_0_11);
 		d |= ((comparator.isReversed() ? 1 : 0) << 2);
 		d |= (comparator.type() << 3);
 		d |= ((searchType & 0b111) << 5);
-		d = (d << 1) | 1;
-		this.minecraft.playerController.sendEnchantPacket((this.container).windowId, d);
+		return d;
 	}
 
 	@Override
 	protected void init() {
 		children.clear();
 		buttons.clear();
-		field_238745_s_ = ySize - 92;
+		playerInventoryTitleY = ySize - 92;
 		super.init();
 		this.searchField = new TextFieldWidget(getFont(), this.guiLeft + 82, this.guiTop + 6, 89, this.getFont().FONT_HEIGHT, null);
 		this.searchField.setMaxStringLength(100);
@@ -189,8 +197,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			getContainer().scrollTo(0);
 			this.currentScroll = 0;
 			if ((searchType & 4) > 0) {
-				//if(ModList.get().isLoaded("jei"))
-				//JEIHandler.setJeiSearchText(searchString);
+				if(ModList.get().isLoaded("jei"))
+					JEIHandler.setJeiSearchText(searchString);
 			}
 			if ((searchType & 2) > 0) {
 				CompoundNBT nbt = new CompoundNBT();
@@ -255,7 +263,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		RenderHelper.enableStandardItemLighting();
 		slotIDUnderMouse = getContainer().drawSlots(st, this, mouseX, mouseY);
 		st.pop();
-		this.func_230459_a_(st, mouseX, mouseY);
+		this.renderHoveredTooltip(st, mouseX, mouseY);
 
 		if (buttonSortingType.isHovered()) {
 			renderTooltip(st, new TranslationTextComponent("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
@@ -268,10 +276,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 	}
 
-	/*private void renderTooltip(MatrixStack p0, List<String> p1, int p2, int p3) {
-		func_238654_b_(p0, p1.stream().map(StringTextComponent::new).collect(Collectors.toList()), p2, p3);
-	}*/
-
 	protected boolean needsScrollBars() {
 		return this.getContainer().itemListClientSorted.size() > rowCount * 9;
 	}
@@ -283,7 +287,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				if (getContainer().getSlotByID(slotIDUnderMouse).stack != null && getContainer().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
 					for (int i = 0;i < getContainer().itemList.size();i++) {
 						if (getContainer().getSlotByID(slotIDUnderMouse).stack.equals(getContainer().itemList.get(i))) {
-							//windowClick(isTransferOne(mouseButton) ? -3 : -2, i, SlotAction.PULL_ONE);
 							storageSlotClick(getContainer().getSlotByID(slotIDUnderMouse).stack.getStack(), SlotAction.PULL_ONE, isTransferOne(mouseButton) ? 1 : 0);
 							return true;
 						}
@@ -292,13 +295,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				return true;
 			} else if (pullHalf(mouseButton)) {
 				if (!mc.player.inventory.getItemStack().isEmpty()) {
-					//windowClick(-2, 0, SlotAction.GET_HALF);
 					storageSlotClick(ItemStack.EMPTY, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
 				} else {
 					if (getContainer().getSlotByID(slotIDUnderMouse).stack != null && getContainer().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
 						for (int i = 0;i < getContainer().itemList.size();i++) {
 							if (getContainer().getSlotByID(slotIDUnderMouse).stack.equals(getContainer().itemList.get(i))) {
-								//windowClick(-2, i, hasShiftDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF);
 								storageSlotClick(getContainer().getSlotByID(slotIDUnderMouse).stack.getStack(), hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
 								return true;
 							}
@@ -307,14 +308,12 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			} else if (pullNormal(mouseButton)) {
 				if (!mc.player.inventory.getItemStack().isEmpty()) {
-					//windowClick(-(slotIDUnderMouse + 2), 0, SlotAction.PULL_OR_PUSH_STACK);
 					storageSlotClick(ItemStack.EMPTY, SlotAction.PULL_OR_PUSH_STACK, 0);
 				} else {
 					if (getContainer().getSlotByID(slotIDUnderMouse).stack != null) {
 						if (getContainer().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
 							for (int i = 0;i < getContainer().itemList.size();i++) {
 								if (getContainer().getSlotByID(slotIDUnderMouse).stack.equals(getContainer().itemList.get(i))) {
-									//windowClick(-2, i, hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK);
 									storageSlotClick(getContainer().getSlotByID(slotIDUnderMouse).stack.getStack(), hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK, 0);
 									return true;
 								}
@@ -324,7 +323,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			}
 		} else if (GLFW.glfwGetKey(mc.getMainWindow().getHandle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
-			//windowClick(-1, 0, SlotAction.SPACE_CLICK);
 			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
 		} else {
 			if (mouseButton == 1 && isPointInRegion(searchField.x - guiLeft, searchField.y - guiTop, 89, this.getFont().FONT_HEIGHT, mouseX, mouseY))
@@ -335,10 +333,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 		return true;
 	}
-
-	/*protected void windowClick(int i, int j, SlotAction pullOne) {
-		mc.playerController.windowClick(this.getContainer().windowId, i, j, ClickType.values()[pullOne.ordinal()], this.mc.player);
-	}*/
 
 	protected void storageSlotClick(ItemStack slotStack, SlotAction act, int mod) {
 		CompoundNBT c = new CompoundNBT();
@@ -356,6 +350,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return mouseButton == 1 && hasShiftDown();
 		case RS:
 			return mouseButton == 2;
+		case DEF:
+			return mouseButton == 1 && !mc.player.inventory.getItemStack().isEmpty();
 		default:
 			return false;
 		}
@@ -367,6 +363,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return hasShiftDown() && hasControlDown();//not in AE
 		case RS:
 			return hasShiftDown() && mouseButton == 2;
+		case DEF:
+			return mouseButton == 1 && hasShiftDown();
 		default:
 			return false;
 		}
@@ -378,6 +376,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			return mouseButton == 1;
 		case RS:
 			return mouseButton == 1;
+		case DEF:
+			return mouseButton == 1 && mc.player.inventory.getItemStack().isEmpty();
 		default:
 			return false;
 		}
@@ -386,8 +386,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	public boolean pullNormal(int mouseButton) {
 		switch (ctrlm()) {
 		case AE:
-			return mouseButton == 0;
 		case RS:
+		case DEF:
 			return mouseButton == 0;
 		default:
 			return false;
@@ -429,9 +429,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 					ITextComponent t = list.get(i);
 					IFormattableTextComponent t2 = t instanceof IFormattableTextComponent ? (IFormattableTextComponent) t : t.deepCopy();
 					if (i == 0) {
-						list.set(i, t2.func_240699_a_(stack.getRarity().color));
+						list.set(i, t2.mergeStyle(stack.getRarity().color));
 					} else {
-						list.set(i, t2.func_240699_a_(TextFormatting.GRAY));
+						list.set(i, t2.mergeStyle(TextFormatting.GRAY));
 					}
 				}
 				this.func_243308_b(st, list, mouseX, mouseY);
@@ -475,7 +475,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	public abstract ResourceLocation getGui();
 
 	@Override
-	protected void func_230450_a_(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
+	protected void drawGuiContainerBackgroundLayer(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
 		mc.textureManager.bindTexture(getGui());
 		this.blit(st, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
@@ -513,10 +513,4 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	protected void onUpdateSearch(String text) {}
-
-	/*@Override
-	protected void func_230451_b_(MatrixStack p_230451_1_, int p_230451_2_, int p_230451_3_) {
-		this.font.func_238422_b_(p_230451_1_, this.title, this.field_238742_p_, this.field_238743_q_, 4210752);
-		this.font.func_238422_b_(p_230451_1_, this.playerInventory.getDisplayName(), this.field_238744_r_, this.field_238745_s_, 4210752);
-	}*/
 }

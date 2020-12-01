@@ -102,14 +102,6 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		syncInv.setInventorySlotContents(0, new ItemStack(Items.BARRIER));
 	}
 
-	@Override
-	public boolean enchantItem(PlayerEntity playerIn, int id) {
-		if(id == 0)return false;
-		int newC = id >> 1;
-		te.setSorting(newC);
-		return false;
-	}
-
 	public ContainerStorageTerminal(ContainerType<?> type, int id, PlayerInventory inv) {
 		this(type, id, inv, null);
 	}
@@ -336,15 +328,12 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	@Override
 	public void detectAndSendChanges() {
 		if(te == null)return;
-		//List<StoredItemStack> itemListOld = itemList;
 		itemList = te.getStacks();
 		ListNBT list = new ListNBT();
 		for (int i = 0;i < itemList.size();i++) {
 			StoredItemStack storedS = itemList.get(i);
-			//StoredItemStack storedSOld = itemListOld.size() > i ? itemListOld.get(i) : null;
 			if (storedS != null) {
 				CompoundNBT tag = new CompoundNBT();
-				//tag.putInt("slot", i);
 				if (storedS != null)
 					storedS.writeToNBT(tag);
 				list.add(tag);
@@ -357,10 +346,8 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		ItemStack is = syncInv.getStackInSlot(0);
 		boolean t = is.getItem() == Items.BARRIER;
 		if(!mainTag.equals(is.getTag()) && !skipUpdateTick) {
-			//System.out.println(itemList);
 			is = new ItemStack(t ? Blocks.STRUCTURE_VOID : Items.BARRIER);
 			syncInv.setInventorySlotContents(0, is);
-			//System.out.println("Set Slot: " + mainTag);
 			is.setTag(mainTag);
 			((ServerPlayerEntity)pinv.player).isChangingQuantityOnly = false;
 		}
@@ -378,164 +365,18 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	public final void receiveClientNBTPacket(CompoundNBT message) {
-		//System.out.println(message);
 		ListNBT list = message.getList("l", 10);
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {
 			CompoundNBT tag = list.getCompound(i);
 			itemList.add(StoredItemStack.readFromNBT(tag));
-			//System.out.println(tag);
 		}
-		//System.out.println(itemList);
 		itemListClient = new ArrayList<>(itemList);
 		pinv.markDirty();
 		terminalData = message.getInt("p");
 		search = message.getString("s");
 		if(onPacket != null)onPacket.run();
 	}
-
-	/*@Override
-	public final ItemStack slotClick(int slotId, int clickedButton, ClickType clickTypeIn, PlayerEntity playerIn) {
-		skipUpdateTick = true;
-		SlotAction mode = SlotAction.VALUES[clickTypeIn.ordinal()];
-		if (slotId < -1 && slotId != -999 && mode != SlotAction.SPACE_CLICK) {
-			if(te == null)return new ItemStack(Blocks.BARRIER, 69);
-			if (mode == SlotAction.PULL_OR_PUSH_STACK) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					ItemStack itemstack = slot.pushStack(stack);
-					playerIn.inventory.setItemStack(itemstack);
-					return itemstack;
-				} else {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						if (slot.stack.getQuantity() == 0) {
-							// craft(playerIn, slot);
-							return ItemStack.EMPTY;
-						} else {
-							ItemStack itemstack = slot.pullFromSlot(64);
-							playerIn.inventory.setItemStack(itemstack);
-							return itemstack;
-						}
-					} else
-						return ItemStack.EMPTY;
-				}
-			} else if (mode == SlotAction.PULL_ONE) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (slotId == -3) {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						ItemStack itemstack = slot.pullFromSlot(1);
-						if (!itemstack.isEmpty()) {
-							this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
-							if (itemstack.getCount() > 0)
-								slot.pushStack(itemstack);
-						}
-						playerIn.inventory.markDirty();
-						return stack;
-					} else
-						return stack;
-				} else {
-					if (!stack.isEmpty()) {
-						slot.stack = itemList.get(clickedButton);
-						if (areItemStacksEqual(stack, slot.stack.getStack(), true) && stack.getCount() + 1 <= stack.getMaxStackSize()) {
-							ItemStack itemstack = slot.pullFromSlot(1);
-							if (!itemstack.isEmpty()) {
-								stack.grow(1);
-								return stack;
-							}
-						}
-					} else {
-						if (itemList.size() > clickedButton) {
-							slot.stack = itemList.get(clickedButton);
-							ItemStack itemstack = slot.pullFromSlot(1);
-							playerIn.inventory.setItemStack(itemstack);
-							return itemstack;
-						} else
-							return ItemStack.EMPTY;
-					}
-				}
-				return ItemStack.EMPTY;
-			} else if (mode == SlotAction.GET_HALF) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					ItemStack stack1 = stack.split(Math.min(stack.getCount(), stack.getMaxStackSize()) / 2);
-					ItemStack itemstack = slot.pushStack(stack1);
-					stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-					playerIn.inventory.setItemStack(stack);
-					return stack;
-				} else {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						ItemStack itemstack = slot.pullFromSlot(Math.min(slot.stack.getQuantity(), slot.stack.getStack().getMaxStackSize()) / 2);
-						playerIn.inventory.setItemStack(itemstack);
-						return itemstack;
-					} else
-						return ItemStack.EMPTY;
-				}
-			} else if (mode == SlotAction.GET_QUARTER) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					ItemStack stack1 = stack.split(Math.min(stack.getCount(), stack.getMaxStackSize()) / 4);
-					ItemStack itemstack = slot.pushStack(stack1);
-					stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-					playerIn.inventory.setItemStack(stack);
-					return stack;
-				} else {
-					if (itemList.size() > clickedButton) {
-						slot.stack = itemList.get(clickedButton);
-						ItemStack itemstack = slot.pullFromSlot(Math.min(slot.stack.getQuantity(), slot.stack.getStack().getMaxStackSize()) / 4);
-						playerIn.inventory.setItemStack(itemstack);
-						return itemstack;
-					} else
-						return ItemStack.EMPTY;
-				}
-			} else if (mode == SlotAction.PULL_ONE) {
-				SlotStorage slot = storageSlotList.get(0);
-				ItemStack stack = playerIn.inventory.getItemStack();
-				if (!stack.isEmpty()) {
-					slot.stack = itemList.get(clickedButton);
-					// if(TomsModUtils.areItemStacksEqual(stack,
-					// slot.stack.stack, true, true, false)){
-					ItemStack s = stack.split(1);
-					ItemStack s2 = slot.pushStack(s);
-					if (!s2.isEmpty()) {
-						stack.grow(s2.getCount());
-					}
-					if (stack.isEmpty()) {
-						stack = ItemStack.EMPTY;
-					}
-					playerIn.inventory.setItemStack(stack);
-					return stack;
-					// }
-				}
-				return ItemStack.EMPTY;
-			} else {
-				SlotStorage slot = storageSlotList.get(0);
-				if (itemList.size() > clickedButton && !playerIn.world.isRemote) {
-					slot.stack = itemList.get(clickedButton);
-					ItemStack itemstack = slot.pullFromSlot(64);
-					if (!itemstack.isEmpty()) {
-						this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
-						if (itemstack.getCount() > 0)
-							slot.pushStack(itemstack);
-					}
-					playerIn.inventory.markDirty();
-				}
-				return ItemStack.EMPTY;
-			}
-		} else if (slotId == -1 && mode == SlotAction.SPACE_CLICK) {
-			for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
-				transferStackInSlot(playerIn, i);
-			}
-			return ItemStack.EMPTY;
-		} else
-			return super.slotClick(slotId, clickedButton, clickTypeIn, playerIn);
-	}*/
 
 	@Override
 	public final ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
@@ -724,6 +565,10 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 				}
 			}
 			player.updateHeldItem();
+		}
+		if(message.contains("c")) {
+			CompoundNBT d = message.getCompound("c");
+			te.setSorting(d.getInt("d"));
 		}
 	}
 

@@ -2,6 +2,9 @@ package com.tom.storagemod.gui;
 
 import java.lang.reflect.Field;
 
+import org.lwjgl.glfw.GLFW;
+
+import net.minecraft.client.gui.recipebook.GhostRecipe;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -10,9 +13,11 @@ import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import net.minecraftforge.fml.ModList;
 
@@ -22,7 +27,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftingTerminal> implements IRecipeShownListener {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/crafting_terminal.png");
-	private static Field stackedContentsField, searchBarField;
+	private static Field stackedContentsField, searchBarField, ghostRecipeField;
 	static {
 		try {
 			for (Field f : RecipeBookGui.class.getDeclaredFields()) {
@@ -32,27 +37,33 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 				} else if(f.getType() == TextFieldWidget.class) {
 					f.setAccessible(true);
 					searchBarField = f;
+				} else if(f.getType() == GhostRecipe.class) {
+					f.setAccessible(true);
+					ghostRecipeField = f;
 				}
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	private final RecipeBookGui recipeBookGui = new RecipeBookGui() {
-		{
-			try {
-				stackedContentsField.set(this, getContainer().new TerminalRecipeItemHelper());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-	};
+	private final RecipeBookGui recipeBookGui;
 	private boolean widthTooNarrow;
 	private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
 	private TextFieldWidget searchField;
+	private GhostRecipe ghostRecipe;
+	private GuiButton buttonPullFromInv;
+	private boolean pullFromInv;
 
 	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, PlayerInventory inv, ITextComponent titleIn) {
 		super(screenContainer, inv, titleIn);
+
+		recipeBookGui = new RecipeBookGui();
+		try {
+			stackedContentsField.set(recipeBookGui, getContainer().new TerminalRecipeItemHelper());
+			ghostRecipe = (GhostRecipe) ghostRecipeField.get(recipeBookGui);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -81,6 +92,10 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setFocusedDefault(this.recipeBookGui);
 		GuiButtonClear btnClr = new GuiButtonClear(guiLeft + 80, guiTop + 110, b -> clearGrid());
 		addButton(btnClr);
+		buttonPullFromInv = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18*4, 4, b -> {
+			pullFromInv = !pullFromInv;
+			sendUpdate();
+		}));
 		this.addButton(new ImageButton(this.guiLeft + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
 			this.recipeBookGui.initSearchBar(this.widthTooNarrow);
 			try {
@@ -125,28 +140,47 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	}
 
 	@Override
+	protected void onPacket() {
+		super.onPacket();
+		int s = container.terminalData;
+		pullFromInv = (s & (1 << 8)) != 0;
+		buttonPullFromInv.state = pullFromInv ? 1 : 0;
+	}
+
+	@Override
+	protected int updateData() {
+		int d = super.updateData();
+		d |= (pullFromInv ? 1 : 0) << 8;
+		return d;
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 		this.recipeBookGui.tick();
 	}
 
 	@Override
-	public void render(MatrixStack st, int p_render_1_, int p_render_2_, float p_render_3_) {
+	public void render(MatrixStack st, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(st);
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-			this.func_230450_a_(st, p_render_3_, p_render_1_, p_render_2_);
+			this.drawGuiContainerBackgroundLayer(st, partialTicks, mouseX, mouseY);
 			RenderSystem.disableLighting();
-			this.recipeBookGui.render(st, p_render_1_, p_render_2_, p_render_3_);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
 			RenderSystem.disableLighting();
-			this.recipeBookGui.render(st, p_render_1_, p_render_2_, p_render_3_);
-			super.render(st, p_render_1_, p_render_2_, p_render_3_);
-			this.recipeBookGui.func_230477_a_(st, this.guiLeft, this.guiTop, true, p_render_3_);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			super.render(st, mouseX, mouseY, partialTicks);
+			this.recipeBookGui.func_230477_a_(st, this.guiLeft, this.guiTop, true, partialTicks);
 		}
 
-		this.func_230459_a_(st, p_render_1_, p_render_2_);
-		this.recipeBookGui.func_238924_c_(st, this.guiLeft, this.guiTop, p_render_1_, p_render_2_);
-		this.func_212932_b(this.recipeBookGui);
+		this.renderHoveredTooltip(st, mouseX, mouseY);
+		this.recipeBookGui.func_238924_c_(st, this.guiLeft, this.guiTop, mouseX, mouseY);
+		this.setFocusedDefault(this.recipeBookGui);
+
+		if (buttonPullFromInv.isHovered()) {
+			renderTooltip(st, new TranslationTextComponent("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
+		}
 	}
 
 	@Override
@@ -184,9 +218,9 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	}
 
 	@Override
-	public void removed() {
+	public void closeScreen() {
 		this.recipeBookGui.removed();
-		super.removed();
+		super.closeScreen();
 	}
 
 	@Override
@@ -196,6 +230,28 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 
 	private void clearGrid() {
 		this.minecraft.playerController.sendEnchantPacket((this.container).windowId, 0);
+	}
+
+	@Override
+	public boolean keyPressed(int code, int p_231046_2_, int p_231046_3_) {
+		if(code == GLFW.GLFW_KEY_S && hoveredSlot != null) {
+			ItemStack itemstack = null;
+
+			for (int i = 0; i < this.ghostRecipe.size(); ++i) {
+				GhostRecipe.GhostIngredient ghostrecipe$ghostingredient = this.ghostRecipe.get(i);
+				int j = ghostrecipe$ghostingredient.getX();
+				int k = ghostrecipe$ghostingredient.getY();
+				if (j == hoveredSlot.xPos && k == hoveredSlot.yPos) {
+					itemstack = ghostrecipe$ghostingredient.getItem();
+				}
+			}
+			if(itemstack != null) {
+				super.searchField.setText(itemstack.getDisplayName().getString());
+				super.searchField.setFocused2(false);
+				return true;
+			}
+		}
+		return super.keyPressed(code, p_231046_2_, p_231046_3_);
 	}
 
 	public class GuiButtonClear extends Button {

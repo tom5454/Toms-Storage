@@ -25,9 +25,9 @@ public class ItemBlockPainted extends BlockItem {
 		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
-			tc.func_240702_b_(" (");
-			tc.func_230529_a_(st.getBlock().getTranslatedName().func_240701_a_(TextFormatting.GREEN));
-			tc.func_240702_b_(")");
+			tc.appendString(" (");
+			tc.append(st.getBlock().getTranslatedName().mergeStyle(TextFormatting.GREEN));
+			tc.appendString(")");
 		}
 		return tc;
 	}

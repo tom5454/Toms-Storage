@@ -129,7 +129,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	public void craft(PlayerEntity thePlayer) {
 		if(currentRecipe != null) {
 			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
-
+			boolean playerInvUpdate = false;
 			for (int i = 0; i < craftMatrix.getSizeInventory(); i++) {
 				ItemStack slot = craftMatrix.getStackInSlot(i);
 				if (i < remainder.size() && !remainder.get(i).isEmpty()) {
@@ -147,6 +147,19 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 				} else if (!slot.isEmpty()) {
 					if (slot.getCount() == 1) {
 						StoredItemStack is = pullStack(new StoredItemStack(slot), 1);
+						if(is == null && (getSorting() & (1 << 8)) != 0) {
+							for(int j = 0;j<thePlayer.inventory.getSizeInventory();j++) {
+								ItemStack st = thePlayer.inventory.getStackInSlot(j);
+								if(ItemStack.areItemsEqual(slot, st) && ItemStack.areItemStackTagsEqual(slot, st)) {
+									st = thePlayer.inventory.decrStackSize(j, 1);
+									if(!st.isEmpty()) {
+										is = new StoredItemStack(st, 1);
+										playerInvUpdate = true;
+										break;
+									}
+								}
+							}
+						}
 						if(is == null)craftMatrix.setInventorySlotContents(i, ItemStack.EMPTY);
 						else craftMatrix.setInventorySlotContents(i, is.getActualStack());
 					} else {
@@ -154,6 +167,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 					}
 				}
 			}
+			if(playerInvUpdate)thePlayer.openContainer.detectAndSendChanges();
 			onCraftingMatrixChanged();
 		}
 	}
