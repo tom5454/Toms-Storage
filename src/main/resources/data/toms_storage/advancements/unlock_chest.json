@@ -1,14 +1,4 @@
 {
-   "display":{
-      "description":"",
-      "title":"",
-      "show_toast":false,
-      "announce_to_chat":false,
-      "background":"minecraft:textures/blocks/stone.png",
-      "icon":{
-         "item":"chest"
-      }
-   },
    "criteria":{
       "inv_changed-chest":{
          "trigger":"minecraft:inventory_changed",

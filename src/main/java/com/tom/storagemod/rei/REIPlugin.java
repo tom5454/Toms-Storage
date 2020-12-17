@@ -42,7 +42,7 @@ public class REIPlugin implements REIPluginV0 {
 					for (int i = 0;i < stacks.length;++i) {
 						if (stacks[i] != null) {
 							CompoundTag CompoundTag = new CompoundTag();
-							CompoundTag.putByte("s", (byte) i);
+							CompoundTag.putByte("s", (byte) (recipe.getWidth() == 1 ? i * 3 : recipe.getWidth() == 2 ? ((i % 2) + i / 2 * 3) : i));
 							for (int j = 0;j < stacks[i].length && j < 3;j++) {
 								if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 									CompoundTag tag = new CompoundTag();

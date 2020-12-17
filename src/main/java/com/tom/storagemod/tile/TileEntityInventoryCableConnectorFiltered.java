@@ -1,0 +1,57 @@
+package com.tom.storagemod.tile;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+
+import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.gui.ContainerFiltered;
+
+public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements NamedScreenHandlerFactory {
+	private SimpleInventory filter = new SimpleInventory(9);
+
+	public TileEntityInventoryCableConnectorFiltered() {
+		super(StorageMod.invCableConnectorFilteredTile);
+	}
+
+	@Override
+	public <R> R call(Function<InventoryWrapper, R> func, Predicate<InventoryWrapper> accessCheck, R def) {
+		return super.call(func, accessCheck, def);
+	}
+
+	@Override
+	protected InventoryWrapper applyFilter() {
+		return new FilteredInventoryWrapper(super.applyFilter(), filter);
+	}
+
+	@Override
+	public CompoundTag toTag(CompoundTag tag) {
+		tag.put("filter", filter.getTags());
+		return super.toTag(tag);
+	}
+
+	@Override
+	public void fromTag(BlockState state, CompoundTag tag) {
+		super.fromTag(state, tag);
+		filter.readTags(tag.getList("filter", 10));
+	}
+
+	@Override
+	public ScreenHandler createMenu(int arg0, PlayerInventory arg1, PlayerEntity arg2) {
+		return new ContainerFiltered(arg0, arg1, filter);
+	}
+
+	@Override
+	public Text getDisplayName() {
+		return new TranslatableText("ts.connector_filtered");
+	}
+}

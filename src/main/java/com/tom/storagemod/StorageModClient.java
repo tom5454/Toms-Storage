@@ -28,6 +28,7 @@ import net.minecraft.util.Identifier;
 
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
+import com.tom.storagemod.gui.GuiFiltered;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
 import com.tom.storagemod.tile.TileEntityPainted;
@@ -39,6 +40,7 @@ public class StorageModClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ScreenRegistry.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
 		ScreenRegistry.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
+		ScreenRegistry.register(StorageMod.filteredConatiner, GuiFiltered::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.paintedTrim, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCableFramed, RenderLayer.getTranslucent());
@@ -52,27 +54,7 @@ public class StorageModClient implements ClientModInitializer {
 				}
 			});
 		});
-		/*List<Block> lst = new ArrayList<>();
-		lst.add(StorageMod.paintedTrim);
-		lst.add(StorageMod.invCableFramed);
-		//lst.add(StorageMod.invProxy);
-		/*ModelLoadingRegistry.INSTANCE.registerVariantProvider(rm -> new ModelVariantProvider() {
 
-			@Override
-			public @Nullable UnbakedModel loadModelVariant(ModelIdentifier modelId, ModelProviderContext context)
-					throws ModelProviderException {
-				if(modelId.getNamespace().equals(StorageMod.modid)) {
-					for (Block blockFor : lst) {
-						Identifier baseLoc = Registry.BLOCK.getId(blockFor);
-						if(blockFor.getStateManager().getStates().stream().filter(st -> st.method_28500(BlockInventoryCableFramed.PAINTED).orElse(true)).map(st -> BlockModels.getModelId(baseLoc, st)).
-								anyMatch(r -> r.equals(modelId))) {
-							return new BakedPaintedModel();
-						}
-					}
-				}
-				return null;
-			}
-		});*/
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> new ModelResourceProvider() {
 
 			@Override

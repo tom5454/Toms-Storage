@@ -7,6 +7,7 @@
 	"block.toms_storage.ts.inventory_cable": "Inventory Cable",
 	"block.toms_storage.ts.inventory_cable_framed": "Framed Inventory Cable",
 	"block.toms_storage.ts.inventory_cable_connector": "Inventory Cable Connector",
+	"block.toms_storage.ts.inventory_cable_connector_filtered": "Inventory Cable Connector (Filtered)",
 	"block.toms_storage.ts.inventory_proxy": "Inventory Proxy",
 	"block.toms_storage.ts.crafting_terminal": "Crafting Terminal",
 	"block.toms_storage.ts.inventory_hopper_basic": "Basic Inventory Hopper",	
@@ -18,10 +19,12 @@
 	
 	"ts.storage_terminal": "S. Terminal",
 	"ts.crafting_terminal": "C. Terminal",
+	"ts.connector_filtered": "Set Filter",
 	
 	"tooltip.toms_storage.hold_shift_for_info": "Hold SHIFT for more info.",
 	"tooltip.toms_storage.paintable": "Can be painted",
 	"tooltip.toms_storage.inventory_cable_connector": "Connects the inventory to the\\Inventory Network. Or gives access to the network.\\Required to connect terminals.",
+	"tooltip.toms_storage.filtered": "Can be filtered",
 	"tooltip.toms_storage.trim": "Connects inventories with the Inventory Connector.",
 	"tooltip.toms_storage.crafting_terminal": "Gives access to your items.\\Place it on an inventory.\\Has a builtin crafting table.",
 	"tooltip.toms_storage.storage_terminal": "Gives access to your items.\\Place it on an inventory.",

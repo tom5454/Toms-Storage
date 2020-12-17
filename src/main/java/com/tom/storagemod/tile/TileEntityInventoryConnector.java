@@ -1,6 +1,7 @@
 package com.tom.storagemod.tile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,6 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 		if(!world.isClient && time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			//Set<List<ItemStack>> equalCheck = new HashSet<>();
 			toCheck.add(pos);
 			checkedBlocks.add(pos);
 			handlers.clear();
@@ -61,7 +61,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 				}
 			}
 			linkedInvs.removeAll(toRM);
-			//System.out.println("Start checking invs");
+			Collections.sort(linkedInvs);
 			int range = StorageMod.CONFIG.invRange * StorageMod.CONFIG.invRange;
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
@@ -69,12 +69,16 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 					BlockPos p = cp.offset(d);
 					if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < range) {
 						checkedBlocks.add(p);
-						BlockEntity te = world.getBlockEntity(p);
-						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
-							continue;
-						} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
-							Inventory ihr = null;
-							/*if(te instanceof ChestBlockEntity) {//Check for double chests
+						BlockState state = world.getBlockState(p);
+						if(state.getBlock() instanceof ITrim) {
+							toCheck.add(p);
+						} else {
+							BlockEntity te = world.getBlockEntity(p);
+							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnectorBase) {
+								continue;
+							} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
+								Inventory ihr = null;
+								/*if(te instanceof ChestBlockEntity) {//Check for double chests
 								BlockState state = world.getBlockState(p);
 								Block block = state.getBlock();
 								if(block instanceof ChestBlock) {
@@ -92,24 +96,20 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 										}
 									}
 								}
-							}else */if(te instanceof Inventory) {
-								//System.out.println("Checking pos: " + p + " " + inv.orElse(null));
-								ihr = IProxy.resolve((Inventory) te);
-								if(ihr instanceof TileEntityInventoryConnector) {
-									TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
-									if(checkHandlers(ih, 0)) {
-										if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
-										continue;
+							}else */
+								if(te instanceof Inventory) {
+									ihr = IProxy.resolve((Inventory) te);
+									if(ihr instanceof TileEntityInventoryConnector) {
+										TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
+										if(checkHandlers(ih, 0)) {
+											if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+											continue;
+										}
 									}
+									if(!(te instanceof TileEntityInventoryCableConnectorBase))
+										toCheck.add(p);
 								}
-								if(!(te instanceof TileEntityInventoryCableConnector))
-									toCheck.add(p);
-							}
-							if(ihr != null)handlers.add(new InventoryWrapper(ihr, d.getOpposite()));
-						} else {
-							BlockState state = world.getBlockState(p);
-							if(state.getBlock() instanceof ITrim) {
-								toCheck.add(p);
+								if(ihr != null)handlers.add(new InventoryWrapper(ihr, d.getOpposite()));
 							}
 						}
 					}
@@ -198,13 +198,24 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 		return false;
 	}
 
+	@Override
+	public boolean isValid(int slot, ItemStack stack) {
+		return call((i, s) -> i.isValid(s, stack, false), slot, false);
+	}
+
 	public void addLinked(LinkedInv inv) {
 		linkedInvs.add(inv);
 	}
 
-	public static class LinkedInv {
+	public static class LinkedInv implements Comparable<LinkedInv> {
 		public Supplier<InventoryWrapper> handler;
 		public long time;
+		public int priority;
+
+		@Override
+		public int compareTo(LinkedInv o) {
+			return Integer.compare(priority, o.priority);
+		}
 	}
 
 	public void unLink(LinkedInv linv) {
