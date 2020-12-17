@@ -26,6 +26,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.tom.storagemod.block.BlockInventoryCable;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
+import com.tom.storagemod.block.BlockInventoryCableConnectorFiltered;
 import com.tom.storagemod.block.BlockInventoryCableFramed;
 import com.tom.storagemod.block.BlockInventoryHopperBasic;
 import com.tom.storagemod.block.BlockInventoryProxy;
@@ -36,6 +37,7 @@ import com.tom.storagemod.block.CraftingTerminal;
 import com.tom.storagemod.block.InventoryConnector;
 import com.tom.storagemod.block.StorageTerminal;
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
+import com.tom.storagemod.gui.ContainerFiltered;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
@@ -46,6 +48,7 @@ import com.tom.storagemod.proxy.IProxy;
 import com.tom.storagemod.proxy.ServerProxy;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
+import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
@@ -66,6 +69,7 @@ public class StorageMod {
 	public static BlockInventoryCable invCable;
 	public static BlockInventoryCableFramed invCableFramed;
 	public static BlockInventoryCableConnector invCableConnector;
+	public static BlockInventoryCableConnectorFiltered invCableConnectorFiltered;
 	public static BlockInventoryProxy invProxy;
 	public static CraftingTerminal craftingTerminal;
 	public static BlockInventoryHopperBasic invHopperBasic;
@@ -78,12 +82,14 @@ public class StorageMod {
 	public static TileEntityType<TileEntityOpenCrate> openCrateTile;
 	public static TileEntityType<TileEntityPainted> paintedTile;
 	public static TileEntityType<TileEntityInventoryCableConnector> invCableConnectorTile;
+	public static TileEntityType<TileEntityInventoryCableConnectorFiltered> invCableConnectorFilteredTile;
 	public static TileEntityType<TileEntityInventoryProxy> invProxyTile;
 	public static TileEntityType<TileEntityCraftingTerminal> craftingTerminalTile;
 	public static TileEntityType<TileEntityInventoryHopperBasic> invHopperBasicTile;
 
 	public static ContainerType<ContainerStorageTerminal> storageTerminal;
 	public static ContainerType<ContainerCraftingTerminal> craftingTerminalCont;
+	public static ContainerType<ContainerFiltered> filteredConatiner;
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -138,6 +144,7 @@ public class StorageMod {
 			invCable = new BlockInventoryCable();
 			invCableFramed = new BlockInventoryCableFramed();
 			invCableConnector = new BlockInventoryCableConnector();
+			invCableConnectorFiltered = new BlockInventoryCableConnectorFiltered();
 			invProxy = new BlockInventoryProxy();
 			craftingTerminal = new CraftingTerminal();
 			invHopperBasic = new BlockInventoryHopperBasic();
@@ -149,6 +156,7 @@ public class StorageMod {
 			blockRegistryEvent.getRegistry().register(invCable);
 			blockRegistryEvent.getRegistry().register(invCableFramed);
 			blockRegistryEvent.getRegistry().register(invCableConnector);
+			blockRegistryEvent.getRegistry().register(invCableConnectorFiltered);
 			blockRegistryEvent.getRegistry().register(invProxy);
 			blockRegistryEvent.getRegistry().register(craftingTerminal);
 			blockRegistryEvent.getRegistry().register(invHopperBasic);
@@ -167,6 +175,7 @@ public class StorageMod {
 			registerItemForBlock(itemRegistryEvent, invCable);
 			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invCableFramed, new Item.Properties().group(STORAGE_MOD_TAB)));
 			registerItemForBlock(itemRegistryEvent, invCableConnector);
+			registerItemForBlock(itemRegistryEvent, invCableConnectorFiltered);
 			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invProxy, new Item.Properties().group(STORAGE_MOD_TAB)));
 			registerItemForBlock(itemRegistryEvent, craftingTerminal);
 			registerItemForBlock(itemRegistryEvent, invHopperBasic);
@@ -191,6 +200,8 @@ public class StorageMod {
 			paintedTile.setRegistryName("ts.painted.tile");
 			invCableConnectorTile = TileEntityType.Builder.create(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
 			invCableConnectorTile.setRegistryName("ts.inventory_cable_connector.tile");
+			invCableConnectorFilteredTile = TileEntityType.Builder.create(TileEntityInventoryCableConnectorFiltered::new, invCableConnectorFiltered).build(null);
+			invCableConnectorFilteredTile.setRegistryName("ts.inventory_cable_connector_filtered.tile");
 			invProxyTile = TileEntityType.Builder.create(TileEntityInventoryProxy::new, invProxy).build(null);
 			invProxyTile.setRegistryName("ts.inventory_proxy.tile");
 			craftingTerminalTile = TileEntityType.Builder.create(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
@@ -202,6 +213,7 @@ public class StorageMod {
 			tileRegistryEvent.getRegistry().register(openCrateTile);
 			tileRegistryEvent.getRegistry().register(paintedTile);
 			tileRegistryEvent.getRegistry().register(invCableConnectorTile);
+			tileRegistryEvent.getRegistry().register(invCableConnectorFilteredTile);
 			tileRegistryEvent.getRegistry().register(invProxyTile);
 			tileRegistryEvent.getRegistry().register(craftingTerminalTile);
 			tileRegistryEvent.getRegistry().register(invHopperBasicTile);
@@ -213,8 +225,11 @@ public class StorageMod {
 			storageTerminal.setRegistryName("ts.storage_terminal.container");
 			craftingTerminalCont = new ContainerType<>(ContainerCraftingTerminal::new);
 			craftingTerminalCont.setRegistryName("ts.crafting_terminal.container");
+			filteredConatiner = new ContainerType<>(ContainerFiltered::new);
+			filteredConatiner.setRegistryName("ts.filtered.container");
 			containerRegistryEvent.getRegistry().register(storageTerminal);
 			containerRegistryEvent.getRegistry().register(craftingTerminalCont);
+			containerRegistryEvent.getRegistry().register(filteredConatiner);
 		}
 	}
 }

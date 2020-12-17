@@ -1,12 +1,4 @@
 {
-   "display":{
-      "description":"",
-      "title":"",
-      "icon":{
-         "item":"glowstone_dust"
-      },
-      "background":"minecraft:textures/blocks/stone.png"
-   },
    "criteria":{
       "inv_changed-glowstone":{
          "trigger":"minecraft:inventory_changed",

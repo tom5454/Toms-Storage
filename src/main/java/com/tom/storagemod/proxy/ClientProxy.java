@@ -40,6 +40,7 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
+import com.tom.storagemod.gui.GuiFiltered;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
@@ -56,6 +57,7 @@ public class ClientProxy implements IProxy {
 	public void clientSetup() {
 		ScreenManager.registerFactory(StorageMod.storageTerminal, GuiStorageTerminal::new);
 		ScreenManager.registerFactory(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
+		ScreenManager.registerFactory(StorageMod.filteredConatiner, GuiFiltered::new);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
 		RenderTypeLookup.setRenderLayer(StorageMod.paintedTrim, e -> true);
 		RenderTypeLookup.setRenderLayer(StorageMod.invCableFramed, e -> true);

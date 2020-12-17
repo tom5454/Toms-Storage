@@ -1,6 +1,7 @@
 package com.tom.storagemod.tile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,11 +46,9 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 		if(!world.isRemote && time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			//Set<List<ItemStack>> equalCheck = new HashSet<>();
 			toCheck.add(pos);
 			checkedBlocks.add(pos);
 			handlers.clear();
-			//System.out.println("Start checking invs");
 			Set<LinkedInv> toRM = new HashSet<>();
 			for (LinkedInv inv : linkedInvs) {
 				if(inv.time + 40 < time) {
@@ -59,52 +58,51 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 				handlers.add(inv.handler.get());
 			}
 			linkedInvs.removeAll(toRM);
+			Collections.sort(linkedInvs);
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
 					BlockPos p = cp.offset(d);
 					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < Config.invRange) {
 						checkedBlocks.add(p);
-						TileEntity te = world.getTileEntity(p);
-						if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
-							continue;
-						} else if(te != null && !Config.onlyTrims) {
-							LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
-							if(te instanceof ChestTileEntity) {//Check for double chests
-								BlockState state = world.getBlockState(p);
-								Block block = state.getBlock();
-								if(block instanceof ChestBlock) {
-									ChestType type = state.get(ChestBlock.TYPE);
-									if (type != ChestType.SINGLE) {
-										BlockPos opos = p.offset(ChestBlock.getDirectionToAttached(state));
-										BlockState ostate = this.getWorld().getBlockState(opos);
-										if (state.getBlock() == ostate.getBlock()) {
-											ChestType otype = ostate.get(ChestBlock.TYPE);
-											if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
-												toCheck.add(opos);
-												checkedBlocks.add(opos);
+						BlockState state = world.getBlockState(p);
+						if(state.getBlock() instanceof ITrim) {
+							toCheck.add(p);
+						} else {
+							TileEntity te = world.getTileEntity(p);
+							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
+								continue;
+							} else if(te != null && !Config.onlyTrims) {
+								LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
+								if(te instanceof ChestTileEntity) {//Check for double chests
+									Block block = state.getBlock();
+									if(block instanceof ChestBlock) {
+										ChestType type = state.get(ChestBlock.TYPE);
+										if (type != ChestType.SINGLE) {
+											BlockPos opos = p.offset(ChestBlock.getDirectionToAttached(state));
+											BlockState ostate = this.getWorld().getBlockState(opos);
+											if (state.getBlock() == ostate.getBlock()) {
+												ChestType otype = ostate.get(ChestBlock.TYPE);
+												if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
+													toCheck.add(opos);
+													checkedBlocks.add(opos);
+												}
 											}
 										}
 									}
 								}
-							}
-							if(inv.isPresent()) {
-								//System.out.println("Checking pos: " + p + " " + inv.orElse(null));
-								IItemHandler ihr = IProxy.resolve(inv.orElse(null));
-								if(ihr instanceof InvHandler) {
-									InvHandler ih = (InvHandler) ihr;
-									if(checkHandlers(ih, 0)) {
-										if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
-										continue;
+								if(inv.isPresent()) {
+									IItemHandler ihr = IProxy.resolve(inv.orElse(null));
+									if(ihr instanceof InvHandler) {
+										InvHandler ih = (InvHandler) ihr;
+										if(checkHandlers(ih, 0)) {
+											if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+											continue;
+										}
 									}
+									toCheck.add(p);
+									handlers.add(inv);
 								}
-								toCheck.add(p);
-								handlers.add(inv);
-							}
-						} else {
-							BlockState state = world.getBlockState(p);
-							if(state.getBlock() instanceof ITrim) {
-								toCheck.add(p);
 							}
 						}
 					}
@@ -236,10 +234,6 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 			return ItemStack.EMPTY;
 		}
 
-		public TileEntityInventoryConnector getThis() {
-			return TileEntityInventoryConnector.this;
-		}
-
 		public List<LazyOptional<IItemHandler>> getHandlers() {
 			return handlers;
 		}
@@ -256,9 +250,15 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 		linkedInvs.add(inv);
 	}
 
-	public static class LinkedInv {
+	public static class LinkedInv implements Comparable<LinkedInv> {
 		public Supplier<LazyOptional<IItemHandler>> handler;
 		public long time;
+		public int priority;
+
+		@Override
+		public int compareTo(LinkedInv o) {
+			return Integer.compare(priority, o.priority);
+		}
 	}
 
 	public void unLink(LinkedInv linv) {
