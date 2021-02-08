@@ -13,6 +13,8 @@ import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -32,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
 import com.tom.storagemod.StorageModClient;
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
 
 public class BlockInventoryCableConnector extends BlockWithEntity implements IInventoryCable {
@@ -67,8 +70,14 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityInventoryCableConnector();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityInventoryCableConnector(pos, state);
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override
@@ -237,20 +246,24 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 	private static VoxelShape createShape(Direction dir, float width, float widthoff, float height, float heightoff, float depth, float depthoff) {
 		switch (dir) {
 		case DOWN:
-			return Block.createCuboidShape(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
+			return createCuboidShape(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
 		case EAST:
-			return Block.createCuboidShape(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
+			return createCuboidShape(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
 		case NORTH:
-			return Block.createCuboidShape(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
+			return createCuboidShape(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
 		case SOUTH:
-			return Block.createCuboidShape(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
+			return createCuboidShape(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
 		case UP:
-			return Block.createCuboidShape(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
+			return createCuboidShape(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
 		case WEST:
-			return Block.createCuboidShape(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
+			return createCuboidShape(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
 		default:
 			break;
 		}
 		return Block.createCuboidShape(0, 0, 0, 16, 16, 16);
+	}
+
+	public static VoxelShape createCuboidShape(double xMin, double yMin, double zMin, double xMax, double yMax, double zMax) {
+		return Block.createCuboidShape(Math.min(xMin, xMax), Math.min(yMin, yMax), Math.min(zMin, zMax), Math.max(xMin, xMax), Math.max(yMin, yMax), Math.max(zMin, zMax));
 	}
 }

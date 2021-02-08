@@ -10,23 +10,23 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 
-public class TileEntityOpenCrate extends BlockEntity implements Tickable, Inventory {
+public class TileEntityOpenCrate extends BlockEntity implements Inventory, TickableServer {
 	private List<ItemEntity> items = new ArrayList<>();
 
-	public TileEntityOpenCrate() {
-		super(StorageMod.openCrateTile);
+	public TileEntityOpenCrate(BlockPos pos, BlockState state) {
+		super(StorageMod.openCrateTile, pos, state);
 	}
 
 	@Override
-	public void tick() {
+	public void updateServer() {
 		if(world.getTime() % 5 == 0){
 			BlockState state = world.getBlockState(pos);
 			Direction f = state.get(Properties.FACING);
@@ -60,7 +60,7 @@ public class TileEntityOpenCrate extends BlockEntity implements Tickable, Invent
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
 				ItemStack s = ent.getStack().split(count);
-				if(ent.getStack().isEmpty())ent.remove();
+				if(ent.getStack().isEmpty())ent.discard();
 				return s;
 			}
 			else return ItemStack.EMPTY;
@@ -73,7 +73,7 @@ public class TileEntityOpenCrate extends BlockEntity implements Tickable, Invent
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
 				ItemStack s = ent.getStack();
-				ent.remove();
+				ent.discard();
 				return s;
 			}
 			else return ItemStack.EMPTY;

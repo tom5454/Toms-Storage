@@ -10,6 +10,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -18,20 +20,18 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageModClient;
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 
 public class BlockOpenCrate extends BlockWithEntity {
 
 	public BlockOpenCrate() {
 		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
-	}
-
-	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityOpenCrate();
 	}
 
 	@Override
@@ -65,5 +65,16 @@ public class BlockOpenCrate extends BlockWithEntity {
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
 		return this.getDefaultState().
 				with(Properties.FACING, ctx.getPlayerFacing().getOpposite());
+	}
+
+	@Override
+	public BlockEntity createBlockEntity(BlockPos paramBlockPos, BlockState paramBlockState) {
+		return new TileEntityOpenCrate(paramBlockPos, paramBlockState);
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 }

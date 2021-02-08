@@ -10,3 +10,5 @@ accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget sea
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget ghostSlots Lnet/minecraft/client/gui/screen/recipebook/RecipeBookGhostSlots;
 
 accessible method net/minecraft/client/gui/widget/AbstractButtonWidget setFocused (Z)V
+
+accessible class net/minecraft/block/entity/BlockEntityType$BlockEntityFactory

@@ -11,6 +11,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -22,6 +24,7 @@ import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityPainted;
 
 public class BlockInventoryCableFramedPainted extends BlockWithEntity implements IInventoryCable, IPaintable {
@@ -57,8 +60,14 @@ public class BlockInventoryCableFramedPainted extends BlockWithEntity implements
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityPainted();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityPainted(pos, state);
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override

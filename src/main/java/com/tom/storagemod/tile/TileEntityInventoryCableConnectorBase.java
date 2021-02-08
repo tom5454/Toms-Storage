@@ -15,28 +15,28 @@ import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 
-public class TileEntityInventoryCableConnectorBase extends BlockEntity implements Tickable, Inventory, IProxy {
+public class TileEntityInventoryCableConnectorBase extends BlockEntity implements TickableServer, Inventory, IProxy {
 	protected TileEntityInventoryConnector master;
 	protected InventoryWrapper pointedAt, masterW;
 	protected LinkedInv linv;
 
-	public TileEntityInventoryCableConnectorBase(BlockEntityType<?> type) {
-		super(type);
+	public TileEntityInventoryCableConnectorBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 
 	@Override
-	public void tick() {
-		if(!world.isClient && world.getTime() % 20 == 19) {
+	public void updateServer() {
+		if(world.getTime() % 20 == 19) {
 			BlockState state = world.getBlockState(pos);
 			Direction facing = state.get(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();

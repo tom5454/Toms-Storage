@@ -12,6 +12,8 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -34,6 +36,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageModClient;
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 
 public class BlockInventoryHopperBasic extends BlockWithEntity implements IInventoryCable {
@@ -53,9 +56,16 @@ public class BlockInventoryHopperBasic extends BlockWithEntity implements IInven
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityInventoryHopperBasic();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityInventoryHopperBasic(pos, state);
 	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
+	}
+
 	@Override
 	public BlockState rotate(BlockState state, BlockRotation rot) {
 		return state.with(FACING, rot.rotate(state.get(FACING)));

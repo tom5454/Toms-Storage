@@ -8,6 +8,8 @@ import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.Waterloggable;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -30,6 +32,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
 public abstract class StorageTerminalBase extends BlockWithEntity implements Waterloggable {
@@ -155,5 +158,11 @@ public abstract class StorageTerminalBase extends BlockWithEntity implements Wat
 		public String asString() {
 			return name;
 		}
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 }

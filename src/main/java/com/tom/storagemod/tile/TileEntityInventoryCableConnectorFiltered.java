@@ -12,6 +12,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.ContainerFiltered;
@@ -19,8 +20,8 @@ import com.tom.storagemod.gui.ContainerFiltered;
 public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements NamedScreenHandlerFactory {
 	private SimpleInventory filter = new SimpleInventory(9);
 
-	public TileEntityInventoryCableConnectorFiltered() {
-		super(StorageMod.invCableConnectorFilteredTile);
+	public TileEntityInventoryCableConnectorFiltered(BlockPos pos, BlockState state) {
+		super(StorageMod.invCableConnectorFilteredTile, pos, state);
 	}
 
 	@Override
@@ -40,8 +41,8 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public void fromTag(BlockState state, CompoundTag tag) {
-		super.fromTag(state, tag);
+	public void fromTag(CompoundTag tag) {
+		super.fromTag(tag);
 		filter.readTags(tag.getList("filter", 10));
 	}
 

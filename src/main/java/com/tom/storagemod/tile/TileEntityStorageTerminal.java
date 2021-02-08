@@ -20,27 +20,28 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.Tickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 
-public class TileEntityStorageTerminal extends BlockEntity implements NamedScreenHandlerFactory, Tickable {
+public class TileEntityStorageTerminal extends BlockEntity implements NamedScreenHandlerFactory, TickableServer {
 	private IItemHandler itemHandler;
 	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
 	private int sort;
 	private String lastSearch = "";
-	public TileEntityStorageTerminal() {
-		super(StorageMod.terminalTile);
+	public TileEntityStorageTerminal(BlockPos pos, BlockState state) {
+		super(StorageMod.terminalTile, pos, state);
 	}
 
-	public TileEntityStorageTerminal(BlockEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityStorageTerminal(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 	}
 
 	@Override
@@ -100,21 +101,19 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	}
 
 	@Override
-	public void tick() {
-		if(!world.isClient) {
-			BlockState st = world.getBlockState(pos);
-			Direction d = st.get(StorageTerminalBase.FACING);
-			TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
-			if(p == TerminalPos.UP)d = Direction.UP;
-			if(p == TerminalPos.DOWN)d = Direction.DOWN;
-			items.clear();
-			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
-			if(inv != null) {
-				itemHandler = InvWrapper.wrap(inv, d.getOpposite());
-				IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
-				map(StoredItemStack::new).forEach(s -> items.merge(s, s,
-						(a, b) -> new StoredItemStack(a.getStack(), a.getQuantity() + b.getQuantity())));
-			}
+	public void updateServer() {
+		BlockState st = world.getBlockState(pos);
+		Direction d = st.get(StorageTerminalBase.FACING);
+		TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
+		if(p == TerminalPos.UP)d = Direction.UP;
+		if(p == TerminalPos.DOWN)d = Direction.DOWN;
+		items.clear();
+		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
+		if(inv != null) {
+			itemHandler = InvWrapper.wrap(inv, d.getOpposite());
+			IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
+			map(StoredItemStack::new).forEach(s -> items.merge(s, s,
+					(a, b) -> new StoredItemStack(a.getStack(), a.getQuantity() + b.getQuantity())));
 		}
 	}
 
@@ -139,9 +138,9 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	}
 
 	@Override
-	public void fromTag(BlockState st, CompoundTag compound) {
+	public void fromTag(CompoundTag compound) {
 		sort = compound.getInt("sort");
-		super.fromTag(st, compound);
+		super.fromTag(compound);
 	}
 
 	public String getLastSearch() {

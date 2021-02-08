@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
@@ -45,8 +46,8 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	private final CraftingInventory craftMatrix = new CraftingInventory(craftingContainer, 3, 3);
 	private CraftingResultInventory craftResult = new CraftingResultInventory();
 	private HashSet<ContainerCraftingTerminal> craftingListeners = new HashSet<>();
-	public TileEntityCraftingTerminal() {
-		super(StorageMod.craftingTerminalTile);
+	public TileEntityCraftingTerminal(BlockPos pos, BlockState state) {
+		super(StorageMod.craftingTerminalTile, pos, state);
 	}
 
 	@Override
@@ -78,8 +79,8 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 	private boolean reading;
 	@Override
-	public void fromTag(BlockState state, CompoundTag compound) {
-		super.fromTag(state, compound);
+	public void fromTag(CompoundTag compound) {
+		super.fromTag(compound);
 		reading = true;
 		ListTag listnbt = compound.getList("CraftingTable", 10);
 
@@ -112,7 +113,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		} while(ItemStack.areItemsEqual(crafted, craftResult.getStack(0)) && (amountCrafted+crafted.getCount()) < crafted.getMaxCount());
 
 		for (ItemStack craftedItem : craftedItemsList) {
-			if (!player.inventory.insertStack(craftedItem.copy())) {
+			if (!player.getInventory().insertStack(craftedItem.copy())) {
 				ItemStack is = pushStack(craftedItem);
 				if(!is.isEmpty()) {
 					ItemScatterer.spawn(world, player.getX(), player.getY(), player.getZ(), is);
@@ -134,7 +135,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 					if (!slot.isEmpty() && slot.getCount() > 1) {
 						ItemStack is = pushStack(remainder.get(i).copy());
 						if(!is.isEmpty()) {
-							if(!thePlayer.inventory.insertStack(is)) {
+							if(!thePlayer.getInventory().insertStack(is)) {
 								ItemScatterer.spawn(world, thePlayer.getX(), thePlayer.getY(), thePlayer.getZ(), is);
 							}
 						}
@@ -146,10 +147,10 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 					if (slot.getCount() == 1) {
 						StoredItemStack is = pullStack(new StoredItemStack(slot), 1);
 						if(is == null && (getSorting() & (1 << 8)) != 0) {
-							for(int j = 0;j<thePlayer.inventory.size();j++) {
-								ItemStack st = thePlayer.inventory.getStack(j);
+							for(int j = 0;j<thePlayer.getInventory().size();j++) {
+								ItemStack st = thePlayer.getInventory().getStack(j);
 								if(ItemStack.areItemsEqual(slot, st) && ItemStack.areTagsEqual(slot, st)) {
-									st = thePlayer.inventory.removeStack(j, 1);
+									st = thePlayer.getInventory().removeStack(j, 1);
 									if(!st.isEmpty()) {
 										is = new StoredItemStack(st, 1);
 										playerInvUpdate = true;
@@ -221,9 +222,9 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 				if (stack.isEmpty()) {
 					for (int j = 0;j < items[i].length;j++) {
 						boolean br = false;
-						for (int k = 0;k < player.inventory.size();k++) {
-							if(ItemStack.areItemsEqual(player.inventory.getStack(k), items[i][j])) {
-								stack = player.inventory.removeStack(k, 1);
+						for (int k = 0;k < player.getInventory().size();k++) {
+							if(ItemStack.areItemsEqual(player.getInventory().getStack(k), items[i][j])) {
+								stack = player.getInventory().removeStack(k, 1);
 								br = true;
 								break;
 							}

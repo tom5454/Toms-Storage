@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
 import com.tom.storagemod.StorageMod;
@@ -17,12 +18,12 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	//public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
 	private BlockState blockState;
 
-	public TileEntityPainted() {
-		super(StorageMod.paintedTile);
+	public TileEntityPainted(BlockPos pos, BlockState state) {
+		super(StorageMod.paintedTile, pos, state);
 	}
 
-	public TileEntityPainted(BlockEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityPainted(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 	}
 
 	public boolean setPaintedBlockState(BlockState blockState) {
@@ -34,8 +35,8 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public void fromTag(BlockState st, CompoundTag compound) {
-		super.fromTag(st, compound);
+	public void fromTag(CompoundTag compound) {
+		super.fromTag(compound);
 		blockState = NbtHelper.toBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
@@ -81,7 +82,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 		if (world != null && world.isClient) {
 			// If needed send a render update.
 			if (! getPaintedBlockState().equals(old)) {
-				world.markDirty(getPos(), this);
+				world.markDirty(getPos());
 				BlockState st = world.getBlockState(pos);
 				world.updateListeners(pos, st, st, 3);
 			}

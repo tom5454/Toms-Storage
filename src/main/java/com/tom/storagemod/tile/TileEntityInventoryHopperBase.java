@@ -8,24 +8,24 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 
-public abstract class TileEntityInventoryHopperBase extends BlockEntity implements Tickable {
+public abstract class TileEntityInventoryHopperBase extends BlockEntity implements TickableServer {
 	protected boolean topNet, bottomNet;
 	protected InventoryWrapper top;
 	protected InventoryWrapper bottom;
-	public TileEntityInventoryHopperBase(BlockEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityInventoryHopperBase(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 	}
 
 	@Override
-	public void tick() {
+	public void updateServer() {
 		if(!world.isClient && world.getTime() % 20 == 1) {
 			BlockState state = world.getBlockState(pos);
 			Direction facing = state.get(BlockInventoryCableConnector.FACING);

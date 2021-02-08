@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -38,7 +37,6 @@ import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
-import com.tom.storagemod.rei.REIPlugin;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends HandledScreen<T> {
 	protected MinecraftClient mc = MinecraftClient.getInstance();
@@ -202,8 +200,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			getScreenHandler().scrollTo(0);
 			this.currentScroll = 0;
 			if ((searchType & 4) > 0) {
-				if(FabricLoader.getInstance().isModLoaded("rei"))
-					REIPlugin.setReiSearchText(searchString);
+				/*if(FabricLoader.getInstance().isModLoaded("rei"))
+					REIPlugin.setReiSearchText(searchString);*/
 			}
 			if ((searchType & 2) > 0) {
 				CompoundTag nbt = new CompoundTag();
@@ -300,7 +298,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 				return true;
 			} else if (pullHalf(mouseButton)) {
-				if (!mc.player.inventory.getCursorStack().isEmpty()) {
+				if (!mc.player.getInventory().getCursorStack().isEmpty()) {
 					//windowClick(-2, 0, SlotAction.GET_HALF);
 					storageSlotClick(ItemStack.EMPTY, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
 				} else {
@@ -315,7 +313,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 					}
 				}
 			} else if (pullNormal(mouseButton)) {
-				if (!mc.player.inventory.getCursorStack().isEmpty()) {
+				if (!mc.player.getInventory().getCursorStack().isEmpty()) {
 					//windowClick(-(slotIDUnderMouse + 2), 0, SlotAction.PULL_OR_PUSH_STACK);
 					storageSlotClick(ItemStack.EMPTY, SlotAction.PULL_OR_PUSH_STACK, 0);
 				} else {
@@ -366,7 +364,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		case RS:
 			return mouseButton == 2;
 		case DEF:
-			return mouseButton == 1 && !mc.player.inventory.getCursorStack().isEmpty();
+			return mouseButton == 1 && !mc.player.getInventory().getCursorStack().isEmpty();
 		default:
 			return false;
 		}
@@ -392,7 +390,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		case RS:
 			return mouseButton == 1;
 		case DEF:
-			return mouseButton == 1 && mc.player.inventory.getCursorStack().isEmpty();
+			return mouseButton == 1 && mc.player.getInventory().getCursorStack().isEmpty();
 		default:
 			return false;
 		}

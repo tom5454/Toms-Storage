@@ -43,11 +43,6 @@ public class BlockPaintedTrim extends BlockWithEntity implements ITrim, IPaintab
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityPainted();
-	}
-
-	@Override
 	public BlockRenderType getRenderType(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
@@ -55,5 +50,10 @@ public class BlockPaintedTrim extends BlockWithEntity implements ITrim, IPaintab
 	@Override
 	public Block getPaintedBlock() {
 		return this;
+	}
+
+	@Override
+	public BlockEntity createBlockEntity(BlockPos paramBlockPos, BlockState paramBlockState) {
+		return new TileEntityPainted(paramBlockPos, paramBlockState);
 	}
 }

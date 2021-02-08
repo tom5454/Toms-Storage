@@ -2,8 +2,6 @@ package com.tom.storagemod;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -58,7 +56,7 @@ public class StorageModClient implements ClientModInitializer {
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> new ModelResourceProvider() {
 
 			@Override
-			public @Nullable UnbakedModel loadModelResource(Identifier resourceId, ModelProviderContext context)
+			public UnbakedModel loadModelResource(Identifier resourceId, ModelProviderContext context)
 					throws ModelProviderException {
 				if(resourceId.equals(PAINT)) {
 					return new BakedPaintedModel();

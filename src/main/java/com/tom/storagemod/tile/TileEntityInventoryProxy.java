@@ -9,22 +9,23 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.Unit;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryProxy;
 import com.tom.storagemod.block.BlockInventoryProxy.DirectionWithNull;
 
-public class TileEntityInventoryProxy extends TileEntityPainted implements Tickable, Inventory, IProxy {
+public class TileEntityInventoryProxy extends TileEntityPainted implements TickableServer, Inventory, IProxy {
 	private InventoryWrapper pointedAt;
 	private InventoryWrapper filter;
 	private boolean ignoreCount;
 	private int globalCountLimit = 64;
-	public TileEntityInventoryProxy() {
-		super(StorageMod.invProxyTile);
+	public TileEntityInventoryProxy(BlockPos pos, BlockState state) {
+		super(StorageMod.invProxyTile, pos, state);
 	}
 
 	private boolean calling;
@@ -41,8 +42,8 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 	}
 
 	@Override
-	public void tick() {
-		if(!world.isClient && world.getTime() % 20 == 18) {
+	public void updateServer() {
+		if(world.getTime() % 20 == 18) {
 			BlockState state = world.getBlockState(pos);
 			Direction facing = state.get(BlockInventoryProxy.FACING);
 			DirectionWithNull filter = state.get(BlockInventoryProxy.FILTER_FACING);

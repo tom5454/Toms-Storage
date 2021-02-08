@@ -13,6 +13,8 @@ import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -38,6 +40,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
 import com.tom.storagemod.StorageModClient;
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
 
 public class BlockInventoryCableConnectorFiltered extends BlockWithEntity implements IInventoryCable {
@@ -74,8 +77,14 @@ public class BlockInventoryCableConnectorFiltered extends BlockWithEntity implem
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityInventoryCableConnectorFiltered();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityInventoryCableConnectorFiltered(pos, state);
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override
@@ -244,17 +253,17 @@ public class BlockInventoryCableConnectorFiltered extends BlockWithEntity implem
 	private static VoxelShape createShape(Direction dir, float width, float widthoff, float height, float heightoff, float depth, float depthoff) {
 		switch (dir) {
 		case DOWN:
-			return Block.createCuboidShape(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
+			return BlockInventoryCableConnector.createCuboidShape(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
 		case EAST:
-			return Block.createCuboidShape(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
+			return BlockInventoryCableConnector.createCuboidShape(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
 		case NORTH:
-			return Block.createCuboidShape(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
+			return BlockInventoryCableConnector.createCuboidShape(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
 		case SOUTH:
-			return Block.createCuboidShape(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
+			return BlockInventoryCableConnector.createCuboidShape(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
 		case UP:
-			return Block.createCuboidShape(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
+			return BlockInventoryCableConnector.createCuboidShape(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
 		case WEST:
-			return Block.createCuboidShape(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
+			return BlockInventoryCableConnector.createCuboidShape(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
 		default:
 			break;
 		}

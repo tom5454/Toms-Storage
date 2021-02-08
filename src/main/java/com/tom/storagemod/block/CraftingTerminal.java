@@ -4,10 +4,12 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
 import com.tom.storagemod.StorageModClient;
@@ -20,8 +22,8 @@ public class CraftingTerminal extends StorageTerminalBase {
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityCraftingTerminal();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityCraftingTerminal(pos, state);
 	}
 
 	@Override

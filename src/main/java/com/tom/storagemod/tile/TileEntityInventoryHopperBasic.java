@@ -3,14 +3,15 @@ package com.tom.storagemod.tile;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
 
 public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBase {
 	private ItemStack filter = ItemStack.EMPTY;
 	private int cooldown;
-	public TileEntityInventoryHopperBasic() {
-		super(StorageMod.invHopperBasicTile);
+	public TileEntityInventoryHopperBasic(BlockPos pos, BlockState state) {
+		super(StorageMod.invHopperBasicTile, pos, state);
 	}
 
 	@Override
@@ -52,8 +53,8 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public void fromTag(BlockState stateIn, CompoundTag nbtIn) {
-		super.fromTag(stateIn, nbtIn);
+	public void fromTag(CompoundTag nbtIn) {
+		super.fromTag(nbtIn);
 		setFilter(ItemStack.fromTag(nbtIn.getCompound("Filter")));
 	}
 

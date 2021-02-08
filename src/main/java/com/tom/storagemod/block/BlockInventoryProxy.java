@@ -12,6 +12,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -35,6 +37,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageModClient;
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
 
 public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
@@ -58,7 +61,7 @@ public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
 			BlockHitResult hit) {
 		ItemStack stack = player.getStackInHand(hand);
 		if(stack.getItem() == Items.DIAMOND && state.get(FACING) != hit.getSide()) {
-			if(state.get(FILTER_FACING) == DirectionWithNull.NULL && !player.abilities.creativeMode) {
+			if(state.get(FILTER_FACING) == DirectionWithNull.NULL && !player.getAbilities().creativeMode) {
 				stack.decrement(1);
 			}
 			world.setBlockState(pos, state.with(FILTER_FACING, DirectionWithNull.of(hit.getSide())));
@@ -68,8 +71,14 @@ public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityInventoryProxy();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityInventoryProxy(pos, state);
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override

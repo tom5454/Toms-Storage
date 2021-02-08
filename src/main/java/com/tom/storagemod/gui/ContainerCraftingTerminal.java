@@ -20,7 +20,6 @@ import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ItemScatterer;
 
 import com.google.common.collect.Lists;
 
@@ -217,7 +216,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 
 			@Override
 			protected void fillInputSlot(Slot slotToFill, ItemStack ingredientIn) {
-				int i = this.inventory.method_7371(ingredientIn);
+				int i = this.inventory.indexOf(ingredientIn);
 				if (i != -1) {
 					ItemStack itemstack = this.inventory.getStack(i).copy();
 					if (!itemstack.isEmpty()) {
@@ -248,29 +247,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			}
 
 			@Override
-			protected void returnSlot(int slotIn) {
-				ItemStack itemstack = this.craftingScreenHandler.getSlot(slotIn).getStack();
-				if (!itemstack.isEmpty()) {
-					PlayerEntity player = inventory.player;
-					ItemScatterer.spawn(player.world, player.getX(), player.getY()-5, player.getZ(), itemstack);
-					/*
-					for(; itemstack.getCount() > 0; this.recipeBookContainer.getSlot(slotIn).decrStackSize(1)) {
-						int i = this.playerInventory.storeItemStack(itemstack);
-						if (i == -1) {
-							i = this.playerInventory.getFirstEmptyStack();
-						}
-
-						ItemStack itemstack1 = itemstack.copy();
-						itemstack1.setCount(1);
-						if (!this.playerInventory.add(i, itemstack1)) {
-							LOGGER.error("Can't find any space for item in the inventory");
-						}
-					}*/
-				}
-			}
-
-			@Override
-			protected void returnInputs() {
+			protected void returnInputs(boolean bool) {
 				((TileEntityCraftingTerminal) te).clear();
 				this.craftingScreenHandler.clearCraftingSlots();
 			}
@@ -295,5 +272,10 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			}
 			((TileEntityCraftingTerminal) te).handlerItemTransfer(pinv.player, stacks);
 		}
+	}
+
+	@Override
+	public boolean method_32339(int id) {
+		return id > 0 && id < 10;
 	}
 }

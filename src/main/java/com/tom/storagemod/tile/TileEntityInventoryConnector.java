@@ -14,28 +14,28 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.ITrim;
 
-public class TileEntityInventoryConnector extends BlockEntity implements Tickable, Inventory {
+public class TileEntityInventoryConnector extends BlockEntity implements TickableServer, Inventory {
 	private List<InventoryWrapper> handlers = new ArrayList<>();
 	private List<LinkedInv> linkedInvs = new ArrayList<>();
 	private int[] invSizes = new int[0];
 	private int invSize;
 
-	public TileEntityInventoryConnector() {
-		super(StorageMod.connectorTile);
+	public TileEntityInventoryConnector(BlockPos pos, BlockState state) {
+		super(StorageMod.connectorTile, pos, state);
 	}
 
 	@Override
-	public void tick() {
+	public void updateServer() {
 		long time = world.getTime();
-		if(!world.isClient && time % 20 == 0) {
+		if(time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			toCheck.add(pos);
