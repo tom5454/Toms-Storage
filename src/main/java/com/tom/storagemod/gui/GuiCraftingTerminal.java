@@ -77,13 +77,17 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			if(recipeBookGui.isOpen()) {
 				buttonSearchType.setX(x - 36);
 				buttonCtrlMode.setX(x - 36);
+				buttonPullFromInv.setX(x - 54);
 				buttonSearchType.y = y + 5;
 				buttonCtrlMode.y = y + 5 + 18;
+				buttonPullFromInv.y = y + 5 + 18;
 			} else {
 				buttonSearchType.setX(x - 18);
 				buttonCtrlMode.setX(x - 18);
+				buttonPullFromInv.setX(x - 18);
 				buttonSearchType.y = y + 5 + 18*2;
 				buttonCtrlMode.y = y + 5 + 18*3;
+				buttonPullFromInv.y = y + 5 + 18*4;
 			}
 		}));
 		if(recipeBookGui.isOpen()) {
@@ -91,10 +95,13 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			buttonDirection.setX(x - 18);
 			buttonSearchType.setX(x - 36);
 			buttonCtrlMode.setX(x - 36);
+			buttonPullFromInv.setX(x - 54);
 			buttonSearchType.y = y + 5;
 			buttonCtrlMode.y = y + 5 + 18;
+			buttonPullFromInv.y = y + 5 + 18;
 			super.searchField.setX(this.x + 82);
 		}
+		onPacket();
 	}
 
 	@Override
@@ -137,7 +144,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setFocused(this.recipeBookGui);
 
 		if (buttonPullFromInv.isHovered()) {
-			renderTooltip(st, new TranslatableText("tooltip.toms_storage.pull_" + buttonSearchType.state), mouseX, mouseY);
+			renderTooltip(st, new TranslatableText("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
 		}
 	}
 

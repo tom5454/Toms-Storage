@@ -438,6 +438,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	@Override
 	public void receive(CompoundTag message) {
+		if(pinv.player.isSpectator())return;
 		if(message.contains("s")) {
 			te.setLastSearch(message.getString("s"));
 		}
