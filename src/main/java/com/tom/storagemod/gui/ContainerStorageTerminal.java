@@ -457,6 +457,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 
 	@Override
 	public void receive(CompoundNBT message) {
+		if(pinv.player.isSpectator())return;
 		if(message.contains("s")) {
 			te.setLastSearch(message.getString("s"));
 		}

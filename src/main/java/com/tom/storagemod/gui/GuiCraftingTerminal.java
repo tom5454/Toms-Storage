@@ -114,13 +114,17 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			if(recipeBookGui.isVisible()) {
 				buttonSearchType.setX(guiLeft - 36);
 				buttonCtrlMode.setX(guiLeft - 36);
+				buttonPullFromInv.setX(guiLeft - 54);
 				buttonSearchType.y = guiTop + 5;
 				buttonCtrlMode.y = guiTop + 5 + 18;
+				buttonPullFromInv.y = guiTop + 5 + 18;
 			} else {
 				buttonSearchType.setX(guiLeft - 18);
 				buttonCtrlMode.setX(guiLeft - 18);
+				buttonPullFromInv.setX(guiLeft - 18);
 				buttonSearchType.y = guiTop + 5 + 18*2;
 				buttonCtrlMode.y = guiTop + 5 + 18*3;
+				buttonPullFromInv.y = guiTop + 5 + 18*4;
 			}
 		}));
 		if(recipeBookGui.isVisible()) {
@@ -128,8 +132,10 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			buttonDirection.setX(guiLeft - 18);
 			buttonSearchType.setX(guiLeft - 36);
 			buttonCtrlMode.setX(guiLeft - 36);
+			buttonPullFromInv.setX(guiLeft - 54);
 			buttonSearchType.y = guiTop + 5;
 			buttonCtrlMode.y = guiTop + 5 + 18;
+			buttonPullFromInv.y = guiTop + 5 + 18;
 			super.searchField.setX(this.guiLeft + 82);
 			try {
 				searchField = (TextFieldWidget) searchBarField.get(recipeBookGui);
@@ -137,6 +143,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 				searchField = null;
 			}
 		}
+		onPacket();
 	}
 
 	@Override

@@ -81,7 +81,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttonSearchType.state = searchType;
 		buttonCtrlMode.state = controllMode;
 
-		if(!loadedSearch) {
+		if(!loadedSearch && container.search != null) {
 			loadedSearch = true;
 			if((searchType & 2) > 0)
 				searchField.setText(container.search);
@@ -119,14 +119,17 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttons.add(searchField);
 		buttonSortingType = addButton(new GuiButton(guiLeft - 18, guiTop + 5, 0, b -> {
 			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());
+			buttonSortingType.state = comparator.type();
 			sendUpdate();
 		}));
 		buttonDirection = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18, 1, b -> {
 			comparator.setReversed(!comparator.isReversed());
+			buttonDirection.state = comparator.isReversed() ? 1 : 0;
 			sendUpdate();
 		}));
 		buttonSearchType = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18*2, 2, b -> {
 			searchType = (searchType + 1) & ((ModList.get().isLoaded("jei") || this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);
+			buttonSearchType.state = searchType;
 			sendUpdate();
 		}) {
 			@Override
