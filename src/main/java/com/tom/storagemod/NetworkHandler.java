@@ -1,10 +1,11 @@
 package com.tom.storagemod;
 
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 import io.netty.buffer.Unpooled;
@@ -20,12 +21,12 @@ public class NetworkHandler {
 	public static void sendToServer(CompoundTag tag) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeCompoundTag(tag);
-		ClientSidePacketRegistry.INSTANCE.sendToServer(DATA_C2S, buf);
+		ClientPlayNetworking.send(DATA_C2S, buf);
 	}
 
 	public static void sendTo(PlayerEntity player, CompoundTag tag) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeCompoundTag(tag);
-		ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, DATA_S2C, buf);
+		ServerPlayNetworking.send((ServerPlayerEntity) player, DATA_S2C, buf);
 	}
 }

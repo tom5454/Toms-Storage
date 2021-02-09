@@ -31,7 +31,9 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 
 	@Override
 	protected InventoryWrapper applyFilter() {
-		return new FilteredInventoryWrapper(super.applyFilter(), filter);
+		InventoryWrapper w = super.applyFilter();
+		if(w == null)return null;
+		return new FilteredInventoryWrapper(w, filter);
 	}
 
 	@Override

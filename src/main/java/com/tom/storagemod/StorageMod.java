@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
@@ -15,7 +15,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -177,12 +176,11 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(craftingTerminal);
 		registerItemForBlock(invHopperBasic);
 
-		ServerSidePacketRegistry.INSTANCE.register(NetworkHandler.DATA_C2S, (ctx, buf) -> {
+		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_C2S, (s, p, h, buf, rp) -> {
 			CompoundTag tag = buf.readCompoundTag();
-			ctx.getTaskQueue().submit(() -> {
-				ServerPlayerEntity sender = (ServerPlayerEntity) ctx.getPlayer();
-				if(sender.currentScreenHandler instanceof IDataReceiver) {
-					((IDataReceiver)sender.currentScreenHandler).receive(tag);
+			s.submit(() -> {
+				if(p.currentScreenHandler instanceof IDataReceiver) {
+					((IDataReceiver)p.currentScreenHandler).receive(tag);
 				}
 			});
 		});

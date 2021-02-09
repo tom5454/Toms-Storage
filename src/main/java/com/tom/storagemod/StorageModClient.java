@@ -8,9 +8,9 @@ import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelProviderException;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -44,11 +44,11 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCableFramed, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
 
-		ClientSidePacketRegistry.INSTANCE.register(NetworkHandler.DATA_S2C, (ctx, buf) -> {
+		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
 			CompoundTag tag = buf.readCompoundTag();
-			ctx.getTaskQueue().submit(() -> {
-				if(MinecraftClient.getInstance().currentScreen instanceof IDataReceiver) {
-					((IDataReceiver)MinecraftClient.getInstance().currentScreen).receive(tag);
+			mc.submit(() -> {
+				if(mc.currentScreen instanceof IDataReceiver) {
+					((IDataReceiver)mc.currentScreen).receive(tag);
 				}
 			});
 		});
