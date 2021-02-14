@@ -98,8 +98,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 				this.addSlot(new SlotCrafting(craftMatrix, j + i * 3, x + 30 + j * 18, y + 17 + i * 18));
 			}
 		}
-
-		addSyncSlot();
 	}
 
 	@Override

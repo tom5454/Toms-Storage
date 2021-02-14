@@ -84,4 +84,9 @@ public class BlockInventoryCableFramedPainted extends BlockWithEntity implements
 	public Block getPaintedBlock() {
 		return StorageMod.invCablePainted;
 	}
+
+	@Override
+	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+		return new ItemStack(StorageMod.invCableFramed);
+	}
 }

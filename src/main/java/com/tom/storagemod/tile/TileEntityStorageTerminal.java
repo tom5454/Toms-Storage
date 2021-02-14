@@ -1,8 +1,6 @@
 package com.tom.storagemod.tile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -33,9 +31,10 @@ import com.tom.storagemod.item.ItemWirelessTerminal;
 
 public class TileEntityStorageTerminal extends BlockEntity implements NamedScreenHandlerFactory, TickableServer {
 	private IItemHandler itemHandler;
-	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
+	private Map<StoredItemStack, Long> items = new HashMap<>();
 	private int sort;
 	private String lastSearch = "";
+	private boolean updateItems;
 	public TileEntityStorageTerminal(BlockPos pos, BlockState state) {
 		super(StorageMod.terminalTile, pos, state);
 	}
@@ -54,8 +53,9 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 		return new TranslatableText("ts.storage_terminal");
 	}
 
-	public List<StoredItemStack> getStacks() {
-		return new ArrayList<>(items.values());
+	public Map<StoredItemStack, Long> getStacks() {
+		updateItems = true;
+		return items;
 	}
 
 	public StoredItemStack pullStack(StoredItemStack stack, long max) {
@@ -102,18 +102,20 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 
 	@Override
 	public void updateServer() {
-		BlockState st = world.getBlockState(pos);
-		Direction d = st.get(StorageTerminalBase.FACING);
-		TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
-		if(p == TerminalPos.UP)d = Direction.UP;
-		if(p == TerminalPos.DOWN)d = Direction.DOWN;
-		items.clear();
-		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
-		if(inv != null) {
-			itemHandler = InvWrapper.wrap(inv, d.getOpposite());
-			IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
-			map(StoredItemStack::new).forEach(s -> items.merge(s, s,
-					(a, b) -> new StoredItemStack(a.getStack(), a.getQuantity() + b.getQuantity())));
+		if(updateItems) {
+			BlockState st = world.getBlockState(pos);
+			Direction d = st.get(StorageTerminalBase.FACING);
+			TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
+			if(p == TerminalPos.UP)d = Direction.UP;
+			if(p == TerminalPos.DOWN)d = Direction.DOWN;
+			items.clear();
+			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
+			if(inv != null) {
+				itemHandler = InvWrapper.wrap(inv, d.getOpposite());
+				IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
+				map(StoredItemStack::new).forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
+			}
+			updateItems = false;
 		}
 	}
 

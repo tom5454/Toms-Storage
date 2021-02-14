@@ -14,8 +14,13 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -56,5 +61,18 @@ public class InventoryConnector extends BlockWithEntity implements IInventoryCab
 	@Override
 	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+			BlockHitResult hit) {
+		if(!world.isClient) {
+			BlockEntity tile = world.getBlockEntity(pos);
+			if(tile instanceof TileEntityInventoryConnector) {
+				TileEntityInventoryConnector te = (TileEntityInventoryConnector) tile;
+				player.sendMessage(new TranslatableText("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.size()), true);
+			}
+		}
+		return ActionResult.SUCCESS;
 	}
 }
