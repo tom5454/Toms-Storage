@@ -5,21 +5,20 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.recipe.Recipe;
@@ -44,8 +43,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	private static final int DIVISION_BASE = 1000;
 	private static final char[] ENCODED_POSTFIXES = "KMGTPE".toCharArray();
 	public static final Format format;
-	private Inventory syncInv = new SimpleInventory(1);
-	private boolean skipUpdateTick;
 
 	static {
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
@@ -62,8 +59,8 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	public List<StoredItemStack> itemList = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClient = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
+	private Map<StoredItemStack, Long> itemsCount = new HashMap<>();
 	private int lines;
-	private int syncSlotID;
 	protected PlayerInventory pinv;
 	public Runnable onPacket;
 	public int terminalData;
@@ -71,7 +68,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv, TileEntityStorageTerminal te) {
 		this(StorageMod.storageTerminal, id, inv, te);
-		addSyncSlot();
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
@@ -80,26 +76,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		this.te = te;
 		this.pinv = inv;
 		addStorageSlots();
-	}
-
-	protected void addSyncSlot() {
-		syncSlotID = addSlot(new Slot(syncInv, 0, -16, -16) {
-			@Override
-			public boolean canTakeItems(PlayerEntity playerIn) {
-				return false;
-			}
-			@Override
-			public boolean canInsert(ItemStack stack) {
-				return false;
-			}
-			@Environment(EnvType.CLIENT)
-			@Override
-			public boolean doDrawHoveringEffect() {
-				return false;
-			}
-
-		}).id;
-		syncInv.setStack(0, new ItemStack(Items.BARRIER));
 	}
 
 	@Override
@@ -120,7 +96,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv) {
 		this(StorageMod.storageTerminal, id, inv);
-		addSyncSlot();
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
@@ -335,49 +310,28 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	@Override
 	public void sendContentUpdates() {
 		if(te == null)return;
-		//List<StoredItemStack> itemListOld = itemList;
-		itemList = te.getStacks();
-		ListTag list = new ListTag();
-		for (int i = 0;i < itemList.size();i++) {
-			StoredItemStack storedS = itemList.get(i);
-			//StoredItemStack storedSOld = itemListOld.size() > i ? itemListOld.get(i) : null;
-			if (storedS != null) {
+		Map<StoredItemStack, Long> itemsCount = te.getStacks();
+		if(!this.itemsCount.equals(itemsCount)) {
+			ListTag list = new ListTag();
+			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
+				StoredItemStack storedS = e.getKey();
 				CompoundTag tag = new CompoundTag();
-				//tag.putInt("slot", i);
-				if (storedS != null)
-					storedS.writeToNBT(tag);
+				storedS.writeToNBT(tag);
+				tag.putLong("c", e.getValue());
 				list.add(tag);
 			}
-		}
-		CompoundTag mainTag = new CompoundTag();
-		mainTag.put("l", list);
-		mainTag.putInt("p", te.getSorting());
-		mainTag.putString("s", te.getLastSearch());
-		ItemStack is = syncInv.getStack(0);
-		boolean t = is.getItem() == Items.BARRIER;
-		if(!mainTag.equals(is.getTag()) && !skipUpdateTick) {
-			//System.out.println(itemList);
-			is = new ItemStack(t ? Blocks.STRUCTURE_VOID : Items.BARRIER);
-			syncInv.setStack(0, is);
-			//System.out.println("Set Slot: " + mainTag);
-			is.setTag(mainTag);
-			((ServerPlayerEntity)pinv.player).skipPacketSlotUpdates = false;
+			CompoundTag mainTag = new CompoundTag();
+			mainTag.put("l", list);
+			mainTag.putInt("p", te.getSorting());
+			mainTag.putString("s", te.getLastSearch());
+			NetworkHandler.sendTo(pinv.player, mainTag);
+			this.itemsCount = new HashMap<>(itemsCount);
 		}
 		super.sendContentUpdates();
-		if(skipUpdateTick)is.setTag(null);
-		skipUpdateTick = false;
-	}
-
-	@Override
-	public void setStackInSlot(int slotID, ItemStack stack) {
-		if(slotID == syncSlotID && stack.hasTag()) {
-			receiveClientTagPacket(stack.getTag());
-		}
-		super.setStackInSlot(slotID, stack);
 	}
 
 	public final void receiveClientTagPacket(CompoundTag message) {
-		//System.out.println(message);
+		System.out.println(message);
 		ListTag list = message.getList("l", 10);
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {

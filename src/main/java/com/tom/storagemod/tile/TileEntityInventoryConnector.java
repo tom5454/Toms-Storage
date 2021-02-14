@@ -225,4 +225,12 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	public InventoryWrapper getInventory() {
 		return new InventoryWrapper(this, Direction.DOWN);
 	}
+
+	public int getFreeSlotCount() {
+		int empty = 0;
+		for(int i = 0;i<invSize;i++) {
+			if(getStack(i).isEmpty())empty++;
+		}
+		return empty;
+	}
 }

@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityPainted;
 
@@ -55,5 +56,10 @@ public class BlockPaintedTrim extends BlockWithEntity implements ITrim, IPaintab
 	@Override
 	public Block getPaintedBlock() {
 		return this;
+	}
+
+	@Override
+	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+		return new ItemStack(StorageMod.inventoryTrim);
 	}
 }
