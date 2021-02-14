@@ -5,22 +5,21 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.RecipeBookCategory;
 import net.minecraft.item.crafting.RecipeItemHelper;
@@ -45,8 +44,6 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	private static final int DIVISION_BASE = 1000;
 	private static final char[] ENCODED_POSTFIXES = "KMGTPE".toCharArray();
 	public static final Format format;
-	private IInventory syncInv = new Inventory(1);
-	private boolean skipUpdateTick;
 
 	static {
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
@@ -63,8 +60,8 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	public List<StoredItemStack> itemList = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClient = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
+	private Map<StoredItemStack, Long> itemsCount = new HashMap<>();
 	private int lines;
-	private int syncSlotID;
 	protected PlayerInventory pinv;
 	public Runnable onPacket;
 	public int terminalData;
@@ -72,7 +69,6 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv, TileEntityStorageTerminal te) {
 		this(StorageMod.storageTerminal, id, inv, te);
-		addSyncSlot();
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
@@ -81,25 +77,6 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		this.te = te;
 		this.pinv = inv;
 		addStorageSlots();
-	}
-
-	protected void addSyncSlot() {
-		syncSlotID = addSlot(new Slot(syncInv, 0, -16, -16) {
-			@Override
-			public boolean canTakeStack(PlayerEntity playerIn) {
-				return false;
-			}
-			@Override
-			public boolean isItemValid(ItemStack stack) {
-				return false;
-			}
-			@OnlyIn(Dist.CLIENT)
-			@Override
-			public boolean isEnabled() {
-				return false;
-			}
-		}).slotNumber;
-		syncInv.setInventorySlotContents(0, new ItemStack(Items.BARRIER));
 	}
 
 	public ContainerStorageTerminal(ContainerType<?> type, int id, PlayerInventory inv) {
@@ -112,7 +89,6 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv) {
 		this(StorageMod.storageTerminal, id, inv);
-		addSyncSlot();
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
@@ -328,40 +304,23 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	@Override
 	public void detectAndSendChanges() {
 		if(te == null)return;
-		itemList = te.getStacks();
-		ListNBT list = new ListNBT();
-		for (int i = 0;i < itemList.size();i++) {
-			StoredItemStack storedS = itemList.get(i);
-			if (storedS != null) {
+		Map<StoredItemStack, Long> itemsCount = te.getStacks();
+		if(!this.itemsCount.equals(itemsCount)) {
+			ListNBT list = new ListNBT();
+			CompoundNBT mainTag = new CompoundNBT();
+			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
+				StoredItemStack storedS = e.getKey();
 				CompoundNBT tag = new CompoundNBT();
-				if (storedS != null)
-					storedS.writeToNBT(tag);
+				storedS.writeToNBT(tag, e.getValue());
 				list.add(tag);
 			}
-		}
-		CompoundNBT mainTag = new CompoundNBT();
-		mainTag.put("l", list);
-		mainTag.putInt("p", te.getSorting());
-		mainTag.putString("s", te.getLastSearch());
-		ItemStack is = syncInv.getStackInSlot(0);
-		boolean t = is.getItem() == Items.BARRIER;
-		if(!mainTag.equals(is.getTag()) && !skipUpdateTick) {
-			is = new ItemStack(t ? Blocks.STRUCTURE_VOID : Items.BARRIER);
-			syncInv.setInventorySlotContents(0, is);
-			is.setTag(mainTag);
-			((ServerPlayerEntity)pinv.player).isChangingQuantityOnly = false;
+			mainTag.put("l", list);
+			mainTag.putInt("p", te.getSorting());
+			mainTag.putString("s", te.getLastSearch());
+			NetworkHandler.sendTo((ServerPlayerEntity) pinv.player, mainTag);
+			this.itemsCount = new HashMap<>(itemsCount);
 		}
 		super.detectAndSendChanges();
-		if(skipUpdateTick)is.setTag(null);
-		skipUpdateTick = false;
-	}
-
-	@Override
-	public void putStackInSlot(int slotID, ItemStack stack) {
-		if(slotID == syncSlotID && stack.hasTag()) {
-			receiveClientNBTPacket(stack.getTag());
-		}
-		super.putStackInSlot(slotID, stack);
 	}
 
 	public final void receiveClientNBTPacket(CompoundNBT message) {

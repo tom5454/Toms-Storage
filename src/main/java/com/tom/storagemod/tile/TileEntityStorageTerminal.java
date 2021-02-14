@@ -1,8 +1,6 @@
 package com.tom.storagemod.tile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -36,9 +34,10 @@ import com.tom.storagemod.item.ItemWirelessTerminal;
 
 public class TileEntityStorageTerminal extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 	private IItemHandler itemHandler;
-	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
+	private Map<StoredItemStack, Long> items = new HashMap<>();
 	private int sort;
 	private String lastSearch = "";
+	private boolean updateItems;
 	public TileEntityStorageTerminal() {
 		super(StorageMod.terminalTile);
 	}
@@ -57,8 +56,9 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 		return new TranslationTextComponent("ts.storage_terminal");
 	}
 
-	public List<StoredItemStack> getStacks() {
-		return new ArrayList<>(items.values());
+	public Map<StoredItemStack, Long> getStacks() {
+		updateItems = true;
+		return items;
 	}
 
 	public StoredItemStack pullStack(StoredItemStack stack, long max) {
@@ -108,7 +108,7 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	@Override
 	public void tick() {
-		if(!world.isRemote) {
+		if(!world.isRemote && updateItems) {
 			BlockState st = world.getBlockState(pos);
 			Direction d = st.get(StorageTerminalBase.FACING);
 			TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
@@ -121,10 +121,10 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 				itemHandler = lih.orElse(null);
 				if(itemHandler != null) {
 					IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
-					map(StoredItemStack::new).forEach(s -> items.merge(s, s,
-							(a, b) -> new StoredItemStack(a.getStack(), a.getQuantity() + b.getQuantity())));
+					map(StoredItemStack::new).forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
 				}
 			}
+			updateItems = false;
 		}
 	}
 

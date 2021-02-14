@@ -10,10 +10,12 @@ public class StoredItemStack {
 	private ItemStack stack;
 	private long count;
 	private static final String ITEM_COUNT_NAME = "c", ITEMSTACK_NAME = "s";
+
 	public StoredItemStack(ItemStack stack, long count) {
 		this.stack = stack;
 		this.count = count;
 	}
+
 	public StoredItemStack(ItemStack stack) {
 		this.stack = stack.copy();
 		this.stack.setCount(1);
@@ -36,6 +38,12 @@ public class StoredItemStack {
 
 	public void writeToNBT(CompoundNBT tag) {
 		tag.putLong(ITEM_COUNT_NAME, getQuantity());
+		tag.put(ITEMSTACK_NAME, stack.write(new CompoundNBT()));
+		tag.getCompound(ITEMSTACK_NAME).remove("Count");
+	}
+
+	public void writeToNBT(CompoundNBT tag, long q) {
+		tag.putLong(ITEM_COUNT_NAME, q);
 		tag.put(ITEMSTACK_NAME, stack.write(new CompoundNBT()));
 		tag.getCompound(ITEMSTACK_NAME).remove("Count");
 	}

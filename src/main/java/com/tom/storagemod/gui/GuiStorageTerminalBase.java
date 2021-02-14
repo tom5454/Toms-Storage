@@ -3,6 +3,7 @@ package com.tom.storagemod.gui;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -33,14 +34,27 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.jei.JEIHandler;
+import com.tom.storagemod.network.IDataReceiver;
 
-public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends ContainerScreen<T> {
+public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends ContainerScreen<T> implements IDataReceiver {
+	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
+
+		@Override
+		public List<String> load(StoredItemStack key) throws Exception {
+			return key.getStack().getTooltip(Minecraft.getInstance().player, getTooltipFlag()).stream().map(ITextComponent::getString).collect(Collectors.toList());
+		}
+
+	});
 	protected Minecraft mc = Minecraft.getInstance();
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
@@ -51,10 +65,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	 * True if the left mouse button was held down last time drawScreen was
 	 * called.
 	 */
+	private boolean refreshItemList;
 	protected boolean wasClicking;
 	protected TextFieldWidget searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
-	protected String searchLast = "";
+	private String searchLast = "";
 	protected boolean loadedSearch = false;
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
@@ -151,6 +166,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		});
 		buttonCtrlMode = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18*3, 3, b -> {
 			controllMode = (controllMode + 1) % ControllMode.VALUES.length;
+			buttonCtrlMode.state = controllMode;
 			sendUpdate();
 		}));
 		updateSearch();
@@ -158,61 +174,67 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	protected void updateSearch() {
 		String searchString = searchField.getText();
-		getContainer().itemListClientSorted.clear();
-		boolean searchMod = false;
-		if (searchString.startsWith("@")) {
-			searchMod = true;
-			searchString = searchString.substring(1);
-		}
-		Pattern m = null;
-		try {
-			m = Pattern.compile(searchString.toLowerCase(), Pattern.CASE_INSENSITIVE);
-		} catch (Throwable ignore) {
-			try {
-				m = Pattern.compile(Pattern.quote(searchString.toLowerCase()), Pattern.CASE_INSENSITIVE);
-			} catch (Throwable __) {
-				return;
+		if (refreshItemList || !searchLast.equals(searchString)) {
+			getContainer().itemListClientSorted.clear();
+			boolean searchMod = false;
+			if (searchString.startsWith("@")) {
+				searchMod = true;
+				searchString = searchString.substring(1);
 			}
-		}
-		boolean notDone = false;
-		for (int i = 0;i < getContainer().itemListClient.size();i++) {
-			StoredItemStack is = getContainer().itemListClient.get(i);
-			if (is != null && is.getStack() != null) {
-				String dspName = searchMod ? is.getStack().getItem().delegate.name().getNamespace() : is.getStack().getDisplayName().getString();
-				notDone = true;
-				if (m.matcher(dspName.toLowerCase()).find()) {
-					addStackToClientList(is);
-					notDone = false;
+			Pattern m = null;
+			try {
+				m = Pattern.compile(searchString.toLowerCase(), Pattern.CASE_INSENSITIVE);
+			} catch (Throwable ignore) {
+				try {
+					m = Pattern.compile(Pattern.quote(searchString.toLowerCase()), Pattern.CASE_INSENSITIVE);
+				} catch (Throwable __) {
+					return;
 				}
-				if (notDone) {
-					for (ITextComponent lp : is.getStack().getTooltip(mc.player, getTooltipFlag())) {
-						if (m.matcher(lp.getString()).find()) {
+			}
+			boolean notDone = false;
+			try {
+				for (int i = 0;i < getContainer().itemListClient.size();i++) {
+					StoredItemStack is = getContainer().itemListClient.get(i);
+					if (is != null && is.getStack() != null) {
+						String dspName = searchMod ? is.getStack().getItem().delegate.name().getNamespace() : is.getStack().getDisplayName().getString();
+						notDone = true;
+						if (m.matcher(dspName.toLowerCase()).find()) {
 							addStackToClientList(is);
 							notDone = false;
-							break;
+						}
+						if (notDone) {
+							for (String lp : tooltipCache.get(is)) {
+								if (m.matcher(lp).find()) {
+									addStackToClientList(is);
+									notDone = false;
+									break;
+								}
+							}
 						}
 					}
 				}
+			} catch (Exception e) {
 			}
+			Collections.sort(getContainer().itemListClientSorted, comparator);
+			if(!searchLast.equals(searchString)) {
+				getContainer().scrollTo(0);
+				this.currentScroll = 0;
+				if ((searchType & 4) > 0) {
+					if(ModList.get().isLoaded("jei"))
+						JEIHandler.setJeiSearchText(searchString);
+				}
+				if ((searchType & 2) > 0) {
+					CompoundNBT nbt = new CompoundNBT();
+					nbt.putString("s", searchString);
+					container.sendMessage(nbt);
+				}
+				onUpdateSearch(searchString);
+			} else {
+				getContainer().scrollTo(this.currentScroll);
+			}
+			refreshItemList = false;
+			this.searchLast = searchString;
 		}
-		Collections.sort(getContainer().itemListClientSorted, comparator);
-		if (!searchLast.equals(searchString)) {
-			getContainer().scrollTo(0);
-			this.currentScroll = 0;
-			if ((searchType & 4) > 0) {
-				if(ModList.get().isLoaded("jei"))
-					JEIHandler.setJeiSearchText(searchString);
-			}
-			if ((searchType & 2) > 0) {
-				CompoundNBT nbt = new CompoundNBT();
-				nbt.putString("s", searchString);
-				container.sendMessage(nbt);
-			}
-			onUpdateSearch(searchString);
-		} else {
-			getContainer().scrollTo(this.currentScroll);
-		}
-		this.searchLast = searchString;
 	}
 
 	private void addStackToClientList(StoredItemStack is) {
@@ -467,7 +489,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		if (!this.needsScrollBars()) {
 			return false;
 		} else {
-			int i = ((this.container).itemList.size() + 9 - 1) / 9 - 5;
+			int i = ((this.container).itemListClientSorted.size() + 9 - 1) / 9 - 5;
 			this.currentScroll = (float)(this.currentScroll - p_mouseScrolled_5_ / i);
 			this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
 			this.container.scrollTo(this.currentScroll);
@@ -516,4 +538,10 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	protected void onUpdateSearch(String text) {}
+
+	@Override
+	public void receive(CompoundNBT tag) {
+		container.receiveClientNBTPacket(tag);
+		refreshItemList = true;
+	}
 }

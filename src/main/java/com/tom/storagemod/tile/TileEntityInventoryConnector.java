@@ -264,4 +264,18 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 	public void unLink(LinkedInv linv) {
 		linkedInvs.remove(linv);
 	}
+
+	public int getFreeSlotCount() {
+		return getInventory().lazyMap(inv -> {
+			int empty = 0;
+			for(int i = 0;i<invSize;i++) {
+				if(inv.getStackInSlot(i).isEmpty())empty++;
+			}
+			return empty;
+		}).orElse(0);
+	}
+
+	public int getInvSize() {
+		return invSize;
+	}
 }
