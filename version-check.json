@@ -9,17 +9,19 @@
     "1.16.2-recommended": "1.2.8",
     "1.16.3-latest": "1.2.9",
     "1.16.3-recommended": "1.2.9",
-    "1.16.4-latest": "1.2.13",
-    "1.16.4-recommended": "1.2.13",
-    "1.16.5-latest": "1.2.13",
-    "1.16.5-recommended": "1.2.13"
+    "1.16.4-latest": "1.2.14",
+    "1.16.4-recommended": "1.2.14",
+    "1.16.5-latest": "1.2.14",
+    "1.16.5-recommended": "1.2.14"
   },
   "1.16.5": {
-    "1.2.13": "Fixed FPS lag in terminal.\nFixed terminal high tick time on servers.\nAdded storage space information to Inventory Connector",
+	"1.2.14": "Fixed terminal gui desync",
+	"1.2.13": "Fixed FPS lag in terminal.\nFixed terminal high tick time on servers.\nAdded storage space information to Inventory Connector",
   	"1.2.12": "Fixed button overlapping in terminal gui.\nFixed terminals being accessible in spectator mode."
   },
   "1.16.4": {
-  	"1.2.13": "Fixed FPS lag in terminal.\nFixed terminal high tick time on servers.\nAdded storage space information to Inventory Connector",
+	"1.2.14": "Fixed terminal gui desync",
+	"1.2.13": "Fixed FPS lag in terminal.\nFixed terminal high tick time on servers.\nAdded storage space information to Inventory Connector",
   	"1.2.12": "Fixed button overlapping in terminal gui.\nFixed terminals being accessible in spectator mode.",
   	"1.2.11": "Added filtered inventory connector\nFixed advancement bug\nFixed painted trims",
   	"1.2.10": "Updated trim texture\nUpdated to 1.16.4"

@@ -94,6 +94,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		addButton(btnClr);
 		buttonPullFromInv = addButton(new GuiButton(guiLeft - 18, guiTop + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
+			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();
 		}));
 		this.addButton(new ImageButton(this.guiLeft + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
