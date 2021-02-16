@@ -331,7 +331,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	}
 
 	public final void receiveClientTagPacket(CompoundTag message) {
-		System.out.println(message);
 		ListTag list = message.getList("l", 10);
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {
