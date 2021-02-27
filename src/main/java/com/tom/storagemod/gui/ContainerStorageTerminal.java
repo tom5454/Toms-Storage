@@ -313,12 +313,14 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		Map<StoredItemStack, Long> itemsCount = te.getStacks();
 		if(!this.itemsCount.equals(itemsCount)) {
 			ListTag list = new ListTag();
+			this.itemList.clear();
 			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
 				StoredItemStack storedS = e.getKey();
 				CompoundTag tag = new CompoundTag();
 				storedS.writeToNBT(tag);
 				tag.putLong("c", e.getValue());
 				list.add(tag);
+				this.itemList.add(new StoredItemStack(e.getKey().getStack(), e.getValue()));
 			}
 			CompoundTag mainTag = new CompoundTag();
 			mainTag.put("l", list);
