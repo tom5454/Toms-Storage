@@ -265,7 +265,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 				stacks[slot] = new ItemStack[l];
 				for (int j = 0;j < l;j++) {
 					CompoundTag tag = nbttagcompound.getCompound("i" + j);
-					stacks[slot][j] = ItemStack.fromTag(tag);
+					stacks[slot][j] = ItemStack.fromNbt(tag);
 				}
 			}
 			((TileEntityCraftingTerminal) te).handlerItemTransfer(pinv.player, stacks);

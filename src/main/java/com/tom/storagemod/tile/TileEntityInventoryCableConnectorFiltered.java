@@ -37,14 +37,14 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag tag) {
+	public CompoundTag writeNbt(CompoundTag tag) {
 		tag.put("filter", filter.getTags());
-		return super.toTag(tag);
+		return super.writeNbt(tag);
 	}
 
 	@Override
-	public void fromTag(CompoundTag tag) {
-		super.fromTag(tag);
+	public void readNbt(CompoundTag tag) {
+		super.readNbt(tag);
 		filter.readTags(tag.getList("filter", 10));
 	}
 

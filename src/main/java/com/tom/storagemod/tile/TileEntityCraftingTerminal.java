@@ -61,7 +61,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compound) {
+	public CompoundTag writeNbt(CompoundTag compound) {
 		ListTag listnbt = new ListTag();
 
 		for(int i = 0; i < craftMatrix.size(); ++i) {
@@ -69,18 +69,18 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 			if (!itemstack.isEmpty()) {
 				CompoundTag CompoundTag = new CompoundTag();
 				CompoundTag.putByte("Slot", (byte)i);
-				itemstack.toTag(CompoundTag);
+				itemstack.writeNbt(CompoundTag);
 				listnbt.add(CompoundTag);
 			}
 		}
 
 		compound.put("CraftingTable", listnbt);
-		return super.toTag(compound);
+		return super.writeNbt(compound);
 	}
 	private boolean reading;
 	@Override
-	public void fromTag(CompoundTag compound) {
-		super.fromTag(compound);
+	public void readNbt(CompoundTag compound) {
+		super.readNbt(compound);
 		reading = true;
 		ListTag listnbt = compound.getList("CraftingTable", 10);
 
@@ -88,7 +88,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 			CompoundTag CompoundTag = listnbt.getCompound(i);
 			int j = CompoundTag.getByte("Slot") & 255;
 			if (j >= 0 && j < craftMatrix.size()) {
-				craftMatrix.setStack(j, ItemStack.fromTag(CompoundTag));
+				craftMatrix.setStack(j, ItemStack.fromNbt(CompoundTag));
 			}
 		}
 		reading = false;

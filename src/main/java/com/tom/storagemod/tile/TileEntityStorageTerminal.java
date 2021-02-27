@@ -134,15 +134,15 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compound) {
+	public CompoundTag writeNbt(CompoundTag compound) {
 		compound.putInt("sort", sort);
-		return super.toTag(compound);
+		return super.writeNbt(compound);
 	}
 
 	@Override
-	public void fromTag(CompoundTag compound) {
+	public void readNbt(CompoundTag compound) {
 		sort = compound.getInt("sort");
-		super.fromTag(compound);
+		super.readNbt(compound);
 	}
 
 	public String getLastSearch() {

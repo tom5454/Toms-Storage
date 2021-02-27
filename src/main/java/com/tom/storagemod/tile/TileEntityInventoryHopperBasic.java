@@ -47,15 +47,15 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compound) {
-		compound.put("Filter", getFilter().toTag(new CompoundTag()));
-		return super.toTag(compound);
+	public CompoundTag writeNbt(CompoundTag compound) {
+		compound.put("Filter", getFilter().writeNbt(new CompoundTag()));
+		return super.writeNbt(compound);
 	}
 
 	@Override
-	public void fromTag(CompoundTag nbtIn) {
-		super.fromTag(nbtIn);
-		setFilter(ItemStack.fromTag(nbtIn.getCompound("Filter")));
+	public void readNbt(CompoundTag nbtIn) {
+		super.readNbt(nbtIn);
+		setFilter(ItemStack.fromNbt(nbtIn.getCompound("Filter")));
 	}
 
 	public void setFilter(ItemStack filter) {

@@ -36,14 +36,14 @@ public class StoredItemStack {
 
 	public void writeToNBT(CompoundTag tag) {
 		tag.putLong(ITEM_COUNT_NAME, getQuantity());
-		tag.put(ITEMSTACK_NAME, stack.toTag(new CompoundTag()));
+		tag.put(ITEMSTACK_NAME, stack.writeNbt(new CompoundTag()));
 		tag.getCompound(ITEMSTACK_NAME).remove("Count");
 	}
 
 	public static StoredItemStack readFromNBT(CompoundTag tag) {
-		ItemStack cheat = ItemStack.fromTag(tag);
+		ItemStack cheat = ItemStack.fromNbt(tag);
 		tag.getCompound(ITEMSTACK_NAME).putByte("Count", (byte) 1);
-		StoredItemStack stack = new StoredItemStack(!cheat.isEmpty() ? cheat : ItemStack.fromTag(tag.getCompound(ITEMSTACK_NAME)), !cheat.isEmpty() ? cheat.getCount() : tag.getLong(ITEM_COUNT_NAME));
+		StoredItemStack stack = new StoredItemStack(!cheat.isEmpty() ? cheat : ItemStack.fromNbt(tag.getCompound(ITEMSTACK_NAME)), !cheat.isEmpty() ? cheat.getCount() : tag.getLong(ITEM_COUNT_NAME));
 		return !stack.stack.isEmpty() ? stack : null;
 	}
 

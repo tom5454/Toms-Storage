@@ -127,7 +127,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
 		this.searchField.setText(searchLast);
 		this.searchField.setMaxLength(100);
-		this.searchField.setHasBorder(false);
+		this.searchField.setDrawsBackground(false);
 		this.searchField.setVisible(true);
 		this.searchField.setEditableColor(16777215);
 		buttons.add(searchField);
@@ -373,7 +373,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	protected void storageSlotClick(ItemStack slotStack, SlotAction act, int mod) {
 		CompoundTag c = new CompoundTag();
-		c.put("s", slotStack.toTag(new CompoundTag()));
+		c.put("s", slotStack.writeNbt(new CompoundTag()));
 		c.putInt("a", act.ordinal());
 		c.putByte("m", (byte) mod);
 		CompoundTag msg = new CompoundTag();

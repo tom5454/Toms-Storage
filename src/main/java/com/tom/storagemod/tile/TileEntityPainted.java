@@ -35,18 +35,18 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public void fromTag(CompoundTag compound) {
-		super.fromTag(compound);
+	public void readNbt(CompoundTag compound) {
+		super.readNbt(compound);
 		blockState = NbtHelper.toBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compound) {
+	public CompoundTag writeNbt(CompoundTag compound) {
 		if (blockState != null) {
 			compound.put("block", NbtHelper.fromBlockState(blockState));
 		}
-		return super.toTag(compound);
+		return super.writeNbt(compound);
 	}
 
 	private void markDirtyClient() {
@@ -67,7 +67,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	@Override
 	public BlockEntityUpdateS2CPacket toUpdatePacket() {
 		CompoundTag nbtTag = new CompoundTag();
-		toTag(nbtTag);
+		writeNbt(nbtTag);
 		return new BlockEntityUpdateS2CPacket(getPos(), 127, nbtTag);
 	}
 
@@ -91,6 +91,6 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 
 	@Override
 	public CompoundTag toClientTag(CompoundTag tag) {
-		return toTag(tag);
+		return writeNbt(tag);
 	}
 }
