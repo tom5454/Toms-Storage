@@ -11,7 +11,7 @@ public class DataPacket {
 	}
 
 	public DataPacket(PacketBuffer pb) {
-		tag = pb.readCompoundTag();
+		tag = pb.func_244273_m();
 	}
 
 	public void toBytes(PacketBuffer pb) {

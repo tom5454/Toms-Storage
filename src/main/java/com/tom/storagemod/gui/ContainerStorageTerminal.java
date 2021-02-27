@@ -308,11 +308,13 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		if(!this.itemsCount.equals(itemsCount)) {
 			ListNBT list = new ListNBT();
 			CompoundNBT mainTag = new CompoundNBT();
+			this.itemList.clear();
 			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
 				StoredItemStack storedS = e.getKey();
 				CompoundNBT tag = new CompoundNBT();
 				storedS.writeToNBT(tag, e.getValue());
 				list.add(tag);
+				this.itemList.add(new StoredItemStack(e.getKey().getStack(), e.getValue()));
 			}
 			mainTag.put("l", list);
 			mainTag.putInt("p", te.getSorting());
