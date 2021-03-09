@@ -145,7 +145,7 @@ public class StoredItemStack {
 	}
 
 	public String getDisplayName() {
-		return stack.getDisplayName().getUnformattedComponentText();
+		return stack.getDisplayName().getString();
 	}
 
 	@Override

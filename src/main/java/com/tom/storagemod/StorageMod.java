@@ -30,6 +30,7 @@ import com.tom.storagemod.block.BlockInventoryCableConnectorFiltered;
 import com.tom.storagemod.block.BlockInventoryCableFramed;
 import com.tom.storagemod.block.BlockInventoryHopperBasic;
 import com.tom.storagemod.block.BlockInventoryProxy;
+import com.tom.storagemod.block.BlockLevelEmitter;
 import com.tom.storagemod.block.BlockOpenCrate;
 import com.tom.storagemod.block.BlockPaintedTrim;
 import com.tom.storagemod.block.BlockTrim;
@@ -38,6 +39,7 @@ import com.tom.storagemod.block.InventoryConnector;
 import com.tom.storagemod.block.StorageTerminal;
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
 import com.tom.storagemod.gui.ContainerFiltered;
+import com.tom.storagemod.gui.ContainerLevelEmitter;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
@@ -52,6 +54,7 @@ import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
+import com.tom.storagemod.tile.TileEntityLevelEmitter;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
@@ -73,6 +76,7 @@ public class StorageMod {
 	public static BlockInventoryProxy invProxy;
 	public static CraftingTerminal craftingTerminal;
 	public static BlockInventoryHopperBasic invHopperBasic;
+	public static BlockLevelEmitter levelEmitter;
 
 	public static ItemPaintKit paintingKit;
 	public static ItemWirelessTerminal wirelessTerminal;
@@ -86,10 +90,12 @@ public class StorageMod {
 	public static TileEntityType<TileEntityInventoryProxy> invProxyTile;
 	public static TileEntityType<TileEntityCraftingTerminal> craftingTerminalTile;
 	public static TileEntityType<TileEntityInventoryHopperBasic> invHopperBasicTile;
+	public static TileEntityType<TileEntityLevelEmitter> levelEmitterTile;
 
 	public static ContainerType<ContainerStorageTerminal> storageTerminal;
 	public static ContainerType<ContainerCraftingTerminal> craftingTerminalCont;
 	public static ContainerType<ContainerFiltered> filteredConatiner;
+	public static ContainerType<ContainerLevelEmitter> levelEmitterConatiner;
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -148,6 +154,7 @@ public class StorageMod {
 			invProxy = new BlockInventoryProxy();
 			craftingTerminal = new CraftingTerminal();
 			invHopperBasic = new BlockInventoryHopperBasic();
+			levelEmitter = new BlockLevelEmitter();
 			blockRegistryEvent.getRegistry().register(connector);
 			blockRegistryEvent.getRegistry().register(terminal);
 			blockRegistryEvent.getRegistry().register(openCrate);
@@ -160,6 +167,7 @@ public class StorageMod {
 			blockRegistryEvent.getRegistry().register(invProxy);
 			blockRegistryEvent.getRegistry().register(craftingTerminal);
 			blockRegistryEvent.getRegistry().register(invHopperBasic);
+			blockRegistryEvent.getRegistry().register(levelEmitter);
 		}
 
 		@SubscribeEvent
@@ -179,6 +187,7 @@ public class StorageMod {
 			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invProxy, new Item.Properties().group(STORAGE_MOD_TAB)));
 			registerItemForBlock(itemRegistryEvent, craftingTerminal);
 			registerItemForBlock(itemRegistryEvent, invHopperBasic);
+			registerItemForBlock(itemRegistryEvent, levelEmitter);
 
 			itemRegistryEvent.getRegistry().register(paintingKit);
 			itemRegistryEvent.getRegistry().register(wirelessTerminal);
@@ -208,6 +217,8 @@ public class StorageMod {
 			craftingTerminalTile.setRegistryName("ts.crafting_terminal.tile");
 			invHopperBasicTile = TileEntityType.Builder.create(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
 			invHopperBasicTile.setRegistryName("ts.inventoty_hopper_basic.tile");
+			levelEmitterTile = TileEntityType.Builder.create(TileEntityLevelEmitter::new, levelEmitter).build(null);
+			levelEmitterTile.setRegistryName("ts.level_emitter.tile");
 			tileRegistryEvent.getRegistry().register(connectorTile);
 			tileRegistryEvent.getRegistry().register(terminalTile);
 			tileRegistryEvent.getRegistry().register(openCrateTile);
@@ -217,6 +228,7 @@ public class StorageMod {
 			tileRegistryEvent.getRegistry().register(invProxyTile);
 			tileRegistryEvent.getRegistry().register(craftingTerminalTile);
 			tileRegistryEvent.getRegistry().register(invHopperBasicTile);
+			tileRegistryEvent.getRegistry().register(levelEmitterTile);
 		}
 
 		@SubscribeEvent
@@ -227,9 +239,12 @@ public class StorageMod {
 			craftingTerminalCont.setRegistryName("ts.crafting_terminal.container");
 			filteredConatiner = new ContainerType<>(ContainerFiltered::new);
 			filteredConatiner.setRegistryName("ts.filtered.container");
+			levelEmitterConatiner = new ContainerType<>(ContainerLevelEmitter::new);
+			levelEmitterConatiner.setRegistryName("ts.level_emitter.container");
 			containerRegistryEvent.getRegistry().register(storageTerminal);
 			containerRegistryEvent.getRegistry().register(craftingTerminalCont);
 			containerRegistryEvent.getRegistry().register(filteredConatiner);
+			containerRegistryEvent.getRegistry().register(levelEmitterConatiner);
 		}
 	}
 }

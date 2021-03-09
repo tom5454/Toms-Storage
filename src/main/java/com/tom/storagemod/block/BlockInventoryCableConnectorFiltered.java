@@ -97,7 +97,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 		if(facing == f)
 			return stateIn.with(SixWayBlock.FACING_TO_PROPERTY_MAP.get(facing), !facingState.isAir(worldIn, facingPos));
 		else
-			return stateIn.with(SixWayBlock.FACING_TO_PROPERTY_MAP.get(facing), IInventoryCable.canConnect(facingState, facing.getOpposite()));
+			return stateIn.with(SixWayBlock.FACING_TO_PROPERTY_MAP.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING) != dir.getOpposite();
+		return state.get(FACING) != dir;
 	}
 
 	@Override

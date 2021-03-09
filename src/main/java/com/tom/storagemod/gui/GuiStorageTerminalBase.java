@@ -126,7 +126,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttons.clear();
 		playerInventoryTitleY = ySize - 92;
 		super.init();
-		this.searchField = new TextFieldWidget(getFont(), this.guiLeft + 82, this.guiTop + 6, 89, this.getFont().FONT_HEIGHT, null);
+		this.searchField = new TextFieldWidget(getFont(), this.guiLeft + 82, this.guiTop + 6, 89, this.getFont().FONT_HEIGHT, new TranslationTextComponent("narrator.toms_storage.terminal_search"));
 		this.searchField.setMaxStringLength(100);
 		this.searchField.setEnableBackgroundDrawing(false);
 		this.searchField.setVisible(true);

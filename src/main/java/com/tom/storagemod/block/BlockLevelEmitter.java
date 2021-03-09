@@ -2,6 +2,7 @@ package com.tom.storagemod.block;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -12,6 +13,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer.Builder;
@@ -28,7 +30,6 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -37,30 +38,59 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.proxy.ClientProxy;
-import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
+import com.tom.storagemod.tile.TileEntityLevelEmitter;
 
-public class BlockInventoryHopperBasic extends ContainerBlock implements IInventoryCable {
+public class BlockLevelEmitter extends ContainerBlock implements IInventoryCable {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
-	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
+	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-	public BlockInventoryHopperBasic() {
+	public BlockLevelEmitter() {
 		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).notSolid().harvestTool(ToolType.AXE));
-		setRegistryName("ts.inventory_hopper_basic");
+		setRegistryName("ts.level_emitter");
 		setDefaultState(getDefaultState()
-				.with(FACING, Direction.DOWN).with(ENABLED, Boolean.valueOf(true)));
+				.with(FACING, Direction.DOWN).with(POWERED, Boolean.valueOf(false)));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
-		ClientProxy.tooltip("inventory_hopper", tooltip);
+		ClientProxy.tooltip("level_emitter", tooltip);
 	}
 
 	@Override
 	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		return new TileEntityInventoryHopperBasic();
+		return new TileEntityLevelEmitter();
 	}
+
+	@Override
+	public boolean canProvidePower(BlockState state) {
+		return true;
+	}
+
+	@Override
+	public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+		if (!blockState.get(POWERED)) {
+			return 0;
+		} else {
+			return blockState.get(FACING).getOpposite() == side ? 15 : 0;
+		}
+	}
+
+	@Override
+	public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+		if (!blockState.get(POWERED)) {
+			return 0;
+		} else {
+			return 15;
+		}
+	}
+
+	@Override
+	public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+		return state.get(FACING) != side;
+	}
+
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
 		return state.with(FACING, rot.rotate(state.get(FACING)));
@@ -73,12 +103,12 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return getDefaultState().with(FACING, context.getFace().getOpposite());
+		return getDefaultState().with(FACING, context.getFace());
 	}
 
 	@Override
 	protected void fillStateContainer(Builder<Block, BlockState> builder) {
-		builder.add(FACING, ENABLED);
+		builder.add(FACING, POWERED);
 	}
 
 	@Override
@@ -93,7 +123,7 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING).getAxis() == dir.getAxis();
+		return state.get(FACING).getOpposite() == dir;
 	}
 
 	@Override
@@ -118,43 +148,33 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState st, World world, BlockPos pos,
-			PlayerEntity player, Hand hand, BlockRayTraceResult trace) {
-		if(!world.isRemote) {
-			ItemStack is = player.getHeldItem(hand);
-			if(!is.isEmpty()) {
-				TileEntity te = world.getTileEntity(pos);
-				if(te instanceof TileEntityInventoryHopperBasic) {
-					((TileEntityInventoryHopperBasic)te).setFilter(is.copy());
-					ITextComponent txt = ((TileEntityInventoryHopperBasic)te).getFilter().getDisplayName();
-					player.sendStatusMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
-				}
-			} else {
-				TileEntity te = world.getTileEntity(pos);
-				if(te instanceof TileEntityInventoryHopperBasic) {
-					if(player.isSneaking()) {
-						((TileEntityInventoryHopperBasic)te).setFilter(ItemStack.EMPTY);
-						player.sendStatusMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", new TranslationTextComponent("tooltip.toms_storage.empty")), true);
-					} else {
-						ItemStack s = ((TileEntityInventoryHopperBasic)te).getFilter();
-						ITextComponent txt = s.isEmpty() ? new TranslationTextComponent("tooltip.toms_storage.empty") : s.getDisplayName();
-						player.sendStatusMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
-					}
-				}
-			}
+	@OnlyIn(Dist.CLIENT)
+	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		if (stateIn.get(POWERED)) {
+			Direction direction = stateIn.get(FACING).getOpposite();
+			double d0 = pos.getX() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
+			double d1 = pos.getY() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
+			double d2 = pos.getZ() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
+			float f = -7.0F;
+
+			f = f / 16.0F;
+			double d3 = f * direction.getXOffset();
+			double d4 = f * direction.getZOffset();
+			worldIn.addParticle(RedstoneParticleData.REDSTONE_DUST, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D);
 		}
-		return ActionResultType.SUCCESS;
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		this.updateState(worldIn, pos, state);
-	}
-
-	private void updateState(World worldIn, BlockPos pos, BlockState state) {
-		boolean flag = !worldIn.isBlockPowered(pos);
-		if (flag != state.get(ENABLED)) {
-			worldIn.setBlockState(pos, state.with(ENABLED, Boolean.valueOf(flag)), 4);
+	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos,
+			PlayerEntity player, Hand hand, BlockRayTraceResult rtr) {
+		if (world.isRemote) {
+			return ActionResultType.SUCCESS;
 		}
+
+		TileEntity blockEntity_1 = world.getTileEntity(pos);
+		if (blockEntity_1 instanceof TileEntityLevelEmitter) {
+			player.openContainer((TileEntityLevelEmitter)blockEntity_1);
+		}
+		return ActionResultType.SUCCESS;
 	}
 }

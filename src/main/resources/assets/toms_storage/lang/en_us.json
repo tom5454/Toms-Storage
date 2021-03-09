@@ -10,7 +10,8 @@
 	"block.toms_storage.ts.inventory_cable_connector_filtered": "Inventory Cable Connector (Filtered)",
 	"block.toms_storage.ts.inventory_proxy": "Inventory Proxy",
 	"block.toms_storage.ts.crafting_terminal": "Crafting Terminal",
-	"block.toms_storage.ts.inventory_hopper_basic": "Basic Inventory Hopper",	
+	"block.toms_storage.ts.inventory_hopper_basic": "Basic Inventory Hopper",
+	"block.toms_storage.ts.level_emitter": "Level Emitter",
 	
 	"item.toms_storage.ts.paint_kit": "Paint Kit",
 	"item.toms_storage.ts.wireless_terminal": "Wireless Terminal",
@@ -20,6 +21,7 @@
 	"ts.storage_terminal": "S. Terminal",
 	"ts.crafting_terminal": "C. Terminal",
 	"ts.connector_filtered": "Set Filter",
+	"ts.level_emitter": "Level Emitter",
 	
 	"tooltip.toms_storage.hold_shift_for_info": "Hold SHIFT for more info.",
 	"tooltip.toms_storage.paintable": "Can be painted",
@@ -32,7 +34,12 @@
 	"tooltip.toms_storage.paint_kit": "Paint blocks to match\\their surroundings!",
 	"tooltip.toms_storage.open_crate": "Converts the block in front of it\\into an inventory.\\Beware: Creates Item Entities",
 	"tooltip.toms_storage.inventory_connector": "Connects all of the touching inventories into one.\\Use the Storage Terminal to access\\all of your items. Trims can connect the gaps.",
-	"tooltip.toms_storage.inventory_proxy": "Extends the face of the block its pointing at.",
+	"tooltip.toms_storage.inventory_proxy": "Extends the face of the block its pointing at.\\Use a diamond on a side to enable filtering mode.\\Place an inventory on the face, and fill the slots with the filtered items.\\Empty slots allow everything. Item Count set max stack size in slot.\\Rename the filter container for additional settings.\\Format: '<key>=[value],[key2]=[value2],...'\\Options:",
+	"tooltip.toms_storage.inventory_proxy.key": " - '%s' %s",
+	"tooltip.toms_storage.inventory_proxy.value": " - '%s=%s' %s",
+	"tooltip.toms_storage.inventory_proxy.ignoreSize": "Ignore filter stack size",
+	"tooltip.toms_storage.inventory_proxy.maxCount.arg": "<max value>",
+	"tooltip.toms_storage.inventory_proxy.maxCount.desc": "Set max stack count in empty slots",
 	"tooltip.toms_storage.inventory_cable": "Connects inventories across\\long distances. Inventory Cable Connectors\\have to be used to attach inventories\\One Inventory Connector must be\\present in the network.",
 	"tooltip.toms_storage.inventory_hopper": "Import of export from your Inventory Network\\Right click an item to set the filter.\\Shift click with an empty hand to clear filter.",
 	"tooltip.toms_storage.loop": "Loop detected in your storage system",
@@ -54,6 +61,12 @@
 	"tooltip.toms_storage.pull_1": "Pull missing items from players inventory when crafting",
 	"tooltip.toms_storage.filter_item": "Filter: %s",
 	"tooltip.toms_storage.empty": "Empty",
+	"tooltip.toms_storage.level_emitter": "Emits a redstone signal based on Inventory System contents.",
+	"tooltip.toms_storage.lvlEm_lt_0": "Emit when more than specified in storage",
+	"tooltip.toms_storage.lvlEm_lt_1": "Emit when less than specified in storage",
+	
+	"narrator.toms_storage.terminal_search": "Terminal Search Field",
+	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
 	
 	"chat.toms_storage.inventory_connector.free_slots": "Inventory Connector: %d free/%d slots.",
 	

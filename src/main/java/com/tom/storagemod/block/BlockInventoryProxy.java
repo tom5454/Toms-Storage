@@ -9,6 +9,7 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
@@ -57,6 +58,10 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 			ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("inventory_proxy", tooltip);
+		if(Screen.hasShiftDown()) {
+			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", new TranslationTextComponent("tooltip.toms_storage.inventory_proxy.ignoreSize")));
+			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.inventory_proxy.value", "maxCount", new TranslationTextComponent("tooltip.toms_storage.inventory_proxy.maxCount.arg"), new TranslationTextComponent("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
+		}
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import com.tom.storagemod.proxy.ClientProxy;
 public class ItemWirelessTerminal extends Item {
 
 	public ItemWirelessTerminal() {
-		super(new Properties().group(StorageMod.STORAGE_MOD_TAB));
+		super(new Properties().group(StorageMod.STORAGE_MOD_TAB).maxStackSize(1));
 		setRegistryName("ts.wireless_terminal");
 	}
 

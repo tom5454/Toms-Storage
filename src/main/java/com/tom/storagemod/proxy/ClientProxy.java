@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -41,6 +42,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
 import com.tom.storagemod.gui.GuiFiltered;
+import com.tom.storagemod.gui.GuiLevelEmitter;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
@@ -58,10 +60,12 @@ public class ClientProxy implements IProxy {
 		ScreenManager.registerFactory(StorageMod.storageTerminal, GuiStorageTerminal::new);
 		ScreenManager.registerFactory(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
 		ScreenManager.registerFactory(StorageMod.filteredConatiner, GuiFiltered::new);
+		ScreenManager.registerFactory(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
 		RenderTypeLookup.setRenderLayer(StorageMod.paintedTrim, e -> true);
 		RenderTypeLookup.setRenderLayer(StorageMod.invCableFramed, e -> true);
 		RenderTypeLookup.setRenderLayer(StorageMod.invProxy, e -> true);
+		RenderTypeLookup.setRenderLayer(StorageMod.levelEmitter, RenderType.getCutout());
 		BlockColors colors = Minecraft.getInstance().getBlockColors();
 		colors.register((state, world, pos, tintIndex) -> {
 			if (world != null) {
