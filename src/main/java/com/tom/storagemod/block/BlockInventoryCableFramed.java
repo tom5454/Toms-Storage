@@ -75,7 +75,7 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 
 	@Override
 	public BlockState getStateForNeighborUpdate(BlockState stateIn, Direction facing, BlockState facingState, WorldAccess worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing.getOpposite()));
+		return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override

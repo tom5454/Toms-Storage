@@ -87,7 +87,7 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 		if(facing == f)
 			return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), !facingState.isAir());
 		else
-			return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing.getOpposite()));
+			return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING) != dir.getOpposite();
+		return state.get(FACING) != dir;
 	}
 
 	@Override

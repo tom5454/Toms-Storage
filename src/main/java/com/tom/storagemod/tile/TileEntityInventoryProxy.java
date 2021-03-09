@@ -87,7 +87,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 			} else {
 				this.filter = null;
 			}
-			markDirty();
+			this.world.updateComparators(this.pos, getCachedState().getBlock());
 		}
 	}
 
@@ -180,7 +180,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 
 	@Override
 	public int getMaxCountPerStack() {
-		return filter == null ? 64 : globalCountLimit;
+		return filter == null ? call(InventoryWrapper::getMaxCountPerStack, i -> true, 0) : globalCountLimit;
 	}
 
 	public int getComparatorOutput() {

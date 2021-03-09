@@ -146,7 +146,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			refreshItemList = true;
 		}));
 		buttonSearchType = addButton(new GuiButton(x - 18, y + 5 + 18*2, 2, b -> {
-			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);//ModList.get().isLoaded("jei") ||
+			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal || FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) ? 0b111 : 0b011);
 			buttonSearchType.state = searchType;
 			sendUpdate();
 		}) {
@@ -224,7 +224,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				getScreenHandler().scrollTo(0);
 				this.currentScroll = 0;
 				if ((searchType & 4) > 0) {
-					if(FabricLoader.getInstance().isModLoaded("rei"))
+					if(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
 						REIPlugin.setReiSearchText(searchString);
 				}
 				if ((searchType & 2) > 0) {

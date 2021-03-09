@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.block.BlockInventoryHopperBasic;
 
 public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBase {
 	private ItemStack filter = ItemStack.EMPTY;
@@ -20,6 +21,7 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 			cooldown--;
 			return;
 		}
+		if(!this.getCachedState().get(BlockInventoryHopperBasic.ENABLED))return;
 		boolean hasFilter = !getFilter().isEmpty();
 		IItemHandler top = this.top == null ? EmptyHandler.INSTANCE : this.top.wrap();
 		IItemHandler bot = this.bottom == null ? EmptyHandler.INSTANCE : this.bottom.wrap();

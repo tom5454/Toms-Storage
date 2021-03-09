@@ -2,6 +2,7 @@ package com.tom.storagemod.block;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,12 +17,12 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -35,29 +36,58 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageModClient;
-import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
+import com.tom.storagemod.tile.TileEntityLevelEmitter;
 
-public class BlockInventoryHopperBasic extends BlockWithEntity implements IInventoryCable {
+public class BlockLevelEmitter extends BlockWithEntity implements IInventoryCable {
 	public static final DirectionProperty FACING = Properties.FACING;
-	public static final BooleanProperty ENABLED = Properties.ENABLED;
+	public static final BooleanProperty POWERED = Properties.POWERED;
 
-	public BlockInventoryHopperBasic() {
+	public BlockLevelEmitter() {
 		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
 		setDefaultState(getDefaultState()
-				.with(FACING, Direction.DOWN).with(ENABLED, Boolean.valueOf(true)));
+				.with(FACING, Direction.DOWN).with(POWERED, Boolean.valueOf(false)));
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		StorageModClient.tooltip("inventory_hopper", tooltip);
+		StorageModClient.tooltip("level_emitter", tooltip);
 	}
 
 	@Override
 	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityInventoryHopperBasic();
+		return new TileEntityLevelEmitter();
 	}
+
+	@Override
+	public boolean emitsRedstonePower(BlockState state) {
+		return true;
+	}
+
+	@Override
+	public int getStrongRedstonePower(BlockState blockState, BlockView blockAccess, BlockPos pos, Direction side) {
+		if (!blockState.get(POWERED)) {
+			return 0;
+		} else {
+			return blockState.get(FACING).getOpposite() == side ? 15 : 0;
+		}
+	}
+
+	@Override
+	public int getWeakRedstonePower(BlockState blockState, BlockView blockAccess, BlockPos pos, Direction side) {
+		if (!blockState.get(POWERED)) {
+			return 0;
+		} else {
+			return 15;
+		}
+	}
+
+	/*@Override
+	public boolean canConnectRedstone(BlockState state, BlockView world, BlockPos pos, Direction side) {
+		return state.get(FACING) != side;
+	}*/
+
 	@Override
 	public BlockState rotate(BlockState state, BlockRotation rot) {
 		return state.with(FACING, rot.rotate(state.get(FACING)));
@@ -70,12 +100,12 @@ public class BlockInventoryHopperBasic extends BlockWithEntity implements IInven
 
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext context) {
-		return getDefaultState().with(FACING, context.getSide().getOpposite());
+		return getDefaultState().with(FACING, context.getSide());
 	}
 
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		builder.add(FACING, ENABLED);
+		builder.add(FACING, POWERED);
 	}
 
 	@Override
@@ -90,7 +120,7 @@ public class BlockInventoryHopperBasic extends BlockWithEntity implements IInven
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING).getAxis() == dir.getAxis();
+		return state.get(FACING).getOpposite() == dir;
 	}
 
 	@Override
@@ -115,43 +145,33 @@ public class BlockInventoryHopperBasic extends BlockWithEntity implements IInven
 	}
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos,
-			PlayerEntity player, Hand hand, BlockHitResult rtr) {
-		if(!world.isClient) {
-			ItemStack is = player.getStackInHand(hand);
-			if(!is.isEmpty()) {
-				BlockEntity te = world.getBlockEntity(pos);
-				if(te instanceof TileEntityInventoryHopperBasic) {
-					((TileEntityInventoryHopperBasic)te).setFilter(is.copy());
-					Text txt = ((TileEntityInventoryHopperBasic)te).getFilter().getName();
-					player.sendMessage(new TranslatableText("tooltip.toms_storage.filter_item", txt), true);
-				}
-			} else {
-				BlockEntity te = world.getBlockEntity(pos);
-				if(te instanceof TileEntityInventoryHopperBasic) {
-					if(player.isSneaking()) {
-						((TileEntityInventoryHopperBasic)te).setFilter(ItemStack.EMPTY);
-						player.sendMessage(new TranslatableText("tooltip.toms_storage.filter_item", new TranslatableText("tooltip.toms_storage.empty")), true);
-					} else {
-						ItemStack s = ((TileEntityInventoryHopperBasic)te).getFilter();
-						Text txt = s.isEmpty() ? new TranslatableText("tooltip.toms_storage.empty") : s.getName();
-						player.sendMessage(new TranslatableText("tooltip.toms_storage.filter_item", txt), true);
-					}
-				}
-			}
+	@Environment(EnvType.CLIENT)
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+		if (stateIn.get(POWERED)) {
+			Direction direction = stateIn.get(FACING).getOpposite();
+			double d0 = pos.getX() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
+			double d1 = pos.getY() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
+			double d2 = pos.getZ() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
+			float f = -7.0F;
+
+			f = f / 16.0F;
+			double d3 = f * direction.getOffsetX();
+			double d4 = f * direction.getOffsetZ();
+			worldIn.addParticle(DustParticleEffect.RED, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D);
 		}
-		return ActionResult.SUCCESS;
 	}
 
 	@Override
-	public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
-		updateEnabled(world, pos, state);
-	}
-
-	private void updateEnabled(World world, BlockPos pos, BlockState state) {
-		boolean bl = !world.isReceivingRedstonePower(pos);
-		if (bl != state.get(ENABLED).booleanValue()) {
-			world.setBlockState(pos, state.with(ENABLED, Boolean.valueOf(bl)), 4);
+	public ActionResult onUse(BlockState state, World world, BlockPos pos,
+			PlayerEntity player, Hand hand, BlockHitResult rtr) {
+		if (world.isClient) {
+			return ActionResult.SUCCESS;
 		}
+
+		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
+		if (blockEntity_1 instanceof TileEntityLevelEmitter) {
+			player.openHandledScreen((TileEntityLevelEmitter)blockEntity_1);
+		}
+		return ActionResult.SUCCESS;
 	}
 }

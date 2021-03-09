@@ -27,6 +27,7 @@ import com.tom.storagemod.block.BlockInventoryCableFramed;
 import com.tom.storagemod.block.BlockInventoryCableFramedPainted;
 import com.tom.storagemod.block.BlockInventoryHopperBasic;
 import com.tom.storagemod.block.BlockInventoryProxy;
+import com.tom.storagemod.block.BlockLevelEmitter;
 import com.tom.storagemod.block.BlockOpenCrate;
 import com.tom.storagemod.block.BlockPaintedTrim;
 import com.tom.storagemod.block.BlockTrim;
@@ -35,6 +36,7 @@ import com.tom.storagemod.block.InventoryConnector;
 import com.tom.storagemod.block.StorageTerminal;
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
 import com.tom.storagemod.gui.ContainerFiltered;
+import com.tom.storagemod.gui.ContainerLevelEmitter;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
@@ -45,6 +47,7 @@ import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
+import com.tom.storagemod.tile.TileEntityLevelEmitter;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
@@ -72,6 +75,7 @@ public class StorageMod implements ModInitializer {
 	public static BlockInventoryProxy invProxy;
 	public static CraftingTerminal craftingTerminal;
 	public static BlockInventoryHopperBasic invHopperBasic;
+	public static BlockLevelEmitter levelEmitter;
 
 	public static ItemPaintKit paintingKit;
 	public static ItemWirelessTerminal wirelessTerminal;
@@ -85,10 +89,12 @@ public class StorageMod implements ModInitializer {
 	public static BlockEntityType<TileEntityInventoryProxy> invProxyTile;
 	public static BlockEntityType<TileEntityCraftingTerminal> craftingTerminalTile;
 	public static BlockEntityType<TileEntityInventoryHopperBasic> invHopperBasicTile;
+	public static BlockEntityType<TileEntityLevelEmitter> levelEmitterTile;
 
 	public static ScreenHandlerType<ContainerStorageTerminal> storageTerminal;
 	public static ScreenHandlerType<ContainerCraftingTerminal> craftingTerminalCont;
 	public static ScreenHandlerType<ContainerFiltered> filteredConatiner;
+	public static ScreenHandlerType<ContainerLevelEmitter> levelEmitterConatiner;
 
 	public static Config CONFIG = AutoConfig.register(Config.class, GsonConfigSerializer::new).getConfig();
 
@@ -118,6 +124,7 @@ public class StorageMod implements ModInitializer {
 		invProxy = new BlockInventoryProxy();
 		craftingTerminal = new CraftingTerminal();
 		invHopperBasic = new BlockInventoryHopperBasic();
+		levelEmitter = new BlockLevelEmitter();
 
 		paintingKit = new ItemPaintKit();
 		wirelessTerminal = new ItemWirelessTerminal();
@@ -131,10 +138,12 @@ public class StorageMod implements ModInitializer {
 		invProxyTile = BlockEntityType.Builder.create(TileEntityInventoryProxy::new, invProxy).build(null);
 		craftingTerminalTile = BlockEntityType.Builder.create(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
 		invHopperBasicTile = BlockEntityType.Builder.create(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
+		levelEmitterTile = BlockEntityType.Builder.create(TileEntityLevelEmitter::new, levelEmitter).build(null);
 
 		storageTerminal = ScreenHandlerRegistry.registerSimple(id("ts.storage_terminal.container"), ContainerStorageTerminal::new);
 		craftingTerminalCont = ScreenHandlerRegistry.registerSimple(id("ts.crafting_terminal.container"), ContainerCraftingTerminal::new);
 		filteredConatiner = ScreenHandlerRegistry.registerSimple(id("ts.filtered.container"), ContainerFiltered::new);
+		levelEmitterConatiner = ScreenHandlerRegistry.registerSimple(id("ts.level_emitter.container"), ContainerLevelEmitter::new);
 
 		Registry.register(Registry.BLOCK, id("ts.inventory_connector"), connector);
 		Registry.register(Registry.BLOCK, id("ts.storage_terminal"), terminal);
@@ -149,6 +158,7 @@ public class StorageMod implements ModInitializer {
 		Registry.register(Registry.BLOCK, id("ts.inventory_proxy"), invProxy);
 		Registry.register(Registry.BLOCK, id("ts.crafting_terminal"), craftingTerminal);
 		Registry.register(Registry.BLOCK, id("ts.inventory_hopper_basic"), invHopperBasic);
+		Registry.register(Registry.BLOCK, id("ts.level_emitter"), levelEmitter);
 
 		Registry.register(Registry.ITEM, id("ts.paint_kit"), paintingKit);
 		Registry.register(Registry.ITEM, id("ts.wireless_terminal"), wirelessTerminal);
@@ -162,6 +172,7 @@ public class StorageMod implements ModInitializer {
 		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_proxy.tile"), invProxyTile);
 		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.crafting_terminal.tile"), craftingTerminalTile);
 		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventoty_hopper_basic.tile"), invHopperBasicTile);
+		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.level_emitter.tile"), levelEmitterTile);
 
 		registerItemForBlock(connector);
 		registerItemForBlock(terminal);
@@ -176,6 +187,7 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(invProxy);
 		registerItemForBlock(craftingTerminal);
 		registerItemForBlock(invHopperBasic);
+		registerItemForBlock(levelEmitter);
 
 		ServerSidePacketRegistry.INSTANCE.register(NetworkHandler.DATA_C2S, (ctx, buf) -> {
 			CompoundTag tag = buf.method_30617();
