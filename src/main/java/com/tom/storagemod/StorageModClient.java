@@ -27,6 +27,7 @@ import net.minecraft.util.Identifier;
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
 import com.tom.storagemod.gui.GuiFiltered;
+import com.tom.storagemod.gui.GuiLevelEmitter;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
 import com.tom.storagemod.tile.TileEntityPainted;
@@ -39,13 +40,15 @@ public class StorageModClient implements ClientModInitializer {
 		ScreenRegistry.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
 		ScreenRegistry.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
 		ScreenRegistry.register(StorageMod.filteredConatiner, GuiFiltered::new);
+		ScreenRegistry.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.paintedTrim, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCableFramed, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
+		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.levelEmitter, RenderLayer.getCutout());
 
 		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
-			CompoundTag tag = buf.readCompoundTag();
+			CompoundTag tag = buf.method_30617();
 			mc.submit(() -> {
 				if(mc.currentScreen instanceof IDataReceiver) {
 					((IDataReceiver)mc.currentScreen).receive(tag);

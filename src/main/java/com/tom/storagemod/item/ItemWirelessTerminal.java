@@ -23,7 +23,7 @@ import com.tom.storagemod.StorageTags;
 public class ItemWirelessTerminal extends Item {
 
 	public ItemWirelessTerminal() {
-		super(new Settings().group(StorageMod.STORAGE_MOD_TAB));
+		super(new Settings().group(StorageMod.STORAGE_MOD_TAB).maxCount(1));
 	}
 
 	@Override

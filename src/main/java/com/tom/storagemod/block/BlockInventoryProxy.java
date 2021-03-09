@@ -14,6 +14,7 @@ import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -25,6 +26,7 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -54,6 +56,10 @@ public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
 			TooltipContext flagIn) {
 		//tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_proxy", tooltip);
+		if(Screen.hasShiftDown()) {
+			tooltip.add(new TranslatableText("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", new TranslatableText("tooltip.toms_storage.inventory_proxy.ignoreSize")));
+			tooltip.add(new TranslatableText("tooltip.toms_storage.inventory_proxy.value", "maxCount", new TranslatableText("tooltip.toms_storage.inventory_proxy.maxCount.arg"), new TranslatableText("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
+		}
 	}
 
 	@Override

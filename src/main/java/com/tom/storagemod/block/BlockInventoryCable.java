@@ -74,7 +74,7 @@ public class BlockInventoryCable extends ConnectingBlock implements Waterloggabl
 			worldIn.getFluidTickScheduler().schedule(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
 		}
 
-		return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing.getOpposite()));
+		return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
