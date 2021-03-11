@@ -82,14 +82,13 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 		int y = 94;
 		this.addSlot(craftingResultSlot = new CraftingResultSlot(pinv.player, craftMatrix, craftResult, 0, x + 124, y + 35) {
 			@Override
-			public ItemStack onTakeItem(PlayerEntity thePlayer, ItemStack stack) {
+			public void onTakeItem(PlayerEntity thePlayer, ItemStack stack) {
 				if (thePlayer.world.isClient)
-					return ItemStack.EMPTY;
+					return;
 				this.onCrafted(stack);
 				if (!pinv.player.getEntityWorld().isClient) {
 					((TileEntityCraftingTerminal) te).craft(thePlayer);
 				}
-				return ItemStack.EMPTY;
 			}
 		});
 

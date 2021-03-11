@@ -189,7 +189,7 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(levelEmitter);
 
 		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_C2S, (s, p, h, buf, rp) -> {
-			CompoundTag tag = buf.method_30617();
+			CompoundTag tag = buf.readUnlimitedCompoundTag();
 			s.submit(() -> {
 				if(p.currentScreenHandler instanceof IDataReceiver) {
 					((IDataReceiver)p.currentScreenHandler).receive(tag);

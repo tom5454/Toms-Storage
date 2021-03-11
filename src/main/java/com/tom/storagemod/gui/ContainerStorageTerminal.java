@@ -203,7 +203,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 			float scaleFactor = 0.6f;
 			//boolean unicodeFlag = fr.getUnicodeFlag();
 			//fr.setUnicodeFlag(false);
-			RenderSystem.disableLighting();
+			//RenderSystem.disableLighting();
 			RenderSystem.disableDepthTest();
 			RenderSystem.disableBlend();
 			String stackSize = formatNumber(size);
@@ -215,7 +215,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 			int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
 			fr.draw(st, stackSize, X, Y, 16777215);
 			st.pop();
-			RenderSystem.enableLighting();
+			//RenderSystem.enableLighting();
 			RenderSystem.enableDepthTest();
 			//fr.setUnicodeFlag(unicodeFlag);
 		}
@@ -251,10 +251,10 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		return slimResult;
 	}
 
-	@Override
+	/*@Override
 	public boolean isNotRestricted(PlayerEntity playerIn) {
 		return te == null ? true : te.canInteractWith(playerIn);
-	}
+	}*/
 
 	public final void scrollTo(float p_148329_1_) {
 		int i = (this.itemListClientSorted.size() + 9 - 1) / 9 - lines;
@@ -286,7 +286,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		for (int i = 0;i < storageSlotList.size();i++) {
 			storageSlotList.get(i).drawSlot(st, gui, mouseX, mouseY);
 		}
-		RenderSystem.disableLighting();
+		//RenderSystem.disableLighting();
 		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
 		st.push();
@@ -410,20 +410,20 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 				}
 			} else {
 				if (act == SlotAction.PULL_OR_PUSH_STACK) {
-					ItemStack stack = player.getInventory().getCursorStack();
+					ItemStack stack = method_34255();
 					if (!stack.isEmpty()) {
 						StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
 						ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
-						player.getInventory().setCursorStack(itemstack);
+						method_34254(itemstack);
 					} else {
 						if (clicked.isEmpty())return;
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
 						if(pulled != null) {
-							player.getInventory().setCursorStack(pulled.getActualStack());
+							method_34254(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.PULL_ONE) {
-					ItemStack stack = player.getInventory().getCursorStack();
+					ItemStack stack = method_34255();
 					if (clicked.isEmpty())return;
 					if (d.getBoolean("m")) {
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
@@ -445,17 +445,17 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 						} else {
 							StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 							if (pulled != null) {
-								player.getInventory().setCursorStack(pulled.getActualStack());
+								method_34254(pulled.getActualStack());
 							}
 						}
 					}
 				} else if (act == SlotAction.GET_HALF) {
-					ItemStack stack = player.getInventory().getCursorStack();
+					ItemStack stack = method_34255();
 					if (!stack.isEmpty()) {
 						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 2, 1));
 						ItemStack itemstack = te.pushStack(stack1);
 						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						player.getInventory().setCursorStack(stack);
+						method_34254(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -467,16 +467,16 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 						}
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 2, 1));
 						if(pulled != null) {
-							player.getInventory().setCursorStack(pulled.getActualStack());
+							method_34254(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.GET_QUARTER) {
-					ItemStack stack = player.getInventory().getCursorStack();
+					ItemStack stack = method_34255();
 					if (!stack.isEmpty()) {
 						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 4, 1));
 						ItemStack itemstack = te.pushStack(stack1);
 						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						player.getInventory().setCursorStack(stack);
+						method_34254(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -487,7 +487,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 						}
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 4, 1));
 						if(pulled != null) {
-							player.getInventory().setCursorStack(pulled.getActualStack());
+							method_34254(pulled.getActualStack());
 						}
 					}
 				} else {
@@ -502,7 +502,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 					}
 				}
 			}
-			player.updateCursorStack();
+			//player.updateCursorStack();
 		}
 		if(message.contains("c")) {
 			CompoundTag d = message.getCompound("c");

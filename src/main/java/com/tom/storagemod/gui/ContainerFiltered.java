@@ -77,14 +77,12 @@ public class ContainerFiltered extends ScreenHandler {
 	}
 
 	@Override
-	public ItemStack onSlotClick(int slotId, int dragType, SlotActionType click, PlayerEntity player) {
+	public void onSlotClick(int slotId, int dragType, SlotActionType click, PlayerEntity player) {
 		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof SlotPhantom) {
-			ItemStack s = player.getInventory().getCursorStack().copy();
+			ItemStack s = method_34255().copy();
 			if(!s.isEmpty())s.setCount(1);
 			slot.setStack(s);
-			return player.getInventory().getCursorStack();
 		}
-		return super.onSlotClick(slotId, dragType, click, player);
 	}
 }

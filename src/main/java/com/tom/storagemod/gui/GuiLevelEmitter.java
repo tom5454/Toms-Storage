@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
@@ -48,8 +49,9 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 
 	@Override
 	protected void drawBackground(MatrixStack matrixStack, float partialTicks, int x, int y) {
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.client.getTextureManager().bindTexture(gui);
+		RenderSystem.setShader(GameRenderer::method_34542);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderTexture(0, gui);
 		int i = (this.width - this.backgroundWidth) / 2;
 		int j = (this.height - this.backgroundHeight) / 2;
 		this.drawTexture(matrixStack, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
@@ -125,8 +127,9 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				client.getTextureManager().bindTexture(gui);
-				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				RenderSystem.setShader(GameRenderer::method_34542);
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 				//int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();

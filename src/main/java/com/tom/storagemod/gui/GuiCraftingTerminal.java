@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screen.recipebook.RecipeBookProvider;
 import net.minecraft.client.gui.screen.recipebook.RecipeBookWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -131,10 +132,8 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.renderBackground(st);
 		if (this.recipeBookGui.isOpen() && this.widthTooNarrow) {
 			this.drawBackground(st, partialTicks, mouseX, mouseY);
-			RenderSystem.disableLighting();
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
-			RenderSystem.disableLighting();
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 			super.render(st, mouseX, mouseY, partialTicks);
 			this.recipeBookGui.drawGhostSlots(st, this.x, this.y, true, partialTicks);
@@ -236,8 +235,9 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		@Override
 		public void renderButton(MatrixStack m, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				mc.getTextureManager().bindTexture(gui);
-				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShader(GameRenderer::method_34542);
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShaderTexture(0, gui);
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				int i = this.getYImage(this.hovered);
 				RenderSystem.enableBlend();

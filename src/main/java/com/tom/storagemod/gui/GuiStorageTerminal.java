@@ -1,9 +1,12 @@
 package com.tom.storagemod.gui;
 
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 
 public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageTerminal> {
 	private static final Identifier gui = new Identifier("toms_storage", "textures/gui/storage_terminal.png");
@@ -22,7 +25,9 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 
 	@Override
 	protected void drawBackground(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
-		mc.getTextureManager().bindTexture(gui);
+		RenderSystem.setShader(GameRenderer::method_34542);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderTexture(0, gui);
 		drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 
