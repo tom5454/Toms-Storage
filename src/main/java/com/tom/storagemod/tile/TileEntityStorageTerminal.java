@@ -60,6 +60,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	public StoredItemStack pullStack(StoredItemStack stack, long max) {
 		ItemStack st = stack.getStack();
 		StoredItemStack ret = null;
+		if(itemHandler == null)return null;
 		for (int i = 0; i < itemHandler.getSlots(); i++) {
 			ItemStack s = itemHandler.getStackInSlot(i);
 			if(ItemStack.areItemsEqual(s, st) && ItemStack.areTagsEqual(s, st)) {

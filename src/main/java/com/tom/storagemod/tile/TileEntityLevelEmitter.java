@@ -44,7 +44,6 @@ public class TileEntityLevelEmitter extends BlockEntity implements Tickable, Nam
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			checkedBlocks.add(pos);
 			BlockPos up = pos.offset(facing.getOpposite());
-			BlockPos down = pos.offset(facing);
 			state = world.getBlockState(up);
 			if(state.getBlock() instanceof IInventoryCable) {
 				top = null;
