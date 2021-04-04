@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 public class StoredItemStack {
 	private ItemStack stack;
@@ -34,13 +34,13 @@ public class StoredItemStack {
 		return s;
 	}
 
-	public void writeToNBT(CompoundTag tag) {
+	public void writeToNBT(NbtCompound tag) {
 		tag.putLong(ITEM_COUNT_NAME, getQuantity());
-		tag.put(ITEMSTACK_NAME, stack.writeNbt(new CompoundTag()));
+		tag.put(ITEMSTACK_NAME, stack.writeNbt(new NbtCompound()));
 		tag.getCompound(ITEMSTACK_NAME).remove("Count");
 	}
 
-	public static StoredItemStack readFromNBT(CompoundTag tag) {
+	public static StoredItemStack readFromNBT(NbtCompound tag) {
 		ItemStack cheat = ItemStack.fromNbt(tag);
 		tag.getCompound(ITEMSTACK_NAME).putByte("Count", (byte) 1);
 		StoredItemStack stack = new StoredItemStack(!cheat.isEmpty() ? cheat : ItemStack.fromNbt(tag.getCompound(ITEMSTACK_NAME)), !cheat.isEmpty() ? cheat.getCount() : tag.getLong(ITEM_COUNT_NAME));

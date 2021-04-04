@@ -10,8 +10,8 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.InputSlotFiller;
 import net.minecraft.recipe.Recipe;
@@ -252,18 +252,18 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	public void receive(CompoundTag message) {
+	public void receive(NbtCompound message) {
 		super.receive(message);
 		if(message.contains("i")) {
 			ItemStack[][] stacks = new ItemStack[9][];
-			ListTag list = message.getList("i", 10);
+			NbtList list = message.getList("i", 10);
 			for (int i = 0;i < list.size();i++) {
-				CompoundTag nbttagcompound = list.getCompound(i);
+				NbtCompound nbttagcompound = list.getCompound(i);
 				byte slot = nbttagcompound.getByte("s");
 				byte l = nbttagcompound.getByte("l");
 				stacks[slot] = new ItemStack[l];
 				for (int j = 0;j < l;j++) {
-					CompoundTag tag = nbttagcompound.getCompound("i" + j);
+					NbtCompound tag = nbttagcompound.getCompound("i" + j);
 					stacks[slot][j] = ItemStack.fromNbt(tag);
 				}
 			}

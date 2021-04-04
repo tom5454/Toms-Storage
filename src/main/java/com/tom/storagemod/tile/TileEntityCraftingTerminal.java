@@ -11,8 +11,8 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.ScreenHandler;
@@ -61,16 +61,16 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 
 	@Override
-	public CompoundTag writeNbt(CompoundTag compound) {
-		ListTag listnbt = new ListTag();
+	public NbtCompound writeNbt(NbtCompound compound) {
+		NbtList listnbt = new NbtList();
 
 		for(int i = 0; i < craftMatrix.size(); ++i) {
 			ItemStack itemstack = craftMatrix.getStack(i);
 			if (!itemstack.isEmpty()) {
-				CompoundTag CompoundTag = new CompoundTag();
-				CompoundTag.putByte("Slot", (byte)i);
-				itemstack.writeNbt(CompoundTag);
-				listnbt.add(CompoundTag);
+				NbtCompound tag = new NbtCompound();
+				tag.putByte("Slot", (byte)i);
+				itemstack.writeNbt(tag);
+				listnbt.add(tag);
 			}
 		}
 
@@ -79,16 +79,16 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 	private boolean reading;
 	@Override
-	public void readNbt(CompoundTag compound) {
+	public void readNbt(NbtCompound compound) {
 		super.readNbt(compound);
 		reading = true;
-		ListTag listnbt = compound.getList("CraftingTable", 10);
+		NbtList listnbt = compound.getList("CraftingTable", 10);
 
 		for(int i = 0; i < listnbt.size(); ++i) {
-			CompoundTag CompoundTag = listnbt.getCompound(i);
-			int j = CompoundTag.getByte("Slot") & 255;
+			NbtCompound tag = listnbt.getCompound(i);
+			int j = tag.getByte("Slot") & 255;
 			if (j >= 0 && j < craftMatrix.size()) {
-				craftMatrix.setStack(j, ItemStack.fromNbt(CompoundTag));
+				craftMatrix.setStack(j, ItemStack.fromNbt(tag));
 			}
 		}
 		reading = false;

@@ -13,7 +13,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -189,7 +189,7 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(levelEmitter);
 
 		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_C2S, (s, p, h, buf, rp) -> {
-			CompoundTag tag = buf.readUnlimitedCompoundTag();
+			NbtCompound tag = buf.readUnlimitedCompound();
 			s.submit(() -> {
 				if(p.currentScreenHandler instanceof IDataReceiver) {
 					((IDataReceiver)p.currentScreenHandler).receive(tag);

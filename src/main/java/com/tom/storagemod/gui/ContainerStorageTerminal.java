@@ -19,8 +19,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.book.RecipeBookCategory;
@@ -312,17 +312,17 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		if(te == null)return;
 		Map<StoredItemStack, Long> itemsCount = te.getStacks();
 		if(!this.itemsCount.equals(itemsCount)) {
-			ListTag list = new ListTag();
+			NbtList list = new NbtList();
 			this.itemList.clear();
 			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
 				StoredItemStack storedS = e.getKey();
-				CompoundTag tag = new CompoundTag();
+				NbtCompound tag = new NbtCompound();
 				storedS.writeToNBT(tag);
 				tag.putLong("c", e.getValue());
 				list.add(tag);
 				this.itemList.add(new StoredItemStack(e.getKey().getStack(), e.getValue()));
 			}
-			CompoundTag mainTag = new CompoundTag();
+			NbtCompound mainTag = new NbtCompound();
 			mainTag.put("l", list);
 			mainTag.putInt("p", te.getSorting());
 			mainTag.putString("s", te.getLastSearch());
@@ -332,12 +332,12 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		super.sendContentUpdates();
 	}
 
-	public final void receiveClientTagPacket(CompoundTag message) {
+	public final void receiveClientTagPacket(NbtCompound message) {
 		//System.out.println(message);
-		ListTag list = message.getList("l", 10);
+		NbtList list = message.getList("l", 10);
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {
-			CompoundTag tag = list.getCompound(i);
+			NbtCompound tag = list.getCompound(i);
 			itemList.add(StoredItemStack.readFromNBT(tag));
 			//System.out.println(tag);
 		}
@@ -388,12 +388,12 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		return false;
 	}
 
-	public void sendMessage(CompoundTag compound) {
+	public void sendMessage(NbtCompound compound) {
 		NetworkHandler.sendToServer(compound);
 	}
 
 	@Override
-	public void receive(CompoundTag message) {
+	public void receive(NbtCompound message) {
 		if(pinv.player.isSpectator())return;
 		if(message.contains("s")) {
 			te.setLastSearch(message.getString("s"));
@@ -401,7 +401,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		if(message.contains("a")) {
 			ServerPlayerEntity player = (ServerPlayerEntity) pinv.player;
 			player.updateLastActionTime();
-			CompoundTag d = message.getCompound("a");
+			NbtCompound d = message.getCompound("a");
 			ItemStack clicked = ItemStack.fromNbt(d.getCompound("s"));
 			SlotAction act = SlotAction.VALUES[Math.abs(d.getInt("a")) % SlotAction.VALUES.length];
 			if(act == SlotAction.SPACE_CLICK) {
@@ -410,20 +410,20 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 				}
 			} else {
 				if (act == SlotAction.PULL_OR_PUSH_STACK) {
-					ItemStack stack = method_34255();
+					ItemStack stack = getCursorStack();
 					if (!stack.isEmpty()) {
 						StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
 						ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
-						method_34254(itemstack);
+						setCursorStack(itemstack);
 					} else {
 						if (clicked.isEmpty())return;
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
 						if(pulled != null) {
-							method_34254(pulled.getActualStack());
+							setCursorStack(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.PULL_ONE) {
-					ItemStack stack = method_34255();
+					ItemStack stack = getCursorStack();
 					if (clicked.isEmpty())return;
 					if (d.getBoolean("m")) {
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
@@ -445,17 +445,17 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 						} else {
 							StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 							if (pulled != null) {
-								method_34254(pulled.getActualStack());
+								setCursorStack(pulled.getActualStack());
 							}
 						}
 					}
 				} else if (act == SlotAction.GET_HALF) {
-					ItemStack stack = method_34255();
+					ItemStack stack = getCursorStack();
 					if (!stack.isEmpty()) {
 						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 2, 1));
 						ItemStack itemstack = te.pushStack(stack1);
 						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						method_34254(stack);
+						setCursorStack(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -467,16 +467,16 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 						}
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 2, 1));
 						if(pulled != null) {
-							method_34254(pulled.getActualStack());
+							setCursorStack(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.GET_QUARTER) {
-					ItemStack stack = method_34255();
+					ItemStack stack = getCursorStack();
 					if (!stack.isEmpty()) {
 						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 4, 1));
 						ItemStack itemstack = te.pushStack(stack1);
 						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						method_34254(stack);
+						setCursorStack(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -487,7 +487,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 						}
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 4, 1));
 						if(pulled != null) {
-							method_34254(pulled.getActualStack());
+							setCursorStack(pulled.getActualStack());
 						}
 					}
 				} else {
@@ -505,7 +505,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 			//player.updateCursorStack();
 		}
 		if(message.contains("c")) {
-			CompoundTag d = message.getCompound("c");
+			NbtCompound d = message.getCompound("c");
 			te.setSorting(d.getInt("d"));
 		}
 	}

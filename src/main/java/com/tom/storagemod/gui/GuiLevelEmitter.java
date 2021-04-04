@@ -12,7 +12,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -49,8 +49,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 
 	@Override
 	protected void drawBackground(MatrixStack matrixStack, float partialTicks, int x, int y) {
-		RenderSystem.setShader(GameRenderer::method_34542);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, gui);
 		int i = (this.width - this.backgroundWidth) / 2;
 		int j = (this.height - this.backgroundHeight) / 2;
@@ -63,7 +62,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		buttons.clear();
 		amountBtns.clear();
 		super.init();
-		textF = new TextFieldWidget(textRenderer, x + 70, y + 41, 89, textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.level_emitter_amount"));
+		textF = new TextFieldWidget(textRenderer, field_2776 + 70, field_2800 + 41, 89, textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.level_emitter_amount"));
 		textF.setMaxLength(100);
 		textF.setDrawsBackground(false);
 		textF.setVisible(true);
@@ -80,7 +79,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 			}
 		});
 		addButton(textF);
-		lessThanBtn = new GuiButton(x - 18, y + 5, 0, b -> {
+		lessThanBtn = new GuiButton(field_2776 - 18, field_2800 + 5, 0, b -> {
 			lt = !lt;
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
@@ -98,7 +97,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(NbtCompound tag) {
 		count = tag.getInt("count");
 		boolean lt = tag.getBoolean("lessThan");
 		lessThanBtn.state = lt ? 1 : 0;
@@ -128,8 +127,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 			if (this.visible) {
 				client.getTextureManager().bindTexture(gui);
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-				RenderSystem.setShader(GameRenderer::method_34542);
-				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				//int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
@@ -140,7 +138,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 	}
 
 	private void send() {
-		CompoundTag mainTag = new CompoundTag();
+		NbtCompound mainTag = new NbtCompound();
 		mainTag.putInt("count", count);
 		mainTag.putBoolean("lessThan", lt);
 		NetworkHandler.sendToServer(mainTag);
@@ -150,7 +148,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		private ButtonWidget btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new ButtonWidget(GuiLevelEmitter.this.x + x, GuiLevelEmitter.this.y + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
+			btn = new ButtonWidget(GuiLevelEmitter.this.field_2776 + x, GuiLevelEmitter.this.field_2800 + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
 			addButton(btn);
 			this.v = v;
 			this.sv = sv;

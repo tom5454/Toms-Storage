@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -48,7 +48,7 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.levelEmitter, RenderLayer.getCutout());
 
 		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
-			CompoundTag tag = buf.readUnlimitedCompoundTag();
+			NbtCompound tag = buf.readUnlimitedCompound();
 			mc.submit(() -> {
 				if(mc.currentScreen instanceof IDataReceiver) {
 					((IDataReceiver)mc.currentScreen).receive(tag);

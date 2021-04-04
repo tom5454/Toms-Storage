@@ -5,7 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
@@ -35,14 +35,14 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public void readNbt(CompoundTag compound) {
+	public void readNbt(NbtCompound compound) {
 		super.readNbt(compound);
 		blockState = NbtHelper.toBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
 
 	@Override
-	public CompoundTag writeNbt(CompoundTag compound) {
+	public NbtCompound writeNbt(NbtCompound compound) {
 		if (blockState != null) {
 			compound.put("block", NbtHelper.fromBlockState(blockState));
 		}
@@ -66,7 +66,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 
 	@Override
 	public BlockEntityUpdateS2CPacket toUpdatePacket() {
-		CompoundTag nbtTag = new CompoundTag();
+		NbtCompound nbtTag = new NbtCompound();
 		writeNbt(nbtTag);
 		return new BlockEntityUpdateS2CPacket(getPos(), 127, nbtTag);
 	}
@@ -76,7 +76,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public void fromClientTag(CompoundTag tag) {
+	public void fromClientTag(NbtCompound tag) {
 		BlockState old = getPaintedBlockState();
 		blockState = NbtHelper.toBlockState(tag.getCompound("block"));
 		if (world != null && world.isClient) {
@@ -90,7 +90,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public CompoundTag toClientTag(CompoundTag tag) {
+	public NbtCompound toClientTag(NbtCompound tag) {
 		return writeNbt(tag);
 	}
 }

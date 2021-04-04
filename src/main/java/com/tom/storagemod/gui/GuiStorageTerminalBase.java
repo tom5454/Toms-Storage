@@ -21,7 +21,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -103,9 +103,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	protected void sendUpdate() {
-		CompoundTag c = new CompoundTag();
+		NbtCompound c = new NbtCompound();
 		c.putInt("d", updateData());
-		CompoundTag msg = new CompoundTag();
+		NbtCompound msg = new NbtCompound();
 		msg.put("c", c);
 		handler.sendMessage(msg);
 	}
@@ -125,26 +125,26 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttons.clear();
 		playerInventoryTitleY = backgroundHeight - 92;
 		super.init();
-		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
+		this.searchField = new TextFieldWidget(textRenderer, this.field_2776 + 82, this.field_2800 + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
 		this.searchField.setText(searchLast);
 		this.searchField.setMaxLength(100);
 		this.searchField.setDrawsBackground(false);
 		this.searchField.setVisible(true);
 		this.searchField.setEditableColor(16777215);
 		buttons.add(searchField);
-		buttonSortingType = addButton(new GuiButton(x - 18, y + 5, 0, b -> {
+		buttonSortingType = addButton(new GuiButton(field_2776 - 18, field_2800 + 5, 0, b -> {
 			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());
 			buttonSortingType.state = comparator.type();
 			sendUpdate();
 			refreshItemList = true;
 		}));
-		buttonDirection = addButton(new GuiButton(x - 18, y + 5 + 18, 1, b -> {
+		buttonDirection = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18, 1, b -> {
 			comparator.setReversed(!comparator.isReversed());
 			buttonDirection.state = comparator.isReversed() ? 1 : 0;
 			sendUpdate();
 			refreshItemList = true;
 		}));
-		buttonSearchType = addButton(new GuiButton(x - 18, y + 5 + 18*2, 2, b -> {
+		buttonSearchType = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18*2, 2, b -> {
 			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);//ModList.get().isLoaded("jei") ||
 			buttonSearchType.state = searchType;
 			sendUpdate();
@@ -152,8 +152,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			@Override
 			public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 				if (this.visible) {
-					RenderSystem.setShader(GameRenderer::method_34542);
-					RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+					RenderSystem.setShader(GameRenderer::getPositionTexShader);
 					RenderSystem.setShaderTexture(0, getGui());
 					this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 					//int i = this.getYImage(this.isHovered);
@@ -167,7 +166,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			}
 		});
-		buttonCtrlMode = addButton(new GuiButton(x - 18, y + 5 + 18*3, 3, b -> {
+		buttonCtrlMode = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18*3, 3, b -> {
 			controllMode = (controllMode + 1) % ControllMode.VALUES.length;
 			buttonCtrlMode.state = controllMode;
 			sendUpdate();
@@ -228,7 +227,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 						REIPlugin.setReiSearchText(searchString);*/
 				}
 				if ((searchType & 2) > 0) {
-					CompoundTag nbt = new CompoundTag();
+					NbtCompound nbt = new NbtCompound();
 					nbt.putString("s", searchString);
 					handler.sendMessage(nbt);
 				}
@@ -258,8 +257,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
 		boolean flag = GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
-		int i = this.x;
-		int j = this.y;
+		int i = this.field_2776;
+		int j = this.field_2800;
 		int k = i + 174;
 		int l = j + 18;
 		int i1 = k + 14;
@@ -281,7 +280,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 		super.render(matrices, mouseX, mouseY, partialTicks);
 
-		RenderSystem.setShader(GameRenderer::method_34542);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		DiffuseLighting.disableGuiDepthLighting();
 		RenderSystem.setShaderTexture(0, creativeInventoryTabs);
@@ -324,7 +323,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 				return true;
 			} else if (pullHalf(mouseButton)) {
-				if (!handler.method_34255().isEmpty()) {
+				if (!handler.getCursorStack().isEmpty()) {
 					storageSlotClick(ItemStack.EMPTY, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
 				} else {
 					if (getScreenHandler().getSlotByID(slotIDUnderMouse).stack != null && getScreenHandler().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
@@ -337,7 +336,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 					}
 				}
 			} else if (pullNormal(mouseButton)) {
-				if (!handler.method_34255().isEmpty()) {
+				if (!handler.getCursorStack().isEmpty()) {
 					storageSlotClick(ItemStack.EMPTY, SlotAction.PULL_OR_PUSH_STACK, 0);
 				} else {
 					if (getScreenHandler().getSlotByID(slotIDUnderMouse).stack != null) {
@@ -355,7 +354,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		} else if (GLFW.glfwGetKey(mc.getWindow().getHandle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
 			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
 		} else {
-			if (mouseButton == 1 && isPointWithinBounds(searchField.x - x, searchField.y - y, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
+			if (mouseButton == 1 && isPointWithinBounds(searchField.x - field_2776, searchField.y - field_2800, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
 				searchField.setText("");
 			else if(this.searchField.mouseClicked(mouseX, mouseY, mouseButton))return true;
 			else
@@ -365,11 +364,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	protected void storageSlotClick(ItemStack slotStack, SlotAction act, int mod) {
-		CompoundTag c = new CompoundTag();
-		c.put("s", slotStack.writeNbt(new CompoundTag()));
+		NbtCompound c = new NbtCompound();
+		c.put("s", slotStack.writeNbt(new NbtCompound()));
 		c.putInt("a", act.ordinal());
 		c.putByte("m", (byte) mod);
-		CompoundTag msg = new CompoundTag();
+		NbtCompound msg = new NbtCompound();
 		msg.put("a", c);
 		handler.sendMessage(msg);
 	}
@@ -381,7 +380,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		case RS:
 			return mouseButton == 2;
 		case DEF:
-			return mouseButton == 1 && !handler.method_34255().isEmpty();
+			return mouseButton == 1 && !handler.getCursorStack().isEmpty();
 		default:
 			return false;
 		}
@@ -407,7 +406,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		case RS:
 			return mouseButton == 1;
 		case DEF:
-			return mouseButton == 1 && handler.method_34255().isEmpty();
+			return mouseButton == 1 && handler.getCursorStack().isEmpty();
 		default:
 			return false;
 		}
@@ -502,10 +501,10 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	@Override
 	protected void drawBackground(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
-		RenderSystem.setShader(GameRenderer::method_34542);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, getGui());
-		drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+		drawTexture(st, this.field_2776, this.field_2800, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 
 	public class GuiButton extends ButtonWidget {
@@ -528,8 +527,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		@Override
 		public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				RenderSystem.setShader(GameRenderer::method_34542);
-				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				RenderSystem.setShaderTexture(0, getGui());
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				//int i = this.getYImage(this.isHovered);
@@ -544,15 +542,15 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	protected void onUpdateSearch(String text) {}
 
 	public int getGuiLeft() {
-		return x;
+		return field_2776;
 	}
 
 	public int getGuiTop() {
-		return y;
+		return field_2800;
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(NbtCompound tag) {
 		handler.receiveClientTagPacket(tag);
 		refreshItemList = true;
 	}

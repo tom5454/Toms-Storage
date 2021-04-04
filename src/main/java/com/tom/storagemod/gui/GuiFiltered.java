@@ -31,8 +31,7 @@ public class GuiFiltered extends HandledScreen<ContainerFiltered> {
 
 	@Override
 	protected void drawBackground(MatrixStack matrixStack, float partialTicks, int x, int y) {
-		RenderSystem.setShader(GameRenderer::method_34542);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, DISPENSER_GUI_TEXTURES);
 		int i = (this.width - this.backgroundWidth) / 2;
 		int j = (this.height - this.backgroundHeight) / 2;

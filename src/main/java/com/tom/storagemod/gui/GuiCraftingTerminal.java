@@ -57,51 +57,51 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		super.init();
 		this.widthTooNarrow = this.width < 379;
 		this.recipeBookGui.initialize(this.width, this.height, this.mc, this.widthTooNarrow, this.handler);
-		this.x = this.recipeBookGui.findLeftEdge(this.widthTooNarrow, this.width, this.backgroundWidth);
+		this.field_2776 = this.recipeBookGui.findLeftEdge(this.widthTooNarrow, this.width, this.backgroundWidth);
 		this.children.add(this.recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
-		GuiButtonClear btnClr = new GuiButtonClear(x + 80, y + 110, b -> clearGrid());
+		GuiButtonClear btnClr = new GuiButtonClear(field_2776 + 80, field_2800 + 110, b -> clearGrid());
 		addButton(btnClr);
-		buttonPullFromInv = addButton(new GuiButton(x - 18, y + 5 + 18*4, 4, b -> {
+		buttonPullFromInv = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
 			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();
 		}));
-		this.addButton(new TexturedButtonWidget(this.x + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (buttonWidget) -> {
+		this.addButton(new TexturedButtonWidget(this.field_2776 + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (buttonWidget) -> {
 			this.recipeBookGui.reset(this.widthTooNarrow);
 			this.recipeBookGui.toggleOpen();
-			this.x = this.recipeBookGui.findLeftEdge(this.widthTooNarrow, this.width, this.backgroundWidth);
-			((TexturedButtonWidget)buttonWidget).setPos(this.x + 4, this.height / 2);
-			super.searchField.setX(this.x + 82);
-			btnClr.setX(this.x + 80);
-			buttonSortingType.setX(x - 18);
-			buttonDirection.setX(x - 18);
+			this.field_2776 = this.recipeBookGui.findLeftEdge(this.widthTooNarrow, this.width, this.backgroundWidth);
+			((TexturedButtonWidget)buttonWidget).setPos(this.field_2776 + 4, this.height / 2);
+			super.searchField.setX(this.field_2776 + 82);
+			btnClr.setX(this.field_2776 + 80);
+			buttonSortingType.setX(field_2776 - 18);
+			buttonDirection.setX(field_2776 - 18);
 			if(recipeBookGui.isOpen()) {
-				buttonSearchType.setX(x - 36);
-				buttonCtrlMode.setX(x - 36);
-				buttonPullFromInv.setX(x - 54);
-				buttonSearchType.y = y + 5;
-				buttonCtrlMode.y = y + 5 + 18;
-				buttonPullFromInv.y = y + 5 + 18;
+				buttonSearchType.setX(field_2776 - 36);
+				buttonCtrlMode.setX(field_2776 - 36);
+				buttonPullFromInv.setX(field_2776 - 54);
+				buttonSearchType.y = field_2800 + 5;
+				buttonCtrlMode.y = field_2800 + 5 + 18;
+				buttonPullFromInv.y = field_2800 + 5 + 18;
 			} else {
-				buttonSearchType.setX(x - 18);
-				buttonCtrlMode.setX(x - 18);
-				buttonPullFromInv.setX(x - 18);
-				buttonSearchType.y = y + 5 + 18*2;
-				buttonCtrlMode.y = y + 5 + 18*3;
-				buttonPullFromInv.y = y + 5 + 18*4;
+				buttonSearchType.setX(field_2776 - 18);
+				buttonCtrlMode.setX(field_2776 - 18);
+				buttonPullFromInv.setX(field_2776 - 18);
+				buttonSearchType.y = field_2800 + 5 + 18*2;
+				buttonCtrlMode.y = field_2800 + 5 + 18*3;
+				buttonPullFromInv.y = field_2800 + 5 + 18*4;
 			}
 		}));
 		if(recipeBookGui.isOpen()) {
-			buttonSortingType.setX(x - 18);
-			buttonDirection.setX(x - 18);
-			buttonSearchType.setX(x - 36);
-			buttonCtrlMode.setX(x - 36);
-			buttonPullFromInv.setX(x - 54);
-			buttonSearchType.y = y + 5;
-			buttonCtrlMode.y = y + 5 + 18;
-			buttonPullFromInv.y = y + 5 + 18;
-			super.searchField.setX(this.x + 82);
+			buttonSortingType.setX(field_2776 - 18);
+			buttonDirection.setX(field_2776 - 18);
+			buttonSearchType.setX(field_2776 - 36);
+			buttonCtrlMode.setX(field_2776 - 36);
+			buttonPullFromInv.setX(field_2776 - 54);
+			buttonSearchType.y = field_2800 + 5;
+			buttonCtrlMode.y = field_2800 + 5 + 18;
+			buttonPullFromInv.y = field_2800 + 5 + 18;
+			super.searchField.setX(this.field_2776 + 82);
 		}
 		onPacket();
 	}
@@ -136,11 +136,11 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		} else {
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 			super.render(st, mouseX, mouseY, partialTicks);
-			this.recipeBookGui.drawGhostSlots(st, this.x, this.y, true, partialTicks);
+			this.recipeBookGui.drawGhostSlots(st, this.field_2776, this.field_2800, true, partialTicks);
 		}
 
 		this.drawMouseoverTooltip(st, mouseX, mouseY);
-		this.recipeBookGui.drawTooltip(st, this.x, this.y, mouseX, mouseY);
+		this.recipeBookGui.drawTooltip(st, this.field_2776, this.field_2800, mouseX, mouseY);
 		this.setFocused(this.recipeBookGui);
 
 		if (buttonPullFromInv.isHovered()) {
@@ -165,7 +165,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	@Override
 	protected boolean isClickOutsideBounds(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton) {
 		boolean flag = mouseX < guiLeftIn || mouseY < guiTopIn || mouseX >= guiLeftIn + this.backgroundWidth || mouseY >= guiTopIn + this.backgroundHeight;
-		return this.recipeBookGui.isClickOutsideBounds(mouseX, mouseY, this.x, this.y, this.backgroundWidth, this.backgroundHeight, mouseButton) && flag;
+		return this.recipeBookGui.isClickOutsideBounds(mouseX, mouseY, this.field_2776, this.field_2800, this.backgroundWidth, this.backgroundHeight, mouseButton) && flag;
 	}
 
 	/**
@@ -235,8 +235,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		@Override
 		public void renderButton(MatrixStack m, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				RenderSystem.setShader(GameRenderer::method_34542);
-				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				RenderSystem.setShaderTexture(0, gui);
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				int i = this.getYImage(this.hovered);

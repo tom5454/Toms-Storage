@@ -2,7 +2,7 @@ package com.tom.storagemod.tile;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
@@ -49,13 +49,13 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public CompoundTag writeNbt(CompoundTag compound) {
-		compound.put("Filter", getFilter().writeNbt(new CompoundTag()));
+	public NbtCompound writeNbt(NbtCompound compound) {
+		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
 		return super.writeNbt(compound);
 	}
 
 	@Override
-	public void readNbt(CompoundTag nbtIn) {
+	public void readNbt(NbtCompound nbtIn) {
 		super.readNbt(nbtIn);
 		setFilter(ItemStack.fromNbt(nbtIn.getCompound("Filter")));
 	}

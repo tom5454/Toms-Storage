@@ -80,7 +80,7 @@ public class ContainerFiltered extends ScreenHandler {
 	public void onSlotClick(int slotId, int dragType, SlotActionType click, PlayerEntity player) {
 		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof SlotPhantom) {
-			ItemStack s = method_34255().copy();
+			ItemStack s = getCursorStack().copy();
 			if(!s.isEmpty())s.setCount(1);
 			slot.setStack(s);
 		}

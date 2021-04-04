@@ -12,7 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -61,6 +61,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	public StoredItemStack pullStack(StoredItemStack stack, long max) {
 		ItemStack st = stack.getStack();
 		StoredItemStack ret = null;
+		if(itemHandler == null)return null;
 		for (int i = 0; i < itemHandler.getSlots(); i++) {
 			ItemStack s = itemHandler.getStackInSlot(i);
 			if(ItemStack.areItemsEqual(s, st) && ItemStack.areTagsEqual(s, st)) {
@@ -134,13 +135,13 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	}
 
 	@Override
-	public CompoundTag writeNbt(CompoundTag compound) {
+	public NbtCompound writeNbt(NbtCompound compound) {
 		compound.putInt("sort", sort);
 		return super.writeNbt(compound);
 	}
 
 	@Override
-	public void readNbt(CompoundTag compound) {
+	public void readNbt(NbtCompound compound) {
 		sort = compound.getInt("sort");
 		super.readNbt(compound);
 	}
