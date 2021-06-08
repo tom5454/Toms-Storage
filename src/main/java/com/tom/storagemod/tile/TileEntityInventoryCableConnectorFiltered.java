@@ -15,6 +15,8 @@ import net.minecraft.text.TranslatableText;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.ContainerFiltered;
+import com.tom.storagemod.util.FilteredInventoryWrapper;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements NamedScreenHandlerFactory {
 	private SimpleInventory filter = new SimpleInventory(9);

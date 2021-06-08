@@ -9,8 +9,12 @@ import java.util.Stack;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -18,9 +22,13 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.ITrim;
+import com.tom.storagemod.util.IProxy;
+import com.tom.storagemod.util.InfoHandler;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityInventoryConnector extends BlockEntity implements Tickable, Inventory {
 	private List<InventoryWrapper> handlers = new ArrayList<>();
@@ -78,27 +86,9 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 								continue;
 							} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
 								Inventory ihr = null;
-								/*if(te instanceof ChestBlockEntity) {//Check for double chests
-								BlockState state = world.getBlockState(p);
-								Block block = state.getBlock();
-								if(block instanceof ChestBlock) {
-									ihr = ChestBlock.getInventory((ChestBlock)block, state, world, p, true);
-									ChestType type = state.get(ChestBlock.CHEST_TYPE);
-									if (type != ChestType.SINGLE) {
-										BlockPos opos = p.offset(ChestBlock.getFacing(state));
-										BlockState ostate = this.getWorld().getBlockState(opos);
-										if (state.getBlock() == ostate.getBlock()) {
-											ChestType otype = ostate.get(ChestBlock.CHEST_TYPE);
-											if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
-												toCheck.add(opos);
-												checkedBlocks.add(opos);
-											}
-										}
-									}
-								}
-							}else */
-								if(te instanceof Inventory) {
-									ihr = IProxy.resolve((Inventory) te);
+								Inventory inv = getInventoryAt(world, p);
+								if(inv != null) {
+									ihr = IProxy.resolve(inv);
 									if(ihr instanceof TileEntityInventoryConnector) {
 										TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
 										if(checkHandlers(ih, 0)) {
@@ -232,5 +222,24 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 			if(getStack(i).isEmpty())empty++;
 		}
 		return empty;
+	}
+
+	public static Inventory getInventoryAt(World world, BlockPos blockPos) {
+		Inventory inventory = null;
+		BlockState blockState = world.getBlockState(blockPos);
+		Block block = blockState.getBlock();
+		if (block instanceof InventoryProvider) {
+			inventory = ((InventoryProvider) block).getInventory(blockState, world, blockPos);
+		} else if (block.hasBlockEntity()) {
+			BlockEntity blockEntity = world.getBlockEntity(blockPos);
+			if (blockEntity instanceof Inventory) {
+				inventory = (Inventory) blockEntity;
+				if (inventory instanceof ChestBlockEntity && block instanceof ChestBlock) {
+					inventory = ChestBlock.getInventory((ChestBlock) block, blockState, world, blockPos, true);
+				}
+			}
+		}
+
+		return inventory;
 	}
 }

@@ -6,6 +6,9 @@ import net.minecraft.nbt.CompoundTag;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.BlockInventoryHopperBasic;
+import com.tom.storagemod.util.EmptyHandler;
+import com.tom.storagemod.util.IItemHandler;
+import com.tom.storagemod.util.ItemHandlerHelper;
 
 public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBase {
 	private ItemStack filter = ItemStack.EMPTY;

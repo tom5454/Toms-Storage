@@ -1,4 +1,4 @@
-package com.tom.storagemod.tile;
+package com.tom.storagemod.util;
 
 import java.util.Set;
 
@@ -56,6 +56,7 @@ public class InventoryWrapper {
 	}
 
 	public boolean isValid(int slot, ItemStack stack, Boolean extract) {
+		if(inv.getMaxCountPerStack() < stack.getCount() + inv.getStack(slot).getCount())return false;//Fix issues with mods that limit stacksize
 		if(inv instanceof SidedInventory) {
 			if(!canAccess(slot))return false;
 			SidedInventory si = (SidedInventory) inv;

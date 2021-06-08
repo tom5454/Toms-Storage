@@ -53,13 +53,16 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 			Supplier<Random> randomSupplier, RenderContext context) {
 		BlockEntity tile = blockView.getBlockEntity(pos);
 		if(tile instanceof TileEntityPainted) {
-			BlockState st = ((TileEntityPainted)tile).getPaintedBlockState();
-			BakedModel model = MinecraftClient.getInstance().getBlockRenderManager().getModel(st);
-			if(model instanceof FabricBakedModel)
-				((FabricBakedModel)model).emitBlockQuads(blockView, st, pos, randomSupplier, context);
-			else
-				context.fallbackConsumer().accept(model);
-			return;
+			try {
+				BlockState st = ((TileEntityPainted)tile).getPaintedBlockState();
+				BakedModel model = MinecraftClient.getInstance().getBlockRenderManager().getModel(st);
+				if(model instanceof FabricBakedModel)
+					((FabricBakedModel)model).emitBlockQuads(blockView, st, pos, randomSupplier, context);
+				else
+					context.fallbackConsumer().accept(model);
+				return;
+			} catch (Exception e) {
+			}
 		}
 
 		QuadEmitter emitter = context.getEmitter();

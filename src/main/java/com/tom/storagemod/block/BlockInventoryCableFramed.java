@@ -8,7 +8,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
@@ -32,7 +31,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityPainted;
 
-public class BlockInventoryCableFramed extends BlockWithEntity implements IInventoryCable, IPaintable {
+public class BlockInventoryCableFramed extends Block implements IInventoryCable, IPaintable {
 	public static final BooleanProperty UP = Properties.UP;
 	public static final BooleanProperty DOWN = Properties.DOWN;
 	public static final BooleanProperty NORTH = Properties.NORTH;
@@ -137,11 +136,6 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 		if(te != null && te instanceof TileEntityPainted)
 			return ((TileEntityPainted)te).setPaintedBlockState(to);
 		return false;
-	}
-
-	@Override
-	public BlockEntity createBlockEntity(BlockView worldIn) {
-		return new TileEntityPainted();
 	}
 
 	@Override
