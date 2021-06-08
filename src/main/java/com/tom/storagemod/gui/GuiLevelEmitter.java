@@ -58,11 +58,10 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 
 	@Override
 	protected void init() {
-		children.clear();
-		buttons.clear();
+		clearChildren();
 		amountBtns.clear();
 		super.init();
-		textF = new TextFieldWidget(textRenderer, field_2776 + 70, field_2800 + 41, 89, textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.level_emitter_amount"));
+		textF = new TextFieldWidget(textRenderer, x + 70, y + 41, 89, textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.level_emitter_amount"));
 		textF.setMaxLength(100);
 		textF.setDrawsBackground(false);
 		textF.setVisible(true);
@@ -78,13 +77,13 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 			} catch (NumberFormatException e) {
 			}
 		});
-		addButton(textF);
-		lessThanBtn = new GuiButton(field_2776 - 18, field_2800 + 5, 0, b -> {
+		addSelectableChild(textF);
+		lessThanBtn = new GuiButton(width - 18, height + 5, 0, b -> {
 			lt = !lt;
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
 		});
-		addButton(lessThanBtn);
+		addSelectableChild(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));
 		amountBtns.add(new AmountBtn( 75, 0,  100, 32, 30));
@@ -148,8 +147,8 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		private ButtonWidget btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new ButtonWidget(GuiLevelEmitter.this.field_2776 + x, GuiLevelEmitter.this.field_2800 + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
-			addButton(btn);
+			btn = new ButtonWidget(GuiLevelEmitter.this.width + x, GuiLevelEmitter.this.height + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
+			addSelectableChild(btn);
 			this.v = v;
 			this.sv = sv;
 		}

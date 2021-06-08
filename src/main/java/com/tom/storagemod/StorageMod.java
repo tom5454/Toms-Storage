@@ -51,11 +51,9 @@ import com.tom.storagemod.tile.TileEntityOpenCrate;
 import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
-import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 
-// The value here should match an entry in the META-INF/mods.toml file
-//@Mod(StorageMod.modid)
 public class StorageMod implements ModInitializer {
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -189,7 +187,7 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(levelEmitter);
 
 		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_C2S, (s, p, h, buf, rp) -> {
-			NbtCompound tag = buf.readUnlimitedCompound();
+			NbtCompound tag = buf.readUnlimitedNbt();
 			s.submit(() -> {
 				if(p.currentScreenHandler instanceof IDataReceiver) {
 					((IDataReceiver)p.currentScreenHandler).receive(tag);

@@ -8,12 +8,9 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -32,10 +29,9 @@ import net.minecraft.world.WorldAccess;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
-import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityPainted;
 
-public class BlockInventoryCableFramed extends BlockWithEntity implements IInventoryCable, IPaintable {
+public class BlockInventoryCableFramed extends Block implements IInventoryCable, IPaintable {
 	public static final BooleanProperty UP = Properties.UP;
 	public static final BooleanProperty DOWN = Properties.DOWN;
 	public static final BooleanProperty NORTH = Properties.NORTH;
@@ -140,17 +136,6 @@ public class BlockInventoryCableFramed extends BlockWithEntity implements IInven
 		if(te != null && te instanceof TileEntityPainted)
 			return ((TileEntityPainted)te).setPaintedBlockState(to);
 		return false;
-	}
-
-	@Override
-	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-		return new TileEntityPainted(pos, state);
-	}
-
-	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
-			BlockEntityType<T> type) {
-		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override

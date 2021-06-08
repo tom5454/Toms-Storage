@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -18,6 +19,8 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryProxy;
 import com.tom.storagemod.block.BlockInventoryProxy.DirectionWithNull;
+import com.tom.storagemod.util.IProxy;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityInventoryProxy extends TileEntityPainted implements TickableServer, Inventory, IProxy {
 	private InventoryWrapper pointedAt;
@@ -49,8 +52,9 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 			DirectionWithNull filter = state.get(BlockInventoryProxy.FILTER_FACING);
 			BlockEntity te = world.getBlockEntity(pos.offset(facing));
 			if(te != null && !(te instanceof TileEntityInventoryProxy)) {
-				if(te instanceof Inventory) {
-					pointedAt = new InventoryWrapper((Inventory) te, facing.getOpposite());
+				Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(facing));
+				if(inv != null) {
+					pointedAt = new InventoryWrapper(inv, facing.getOpposite());
 				} else {
 					pointedAt = null;
 				}
@@ -62,8 +66,9 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 			if(filter != DirectionWithNull.NULL) {
 				te = world.getBlockEntity(pos.offset(filter.getDir()));
 				if(te != null && !(te instanceof TileEntityInventoryProxy)) {
-					if(te instanceof Inventory) {
-						this.filter = new InventoryWrapper((Inventory) te, filter.getDir().getOpposite());
+					Inventory inv = TileEntityInventoryConnector.getInventoryAt(world, pos.offset(filter.getDir()));
+					if(inv != null) {
+						this.filter = new InventoryWrapper(inv, filter.getDir().getOpposite());
 						String[] sp = this.filter.toString().split(",");
 						for (String string : sp) {
 							String[] sp2 = string.split("=");

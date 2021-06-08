@@ -48,7 +48,7 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.levelEmitter, RenderLayer.getCutout());
 
 		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
-			NbtCompound tag = buf.readUnlimitedCompound();
+			NbtCompound tag = buf.readUnlimitedNbt();
 			mc.submit(() -> {
 				if(mc.currentScreen instanceof IDataReceiver) {
 					((IDataReceiver)mc.currentScreen).receive(tag);

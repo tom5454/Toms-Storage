@@ -27,7 +27,7 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 	protected void drawBackground(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, gui);
-		drawTexture(st, this.field_2776, this.field_2800, 0, 0, this.backgroundWidth, this.backgroundHeight);
+		drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 
 	@Override

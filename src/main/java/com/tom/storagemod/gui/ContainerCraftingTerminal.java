@@ -15,7 +15,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.InputSlotFiller;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
@@ -157,7 +157,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	public void populateRecipeFinder(RecipeFinder itemHelperIn) {
+	public void populateRecipeFinder(RecipeMatcher itemHelperIn) {
 		this.craftMatrix.provideRecipeInputs(itemHelperIn);
 	}
 
@@ -193,12 +193,12 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 		return 10;
 	}
 
-	public class TerminalRecipeItemHelper extends RecipeFinder {
+	public class TerminalRecipeItemHelper extends RecipeMatcher {
 		@Override
 		public void clear() {
 			super.clear();
 			itemList.forEach(e -> {
-				addNormalItem(e.getActualStack());
+				addUnenchantedInput(e.getActualStack());
 			});
 		}
 	}
@@ -208,7 +208,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	public void fillInputSlots(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayerEntity p_217056_3_) {
 		(new InputSlotFiller(this) {
 			{
-				recipeFinder = new TerminalRecipeItemHelper();
+				matcher = new TerminalRecipeItemHelper();
 			}
 
 			@Override
@@ -246,7 +246,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			@Override
 			protected void returnInputs(boolean bool) {
 				((TileEntityCraftingTerminal) te).clear();
-				this.craftingScreenHandler.clearCraftingSlots();
+				clearCraftingSlots();
 			}
 		}).fillInputSlots(p_217056_3_, p_217056_2_, p_217056_1_);
 	}
@@ -272,7 +272,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	public boolean method_32339(int id) {
+	public boolean canInsertIntoSlot(int id) {
 		return id > 0 && id < 10;
 	}
 }

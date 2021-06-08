@@ -24,6 +24,9 @@ import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.BlockLevelEmitter;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.gui.ContainerLevelEmitter;
+import com.tom.storagemod.util.EmptyHandler;
+import com.tom.storagemod.util.IItemHandler;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityLevelEmitter extends BlockEntity implements TickableServer, NamedScreenHandlerFactory {
 	private ItemStack filter = ItemStack.EMPTY;

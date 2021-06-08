@@ -6,12 +6,10 @@ import java.util.Stack;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -24,6 +22,8 @@ import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
+import com.tom.storagemod.util.IProxy;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityInventoryCableConnectorBase extends BlockEntity implements TickableServer, Inventory, IProxy {
 	protected TileEntityInventoryConnector master;
@@ -72,17 +72,9 @@ public class TileEntityInventoryCableConnectorBase extends BlockEntity implement
 				}
 			}
 			BlockPos p = pos.offset(facing);
-			BlockEntity te = world.getBlockEntity(p);
-			if(te instanceof Inventory) {
-				Inventory ihr = (Inventory) te;
-				if(te instanceof ChestBlockEntity) {
-					state = world.getBlockState(p);
-					Block block = state.getBlock();
-					if(block instanceof ChestBlock) {
-						ihr = ChestBlock.getInventory((ChestBlock)block, state, world, p, true);
-					}
-				}
-				pointedAt = new InventoryWrapper(ihr, facing.getOpposite());
+			Inventory inv = HopperBlockEntity.getInventoryAt(world, p);
+			if(inv != null) {
+				pointedAt = new InventoryWrapper(inv, facing.getOpposite());
 			} else {
 				pointedAt = null;
 			}

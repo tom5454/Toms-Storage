@@ -28,6 +28,9 @@ import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.util.IItemHandler;
+import com.tom.storagemod.util.InvWrapper;
+import com.tom.storagemod.util.ItemHandlerHelper;
 
 public class TileEntityStorageTerminal extends BlockEntity implements NamedScreenHandlerFactory, TickableServer {
 	private IItemHandler itemHandler;

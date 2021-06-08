@@ -70,8 +70,9 @@
 	
 	"chat.toms_storage.inventory_connector.free_slots": "Inventory Connector: %d free/%d slots.",
 	
-	"tomsstorage.config.inventory_connector_range": "Inventory Connector Range",
-	"tomsstorage.config.only_trims_connect": "Only Allow Trims to Connect Inventories",
-	"tomsstorage.config.inv_cable_connector_max_scan": "Inventory Cable Connector Maximum number of cables",
-	"tomsstorage.config.wireless_reach": "Wireless terminal reach"
+	"text.autoconfig.toms_storage.title": "Tom's Simple Storage Configuration",
+	"text.autoconfig.toms_storage.option.invRange": "Inventory Connector Range",
+	"text.autoconfig.toms_storage.option.onlyTrims": "Only Allow Trims to Connect Inventories",
+	"text.autoconfig.toms_storage.option.invConnectorMaxCables": "Inventory Cable Connector Maximum number of cables",
+	"text.autoconfig.toms_storage.option.wirelessRange": "Wireless terminal reach"
 }

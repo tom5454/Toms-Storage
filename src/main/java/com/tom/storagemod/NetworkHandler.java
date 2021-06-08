@@ -20,13 +20,13 @@ public class NetworkHandler {
 
 	public static void sendToServer(NbtCompound tag) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeCompound(tag);
+		buf.writeNbt(tag);
 		ClientPlayNetworking.send(DATA_C2S, buf);
 	}
 
 	public static void sendTo(PlayerEntity player, NbtCompound tag) {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeCompound(tag);
+		buf.writeNbt(tag);
 		ServerPlayNetworking.send((ServerPlayerEntity) player, DATA_S2C, buf);
 	}
 }

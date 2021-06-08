@@ -16,6 +16,8 @@ import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.ContainerFiltered;
+import com.tom.storagemod.util.FilteredInventoryWrapper;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements NamedScreenHandlerFactory {
 	private SimpleInventory filter = new SimpleInventory(9);
@@ -38,14 +40,14 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 
 	@Override
 	public NbtCompound writeNbt(NbtCompound tag) {
-		tag.put("filter", filter.getTags());
+		tag.put("filter", filter.toNbtList());
 		return super.writeNbt(tag);
 	}
 
 	@Override
 	public void readNbt(NbtCompound tag) {
 		super.readNbt(tag);
-		filter.readTags(tag.getList("filter", 10));
+		filter.readNbtList(tag.getList("filter", 10));
 	}
 
 	@Override

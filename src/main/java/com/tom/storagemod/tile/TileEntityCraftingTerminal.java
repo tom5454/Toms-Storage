@@ -127,7 +127,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 
 	public void craft(PlayerEntity thePlayer) {
 		if(currentRecipe != null) {
-			DefaultedList<ItemStack> remainder = currentRecipe.getRemainingStacks(craftMatrix);
+			DefaultedList<ItemStack> remainder = currentRecipe.getRemainder(craftMatrix);
 			boolean playerInvUpdate = false;
 			for (int i = 0; i < craftMatrix.size(); i++) {
 				ItemStack slot = craftMatrix.getStack(i);

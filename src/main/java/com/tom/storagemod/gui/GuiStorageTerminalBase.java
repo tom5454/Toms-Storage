@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -44,6 +45,7 @@ import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
+import com.tom.storagemod.rei.REIPlugin;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends HandledScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
@@ -88,7 +90,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		searchType = (s & 0b111_00_0_00) >> 5;
 		searchField.setFocusUnlocked((searchType & 1) == 0);
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
-			searchField.setFocused(true);
+			searchField.setTextFieldFocused(true);
 		}
 		buttonSortingType.state = type;
 		buttonDirection.state = rev ? 1 : 0;
@@ -121,30 +123,29 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	@Override
 	protected void init() {
-		children.clear();
-		buttons.clear();
+		clearChildren();
 		playerInventoryTitleY = backgroundHeight - 92;
 		super.init();
-		this.searchField = new TextFieldWidget(textRenderer, this.field_2776 + 82, this.field_2800 + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
+		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
 		this.searchField.setText(searchLast);
 		this.searchField.setMaxLength(100);
 		this.searchField.setDrawsBackground(false);
 		this.searchField.setVisible(true);
 		this.searchField.setEditableColor(16777215);
-		buttons.add(searchField);
-		buttonSortingType = addButton(new GuiButton(field_2776 - 18, field_2800 + 5, 0, b -> {
+		addDrawableChild(searchField);
+		buttonSortingType = addDrawableChild(new GuiButton(x - 18, y + 5, 0, b -> {
 			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());
 			buttonSortingType.state = comparator.type();
 			sendUpdate();
 			refreshItemList = true;
 		}));
-		buttonDirection = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18, 1, b -> {
+		buttonDirection = addDrawableChild(new GuiButton(x - 18, y + 5 + 18, 1, b -> {
 			comparator.setReversed(!comparator.isReversed());
 			buttonDirection.state = comparator.isReversed() ? 1 : 0;
 			sendUpdate();
 			refreshItemList = true;
 		}));
-		buttonSearchType = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18*2, 2, b -> {
+		buttonSearchType = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*2, 2, b -> {
 			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);//ModList.get().isLoaded("jei") ||
 			buttonSearchType.state = searchType;
 			sendUpdate();
@@ -166,7 +167,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			}
 		});
-		buttonCtrlMode = addButton(new GuiButton(field_2776 - 18, field_2800 + 5 + 18*3, 3, b -> {
+		buttonCtrlMode = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*3, 3, b -> {
 			controllMode = (controllMode + 1) % ControllMode.VALUES.length;
 			buttonCtrlMode.state = controllMode;
 			sendUpdate();
@@ -223,8 +224,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				getScreenHandler().scrollTo(0);
 				this.currentScroll = 0;
 				if ((searchType & 4) > 0) {
-					/*if(FabricLoader.getInstance().isModLoaded("rei"))
-						REIPlugin.setReiSearchText(searchString);*/
+					if(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
+						REIPlugin.setReiSearchText(searchString);
 				}
 				if ((searchType & 2) > 0) {
 					NbtCompound nbt = new NbtCompound();
@@ -257,8 +258,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
 		boolean flag = GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
-		int i = this.field_2776;
-		int j = this.field_2800;
+		int i = this.x;
+		int j = this.y;
 		int k = i + 174;
 		int l = j + 18;
 		int i1 = k + 14;
@@ -354,7 +355,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		} else if (GLFW.glfwGetKey(mc.getWindow().getHandle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
 			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
 		} else {
-			if (mouseButton == 1 && isPointWithinBounds(searchField.x - field_2776, searchField.y - field_2800, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
+			if (mouseButton == 1 && isPointWithinBounds(searchField.x - x, searchField.y - y, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
 				searchField.setText("");
 			else if(this.searchField.mouseClicked(mouseX, mouseY, mouseButton))return true;
 			else
@@ -504,7 +505,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, getGui());
-		drawTexture(st, this.field_2776, this.field_2800, 0, 0, this.backgroundWidth, this.backgroundHeight);
+		drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 
 	public class GuiButton extends ButtonWidget {
@@ -542,11 +543,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	protected void onUpdateSearch(String text) {}
 
 	public int getGuiLeft() {
-		return field_2776;
+		return x;
 	}
 
 	public int getGuiTop() {
-		return field_2800;
+		return y;
 	}
 
 	@Override

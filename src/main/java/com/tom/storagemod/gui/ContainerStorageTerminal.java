@@ -22,7 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeFinder;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -511,7 +511,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	}
 
 	@Override
-	public void populateRecipeFinder(RecipeFinder paramRecipeFinder) {
+	public void populateRecipeFinder(RecipeMatcher paramRecipeFinder) {
 	}
 
 	@Override
@@ -555,7 +555,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	}
 
 	@Override
-	public boolean method_32339(int paramInt) {
+	public boolean canInsertIntoSlot(int index) {
 		return false;
 	}
 }

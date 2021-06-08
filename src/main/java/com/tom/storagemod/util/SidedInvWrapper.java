@@ -1,4 +1,4 @@
-package com.tom.storagemod.tile;
+package com.tom.storagemod.util;
 
 import java.util.Objects;
 

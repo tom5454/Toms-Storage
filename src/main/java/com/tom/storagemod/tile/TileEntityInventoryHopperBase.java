@@ -7,6 +7,7 @@ import java.util.Stack;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -15,6 +16,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
+import com.tom.storagemod.util.InventoryWrapper;
 
 public abstract class TileEntityInventoryHopperBase extends BlockEntity implements TickableServer {
 	protected boolean topNet, bottomNet;
@@ -61,9 +63,9 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 				}
 			} else {
 				topNet = false;
-				BlockEntity te = world.getBlockEntity(up);
-				if(te instanceof Inventory) {
-					top = new InventoryWrapper((Inventory) te, facing);
+				Inventory inv = HopperBlockEntity.getInventoryAt(world, up);
+				if(inv != null) {
+					top = new InventoryWrapper(inv, facing);
 				} else {
 					top = null;
 				}
@@ -95,9 +97,9 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 				}
 			} else {
 				bottomNet = false;
-				BlockEntity te = world.getBlockEntity(down);
-				if(te instanceof Inventory) {
-					bottom = new InventoryWrapper((Inventory) te, facing.getOpposite());
+				Inventory inv = HopperBlockEntity.getInventoryAt(world, down);
+				if(inv != null) {
+					bottom = new InventoryWrapper(inv, facing.getOpposite());
 				} else {
 					bottom = null;
 				}

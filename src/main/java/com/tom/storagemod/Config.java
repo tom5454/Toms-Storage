@@ -1,8 +1,8 @@
 package com.tom.storagemod;
 
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
+import me.shedaniel.autoconfig.ConfigData;
 
-@me.sargunvohra.mcmods.autoconfig1u.annotation.Config(name = "toms_storage")
+@me.shedaniel.autoconfig.annotation.Config(name = "toms_storage")
 public class Config implements ConfigData {
 	public boolean onlyTrims = false;
 	public int invRange = 16;
