@@ -15,6 +15,7 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.enums.ChestType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -87,7 +88,24 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 							} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
 								Inventory ihr = null;
 								Inventory inv = getInventoryAt(world, p);
-								if(inv != null) {
+								if(te instanceof ChestBlockEntity) {//Check for double chests
+									Block block = state.getBlock();
+									if(block instanceof ChestBlock) {
+										ihr = ChestBlock.getInventory((ChestBlock)block, state, world, p, true);
+										ChestType type = state.get(ChestBlock.CHEST_TYPE);
+										if (type != ChestType.SINGLE) {
+											BlockPos opos = p.offset(ChestBlock.getFacing(state));
+											BlockState ostate = this.getWorld().getBlockState(opos);
+											if (state.getBlock() == ostate.getBlock()) {
+												ChestType otype = ostate.get(ChestBlock.CHEST_TYPE);
+												if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
+													toCheck.add(opos);
+													checkedBlocks.add(opos);
+												}
+											}
+										}
+									}
+								} else if(inv != null) {
 									ihr = IProxy.resolve(inv);
 									if(ihr instanceof TileEntityInventoryConnector) {
 										TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;

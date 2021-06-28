@@ -10,7 +10,7 @@ public class FilteredInventoryWrapper extends InventoryWrapper {
 	private Inventory filter;
 	private InventoryWrapper inv;
 	public FilteredInventoryWrapper(InventoryWrapper inv, Inventory filter) {
-		super(null, null);
+		super();
 		this.inv = inv;
 		this.filter = filter;
 	}

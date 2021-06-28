@@ -4,19 +4,26 @@ import java.util.Set;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Direction;
 
 public class InventoryWrapper {
-	public static final InventoryWrapper INSTANCE = null;
-	private Inventory inv;
-	private Direction dir;
+	private static final SimpleInventory DUMMY = new SimpleInventory(0);
+	private final Inventory inv;
+	private final Direction dir;
 
 	public InventoryWrapper(Inventory inv, Direction dir) {
+		if(inv == null)throw new NullPointerException("inv is null");
 		this.inv = inv;
 		this.dir = dir;
+	}
+
+	protected InventoryWrapper() {
+		this.inv = DUMMY;
+		this.dir = Direction.DOWN;
 	}
 
 	public IItemHandler wrap() {
