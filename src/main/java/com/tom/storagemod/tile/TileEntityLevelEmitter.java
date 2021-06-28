@@ -8,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
@@ -70,13 +69,6 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 						}
 						if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
 					}
-				}
-			} else {
-				BlockEntity te = world.getBlockEntity(up);
-				if(te instanceof Inventory) {
-					top = new InventoryWrapper((Inventory) te, facing);
-				} else {
-					top = null;
 				}
 			}
 		}
