@@ -67,7 +67,7 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 			StoredItemStack ret = null;
 			for (int i = 0; i < itemHandler.getSlots(); i++) {
 				ItemStack s = itemHandler.getStackInSlot(i);
-				if(ItemStack.areItemsEqual(s, st) && ItemStack.areItemStackTagsEqual(s, st)) {
+				if(ItemStack.isSame(s, st) && ItemStack.tagMatches(s, st)) {
 					ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
 					if(!pulled.isEmpty()) {
 						if(ret == null)ret = new StoredItemStack(pulled);
@@ -102,19 +102,19 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 		if(st.isEmpty())return;
 		StoredItemStack st0 = pushStack(new StoredItemStack(st));
 		if(st0 != null) {
-			InventoryHelper.spawnItemStack(world, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, st0.getActualStack());
+			InventoryHelper.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, st0.getActualStack());
 		}
 	}
 
 	@Override
 	public void tick() {
-		if(!world.isRemote && updateItems) {
-			BlockState st = world.getBlockState(pos);
-			Direction d = st.get(StorageTerminalBase.FACING);
-			TerminalPos p = st.get(StorageTerminalBase.TERMINAL_POS);
+		if(!level.isClientSide && updateItems) {
+			BlockState st = level.getBlockState(worldPosition);
+			Direction d = st.getValue(StorageTerminalBase.FACING);
+			TerminalPos p = st.getValue(StorageTerminalBase.TERMINAL_POS);
 			if(p == TerminalPos.UP)d = Direction.UP;
 			if(p == TerminalPos.DOWN)d = Direction.DOWN;
-			TileEntity invTile = world.getTileEntity(pos.offset(d));
+			TileEntity invTile = level.getBlockEntity(worldPosition.relative(d));
 			items.clear();
 			if(invTile != null) {
 				LazyOptional<IItemHandler> lih = invTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
@@ -129,9 +129,9 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 	}
 
 	public boolean canInteractWith(PlayerEntity player) {
-		if(world.getTileEntity(pos) != this)return false;
+		if(level.getBlockEntity(worldPosition) != this)return false;
 		double dist = ItemWirelessTerminal.isPlayerHolding(player) ? Config.wirelessRange*2*Config.wirelessRange*2 : 64;
-		return !(player.getDistanceSq(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > dist);
+		return !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > dist);
 	}
 
 	public int getSorting() {
@@ -143,15 +143,15 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundNBT save(CompoundNBT compound) {
 		compound.putInt("sort", sort);
-		return super.write(compound);
+		return super.save(compound);
 	}
 
 	@Override
-	public void read(BlockState st, CompoundNBT compound) {
+	public void load(BlockState st, CompoundNBT compound) {
 		sort = compound.getInt("sort");
-		super.read(st, compound);
+		super.load(st, compound);
 	}
 
 	public String getLastSearch() {

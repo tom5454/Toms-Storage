@@ -131,7 +131,7 @@ public class StorageMod {
 
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public ItemStack createIcon() {
+		public ItemStack makeIcon() {
 			return new ItemStack(terminal);
 		}
 	};
@@ -181,10 +181,10 @@ public class StorageMod {
 			registerItemForBlock(itemRegistryEvent, inventoryTrim);
 			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(paintedTrim));
 			registerItemForBlock(itemRegistryEvent, invCable);
-			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invCableFramed, new Item.Properties().group(STORAGE_MOD_TAB)));
+			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invCableFramed, new Item.Properties().tab(STORAGE_MOD_TAB)));
 			registerItemForBlock(itemRegistryEvent, invCableConnector);
 			registerItemForBlock(itemRegistryEvent, invCableConnectorFiltered);
-			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invProxy, new Item.Properties().group(STORAGE_MOD_TAB)));
+			itemRegistryEvent.getRegistry().register(new ItemBlockPainted(invProxy, new Item.Properties().tab(STORAGE_MOD_TAB)));
 			registerItemForBlock(itemRegistryEvent, craftingTerminal);
 			registerItemForBlock(itemRegistryEvent, invHopperBasic);
 			registerItemForBlock(itemRegistryEvent, levelEmitter);
@@ -194,30 +194,30 @@ public class StorageMod {
 		}
 
 		private static void registerItemForBlock(RegistryEvent.Register<Item> itemRegistryEvent, Block block) {
-			itemRegistryEvent.getRegistry().register(new BlockItem(block, new Item.Properties().group(STORAGE_MOD_TAB)).setRegistryName(block.getRegistryName()));
+			itemRegistryEvent.getRegistry().register(new BlockItem(block, new Item.Properties().tab(STORAGE_MOD_TAB)).setRegistryName(block.getRegistryName()));
 		}
 
 		@SubscribeEvent
 		public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> tileRegistryEvent) {
-			connectorTile = TileEntityType.Builder.create(TileEntityInventoryConnector::new, connector).build(null);
+			connectorTile = TileEntityType.Builder.of(TileEntityInventoryConnector::new, connector).build(null);
 			connectorTile.setRegistryName("ts.inventory_connector.tile");
-			terminalTile = TileEntityType.Builder.create(TileEntityStorageTerminal::new, terminal).build(null);
+			terminalTile = TileEntityType.Builder.of(TileEntityStorageTerminal::new, terminal).build(null);
 			terminalTile.setRegistryName("ts.storage_terminal.tile");
-			openCrateTile = TileEntityType.Builder.create(TileEntityOpenCrate::new, openCrate).build(null);
+			openCrateTile = TileEntityType.Builder.of(TileEntityOpenCrate::new, openCrate).build(null);
 			openCrateTile.setRegistryName("ts.open_crate.tile");
-			paintedTile = TileEntityType.Builder.create(TileEntityPainted::new, paintedTrim, invCableFramed).build(null);
+			paintedTile = TileEntityType.Builder.of(TileEntityPainted::new, paintedTrim, invCableFramed).build(null);
 			paintedTile.setRegistryName("ts.painted.tile");
-			invCableConnectorTile = TileEntityType.Builder.create(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
+			invCableConnectorTile = TileEntityType.Builder.of(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
 			invCableConnectorTile.setRegistryName("ts.inventory_cable_connector.tile");
-			invCableConnectorFilteredTile = TileEntityType.Builder.create(TileEntityInventoryCableConnectorFiltered::new, invCableConnectorFiltered).build(null);
+			invCableConnectorFilteredTile = TileEntityType.Builder.of(TileEntityInventoryCableConnectorFiltered::new, invCableConnectorFiltered).build(null);
 			invCableConnectorFilteredTile.setRegistryName("ts.inventory_cable_connector_filtered.tile");
-			invProxyTile = TileEntityType.Builder.create(TileEntityInventoryProxy::new, invProxy).build(null);
+			invProxyTile = TileEntityType.Builder.of(TileEntityInventoryProxy::new, invProxy).build(null);
 			invProxyTile.setRegistryName("ts.inventory_proxy.tile");
-			craftingTerminalTile = TileEntityType.Builder.create(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
+			craftingTerminalTile = TileEntityType.Builder.of(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
 			craftingTerminalTile.setRegistryName("ts.crafting_terminal.tile");
-			invHopperBasicTile = TileEntityType.Builder.create(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
+			invHopperBasicTile = TileEntityType.Builder.of(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
 			invHopperBasicTile.setRegistryName("ts.inventoty_hopper_basic.tile");
-			levelEmitterTile = TileEntityType.Builder.create(TileEntityLevelEmitter::new, levelEmitter).build(null);
+			levelEmitterTile = TileEntityType.Builder.of(TileEntityLevelEmitter::new, levelEmitter).build(null);
 			levelEmitterTile.setRegistryName("ts.level_emitter.tile");
 			tileRegistryEvent.getRegistry().register(connectorTile);
 			tileRegistryEvent.getRegistry().register(terminalTile);

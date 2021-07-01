@@ -45,41 +45,41 @@ public class BlockLevelEmitter extends ContainerBlock implements IInventoryCable
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
 	public BlockLevelEmitter() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).notSolid().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion().harvestTool(ToolType.AXE));
 		setRegistryName("ts.level_emitter");
-		setDefaultState(getDefaultState()
-				.with(FACING, Direction.DOWN).with(POWERED, Boolean.valueOf(false)));
+		registerDefaultState(defaultBlockState()
+				.setValue(FACING, Direction.DOWN).setValue(POWERED, Boolean.valueOf(false)));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("level_emitter", tooltip);
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityLevelEmitter();
 	}
 
 	@Override
-	public boolean canProvidePower(BlockState state) {
+	public boolean isSignalSource(BlockState state) {
 		return true;
 	}
 
 	@Override
-	public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-		if (!blockState.get(POWERED)) {
+	public int getDirectSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+		if (!blockState.getValue(POWERED)) {
 			return 0;
 		} else {
-			return blockState.get(FACING).getOpposite() == side ? 15 : 0;
+			return blockState.getValue(FACING).getOpposite() == side ? 15 : 0;
 		}
 	}
 
 	@Override
-	public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-		if (!blockState.get(POWERED)) {
+	public int getSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+		if (!blockState.getValue(POWERED)) {
 			return 0;
 		} else {
 			return 15;
@@ -88,31 +88,31 @@ public class BlockLevelEmitter extends ContainerBlock implements IInventoryCable
 
 	@Override
 	public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-		return state.get(FACING) != side;
+		return state.getValue(FACING) != side;
 	}
 
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return getDefaultState().with(FACING, context.getFace());
+		return defaultBlockState().setValue(FACING, context.getClickedFace());
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(FACING, POWERED);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
@@ -123,57 +123,57 @@ public class BlockLevelEmitter extends ContainerBlock implements IInventoryCable
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING).getOpposite() == dir;
+		return state.getValue(FACING).getOpposite() == dir;
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(FACING)) {
+		switch (state.getValue(FACING)) {
 		case DOWN:
-			return VoxelShapes.or(makeCuboidShape(5, 0, 5, 11, 6, 11), makeCuboidShape(3, 6, 3, 13, 16, 13));
+			return VoxelShapes.or(box(5, 0, 5, 11, 6, 11), box(3, 6, 3, 13, 16, 13));
 		case EAST:
-			return VoxelShapes.or(makeCuboidShape(10, 5, 5, 16, 11, 11), makeCuboidShape(0, 3, 3, 10, 13, 13));
+			return VoxelShapes.or(box(10, 5, 5, 16, 11, 11), box(0, 3, 3, 10, 13, 13));
 		case NORTH:
-			return VoxelShapes.or(makeCuboidShape(5, 5, 0, 11, 11, 6), makeCuboidShape(3, 3, 6, 13, 13, 16));
+			return VoxelShapes.or(box(5, 5, 0, 11, 11, 6), box(3, 3, 6, 13, 13, 16));
 		case SOUTH:
-			return VoxelShapes.or(makeCuboidShape(5, 5, 10, 11, 11, 16), makeCuboidShape(3, 3, 0, 13, 13, 10));
+			return VoxelShapes.or(box(5, 5, 10, 11, 11, 16), box(3, 3, 0, 13, 13, 10));
 		case UP:
-			return VoxelShapes.or(makeCuboidShape(5, 10, 5, 11, 16, 11), makeCuboidShape(3, 0, 3, 13, 10, 13));
+			return VoxelShapes.or(box(5, 10, 5, 11, 16, 11), box(3, 0, 3, 13, 10, 13));
 		case WEST:
-			return VoxelShapes.or(makeCuboidShape(0, 5, 5, 6, 11, 11), makeCuboidShape(6, 3, 3, 16, 13, 13));
+			return VoxelShapes.or(box(0, 5, 5, 6, 11, 11), box(6, 3, 3, 16, 13, 13));
 		default:
 			break;
 		}
-		return VoxelShapes.fullCube();
+		return VoxelShapes.block();
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		if (stateIn.get(POWERED)) {
-			Direction direction = stateIn.get(FACING).getOpposite();
+		if (stateIn.getValue(POWERED)) {
+			Direction direction = stateIn.getValue(FACING).getOpposite();
 			double d0 = pos.getX() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
 			double d1 = pos.getY() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
 			double d2 = pos.getZ() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
 			float f = -7.0F;
 
 			f = f / 16.0F;
-			double d3 = f * direction.getXOffset();
-			double d4 = f * direction.getZOffset();
-			worldIn.addParticle(RedstoneParticleData.REDSTONE_DUST, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D);
+			double d3 = f * direction.getStepX();
+			double d4 = f * direction.getStepZ();
+			worldIn.addParticle(RedstoneParticleData.REDSTONE, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D);
 		}
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos,
+	public ActionResultType use(BlockState state, World world, BlockPos pos,
 			PlayerEntity player, Hand hand, BlockRayTraceResult rtr) {
-		if (world.isRemote) {
+		if (world.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 
-		TileEntity blockEntity_1 = world.getTileEntity(pos);
+		TileEntity blockEntity_1 = world.getBlockEntity(pos);
 		if (blockEntity_1 instanceof TileEntityLevelEmitter) {
-			player.openContainer((TileEntityLevelEmitter)blockEntity_1);
+			player.openMenu((TileEntityLevelEmitter)blockEntity_1);
 		}
 		return ActionResultType.SUCCESS;
 	}

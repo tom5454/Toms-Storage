@@ -21,13 +21,13 @@ public class ItemBlockPainted extends BlockItem {
 	}
 
 	@Override
-	public ITextComponent getDisplayName(ItemStack is) {
-		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
+	public ITextComponent getName(ItemStack is) {
+		IFormattableTextComponent tc = (IFormattableTextComponent) super.getName(is);
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
-			tc.appendString(" (");
-			tc.append(st.getBlock().getTranslatedName().mergeStyle(TextFormatting.GREEN));
-			tc.appendString(")");
+			tc.append(" (");
+			tc.append(st.getBlock().getName().withStyle(TextFormatting.GREEN));
+			tc.append(")");
 		}
 		return tc;
 	}

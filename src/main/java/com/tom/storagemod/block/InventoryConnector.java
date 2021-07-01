@@ -31,23 +31,23 @@ import com.tom.storagemod.tile.TileEntityInventoryConnector;
 public class InventoryConnector extends ContainerBlock implements IInventoryCable {
 
 	public InventoryConnector() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_connector");
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityInventoryConnector();
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_connector", tooltip);
 	}
@@ -58,13 +58,13 @@ public class InventoryConnector extends ContainerBlock implements IInventoryCabl
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
 			Hand handIn, BlockRayTraceResult hit) {
-		if(!worldIn.isRemote) {
-			TileEntity tile = worldIn.getTileEntity(pos);
+		if(!worldIn.isClientSide) {
+			TileEntity tile = worldIn.getBlockEntity(pos);
 			if(tile instanceof TileEntityInventoryConnector) {
 				TileEntityInventoryConnector te = (TileEntityInventoryConnector) tile;
-				player.sendStatusMessage(new TranslationTextComponent("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.getInvSize()), true);
+				player.displayClientMessage(new TranslationTextComponent("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.getInvSize()), true);
 			}
 		}
 		return ActionResultType.SUCCESS;

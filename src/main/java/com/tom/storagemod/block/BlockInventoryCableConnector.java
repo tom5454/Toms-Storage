@@ -49,92 +49,92 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 	protected VoxelShape[][] shapes;
 
 	public BlockInventoryCableConnector() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).notSolid().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion().harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable_connector");
 		this.shapes = this.makeShapes(0.125f);
-		setDefaultState(getDefaultState()
-				.with(DOWN, false)
-				.with(UP, false)
-				.with(NORTH, false)
-				.with(EAST, false)
-				.with(SOUTH, false)
-				.with(WEST, false)
-				.with(FACING, Direction.DOWN));
+		registerDefaultState(defaultBlockState()
+				.setValue(DOWN, false)
+				.setValue(UP, false)
+				.setValue(NORTH, false)
+				.setValue(EAST, false)
+				.setValue(SOUTH, false)
+				.setValue(WEST, false)
+				.setValue(FACING, Direction.DOWN));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityInventoryCableConnector();
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, FACING);//COLOR
 	}
 
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		Direction f = stateIn.get(FACING);
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		Direction f = stateIn.getValue(FACING);
 		if(facing == f)
-			return stateIn.with(SixWayBlock.FACING_TO_PROPERTY_MAP.get(facing), !facingState.isAir(worldIn, facingPos));
+			return stateIn.setValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(facing), !facingState.isAir(worldIn, facingPos));
 		else
-			return stateIn.with(SixWayBlock.FACING_TO_PROPERTY_MAP.get(facing), IInventoryCable.canConnect(facingState, facing));
+			return stateIn.setValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return withConnectionProperties(getDefaultState().with(FACING, context.getFace().getOpposite()), context.getWorld(), context.getPos())
+		return withConnectionProperties(defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite()), context.getLevel(), context.getClickedPos())
 				//with(COLOR, context.getItem().hasTag() ? DyeColor.byId(context.getItem().getTag().getInt("color")) : DyeColor.WHITE).
 				;
 	}
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING) != dir;
+		return state.getValue(FACING) != dir;
 	}
 
 	@Override
 	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
-		Direction f = state.get(FACING);
+		Direction f = state.getValue(FACING);
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			if(d != f && state.get(BlockInventoryCable.DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.offset(d));
+			if(d != f && state.getValue(BlockInventoryCable.DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.relative(d));
 		}
 		return next;
 	}
 
 	public BlockState withConnectionProperties(BlockState state, IWorld blockView_1, BlockPos blockPos_1) {
-		BlockState block_1 = blockView_1.getBlockState(blockPos_1.down());
-		BlockState block_2 = blockView_1.getBlockState(blockPos_1.up());
+		BlockState block_1 = blockView_1.getBlockState(blockPos_1.below());
+		BlockState block_2 = blockView_1.getBlockState(blockPos_1.above());
 		BlockState block_3 = blockView_1.getBlockState(blockPos_1.north());
 		BlockState block_4 = blockView_1.getBlockState(blockPos_1.east());
 		BlockState block_5 = blockView_1.getBlockState(blockPos_1.south());
 		BlockState block_6 = blockView_1.getBlockState(blockPos_1.west());
 
 		return state
-				.with(DOWN, canConnect(state, block_1, Direction.DOWN))
-				.with(UP, canConnect(state, block_2, Direction.UP))
-				.with(NORTH, canConnect(state, block_3, Direction.NORTH))
-				.with(EAST, canConnect(state, block_4, Direction.EAST))
-				.with(SOUTH, canConnect(state, block_5, Direction.SOUTH))
-				.with(WEST, canConnect(state, block_6, Direction.WEST));
+				.setValue(DOWN, canConnect(state, block_1, Direction.DOWN))
+				.setValue(UP, canConnect(state, block_2, Direction.UP))
+				.setValue(NORTH, canConnect(state, block_3, Direction.NORTH))
+				.setValue(EAST, canConnect(state, block_4, Direction.EAST))
+				.setValue(SOUTH, canConnect(state, block_5, Direction.SOUTH))
+				.setValue(WEST, canConnect(state, block_6, Direction.WEST));
 	}
 
 	@SuppressWarnings("deprecation")
 	private boolean canConnect(BlockState state, BlockState block, Direction dir) {
-		Direction f = state.get(FACING);
+		Direction f = state.getValue(FACING);
 		return (dir != f && IInventoryCable.canConnect(block, dir)) || (dir == f && !block.isAir());
 	}
 
@@ -156,11 +156,11 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {
 		switch (blockRotation_1) {
 		case CLOCKWISE_180:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(EAST, blockState_1.get(WEST)).with(SOUTH, blockState_1.get(NORTH)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(EAST, blockState_1.getValue(WEST)).setValue(SOUTH, blockState_1.getValue(NORTH)).setValue(WEST, blockState_1.getValue(EAST));
 		case CLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(EAST)).with(EAST, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(WEST)).with(WEST, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(EAST)).setValue(EAST, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(NORTH));
 		case COUNTERCLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(WEST)).with(EAST, blockState_1.get(NORTH)).with(SOUTH, blockState_1.get(EAST)).with(WEST, blockState_1.get(SOUTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(WEST)).setValue(EAST, blockState_1.getValue(NORTH)).setValue(SOUTH, blockState_1.getValue(EAST)).setValue(WEST, blockState_1.getValue(SOUTH));
 		default:
 			break;
 		}
@@ -172,9 +172,9 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {
 		case FRONT_BACK:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(NORTH));
 		case LEFT_RIGHT:
-			return blockState_1.with(EAST, blockState_1.get(WEST)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(EAST, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(EAST));
 		default:
 			break;
 		}
@@ -183,14 +183,14 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return this.shapes[state.get(FACING).ordinal()][this.getShapeIndex(state)];
+		return this.shapes[state.getValue(FACING).ordinal()][this.getShapeIndex(state)];
 	}
 
 	protected int getShapeIndex(BlockState state) {
 		int i = 0;
 
 		for(int j = 0; j < FACING_VALUES.length; ++j) {
-			if (state.get(SixWayBlock.FACING_TO_PROPERTY_MAP.get(FACING_VALUES[j]))) {
+			if (state.getValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(FACING_VALUES[j]))) {
 				i |= 1 << j;
 			}
 		}
@@ -200,12 +200,12 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 	private VoxelShape[][] makeShapes(float apothem) {
 		float f = 0.5F - apothem;
 		float f1 = 0.5F + apothem;
-		VoxelShape voxelshape = Block.makeCuboidShape(f * 16.0F, f * 16.0F, f * 16.0F, f1 * 16.0F, f1 * 16.0F, f1 * 16.0F);
+		VoxelShape voxelshape = Block.box(f * 16.0F, f * 16.0F, f * 16.0F, f1 * 16.0F, f1 * 16.0F, f1 * 16.0F);
 		VoxelShape[] avoxelshape = new VoxelShape[FACING_VALUES.length];
 
 		for(int i = 0; i < FACING_VALUES.length; ++i) {
 			Direction direction = FACING_VALUES[i];
-			avoxelshape[i] = VoxelShapes.create(0.5D + Math.min((-apothem), direction.getXOffset() * 0.5D), 0.5D + Math.min((-apothem), direction.getYOffset() * 0.5D), 0.5D + Math.min((-apothem), direction.getZOffset() * 0.5D), 0.5D + Math.max(apothem, direction.getXOffset() * 0.5D), 0.5D + Math.max(apothem, direction.getYOffset() * 0.5D), 0.5D + Math.max(apothem, direction.getZOffset() * 0.5D));
+			avoxelshape[i] = VoxelShapes.box(0.5D + Math.min((-apothem), direction.getStepX() * 0.5D), 0.5D + Math.min((-apothem), direction.getStepY() * 0.5D), 0.5D + Math.min((-apothem), direction.getStepZ() * 0.5D), 0.5D + Math.max(apothem, direction.getStepX() * 0.5D), 0.5D + Math.max(apothem, direction.getStepY() * 0.5D), 0.5D + Math.max(apothem, direction.getStepZ() * 0.5D));
 		}
 
 		VoxelShape[] avoxelshape1 = new VoxelShape[64];
@@ -240,20 +240,20 @@ public class BlockInventoryCableConnector extends ContainerBlock implements IInv
 	private static VoxelShape createShape(Direction dir, float width, float widthoff, float height, float heightoff, float depth, float depthoff) {
 		switch (dir) {
 		case DOWN:
-			return Block.makeCuboidShape(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
+			return Block.box(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
 		case EAST:
-			return Block.makeCuboidShape(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
+			return Block.box(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
 		case NORTH:
-			return Block.makeCuboidShape(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
+			return Block.box(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
 		case SOUTH:
-			return Block.makeCuboidShape(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
+			return Block.box(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
 		case UP:
-			return Block.makeCuboidShape(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
+			return Block.box(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
 		case WEST:
-			return Block.makeCuboidShape(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
+			return Block.box(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
 		default:
 			break;
 		}
-		return Block.makeCuboidShape(0, 0, 0, 16, 16, 16);
+		return Block.box(0, 0, 0, 16, 16, 16);
 	}
 }

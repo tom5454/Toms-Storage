@@ -44,14 +44,14 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 
 	@Override
 	public void tick() {
-		if(!world.isRemote && world.getGameTime() % 20 == 1) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryCableConnector.FACING);
+		if(!level.isClientSide && level.getGameTime() % 20 == 1) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			checkedBlocks.add(pos);
-			BlockPos up = pos.offset(facing.getOpposite());
-			state = world.getBlockState(up);
+			checkedBlocks.add(worldPosition);
+			BlockPos up = worldPosition.relative(facing.getOpposite());
+			state = level.getBlockState(up);
 			if(state.getBlock() instanceof IInventoryCable) {
 				top = null;
 				toCheck.add(up);
@@ -59,17 +59,17 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 					BlockPos cp = toCheck.pop();
 					if(!checkedBlocks.contains(cp)) {
 						checkedBlocks.add(cp);
-						if(world.isBlockLoaded(cp)) {
-							state = world.getBlockState(cp);
+						if(level.hasChunkAt(cp)) {
+							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
-								TileEntity te = world.getTileEntity(cp);
+								TileEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									top = ((TileEntityInventoryConnector) te).getInventory();
 								}
 								break;
 							}
 							if(state.getBlock() instanceof IInventoryCable) {
-								toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+								toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
 							}
 						}
 						if(checkedBlocks.size() > Config.invConnectorMax)break;
@@ -77,23 +77,23 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 				}
 			} else {
 				if(top == null || !top.isPresent()) {
-					TileEntity te = world.getTileEntity(up);
+					TileEntity te = level.getBlockEntity(up);
 					if(te != null) {
 						top = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 					}
 				}
 			}
 		}
-		if(!world.isRemote && world.getGameTime() % 10 == 2 && top != null) {
-			BlockState state = world.getBlockState(pos);
-			boolean p = state.get(BlockLevelEmitter.POWERED);
+		if(!level.isClientSide && level.getGameTime() % 10 == 2 && top != null) {
+			BlockState state = level.getBlockState(worldPosition);
+			boolean p = state.getValue(BlockLevelEmitter.POWERED);
 			boolean currState = false;
 			IItemHandler top = this.top.orElse(EmptyHandler.INSTANCE);
 			if(!filter.isEmpty()) {
 				int counter = 0;
 				for (int i = 0; i < top.getSlots(); i++) {
 					ItemStack inSlot = top.getStackInSlot(i);
-					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areItemStackTagsEqual(inSlot, getFilter())) {
+					if(!ItemStack.isSame(inSlot, getFilter()) || !ItemStack.tagMatches(inSlot, getFilter())) {
 						continue;
 					}
 					counter += inSlot.getCount();
@@ -107,30 +107,30 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 				currState = false;
 			}
 			if(currState != p) {
-				world.setBlockState(pos, state.with(BlockLevelEmitter.POWERED, Boolean.valueOf(currState)), 3);
+				level.setBlock(worldPosition, state.setValue(BlockLevelEmitter.POWERED, Boolean.valueOf(currState)), 3);
 
-				Direction direction = state.get(BlockLevelEmitter.FACING);
-				BlockPos blockpos = pos.offset(direction);
-				if (!ForgeEventFactory.onNeighborNotify(world, pos, world.getBlockState(pos), EnumSet.of(direction), false).isCanceled()) {
-					world.neighborChanged(blockpos, state.getBlock(), pos);
-					world.notifyNeighborsOfStateExcept(blockpos, state.getBlock(), direction.getOpposite());
+				Direction direction = state.getValue(BlockLevelEmitter.FACING);
+				BlockPos blockpos = worldPosition.relative(direction);
+				if (!ForgeEventFactory.onNeighborNotify(level, worldPosition, level.getBlockState(worldPosition), EnumSet.of(direction), false).isCanceled()) {
+					level.neighborChanged(blockpos, state.getBlock(), worldPosition);
+					level.updateNeighborsAtExceptFromFacing(blockpos, state.getBlock(), direction.getOpposite());
 				}
 			}
 		}
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		compound.put("Filter", getFilter().write(new CompoundNBT()));
+	public CompoundNBT save(CompoundNBT compound) {
+		compound.put("Filter", getFilter().save(new CompoundNBT()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
-		return super.write(compound);
+		return super.save(compound);
 	}
 
 	@Override
-	public void read(BlockState stateIn, CompoundNBT nbtIn) {
-		super.read(stateIn, nbtIn);
-		setFilter(ItemStack.read(nbtIn.getCompound("Filter")));
+	public void load(BlockState stateIn, CompoundNBT nbtIn) {
+		super.load(stateIn, nbtIn);
+		setFilter(ItemStack.of(nbtIn.getCompound("Filter")));
 		count = nbtIn.getInt("Count");
 		lessThan = nbtIn.getBoolean("lessThan");
 	}

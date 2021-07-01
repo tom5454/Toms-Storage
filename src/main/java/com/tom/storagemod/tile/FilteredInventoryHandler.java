@@ -49,10 +49,10 @@ public class FilteredInventoryHandler implements IItemHandler {
 	}
 
 	private boolean isInFilter(ItemStack stack) {
-		for(int i = 0;i<filter.getSizeInventory();i++) {
-			ItemStack is = filter.getStackInSlot(i);
+		for(int i = 0;i<filter.getContainerSize();i++) {
+			ItemStack is = filter.getItem(i);
 			if(is.isEmpty())continue;
-			if(ItemStack.areItemsEqual(stack, is))return true;
+			if(ItemStack.isSame(stack, is))return true;
 		}
 		return false;
 	}

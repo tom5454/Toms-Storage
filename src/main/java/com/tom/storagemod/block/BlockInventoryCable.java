@@ -42,86 +42,86 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 	public static final BooleanProperty[] DIR_TO_PROPERTY = new BooleanProperty[] {DOWN, UP, NORTH, SOUTH, WEST, EAST};
 
 	public BlockInventoryCable() {
-		super(0.125f, Block.Properties.create(Material.WOOD).hardnessAndResistance(2).harvestTool(ToolType.AXE));
+		super(0.125f, Block.Properties.of(Material.WOOD).strength(2).harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_cable");
-		setDefaultState(getDefaultState()
-				.with(DOWN, false)
-				.with(UP, false)
-				.with(NORTH, false)
-				.with(EAST, false)
-				.with(SOUTH, false)
-				.with(WEST, false)
-				.with(WATERLOGGED, false));
+		registerDefaultState(defaultBlockState()
+				.setValue(DOWN, false)
+				.setValue(UP, false)
+				.setValue(NORTH, false)
+				.setValue(EAST, false)
+				.setValue(SOUTH, false)
+				.setValue(WEST, false)
+				.setValue(WATERLOGGED, false));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, WATERLOGGED);
 	}
 
 	@Override
 	public FluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (stateIn.get(WATERLOGGED)) {
-			worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 
-		return stateIn.with(SixWayBlock.FACING_TO_PROPERTY_MAP.get(facing), IInventoryCable.canConnect(facingState, facing));
+		return stateIn.setValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		FluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
-		return withConnectionProperties(context.getWorld(), context.getPos()).
-				with(WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER));
+		FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
+		return withConnectionProperties(context.getLevel(), context.getClickedPos()).
+				setValue(WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER));
 	}
 
 	@Override
 	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			if(state.get(DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.offset(d));
+			if(state.getValue(DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.relative(d));
 		}
 		return next;
 	}
 
 	public BlockState withConnectionProperties(IWorld blockView_1, BlockPos blockPos_1) {
-		BlockState block_1 = blockView_1.getBlockState(blockPos_1.down());
-		BlockState block_2 = blockView_1.getBlockState(blockPos_1.up());
+		BlockState block_1 = blockView_1.getBlockState(blockPos_1.below());
+		BlockState block_2 = blockView_1.getBlockState(blockPos_1.above());
 		BlockState block_3 = blockView_1.getBlockState(blockPos_1.north());
 		BlockState block_4 = blockView_1.getBlockState(blockPos_1.east());
 		BlockState block_5 = blockView_1.getBlockState(blockPos_1.south());
 		BlockState block_6 = blockView_1.getBlockState(blockPos_1.west());
 
-		return getDefaultState()
-				.with(DOWN, IInventoryCable.canConnect(block_1, Direction.DOWN))
-				.with(UP, IInventoryCable.canConnect(block_2, Direction.UP))
-				.with(NORTH, IInventoryCable.canConnect(block_3, Direction.NORTH))
-				.with(EAST, IInventoryCable.canConnect(block_4, Direction.EAST))
-				.with(SOUTH, IInventoryCable.canConnect(block_5, Direction.SOUTH))
-				.with(WEST, IInventoryCable.canConnect(block_6, Direction.WEST));
+		return defaultBlockState()
+				.setValue(DOWN, IInventoryCable.canConnect(block_1, Direction.DOWN))
+				.setValue(UP, IInventoryCable.canConnect(block_2, Direction.UP))
+				.setValue(NORTH, IInventoryCable.canConnect(block_3, Direction.NORTH))
+				.setValue(EAST, IInventoryCable.canConnect(block_4, Direction.EAST))
+				.setValue(SOUTH, IInventoryCable.canConnect(block_5, Direction.SOUTH))
+				.setValue(WEST, IInventoryCable.canConnect(block_6, Direction.WEST));
 	}
 
 	@Override
 	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {
 		switch (blockRotation_1) {
 		case CLOCKWISE_180:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(EAST, blockState_1.get(WEST)).with(SOUTH, blockState_1.get(NORTH)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(EAST, blockState_1.getValue(WEST)).setValue(SOUTH, blockState_1.getValue(NORTH)).setValue(WEST, blockState_1.getValue(EAST));
 		case CLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(EAST)).with(EAST, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(WEST)).with(WEST, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(EAST)).setValue(EAST, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(NORTH));
 		case COUNTERCLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(WEST)).with(EAST, blockState_1.get(NORTH)).with(SOUTH, blockState_1.get(EAST)).with(WEST, blockState_1.get(SOUTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(WEST)).setValue(EAST, blockState_1.getValue(NORTH)).setValue(SOUTH, blockState_1.getValue(EAST)).setValue(WEST, blockState_1.getValue(SOUTH));
 		default:
 			break;
 		}
@@ -135,9 +135,9 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {
 		case FRONT_BACK:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(NORTH));
 		case LEFT_RIGHT:
-			return blockState_1.with(EAST, blockState_1.get(WEST)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(EAST, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(EAST));
 		default:
 			break;
 		}

@@ -29,46 +29,46 @@ import com.tom.storagemod.tile.TileEntityOpenCrate;
 public class BlockOpenCrate extends ContainerBlock {
 
 	public BlockOpenCrate() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.open_crate");
-		setDefaultState(getDefaultState().with(BlockStateProperties.FACING, Direction.DOWN));
+		registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN));
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityOpenCrate();
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("open_crate", tooltip);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(BlockStateProperties.FACING);
 	}
 
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(BlockStateProperties.FACING, rot.rotate(state.get(BlockStateProperties.FACING)));
+		return state.setValue(BlockStateProperties.FACING, rot.rotate(state.getValue(BlockStateProperties.FACING)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(BlockStateProperties.FACING)));
+		return state.rotate(mirrorIn.getRotation(state.getValue(BlockStateProperties.FACING)));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().
-				with(BlockStateProperties.FACING, context.getNearestLookingDirection().getOpposite());
+		return this.defaultBlockState().
+				setValue(BlockStateProperties.FACING, context.getNearestLookingDirection().getOpposite());
 	}
 }

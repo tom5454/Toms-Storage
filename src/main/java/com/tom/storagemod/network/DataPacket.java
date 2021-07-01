@@ -11,10 +11,10 @@ public class DataPacket {
 	}
 
 	public DataPacket(PacketBuffer pb) {
-		tag = pb.func_244273_m();
+		tag = pb.readAnySizeNbt();
 	}
 
 	public void toBytes(PacketBuffer pb) {
-		pb.writeCompoundTag(tag);
+		pb.writeNbt(tag);
 	}
 }

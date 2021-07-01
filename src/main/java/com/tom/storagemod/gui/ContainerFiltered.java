@@ -20,9 +20,9 @@ public class ContainerFiltered extends Container {
 
 	public ContainerFiltered(int p_i50088_1_, PlayerInventory p_i50088_2_, IInventory p_i50088_3_) {
 		super(StorageMod.filteredConatiner, p_i50088_1_);
-		assertInventorySize(p_i50088_3_, 9);
+		checkContainerSize(p_i50088_3_, 9);
 		this.dispenserInventory = p_i50088_3_;
-		p_i50088_3_.openInventory(p_i50088_2_.player);
+		p_i50088_3_.startOpen(p_i50088_2_.player);
 
 		for(int i = 0; i < 3; ++i) {
 			for(int j = 0; j < 3; ++j) {
@@ -46,8 +46,8 @@ public class ContainerFiltered extends Container {
 	 * Determines whether supplied player can use this container
 	 */
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
-		return this.dispenserInventory.isUsableByPlayer(playerIn);
+	public boolean stillValid(PlayerEntity playerIn) {
+		return this.dispenserInventory.stillValid(playerIn);
 	}
 
 	/**
@@ -55,18 +55,18 @@ public class ContainerFiltered extends Container {
 	 * inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-		Slot slot = this.inventorySlots.get(index);
-		if (slot != null && slot.getHasStack()) {
+	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+		Slot slot = this.slots.get(index);
+		if (slot != null && slot.hasItem()) {
 			if (index < 9) {
 			} else {
-				ItemStack is = slot.getStack().copy();
+				ItemStack is = slot.getItem().copy();
 				is.setCount(1);
 				for(int i = 0;i<9;i++) {
-					Slot sl = this.inventorySlots.get(i);
-					if(ItemStack.areItemsEqual(sl.getStack(), is))break;
-					if(sl.getStack().isEmpty()) {
-						sl.putStack(is);
+					Slot sl = this.slots.get(i);
+					if(ItemStack.isSame(sl.getItem(), is))break;
+					if(sl.getItem().isEmpty()) {
+						sl.set(is);
 						break;
 					}
 				}
@@ -80,20 +80,20 @@ public class ContainerFiltered extends Container {
 	 * Called when the container is closed.
 	 */
 	@Override
-	public void onContainerClosed(PlayerEntity playerIn) {
-		super.onContainerClosed(playerIn);
-		this.dispenserInventory.closeInventory(playerIn);
+	public void removed(PlayerEntity playerIn) {
+		super.removed(playerIn);
+		this.dispenserInventory.stopOpen(playerIn);
 	}
 
 	@Override
-	public ItemStack slotClick(int slotId, int dragType, ClickType click, PlayerEntity player) {
-		Slot slot = slotId > -1 && slotId < inventorySlots.size() ? inventorySlots.get(slotId) : null;
+	public ItemStack clicked(int slotId, int dragType, ClickType click, PlayerEntity player) {
+		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof SlotPhantom) {
-			ItemStack s = player.inventory.getItemStack().copy();
+			ItemStack s = player.inventory.getCarried().copy();
 			if(!s.isEmpty())s.setCount(1);
-			slot.putStack(s);
-			return player.inventory.getItemStack();
+			slot.set(s);
+			return player.inventory.getCarried();
 		}
-		return super.slotClick(slotId, dragType, click, player);
+		return super.clicked(slotId, dragType, click, player);
 	}
 }

@@ -27,27 +27,29 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.IPaintable;
 import com.tom.storagemod.proxy.ClientProxy;
 
+import net.minecraft.item.Item.Properties;
+
 public class ItemPaintKit extends Item {
 
 	public ItemPaintKit() {
-		super(new Properties().maxDamage(100).group(StorageMod.STORAGE_MOD_TAB));
+		super(new Properties().durability(100).tab(StorageMod.STORAGE_MOD_TAB));
 		setRegistryName("ts.paint_kit");
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		ClientProxy.tooltip("paint_kit", tooltip);
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		if(!context.getWorld().isRemote) {
-			if(context.hasSecondaryUseForPlayer()) {
-				BlockState state = context.getWorld().getBlockState(context.getPos());
-				TileEntity tile = context.getWorld().getTileEntity(context.getPos());
-				if(tile == null && state.isSolid()) {
-					ItemStack is = context.getItem();
+	public ActionResultType useOn(ItemUseContext context) {
+		if(!context.getLevel().isClientSide) {
+			if(context.isSecondaryUseActive()) {
+				BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+				TileEntity tile = context.getLevel().getBlockEntity(context.getClickedPos());
+				if(tile == null && state.canOcclude()) {
+					ItemStack is = context.getItemInHand();
 					if(!is.hasTag())is.setTag(new CompoundNBT());
 					is.getTag().put("block", NBTUtil.writeBlockState(state));
 					//ITextComponent tc = new TranslationTextComponent("tooltip.toms_storage.set_paint", state.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
@@ -55,16 +57,16 @@ public class ItemPaintKit extends Item {
 				}
 				return ActionResultType.SUCCESS;
 			} else {
-				BlockState state = context.getWorld().getBlockState(context.getPos());
-				ItemStack is = context.getItem();
+				BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+				ItemStack is = context.getItemInHand();
 				if(is.hasTag() && is.getTag().contains("block") && state.getBlock() instanceof IPaintable) {
-					if(((IPaintable)state.getBlock()).paint(context.getWorld(), context.getPos(), NBTUtil.readBlockState(is.getTag().getCompound("block")))) {
+					if(((IPaintable)state.getBlock()).paint(context.getLevel(), context.getClickedPos(), NBTUtil.readBlockState(is.getTag().getCompound("block")))) {
 						PlayerEntity playerentity = context.getPlayer();
-						context.getWorld().playSound(playerentity, context.getPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
+						context.getLevel().playSound(playerentity, context.getClickedPos(), SoundEvents.BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 						if(playerentity != null) {
-							is.damageItem(1, context.getPlayer(), p -> p.sendBreakAnimation(context.getHand()));
+							is.hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(context.getHand()));
 							if(is.isEmpty()) {
-								playerentity.setHeldItem(context.getHand(), new ItemStack(Items.BUCKET));
+								playerentity.setItemInHand(context.getHand(), new ItemStack(Items.BUCKET));
 							}
 						}
 					}
@@ -72,23 +74,23 @@ public class ItemPaintKit extends Item {
 				}
 			}
 		} else {
-			BlockState state = context.getWorld().getBlockState(context.getPos());
-			if(context.hasSecondaryUseForPlayer())return ActionResultType.SUCCESS;
+			BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+			if(context.isSecondaryUseActive())return ActionResultType.SUCCESS;
 			if(state.getBlock() instanceof IPaintable) {
 				return ActionResultType.SUCCESS;
 			}
 		}
-		return super.onItemUse(context);
+		return super.useOn(context);
 	}
 
 	@Override
-	public ITextComponent getDisplayName(ItemStack is) {
-		IFormattableTextComponent tc = (IFormattableTextComponent) super.getDisplayName(is);
+	public ITextComponent getName(ItemStack is) {
+		IFormattableTextComponent tc = (IFormattableTextComponent) super.getName(is);
 		if(is.hasTag() && is.getTag().contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("block"));
-			tc.appendString(" (");
-			tc.append(st.getBlock().getTranslatedName().mergeStyle(TextFormatting.GREEN));
-			tc.appendString(")");
+			tc.append(" (");
+			tc.append(st.getBlock().getName().withStyle(TextFormatting.GREEN));
+			tc.append(")");
 		}
 		return tc;
 	}

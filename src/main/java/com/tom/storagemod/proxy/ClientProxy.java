@@ -57,20 +57,20 @@ public class ClientProxy implements IProxy {
 
 	@Override
 	public void clientSetup() {
-		ScreenManager.registerFactory(StorageMod.storageTerminal, GuiStorageTerminal::new);
-		ScreenManager.registerFactory(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
-		ScreenManager.registerFactory(StorageMod.filteredConatiner, GuiFiltered::new);
-		ScreenManager.registerFactory(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
+		ScreenManager.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
+		ScreenManager.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
+		ScreenManager.register(StorageMod.filteredConatiner, GuiFiltered::new);
+		ScreenManager.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
 		RenderTypeLookup.setRenderLayer(StorageMod.paintedTrim, e -> true);
 		RenderTypeLookup.setRenderLayer(StorageMod.invCableFramed, e -> true);
 		RenderTypeLookup.setRenderLayer(StorageMod.invProxy, e -> true);
-		RenderTypeLookup.setRenderLayer(StorageMod.levelEmitter, RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(StorageMod.levelEmitter, RenderType.cutout());
 		BlockColors colors = Minecraft.getInstance().getBlockColors();
 		colors.register((state, world, pos, tintIndex) -> {
 			if (world != null) {
 				try {
-					BlockState mimicBlock = ((TileEntityPainted)world.getTileEntity(pos)).getPaintedBlockState();
+					BlockState mimicBlock = ((TileEntityPainted)world.getBlockEntity(pos)).getPaintedBlockState();
 					return colors.getColor(mimicBlock, world, pos, tintIndex);
 				} catch (Exception var8) {
 					return - 1;
@@ -89,8 +89,8 @@ public class ClientProxy implements IProxy {
 
 	private static void bindPaintedModel(ModelBakeEvent event, Block blockFor) {
 		ResourceLocation baseLoc = blockFor.delegate.name();
-		blockFor.getStateContainer().getValidStates().forEach(st -> {
-			ModelResourceLocation resLoc = BlockModelShapes.getModelLocation(baseLoc, st);
+		blockFor.getStateDefinition().getPossibleStates().forEach(st -> {
+			ModelResourceLocation resLoc = BlockModelShapes.stateToModelLocation(baseLoc, st);
 			event.getModelRegistry().put(resLoc, new BakedPaintedModel(blockFor, event.getModelRegistry().get(resLoc)));
 		});
 	}
@@ -105,37 +105,37 @@ public class ClientProxy implements IProxy {
 			return;
 
 		BlockRayTraceResult lookingAt = (BlockRayTraceResult) player.pick(Config.wirelessRange, 0f, true);
-		BlockState state = mc.world.getBlockState(lookingAt.getPos());
+		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
-			BlockPos pos = lookingAt.getPos();
-			Vector3d renderPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
-			Tessellator.getInstance().getBuffer().begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+			BlockPos pos = lookingAt.getBlockPos();
+			Vector3d renderPos = mc.gameRenderer.getMainCamera().getPosition();
+			Tessellator.getInstance().getBuilder().begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 			MatrixStack ms = evt.getMatrixStack();
 			ms.translate(pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z);
 			float scale = 1.01f;
 			ms.scale(scale, scale, scale);
 			ms.translate(-0.001f, -0.001f, -0.001f);
-			drawShape(ms, Tessellator.getInstance().getBuffer(), state.getRenderShape(player.world, pos), 0, 0, 0, 1, 1, 1, 1);
-			Tessellator.getInstance().draw();
+			drawShape(ms, Tessellator.getInstance().getBuilder(), state.getOcclusionShape(player.level, pos), 0, 0, 0, 1, 1, 1, 1);
+			Tessellator.getInstance().end();
 		}
 	}
 
 	private static void drawShape(MatrixStack matrixStackIn, IVertexBuilder bufferIn, VoxelShape shapeIn, double xIn, double yIn, double zIn, float red, float green, float blue, float alpha) {
-		Matrix4f matrix4f = matrixStackIn.getLast().getMatrix();
-		shapeIn.forEachEdge((p_230013_12_, p_230013_14_, p_230013_16_, p_230013_18_, p_230013_20_, p_230013_22_) -> {
-			bufferIn.pos(matrix4f, (float)(p_230013_12_ + xIn), (float)(p_230013_14_ + yIn), (float)(p_230013_16_ + zIn)).color(red, green, blue, alpha).endVertex();
-			bufferIn.pos(matrix4f, (float)(p_230013_18_ + xIn), (float)(p_230013_20_ + yIn), (float)(p_230013_22_ + zIn)).color(red, green, blue, alpha).endVertex();
+		Matrix4f matrix4f = matrixStackIn.last().pose();
+		shapeIn.forAllEdges((p_230013_12_, p_230013_14_, p_230013_16_, p_230013_18_, p_230013_20_, p_230013_22_) -> {
+			bufferIn.vertex(matrix4f, (float)(p_230013_12_ + xIn), (float)(p_230013_14_ + yIn), (float)(p_230013_16_ + zIn)).color(red, green, blue, alpha).endVertex();
+			bufferIn.vertex(matrix4f, (float)(p_230013_18_ + xIn), (float)(p_230013_20_ + yIn), (float)(p_230013_22_ + zIn)).color(red, green, blue, alpha).endVertex();
 		});
 	}
 
 	public static void tooltip(String key, List<ITextComponent> tooltip) {
 		if(Screen.hasShiftDown()) {
-			String[] sp = I18n.format("tooltip.toms_storage." + key).split("\\\\");
+			String[] sp = I18n.get("tooltip.toms_storage." + key).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
 				tooltip.add(new StringTextComponent(sp[i]));
 			}
 		} else {
-			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(TextFormatting.ITALIC, TextFormatting.GRAY));
 		}
 	}
 }

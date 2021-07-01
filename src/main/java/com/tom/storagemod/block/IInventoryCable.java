@@ -16,7 +16,7 @@ public interface IInventoryCable {
 	default List<BlockPos> next(World world, BlockState state, BlockPos pos) {
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			next.add(pos.offset(d));
+			next.add(pos.relative(d));
 		}
 		return next;
 	}

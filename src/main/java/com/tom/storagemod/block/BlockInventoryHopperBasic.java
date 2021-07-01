@@ -44,45 +44,45 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 
 	public BlockInventoryHopperBasic() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).notSolid().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion().harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_hopper_basic");
-		setDefaultState(getDefaultState()
-				.with(FACING, Direction.DOWN).with(ENABLED, Boolean.valueOf(true)));
+		registerDefaultState(defaultBlockState()
+				.setValue(FACING, Direction.DOWN).setValue(ENABLED, Boolean.valueOf(true)));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_hopper", tooltip);
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityInventoryHopperBasic();
 	}
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return getDefaultState().with(FACING, context.getFace().getOpposite());
+		return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(FACING, ENABLED);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
@@ -93,52 +93,52 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 
 	@Override
 	public boolean canConnectFrom(BlockState state, Direction dir) {
-		return state.get(FACING).getAxis() == dir.getAxis();
+		return state.getValue(FACING).getAxis() == dir.getAxis();
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(FACING)) {
+		switch (state.getValue(FACING)) {
 		case DOWN:
-			return VoxelShapes.or(makeCuboidShape(5, 0, 5, 11, 6, 11), makeCuboidShape(3, 6, 3, 13, 16, 13));
+			return VoxelShapes.or(box(5, 0, 5, 11, 6, 11), box(3, 6, 3, 13, 16, 13));
 		case EAST:
-			return VoxelShapes.or(makeCuboidShape(10, 5, 5, 16, 11, 11), makeCuboidShape(0, 3, 3, 10, 13, 13));
+			return VoxelShapes.or(box(10, 5, 5, 16, 11, 11), box(0, 3, 3, 10, 13, 13));
 		case NORTH:
-			return VoxelShapes.or(makeCuboidShape(5, 5, 0, 11, 11, 6), makeCuboidShape(3, 3, 6, 13, 13, 16));
+			return VoxelShapes.or(box(5, 5, 0, 11, 11, 6), box(3, 3, 6, 13, 13, 16));
 		case SOUTH:
-			return VoxelShapes.or(makeCuboidShape(5, 5, 10, 11, 11, 16), makeCuboidShape(3, 3, 0, 13, 13, 10));
+			return VoxelShapes.or(box(5, 5, 10, 11, 11, 16), box(3, 3, 0, 13, 13, 10));
 		case UP:
-			return VoxelShapes.or(makeCuboidShape(5, 10, 5, 11, 16, 11), makeCuboidShape(3, 0, 3, 13, 10, 13));
+			return VoxelShapes.or(box(5, 10, 5, 11, 16, 11), box(3, 0, 3, 13, 10, 13));
 		case WEST:
-			return VoxelShapes.or(makeCuboidShape(0, 5, 5, 6, 11, 11), makeCuboidShape(6, 3, 3, 16, 13, 13));
+			return VoxelShapes.or(box(0, 5, 5, 6, 11, 11), box(6, 3, 3, 16, 13, 13));
 		default:
 			break;
 		}
-		return VoxelShapes.fullCube();
+		return VoxelShapes.block();
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState st, World world, BlockPos pos,
+	public ActionResultType use(BlockState st, World world, BlockPos pos,
 			PlayerEntity player, Hand hand, BlockRayTraceResult trace) {
-		if(!world.isRemote) {
-			ItemStack is = player.getHeldItem(hand);
+		if(!world.isClientSide) {
+			ItemStack is = player.getItemInHand(hand);
 			if(!is.isEmpty()) {
-				TileEntity te = world.getTileEntity(pos);
+				TileEntity te = world.getBlockEntity(pos);
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					((TileEntityInventoryHopperBasic)te).setFilter(is.copy());
-					ITextComponent txt = ((TileEntityInventoryHopperBasic)te).getFilter().getDisplayName();
-					player.sendStatusMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
+					ITextComponent txt = ((TileEntityInventoryHopperBasic)te).getFilter().getHoverName();
+					player.displayClientMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
 				}
 			} else {
-				TileEntity te = world.getTileEntity(pos);
+				TileEntity te = world.getBlockEntity(pos);
 				if(te instanceof TileEntityInventoryHopperBasic) {
-					if(player.isSneaking()) {
+					if(player.isShiftKeyDown()) {
 						((TileEntityInventoryHopperBasic)te).setFilter(ItemStack.EMPTY);
-						player.sendStatusMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", new TranslationTextComponent("tooltip.toms_storage.empty")), true);
+						player.displayClientMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", new TranslationTextComponent("tooltip.toms_storage.empty")), true);
 					} else {
 						ItemStack s = ((TileEntityInventoryHopperBasic)te).getFilter();
-						ITextComponent txt = s.isEmpty() ? new TranslationTextComponent("tooltip.toms_storage.empty") : s.getDisplayName();
-						player.sendStatusMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
+						ITextComponent txt = s.isEmpty() ? new TranslationTextComponent("tooltip.toms_storage.empty") : s.getHoverName();
+						player.displayClientMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
 					}
 				}
 			}
@@ -152,9 +152,9 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 	}
 
 	private void updateState(World worldIn, BlockPos pos, BlockState state) {
-		boolean flag = !worldIn.isBlockPowered(pos);
-		if (flag != state.get(ENABLED)) {
-			worldIn.setBlockState(pos, state.with(ENABLED, Boolean.valueOf(flag)), 4);
+		boolean flag = !worldIn.hasNeighborSignal(pos);
+		if (flag != state.getValue(ENABLED)) {
+			worldIn.setBlock(pos, state.setValue(ENABLED, Boolean.valueOf(flag)), 4);
 		}
 	}
 }

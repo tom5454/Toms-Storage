@@ -30,25 +30,25 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 		this.inv = te == null ? new Inventory(1) : new IInventory() {
 
 			@Override
-			public void clear() {
+			public void clearContent() {
 			}
 
 			@Override
-			public void setInventorySlotContents(int index, ItemStack stack) {
+			public void setItem(int index, ItemStack stack) {
 				te.setFilter(stack);
 			}
 
 			@Override
-			public ItemStack removeStackFromSlot(int index) {
+			public ItemStack removeItemNoUpdate(int index) {
 				return ItemStack.EMPTY;
 			}
 
 			@Override
-			public void markDirty() {
+			public void setChanged() {
 			}
 
 			@Override
-			public boolean isUsableByPlayer(PlayerEntity player) {
+			public boolean stillValid(PlayerEntity player) {
 				return false;
 			}
 
@@ -58,21 +58,21 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 			}
 
 			@Override
-			public ItemStack getStackInSlot(int index) {
+			public ItemStack getItem(int index) {
 				return te.getFilter();
 			}
 
 			@Override
-			public int getSizeInventory() {
+			public int getContainerSize() {
 				return 1;
 			}
 
 			@Override
-			public ItemStack decrStackSize(int index, int count) {
+			public ItemStack removeItem(int index, int count) {
 				return ItemStack.EMPTY;
 			}
 		};
-		inv.openInventory(p_i50088_2_.player);
+		inv.startOpen(p_i50088_2_.player);
 		this.te = te;
 		this.pinv = p_i50088_2_;
 
@@ -94,7 +94,7 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	 * Determines whether supplied player can use this container
 	 */
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
+	public boolean stillValid(PlayerEntity playerIn) {
 		return true;
 	}
 
@@ -103,17 +103,17 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	 * inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-		Slot slot = this.inventorySlots.get(index);
-		if (slot != null && slot.getHasStack()) {
+	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+		Slot slot = this.slots.get(index);
+		if (slot != null && slot.hasItem()) {
 			if (index < 1) {
 			} else {
-				ItemStack is = slot.getStack().copy();
+				ItemStack is = slot.getItem().copy();
 				is.setCount(1);
-				Slot sl = this.inventorySlots.get(0);
-				if(!ItemStack.areItemsEqual(sl.getStack(), is)) {
-					if(sl.getStack().isEmpty()) {
-						sl.putStack(is);
+				Slot sl = this.slots.get(0);
+				if(!ItemStack.isSame(sl.getItem(), is)) {
+					if(sl.getItem().isEmpty()) {
+						sl.set(is);
 					}
 				}
 			}
@@ -126,21 +126,21 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	 * Called when the container is closed.
 	 */
 	@Override
-	public void onContainerClosed(PlayerEntity playerIn) {
-		super.onContainerClosed(playerIn);
-		this.inv.closeInventory(playerIn);
+	public void removed(PlayerEntity playerIn) {
+		super.removed(playerIn);
+		this.inv.stopOpen(playerIn);
 	}
 
 	@Override
-	public ItemStack slotClick(int slotId, int dragType, ClickType click, PlayerEntity player) {
-		Slot slot = slotId > -1 && slotId < inventorySlots.size() ? inventorySlots.get(slotId) : null;
+	public ItemStack clicked(int slotId, int dragType, ClickType click, PlayerEntity player) {
+		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof SlotPhantom) {
-			ItemStack s = player.inventory.getItemStack().copy();
+			ItemStack s = player.inventory.getCarried().copy();
 			if(!s.isEmpty())s.setCount(1);
-			slot.putStack(s);
-			return player.inventory.getItemStack();
+			slot.set(s);
+			return player.inventory.getCarried();
 		}
-		return super.slotClick(slotId, dragType, click, player);
+		return super.clicked(slotId, dragType, click, player);
 	}
 
 	private int lastCount = 0;
@@ -156,7 +156,7 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	}
 
 	@Override
-	public void detectAndSendChanges() {
+	public void broadcastChanges() {
 		if(te == null)return;
 		if(lastCount != te.getCount() || lessThan != te.isLessThan()) {
 			CompoundNBT mainTag = new CompoundNBT();
@@ -166,6 +166,6 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 			lessThan = te.isLessThan();
 			NetworkHandler.sendTo((ServerPlayerEntity) pinv.player, mainTag);
 		}
-		super.detectAndSendChanges();
+		super.broadcastChanges();
 	}
 }

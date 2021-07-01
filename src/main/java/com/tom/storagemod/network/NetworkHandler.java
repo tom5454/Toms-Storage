@@ -32,14 +32,14 @@ public class NetworkHandler {
 		if(ctx.get().getDirection() == NetworkDirection.PLAY_TO_SERVER) {
 			ctx.get().enqueueWork(() -> {
 				ServerPlayerEntity sender = ctx.get().getSender();
-				if(sender.openContainer instanceof IDataReceiver) {
-					((IDataReceiver)sender.openContainer).receive(packet.tag);
+				if(sender.containerMenu instanceof IDataReceiver) {
+					((IDataReceiver)sender.containerMenu).receive(packet.tag);
 				}
 			});
 		} else if(ctx.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT) {
 			ctx.get().enqueueWork(() -> {
-				if(Minecraft.getInstance().currentScreen instanceof IDataReceiver) {
-					((IDataReceiver)Minecraft.getInstance().currentScreen).receive(packet.tag);
+				if(Minecraft.getInstance().screen instanceof IDataReceiver) {
+					((IDataReceiver)Minecraft.getInstance().screen).receive(packet.tag);
 				}
 			});
 		}

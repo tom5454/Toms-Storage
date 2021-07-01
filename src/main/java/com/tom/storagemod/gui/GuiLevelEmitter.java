@@ -23,6 +23,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.tom.storagemod.network.IDataReceiver;
 import com.tom.storagemod.network.NetworkHandler;
 
+import net.minecraft.client.gui.widget.button.Button.IPressable;
+
 public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> implements IDataReceiver {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/level_emitter.png");
 	private GuiButton lessThanBtn;
@@ -40,19 +42,19 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		this.renderBackground(matrixStack);
 		amountBtns.forEach(AmountBtn::update);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+		this.renderTooltip(matrixStack, mouseX, mouseY);
 		if(lessThanBtn.isHovered()) {
-			func_243308_b(matrixStack, Arrays.stream(I18n.format("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(StringTextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+			renderComponentTooltip(matrixStack, Arrays.stream(I18n.get("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(StringTextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+	protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bindTexture(gui);
-		int i = (this.width - this.xSize) / 2;
-		int j = (this.height - this.ySize) / 2;
-		this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+		this.minecraft.getTextureManager().bind(gui);
+		int i = (this.width - this.imageWidth) / 2;
+		int j = (this.height - this.imageHeight) / 2;
+		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	@Override
@@ -61,12 +63,12 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		buttons.clear();
 		amountBtns.clear();
 		super.init();
-		textF = new TextFieldWidget(font, guiLeft + 70, guiTop + 41, 89, font.FONT_HEIGHT, new TranslationTextComponent("narrator.toms_storage.level_emitter_amount"));
-		textF.setMaxStringLength(100);
-		textF.setEnableBackgroundDrawing(false);
+		textF = new TextFieldWidget(font, leftPos + 70, topPos + 41, 89, font.lineHeight, new TranslationTextComponent("narrator.toms_storage.level_emitter_amount"));
+		textF.setMaxLength(100);
+		textF.setBordered(false);
 		textF.setVisible(true);
 		textF.setTextColor(16777215);
-		textF.setText("1");
+		textF.setValue("1");
 		textF.setResponder(t -> {
 			try {
 				int c = Integer.parseInt(t);
@@ -78,7 +80,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 			}
 		});
 		addButton(textF);
-		lessThanBtn = new GuiButton(guiLeft - 18, guiTop + 5, 0, b -> {
+		lessThanBtn = new GuiButton(leftPos - 18, topPos + 5, 0, b -> {
 			lt = !lt;
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
@@ -101,7 +103,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		boolean lt = tag.getBoolean("lessThan");
 		lessThanBtn.state = lt ? 1 : 0;
 		this.lt = lt;
-		textF.setText(Integer.toString(count));
+		textF.setValue(Integer.toString(count));
 	}
 
 	public class GuiButton extends Button {
@@ -124,7 +126,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		@Override
 		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				minecraft.getTextureManager().bindTexture(gui);
+				minecraft.getTextureManager().bind(gui);
 				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				//int i = this.getYImage(this.isHovered);
@@ -147,7 +149,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		private Button btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new Button(guiLeft + x, guiTop + y + 16, len, 20, new StringTextComponent((v > 0 ? "+" : "") + v), this::evt);
+			btn = new Button(leftPos + x, topPos + y + 16, len, 20, new StringTextComponent((v > 0 ? "+" : "") + v), this::evt);
 			addButton(btn);
 			this.v = v;
 			this.sv = sv;
@@ -156,7 +158,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		private void evt(Button b) {
 			count += hasShiftDown() ? sv : v;
 			if(count < 1)count = 1;
-			textF.setText(Integer.toString(count));
+			textF.setValue(Integer.toString(count));
 			send();
 		}
 

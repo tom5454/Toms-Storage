@@ -34,16 +34,16 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 
 	@Override
 	public void tick() {
-		if(world.getGameTime() % 5 == 0){
-			BlockState state = world.getBlockState(pos);
-			Direction f = state.get(BlockStateProperties.FACING);
-			BlockPos p = pos.offset(f);
-			items = world.getEntitiesWithinAABB(ItemEntity.class, new AxisAlignedBB(p));
+		if(level.getGameTime() % 5 == 0){
+			BlockState state = level.getBlockState(worldPosition);
+			Direction f = state.getValue(BlockStateProperties.FACING);
+			BlockPos p = worldPosition.relative(f);
+			items = level.getEntitiesOfClass(ItemEntity.class, new AxisAlignedBB(p));
 		}
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return items.size() + 1;
 	}
 
@@ -53,7 +53,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getItem(int index) {
 		if(items.size() > index){
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive())return ent.getItem();
@@ -62,7 +62,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
+	public ItemStack removeItem(int index, int count) {
 		if(items.size() > index){
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
@@ -75,7 +75,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
+	public ItemStack removeItemNoUpdate(int index) {
 		if(items.size() > index){
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
@@ -88,48 +88,48 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
-		BlockState state = world.getBlockState(pos);
+	public void setItem(int index, ItemStack stack) {
+		BlockState state = level.getBlockState(worldPosition);
 		Direction f = Direction.UP;
-		if(state.getBlock() == StorageMod.openCrate)f = state.get(BlockStateProperties.FACING);
-		BlockPos p = pos.offset(f);
-		ItemEntity entityitem = new ItemEntity(world, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, stack);
-		entityitem.setDefaultPickupDelay();
-		entityitem.setMotion(Vector3d.ZERO);
-		world.addEntity(entityitem);
+		if(state.getBlock() == StorageMod.openCrate)f = state.getValue(BlockStateProperties.FACING);
+		BlockPos p = worldPosition.relative(f);
+		ItemEntity entityitem = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, stack);
+		entityitem.setDefaultPickUpDelay();
+		entityitem.setDeltaMovement(Vector3d.ZERO);
+		level.addFreshEntity(entityitem);
 		items.add(entityitem);
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 64;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean canPlaceItem(int index, ItemStack stack) {
 		return index == items.size();
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 	}
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if (this.chestHandler == null)
 				this.chestHandler = LazyOptional.of(this::createHandler);
 			return this.chestHandler.cast();
@@ -142,8 +142,8 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		if (chestHandler != null)
 			chestHandler.invalidate();
 	}

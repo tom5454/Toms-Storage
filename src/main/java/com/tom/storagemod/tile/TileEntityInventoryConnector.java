@@ -42,12 +42,12 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 
 	@Override
 	public void tick() {
-		long time = world.getGameTime();
-		if(!world.isRemote && time % 20 == 0) {
+		long time = level.getGameTime();
+		if(!level.isClientSide && time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			toCheck.add(pos);
-			checkedBlocks.add(pos);
+			toCheck.add(worldPosition);
+			checkedBlocks.add(worldPosition);
 			handlers.clear();
 			Set<LinkedInv> toRM = new HashSet<>();
 			for (LinkedInv inv : linkedInvs) {
@@ -62,14 +62,14 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
-					BlockPos p = cp.offset(d);
-					if(!checkedBlocks.contains(p) && p.distanceSq(pos) < Config.invRange) {
+					BlockPos p = cp.relative(d);
+					if(!checkedBlocks.contains(p) && p.distSqr(worldPosition) < Config.invRange) {
 						checkedBlocks.add(p);
-						BlockState state = world.getBlockState(p);
+						BlockState state = level.getBlockState(p);
 						if(state.getBlock() instanceof ITrim) {
 							toCheck.add(p);
 						} else {
-							TileEntity te = world.getTileEntity(p);
+							TileEntity te = level.getBlockEntity(p);
 							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
 								continue;
 							} else if(te != null && !Config.onlyTrims) {
@@ -77,13 +77,13 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 								if(te instanceof ChestTileEntity) {//Check for double chests
 									Block block = state.getBlock();
 									if(block instanceof ChestBlock) {
-										ChestType type = state.get(ChestBlock.TYPE);
+										ChestType type = state.getValue(ChestBlock.TYPE);
 										if (type != ChestType.SINGLE) {
-											BlockPos opos = p.offset(ChestBlock.getDirectionToAttached(state));
-											BlockState ostate = this.getWorld().getBlockState(opos);
+											BlockPos opos = p.relative(ChestBlock.getConnectedDirection(state));
+											BlockState ostate = this.getLevel().getBlockState(opos);
 											if (state.getBlock() == ostate.getBlock()) {
-												ChestType otype = ostate.get(ChestBlock.TYPE);
-												if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
+												ChestType otype = ostate.getValue(ChestBlock.TYPE);
+												if (otype != ChestType.SINGLE && type != otype && state.getValue(ChestBlock.FACING) == ostate.getValue(ChestBlock.FACING)) {
 													toCheck.add(opos);
 													checkedBlocks.add(opos);
 												}
@@ -134,7 +134,7 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return getInventory().cast();
 		}
 		return super.getCapability(cap, side);
@@ -240,8 +240,8 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 	}
 
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		if (invHandler != null)
 			invHandler.invalidate();
 	}

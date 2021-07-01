@@ -15,16 +15,16 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 
 	@Override
 	protected void init() {
-		xSize = 194;
-		ySize = 202;
+		imageWidth = 194;
+		imageHeight = 202;
 		rowCount = 5;
 		super.init();
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
-		mc.textureManager.bindTexture(gui);
-		this.blit(st, this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+	protected void renderBg(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
+		mc.textureManager.bind(gui);
+		this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	@Override

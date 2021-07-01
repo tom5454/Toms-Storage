@@ -29,13 +29,13 @@ import com.tom.storagemod.tile.TileEntityPainted;
 public class BlockPaintedTrim extends ContainerBlock implements ITrim, IPaintable {
 
 	public BlockPaintedTrim() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.painted_trim");
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("trim", tooltip);
@@ -43,19 +43,19 @@ public class BlockPaintedTrim extends ContainerBlock implements ITrim, IPaintabl
 
 	@Override
 	public boolean paint(World world, BlockPos pos, BlockState to) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if(te != null && te instanceof TileEntityPainted)
 			return ((TileEntityPainted)te).setPaintedBlockState(to);
 		return false;
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityPainted();
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 

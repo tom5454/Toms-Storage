@@ -22,33 +22,35 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.proxy.ClientProxy;
 
+import net.minecraft.item.Item.Properties;
+
 public class ItemWirelessTerminal extends Item {
 
 	public ItemWirelessTerminal() {
-		super(new Properties().group(StorageMod.STORAGE_MOD_TAB).maxStackSize(1));
+		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
 		setRegistryName("ts.wireless_terminal");
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		ClientProxy.tooltip("wireless_terminal", tooltip);
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		BlockRayTraceResult lookingAt = (BlockRayTraceResult) playerIn.pick(Config.wirelessRange, 0f, true);
-		BlockState state = worldIn.getBlockState(lookingAt.getPos());
+		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
-			ActionResultType r = state.onBlockActivated(worldIn, playerIn, handIn, lookingAt);
-			return new ActionResult<>(r, playerIn.getHeldItem(handIn));
+			ActionResultType r = state.use(worldIn, playerIn, handIn, lookingAt);
+			return new ActionResult<>(r, playerIn.getItemInHand(handIn));
 		} else {
-			return super.onItemRightClick(worldIn, playerIn, handIn);
+			return super.use(worldIn, playerIn, handIn);
 		}
 	}
 
 	public static boolean isPlayerHolding(PlayerEntity player) {
-		return player.getHeldItemMainhand().getItem() == StorageMod.wirelessTerminal ||
-				player.getHeldItemOffhand().getItem() == StorageMod.wirelessTerminal;
+		return player.getMainHandItem().getItem() == StorageMod.wirelessTerminal ||
+				player.getOffhandItem().getItem() == StorageMod.wirelessTerminal;
 	}
 }

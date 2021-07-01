@@ -93,7 +93,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	protected void addPlayerSlots(PlayerInventory playerInventory, int x, int y) {
-		this.playerSlotsStart = inventorySlots.size() - 1;
+		this.playerSlotsStart = slots.size() - 1;
 		for (int i = 0;i < 3;++i) {
 			for (int j = 0;j < 9;++j) {
 				addSlot(new Slot(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
@@ -171,12 +171,12 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 
 			}
 			if (stack != null) {
-				st.push();
+				st.pushPose();
 				gui.renderItemInGui(st, stack.getStack().copy().split(1), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
 				FontRenderer r = stack.getStack().getItem().getFontRenderer(stack.getStack());
 				if(r == null)r = gui.getFont();
 				this.drawStackSize(st, r, stack.getQuantity(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition);
-				st.pop();
+				st.popPose();
 			}
 		}
 
@@ -184,7 +184,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		public boolean drawTooltip(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (stack != null) {
 				if (stack.getQuantity() > 9999) {
-					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.format("tooltip.toms_storage.amount", stack.getQuantity()));
+					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.get("tooltip.toms_storage.amount", stack.getQuantity()));
 				} else {
 					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
 				}
@@ -201,14 +201,14 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			RenderSystem.disableDepthTest();
 			RenderSystem.disableBlend();
 			String stackSize = formatNumber(size);
-			st.push();
+			st.pushPose();
 			st.scale(scaleFactor, scaleFactor, scaleFactor);
 			st.translate(0, 0, 450);
 			float inverseScaleFactor = 1.0f / scaleFactor;
-			int X = (int) (((float) x + 0 + 16.0f - fr.getStringWidth(stackSize) * scaleFactor) * inverseScaleFactor);
+			int X = (int) (((float) x + 0 + 16.0f - fr.width(stackSize) * scaleFactor) * inverseScaleFactor);
 			int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-			fr.drawStringWithShadow(st, stackSize, X, Y, 16777215);
-			st.pop();
+			fr.drawShadow(st, stackSize, X, Y, 16777215);
+			st.popPose();
 			RenderSystem.enableLighting();
 			RenderSystem.enableDepthTest();
 			//fr.setUnicodeFlag(unicodeFlag);
@@ -246,7 +246,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
+	public boolean stillValid(PlayerEntity playerIn) {
 		return te.canInteractWith(playerIn);
 	}
 
@@ -283,12 +283,12 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		RenderSystem.disableLighting();
 		RenderSystem.disableDepthTest();
 		RenderSystem.disableBlend();
-		st.push();
+		st.pushPose();
 		st.translate(0, 0, 100);
 		for (int i = 0;i < storageSlotList.size();i++) {
-			if (storageSlotList.get(i).drawTooltip(st, gui, mouseX, mouseY)) { st.pop(); return i; }
+			if (storageSlotList.get(i).drawTooltip(st, gui, mouseX, mouseY)) { st.popPose(); return i; }
 		}
-		st.pop();
+		st.popPose();
 		return -1;
 	}
 
@@ -302,7 +302,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	@Override
-	public void detectAndSendChanges() {
+	public void broadcastChanges() {
 		if(te == null)return;
 		Map<StoredItemStack, Long> itemsCount = te.getStacks();
 		if(!this.itemsCount.equals(itemsCount)) {
@@ -322,7 +322,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			NetworkHandler.sendTo((ServerPlayerEntity) pinv.player, mainTag);
 			this.itemsCount = new HashMap<>(itemsCount);
 		}
-		super.detectAndSendChanges();
+		super.broadcastChanges();
 	}
 
 	public final void receiveClientNBTPacket(CompoundNBT message) {
@@ -333,24 +333,24 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			itemList.add(StoredItemStack.readFromNBT(tag));
 		}
 		itemListClient = new ArrayList<>(itemList);
-		pinv.markDirty();
+		pinv.setChanged();
 		terminalData = message.getInt("p");
 		search = message.getString("s");
 		if(onPacket != null)onPacket.run();
 	}
 
 	@Override
-	public final ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-		if (inventorySlots.size() > index) {
+	public final ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+		if (slots.size() > index) {
 			if (index > playerSlotsStart && te != null) {
-				if (inventorySlots.get(index) != null && inventorySlots.get(index).getHasStack()) {
-					Slot slot = inventorySlots.get(index);
-					ItemStack slotStack = slot.getStack();
+				if (slots.get(index) != null && slots.get(index).hasItem()) {
+					Slot slot = slots.get(index);
+					ItemStack slotStack = slot.getItem();
 					StoredItemStack c = te.pushStack(new StoredItemStack(slotStack, slotStack.getCount()));
 					ItemStack itemstack = c != null ? c.getActualStack() : ItemStack.EMPTY;
-					slot.putStack(itemstack);
-					if (!playerIn.world.isRemote)
-						detectAndSendChanges();
+					slot.set(itemstack);
+					if (!playerIn.level.isClientSide)
+						broadcastChanges();
 				}
 			} else {
 				return shiftClickItems(playerIn, index);
@@ -370,7 +370,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 			if (stack.getItem() == matchTo.getItem()) {
 				boolean equals = true;
 				if (checkNBT) {
-					equals = equals && ItemStack.areItemStackTagsEqual(stack, matchTo);
+					equals = equals && ItemStack.tagMatches(stack, matchTo);
 				}
 				return equals;
 			}
@@ -380,30 +380,30 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 
 
 	@Override
-	public void fillStackedContents(RecipeItemHelper itemHelperIn) {
+	public void fillCraftSlotsStackedContents(RecipeItemHelper itemHelperIn) {
 	}
 
 	@Override
-	public void clear() {
+	public void clearCraftingContent() {
 	}
 
 	@Override
-	public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
+	public boolean recipeMatches(IRecipe<? super CraftingInventory> recipeIn) {
 		return false;
 	}
 
 	@Override
-	public int getOutputSlot() {
+	public int getResultSlotIndex() {
 		return 0;
 	}
 
 	@Override
-	public int getWidth() {
+	public int getGridWidth() {
 		return 0;
 	}
 
 	@Override
-	public int getHeight() {
+	public int getGridHeight() {
 		return 0;
 	}
 
@@ -424,39 +424,39 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 		}
 		if(message.contains("a")) {
 			ServerPlayerEntity player = (ServerPlayerEntity) pinv.player;
-			player.markPlayerActive();
+			player.resetLastActionTime();
 			CompoundNBT d = message.getCompound("a");
-			ItemStack clicked = ItemStack.read(d.getCompound("s"));
+			ItemStack clicked = ItemStack.of(d.getCompound("s"));
 			SlotAction act = SlotAction.VALUES[Math.abs(d.getInt("a")) % SlotAction.VALUES.length];
 			if(act == SlotAction.SPACE_CLICK) {
 				for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
-					transferStackInSlot(player, i);
+					quickMoveStack(player, i);
 				}
 			} else {
 				if (act == SlotAction.PULL_OR_PUSH_STACK) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCarried();
 					if (!stack.isEmpty()) {
 						StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
 						ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
-						player.inventory.setItemStack(itemstack);
+						player.inventory.setCarried(itemstack);
 					} else {
 						if (clicked.isEmpty())return;
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxStackSize());
 						if(pulled != null) {
-							player.inventory.setItemStack(pulled.getActualStack());
+							player.inventory.setCarried(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.PULL_ONE) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCarried();
 					if (clicked.isEmpty())return;
 					if (d.getBoolean("m")) {
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 						if(pulled != null) {
 							ItemStack itemstack = pulled.getActualStack();
-							this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
+							this.moveItemStackTo(itemstack, playerSlotsStart + 1, this.slots.size(), true);
 							if (itemstack.getCount() > 0)
 								te.pushOrDrop(itemstack);
-							player.inventory.markDirty();
+							player.inventory.setChanged();
 						}
 					} else {
 						if (!stack.isEmpty()) {
@@ -469,17 +469,17 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 						} else {
 							StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 							if (pulled != null) {
-								player.inventory.setItemStack(pulled.getActualStack());
+								player.inventory.setCarried(pulled.getActualStack());
 							}
 						}
 					}
 				} else if (act == SlotAction.GET_HALF) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCarried();
 					if (!stack.isEmpty()) {
 						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxStackSize()) / 2, 1));
 						ItemStack itemstack = te.pushStack(stack1);
 						stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						player.inventory.setItemStack(stack);
+						player.inventory.setCarried(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -491,16 +491,16 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 						}
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 2, 1));
 						if(pulled != null) {
-							player.inventory.setItemStack(pulled.getActualStack());
+							player.inventory.setCarried(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.GET_QUARTER) {
-					ItemStack stack = player.inventory.getItemStack();
+					ItemStack stack = player.inventory.getCarried();
 					if (!stack.isEmpty()) {
 						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxStackSize()) / 4, 1));
 						ItemStack itemstack = te.pushStack(stack1);
 						stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						player.inventory.setItemStack(stack);
+						player.inventory.setCarried(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -511,7 +511,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 						}
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 4, 1));
 						if(pulled != null) {
-							player.inventory.setItemStack(pulled.getActualStack());
+							player.inventory.setCarried(pulled.getActualStack());
 						}
 					}
 				} else {
@@ -519,14 +519,14 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 					StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxStackSize());
 					if(pulled != null) {
 						ItemStack itemstack = pulled.getActualStack();
-						this.mergeItemStack(itemstack, playerSlotsStart + 1, this.inventorySlots.size(), true);
+						this.moveItemStackTo(itemstack, playerSlotsStart + 1, this.slots.size(), true);
 						if (itemstack.getCount() > 0)
 							te.pushOrDrop(itemstack);
-						player.inventory.markDirty();
+						player.inventory.setChanged();
 					}
 				}
 			}
-			player.updateHeldItem();
+			player.broadcastCarriedItem();
 		}
 		if(message.contains("c")) {
 			CompoundNBT d = message.getCompound("c");
@@ -535,7 +535,7 @@ public class ContainerStorageTerminal extends RecipeBookContainer<CraftingInvent
 	}
 
 	@Override
-	public RecipeBookCategory func_241850_m() {
+	public RecipeBookCategory getRecipeBookType() {
 		return RecipeBookCategory.CRAFTING;
 	}
 }

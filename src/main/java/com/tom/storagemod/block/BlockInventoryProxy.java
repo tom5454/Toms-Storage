@@ -47,14 +47,14 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 	public static final EnumProperty<DirectionWithNull> FILTER_FACING = EnumProperty.create("filter_facing", DirectionWithNull.class);
 
 	public BlockInventoryProxy() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.inventory_proxy");
-		setDefaultState(getDefaultState().with(FACING, Direction.DOWN).with(FILTER_FACING, DirectionWithNull.NULL));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.DOWN).setValue(FILTER_FACING, DirectionWithNull.NULL));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("inventory_proxy", tooltip);
@@ -65,37 +65,37 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		return new TileEntityInventoryProxy();
 	}
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return getDefaultState().with(FACING, context.getFace().getOpposite());
+		return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(FACING, FILTER_FACING);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
 	@Override
 	public boolean paint(World world, BlockPos pos, BlockState to) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if(te != null && te instanceof TileEntityPainted)
 			return ((TileEntityPainted)te).setPaintedBlockState(to);
 		return false;
@@ -104,36 +104,36 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 	@Override
 	public List<ItemStack> getDrops(BlockState state, net.minecraft.loot.LootContext.Builder builder) {
 		List<ItemStack> stacks = super.getDrops(state, builder);
-		if(state.get(FILTER_FACING) != DirectionWithNull.NULL)
+		if(state.getValue(FILTER_FACING) != DirectionWithNull.NULL)
 			stacks.add(new ItemStack(Items.DIAMOND));
 		return stacks;
 	}
 
 	@Override
-	public boolean hasComparatorInputOverride(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	public int getComparatorInputOverride(BlockState state, World world, BlockPos pos) {
-		TileEntity te = world.getTileEntity(pos);
-		if(state.get(FILTER_FACING) != DirectionWithNull.NULL) {
+	public int getAnalogOutputSignal(BlockState state, World world, BlockPos pos) {
+		TileEntity te = world.getBlockEntity(pos);
+		if(state.getValue(FILTER_FACING) != DirectionWithNull.NULL) {
 			if(te instanceof TileEntityInventoryProxy) {
 				return ((TileEntityInventoryProxy) te).getComparatorOutput();
 			}
 		}
-		return Container.calcRedstone(te);
+		return Container.getRedstoneSignalFromBlockEntity(te);
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
 			BlockRayTraceResult hit) {
-		ItemStack stack = player.getHeldItem(hand);
-		if(stack.getItem() == Items.DIAMOND && state.get(FACING) != hit.getFace()) {
-			if(state.get(FILTER_FACING) == DirectionWithNull.NULL && !player.abilities.isCreativeMode) {
+		ItemStack stack = player.getItemInHand(hand);
+		if(stack.getItem() == Items.DIAMOND && state.getValue(FACING) != hit.getDirection()) {
+			if(state.getValue(FILTER_FACING) == DirectionWithNull.NULL && !player.abilities.instabuild) {
 				stack.shrink(1);
 			}
-			world.setBlockState(pos, state.with(FILTER_FACING, DirectionWithNull.of(hit.getFace())));
+			world.setBlockAndUpdate(pos, state.setValue(FILTER_FACING, DirectionWithNull.of(hit.getDirection())));
 			return ActionResultType.SUCCESS;
 		}
 		return ActionResultType.PASS;
@@ -161,7 +161,7 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 		}
 
 		private DirectionWithNull(Direction dir) {
-			this.name = dir.getString();
+			this.name = dir.getSerializedName();
 			this.dir = dir;
 		}
 
@@ -175,7 +175,7 @@ public class BlockInventoryProxy extends ContainerBlock implements IPaintable {
 		}
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return name;
 		}
 

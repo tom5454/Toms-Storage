@@ -25,14 +25,14 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 			cooldown--;
 			return;
 		}
-		if(!this.getBlockState().get(BlockInventoryHopperBasic.ENABLED))return;
+		if(!this.getBlockState().getValue(BlockInventoryHopperBasic.ENABLED))return;
 		boolean hasFilter = !getFilter().isEmpty();
 		IItemHandler top = this.top.orElse(EmptyHandler.INSTANCE);
 		IItemHandler bot = this.bottom.orElse(EmptyHandler.INSTANCE);
 		for (int i = 0; i < top.getSlots(); i++) {
 			if(hasFilter) {
 				ItemStack inSlot = top.getStackInSlot(i);
-				if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areItemStackTagsEqual(inSlot, getFilter())) {
+				if(!ItemStack.isSame(inSlot, getFilter()) || !ItemStack.tagMatches(inSlot, getFilter())) {
 					continue;
 				}
 			}
@@ -52,15 +52,15 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		compound.put("Filter", getFilter().write(new CompoundNBT()));
-		return super.write(compound);
+	public CompoundNBT save(CompoundNBT compound) {
+		compound.put("Filter", getFilter().save(new CompoundNBT()));
+		return super.save(compound);
 	}
 
 	@Override
-	public void read(BlockState stateIn, CompoundNBT nbtIn) {
-		super.read(stateIn, nbtIn);
-		setFilter(ItemStack.read(nbtIn.getCompound("Filter")));
+	public void load(BlockState stateIn, CompoundNBT nbtIn) {
+		super.load(stateIn, nbtIn);
+		setFilter(ItemStack.of(nbtIn.getCompound("Filter")));
 	}
 
 	public void setFilter(ItemStack filter) {

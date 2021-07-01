@@ -30,15 +30,15 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 
 	@Override
 	public void tick() {
-		if(!world.isRemote && world.getGameTime() % 20 == 1) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryCableConnector.FACING);
+		if(!level.isClientSide && level.getGameTime() % 20 == 1) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			checkedBlocks.add(pos);
-			BlockPos up = pos.offset(facing.getOpposite());
-			BlockPos down = pos.offset(facing);
-			state = world.getBlockState(up);
+			checkedBlocks.add(worldPosition);
+			BlockPos up = worldPosition.relative(facing.getOpposite());
+			BlockPos down = worldPosition.relative(facing);
+			state = level.getBlockState(up);
 			if(state.getBlock() instanceof IInventoryCable) {
 				top = null;
 				topNet = true;
@@ -47,17 +47,17 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 					BlockPos cp = toCheck.pop();
 					if(!checkedBlocks.contains(cp)) {
 						checkedBlocks.add(cp);
-						if(world.isBlockLoaded(cp)) {
-							state = world.getBlockState(cp);
+						if(level.hasChunkAt(cp)) {
+							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
-								TileEntity te = world.getTileEntity(cp);
+								TileEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									top = ((TileEntityInventoryConnector) te).getInventory();
 								}
 								break;
 							}
 							if(state.getBlock() instanceof IInventoryCable) {
-								toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+								toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
 							}
 						}
 						if(checkedBlocks.size() > Config.invConnectorMax)break;
@@ -66,13 +66,13 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 			} else {
 				topNet = false;
 				if(top == null || !top.isPresent()) {
-					TileEntity te = world.getTileEntity(up);
+					TileEntity te = level.getBlockEntity(up);
 					if(te != null) {
 						top = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 					}
 				}
 			}
-			state = world.getBlockState(down);
+			state = level.getBlockState(down);
 			if(state.getBlock() instanceof IInventoryCable) {
 				toCheck.add(down);
 				bottom = null;
@@ -81,17 +81,17 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 					BlockPos cp = toCheck.pop();
 					if(!checkedBlocks.contains(cp)) {
 						checkedBlocks.add(cp);
-						if(world.isBlockLoaded(cp)) {
-							state = world.getBlockState(cp);
+						if(level.hasChunkAt(cp)) {
+							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
-								TileEntity te = world.getTileEntity(cp);
+								TileEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									bottom = ((TileEntityInventoryConnector) te).getInventory();
 								}
 								break;
 							}
 							if(state.getBlock() instanceof IInventoryCable) {
-								toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+								toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
 							}
 						}
 						if(checkedBlocks.size() > Config.invConnectorMax)break;
@@ -100,14 +100,14 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 			} else {
 				bottomNet = false;
 				if(bottom == null || !bottom.isPresent()) {
-					TileEntity te = world.getTileEntity(down);
+					TileEntity te = level.getBlockEntity(down);
 					if(te != null) {
 						bottom = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 					}
 				}
 			}
 		}
-		if(!world.isRemote && (topNet || bottomNet) && top != null && top.isPresent() && bottom != null && bottom.isPresent()) {
+		if(!level.isClientSide && (topNet || bottomNet) && top != null && top.isPresent() && bottom != null && bottom.isPresent()) {
 			update();
 		}
 	}

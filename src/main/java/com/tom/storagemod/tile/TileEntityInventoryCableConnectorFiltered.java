@@ -35,15 +35,15 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT tag) {
-		tag.put("filter", filter.write());
-		return super.write(tag);
+	public CompoundNBT save(CompoundNBT tag) {
+		tag.put("filter", filter.createTag());
+		return super.save(tag);
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT tag) {
-		super.read(state, tag);
-		filter.read(tag.getList("filter", 10));
+	public void load(BlockState state, CompoundNBT tag) {
+		super.load(state, tag);
+		filter.fromTag(tag.getList("filter", 10));
 	}
 
 	@Override

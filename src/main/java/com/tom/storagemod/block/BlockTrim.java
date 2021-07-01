@@ -23,13 +23,13 @@ import com.tom.storagemod.proxy.ClientProxy;
 public class BlockTrim extends Block implements ITrim, IPaintable {
 
 	public BlockTrim() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
 		setRegistryName("ts.trim");
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("trim", tooltip);
@@ -37,7 +37,7 @@ public class BlockTrim extends Block implements ITrim, IPaintable {
 
 	@Override
 	public boolean paint(World world, BlockPos pos, BlockState to) {
-		world.setBlockState(pos, StorageMod.paintedTrim.getDefaultState());
+		world.setBlockAndUpdate(pos, StorageMod.paintedTrim.defaultBlockState());
 		return StorageMod.paintedTrim.paint(world, pos, to);
 	}
 }

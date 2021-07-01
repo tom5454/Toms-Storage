@@ -75,7 +75,7 @@ public class CraftingTerminalTransferHandler implements IRecipeTransferHandler {
 						for (int j = 0;j < stacks[i].length && j < 3;j++) {
 							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 								CompoundNBT tag = new CompoundNBT();
-								stacks[i][j].write(tag);
+								stacks[i][j].save(tag);
 								CompoundNBT.put("i" + j, tag);
 							}
 						}

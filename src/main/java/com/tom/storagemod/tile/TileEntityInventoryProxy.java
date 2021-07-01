@@ -34,9 +34,9 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 	}
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryProxy.FACING);
+		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(BlockInventoryProxy.FACING);
 			if(side != facing) {
 				if (this.invHandler == null)
 					this.invHandler = LazyOptional.of(InvHandler::new);
@@ -108,19 +108,19 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 	}
 
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		if (invHandler != null)
 			invHandler.invalidate();
 	}
 	@Override
 	public void tick() {
-		if(!world.isRemote && world.getGameTime() % 20 == 18) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryProxy.FACING);
-			DirectionWithNull filter = state.get(BlockInventoryProxy.FILTER_FACING);
+		if(!level.isClientSide && level.getGameTime() % 20 == 18) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(BlockInventoryProxy.FACING);
+			DirectionWithNull filter = state.getValue(BlockInventoryProxy.FILTER_FACING);
 			if(pointedAt == null || !pointedAt.isPresent()) {
-				TileEntity te = world.getTileEntity(pos.offset(facing));
+				TileEntity te = level.getBlockEntity(worldPosition.relative(facing));
 				if(te != null && !(te instanceof TileEntityInventoryProxy)) {
 					pointedAt = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 				}
@@ -128,7 +128,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 			ignoreCount = false;
 			globalCountLimit = 64;
 			if(filter != DirectionWithNull.NULL) {
-				TileEntity te = world.getTileEntity(pos.offset(filter.getDir()));
+				TileEntity te = level.getBlockEntity(worldPosition.relative(filter.getDir()));
 				if(te != null && !(te instanceof TileEntityInventoryProxy)) {
 					this.filter = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 					if(te instanceof INamedContainerProvider) {
@@ -157,7 +157,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 			} else {
 				this.filter = null;
 			}
-			this.world.updateComparatorOutputLevel(this.pos, getBlockState().getBlock());
+			this.level.updateNeighbourForOutputSignal(this.worldPosition, getBlockState().getBlock());
 		}
 	}
 
@@ -186,7 +186,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 				ItemStack fstack = fsize > j ? filter.getStackInSlot(j) : ItemStack.EMPTY;
 
 				if (!itemStack.isEmpty()) {
-					if(fstack.isEmpty() || (ItemStack.areItemsEqual(itemStack, fstack) && ItemStack.areItemStackTagsEqual(itemStack, fstack))) {
+					if(fstack.isEmpty() || (ItemStack.isSame(itemStack, fstack) && ItemStack.tagMatches(itemStack, fstack))) {
 						f += itemStack.getCount() / Math.min((ignoreCount || fstack.isEmpty() ? globalCountLimit : fstack.getCount()), itemStack.getMaxStackSize());
 						i++;
 					}
@@ -206,12 +206,12 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 				if(fstack.isEmpty())return true;
 				if(stack == null) {
 					stack = w.getStackInSlot(slot);
-					if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areItemStackTagsEqual(stack, fstack)) {
+					if(ItemStack.isSame(stack, fstack) && ItemStack.tagMatches(stack, fstack)) {
 						return true;
 					}
 					return false;
 				}
-				if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areItemStackTagsEqual(stack, fstack)) {
+				if(ItemStack.isSame(stack, fstack) && ItemStack.tagMatches(stack, fstack)) {
 					if(ignoreCount)return true;
 					int count = w.getStackInSlot(slot).getCount();
 					if(count < fstack.getCount())

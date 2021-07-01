@@ -12,17 +12,17 @@ public class SlotPhantom extends Slot {
 	}
 
 	@Override
-	public boolean canTakeStack(PlayerEntity p_82869_1_) {
+	public boolean mayPickup(PlayerEntity p_82869_1_) {
 		return false;
 	}
 
 	@Override
-	public int getSlotStackLimit() {
+	public int getMaxStackSize() {
 		return 1;
 	}
 
 	@Override
-	public boolean isItemValid(ItemStack p_75214_1_) {
+	public boolean mayPlace(ItemStack p_75214_1_) {
 		return true;
 	}
 }

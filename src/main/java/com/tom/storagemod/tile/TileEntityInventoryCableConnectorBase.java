@@ -38,13 +38,13 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 
 	@Override
 	public void tick() {
-		if(!world.isRemote && world.getGameTime() % 20 == 19) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryCableConnector.FACING);
+		if(!level.isClientSide && level.getGameTime() % 20 == 19) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			checkedBlocks.add(pos);
-			toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, pos));
+			checkedBlocks.add(worldPosition);
+			toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, worldPosition));
 			if(master != null)master.unLink(linv);
 			master = null;
 			linv = new LinkedInv();
@@ -52,27 +52,27 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 				BlockPos cp = toCheck.pop();
 				if(!checkedBlocks.contains(cp)) {
 					checkedBlocks.add(cp);
-					if(world.isBlockLoaded(cp)) {
-						state = world.getBlockState(cp);
+					if(level.hasChunkAt(cp)) {
+						state = level.getBlockState(cp);
 						if(state.getBlock() == StorageMod.connector) {
-							TileEntity te = world.getTileEntity(cp);
+							TileEntity te = level.getBlockEntity(cp);
 							if(te instanceof TileEntityInventoryConnector) {
 								master = (TileEntityInventoryConnector) te;
-								linv.time = world.getGameTime();
+								linv.time = level.getGameTime();
 								linv.handler = this::applyFilter;
 								master.addLinked(linv);
 							}
 							break;
 						}
 						if(state.getBlock() instanceof IInventoryCable) {
-							toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+							toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
 						}
 					}
 					if(checkedBlocks.size() > Config.invConnectorMax)break;
 				}
 			}
 			if(pointedAt == null || !pointedAt.isPresent()) {
-				TileEntity te = world.getTileEntity(pos.offset(facing));
+				TileEntity te = level.getBlockEntity(worldPosition.relative(facing));
 				if(te != null) {
 					pointedAt = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 				}
@@ -90,7 +90,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.removed && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			if (this.invHandler == null)
 				this.invHandler = getCapability();
 			return this.invHandler.cast();
@@ -153,8 +153,8 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 	}
 
 	@Override
-	public void remove() {
-		super.remove();
+	public void setRemoved() {
+		super.setRemoved();
 		if (invHandler != null)
 			invHandler.invalidate();
 	}

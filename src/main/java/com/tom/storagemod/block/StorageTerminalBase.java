@@ -38,85 +38,85 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 	public static final EnumProperty<TerminalPos> TERMINAL_POS = EnumProperty.create("pos", TerminalPos.class);
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-	private static final VoxelShape SHAPE_N = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 6.0D);
-	private static final VoxelShape SHAPE_S = Block.makeCuboidShape(0.0D, 0.0D, 10.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_E = Block.makeCuboidShape(10.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_W = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 6.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_U = Block.makeCuboidShape(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_D = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
+	private static final VoxelShape SHAPE_N = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 6.0D);
+	private static final VoxelShape SHAPE_S = Block.box(0.0D, 0.0D, 10.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_E = Block.box(10.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_W = Block.box(0.0D, 0.0D, 0.0D, 6.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_U = Block.box(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_D = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public StorageTerminalBase() {
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(3).harvestTool(ToolType.AXE).setLightLevel(s -> 6));
-		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER).with(WATERLOGGED, false).with(FACING, Direction.NORTH));
+		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE).lightLevel(s -> 6));
+		registerDefaultState(defaultBlockState().setValue(TERMINAL_POS, TerminalPos.CENTER).setValue(WATERLOGGED, false).setValue(FACING, Direction.NORTH));
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
+	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
 
 	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(FACING, WATERLOGGED, TERMINAL_POS);
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos,
+	public ActionResultType use(BlockState state, World world, BlockPos pos,
 			PlayerEntity player, Hand hand, BlockRayTraceResult rtr) {
-		if (world.isRemote) {
+		if (world.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 
-		TileEntity blockEntity_1 = world.getTileEntity(pos);
+		TileEntity blockEntity_1 = world.getBlockEntity(pos);
 		if (blockEntity_1 instanceof TileEntityStorageTerminal) {
-			player.openContainer((TileEntityStorageTerminal)blockEntity_1);
+			player.openMenu((TileEntityStorageTerminal)blockEntity_1);
 		}
 		return ActionResultType.SUCCESS;
 	}
 
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction direction = context.getFace().getOpposite();
-		FluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
+		Direction direction = context.getClickedFace().getOpposite();
+		FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
 		TerminalPos pos = TerminalPos.CENTER;
 		if(direction.getAxis() == Direction.Axis.Y) {
 			if(direction == Direction.UP)pos = TerminalPos.UP;
 			if(direction == Direction.DOWN)pos = TerminalPos.DOWN;
-			direction = context.getPlacementHorizontalFacing();
+			direction = context.getHorizontalDirection();
 		}
-		return this.getDefaultState().with(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.NORTH : direction).
-				with(TERMINAL_POS, pos).
-				with(WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER));
+		return this.defaultBlockState().setValue(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.NORTH : direction).
+				setValue(TERMINAL_POS, pos).
+				setValue(WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER));
 	}
 
 	@Override
 	public FluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (stateIn.get(WATERLOGGED)) {
-			worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 
-		return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(TERMINAL_POS)) {
+		switch (state.getValue(TERMINAL_POS)) {
 		case CENTER:
-			switch (state.get(FACING)) {
+			switch (state.getValue(FACING)) {
 			case NORTH:
 				return SHAPE_N;
 			case SOUTH:
@@ -154,7 +154,7 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 		}
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return name;
 		}
 	}

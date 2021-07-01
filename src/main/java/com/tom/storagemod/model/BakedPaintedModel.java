@@ -34,7 +34,7 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	}
 
 	@Override
-	public boolean isAmbientOcclusion() {
+	public boolean useAmbientOcclusion() {
 		return true;
 	}
 
@@ -44,19 +44,19 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	}
 
 	@Override
-	public boolean isSideLit() {
+	public boolean usesBlockLight() {
 		return false;
 	}
 
 	@Override
-	public boolean isBuiltInRenderer() {
+	public boolean isCustomRenderer() {
 		return false;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public TextureAtlasSprite getParticleTexture() {
-		return parent.getParticleTexture();
+	public TextureAtlasSprite getParticleIcon() {
+		return parent.getParticleIcon();
 	}
 
 	@Override
@@ -72,16 +72,16 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 		BlockState blockstate = null;
 		if(blockstateSupp != null)blockstate = blockstateSupp.get();
 		RenderType layer = MinecraftForgeClient.getRenderLayer();
-		if (blockstate == null || blockstate == Blocks.AIR.getDefaultState()) {
+		if (blockstate == null || blockstate == Blocks.AIR.defaultBlockState()) {
 			blockstate = state;
 			model = parent;
-			if(layer != null && layer != RenderType.getSolid())return Collections.emptyList();
+			if(layer != null && layer != RenderType.solid())return Collections.emptyList();
 		}
 		if (layer != null && ! RenderTypeLookup.canRenderInLayer(blockstate, layer)) { // always render in the null layer or the block-breaking textures don't show up
 			return Collections.emptyList();
 		}
 		if(model == null)
-			model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(blockstate);
+			model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(blockstate);
 		return model.getQuads(blockstate, side, rand);
 	}
 
