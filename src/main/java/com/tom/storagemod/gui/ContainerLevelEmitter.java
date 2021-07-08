@@ -137,7 +137,9 @@ public class ContainerLevelEmitter extends ScreenHandler implements IDataReceive
 			ItemStack s = getCursorStack().copy();
 			if(!s.isEmpty())s.setCount(1);
 			slot.setStack(s);
+			return;
 		}
+		super.onSlotClick(slotId, dragType, click, player);
 	}
 
 	private int lastCount = 0;

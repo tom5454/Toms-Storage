@@ -62,7 +62,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setInitialFocus(this.recipeBookGui);
 		GuiButtonClear btnClr = new GuiButtonClear(x + 80, y + 110, b -> clearGrid());
 		addDrawableChild(btnClr);
-		buttonPullFromInv = addSelectableChild(new GuiButton(x - 18, y + 5 + 18*4, 4, b -> {
+		buttonPullFromInv = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
 			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();

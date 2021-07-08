@@ -77,13 +77,13 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 			} catch (NumberFormatException e) {
 			}
 		});
-		addSelectableChild(textF);
-		lessThanBtn = new GuiButton(width - 18, height + 5, 0, b -> {
+		addDrawableChild(textF);
+		lessThanBtn = new GuiButton(x - 18, y + 5, 0, b -> {
 			lt = !lt;
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
 		});
-		addSelectableChild(lessThanBtn);
+		addDrawableChild(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));
 		amountBtns.add(new AmountBtn( 75, 0,  100, 32, 30));
@@ -124,9 +124,10 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		@Override
 		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				client.getTextureManager().bindTexture(gui);
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderTexture(0, gui);
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
 				//int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
@@ -147,8 +148,8 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		private ButtonWidget btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new ButtonWidget(GuiLevelEmitter.this.width + x, GuiLevelEmitter.this.height + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
-			addSelectableChild(btn);
+			btn = new ButtonWidget(GuiLevelEmitter.this.x + x, GuiLevelEmitter.this.y + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
+			addDrawableChild(btn);
 			this.v = v;
 			this.sv = sv;
 		}
