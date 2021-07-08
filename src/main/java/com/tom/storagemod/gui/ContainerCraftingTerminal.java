@@ -141,7 +141,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			if (slot instanceof SlotCrafting || slot == craftingResultSlot) {
 				for (ScreenHandlerListener listener : listeners) {
 					if (listener instanceof ServerPlayerEntity) {
-						((ServerPlayerEntity) listener).networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, i, slot.getStack()));
+						((ServerPlayerEntity) listener).networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, nextRevision(), i, slot.getStack()));
 					}
 				}
 			}

@@ -250,8 +250,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void handledScreenTick() {
 		updateSearch();
 	}
 
