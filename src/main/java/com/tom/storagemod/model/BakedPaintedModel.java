@@ -5,19 +5,19 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemOverrideList;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
@@ -27,8 +27,8 @@ import com.tom.storagemod.tile.TileEntityPainted;
 
 public class BakedPaintedModel implements IDynamicBakedModel {
 	private Block blockFor;
-	private IBakedModel parent;
-	public BakedPaintedModel(Block blockFor, IBakedModel parent) {
+	private BakedModel parent;
+	public BakedPaintedModel(Block blockFor, BakedModel parent) {
 		this.blockFor = blockFor;
 		this.parent = parent;
 	}
@@ -60,14 +60,14 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	}
 
 	@Override
-	public ItemOverrideList getOverrides() {
+	public ItemOverrides getOverrides() {
 		return null;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand, IModelData modelData) {
-		IBakedModel model = null;
+		BakedModel model = null;
 		Supplier<BlockState> blockstateSupp = modelData.getData(TileEntityPainted.FACADE_STATE);
 		BlockState blockstate = null;
 		if(blockstateSupp != null)blockstate = blockstateSupp.get();
@@ -77,7 +77,8 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 			model = parent;
 			if(layer != null && layer != RenderType.solid())return Collections.emptyList();
 		}
-		if (layer != null && ! RenderTypeLookup.canRenderInLayer(blockstate, layer)) { // always render in the null layer or the block-breaking textures don't show up
+
+		if (layer != null && ! ItemBlockRenderTypes.canRenderInLayer(blockstate, layer)) { // always render in the null layer or the block-breaking textures don't show up
 			return Collections.emptyList();
 		}
 		if(model == null)
@@ -86,8 +87,7 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	}
 
 	@Override
-	public IModelData getModelData(IBlockDisplayReader world, BlockPos pos, BlockState state, IModelData tileData) {
+	public IModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, IModelData tileData) {
 		return tileData;
 	}
-
 }

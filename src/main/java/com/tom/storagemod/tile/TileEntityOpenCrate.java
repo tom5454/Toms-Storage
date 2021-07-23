@@ -3,18 +3,18 @@ package com.tom.storagemod.tile;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity.RemovalReason;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -23,22 +23,23 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 
-public class TileEntityOpenCrate extends TileEntity implements ITickableTileEntity, IInventory {
+public class TileEntityOpenCrate extends BlockEntity implements TickableServer, Container {
 	private List<ItemEntity> items = new ArrayList<>();
 	private LazyOptional<IItemHandlerModifiable> chestHandler;
 
-	public TileEntityOpenCrate() {
-		super(StorageMod.openCrateTile);
+	public TileEntityOpenCrate(BlockPos pos, BlockState state) {
+		super(StorageMod.openCrateTile, pos, state);
 	}
 
 	@Override
-	public void tick() {
+	public void updateServer() {
 		if(level.getGameTime() % 5 == 0){
 			BlockState state = level.getBlockState(worldPosition);
 			Direction f = state.getValue(BlockStateProperties.FACING);
 			BlockPos p = worldPosition.relative(f);
-			items = level.getEntitiesOfClass(ItemEntity.class, new AxisAlignedBB(p));
+			items = level.getEntitiesOfClass(ItemEntity.class, new AABB(p));
 		}
 	}
 
@@ -67,7 +68,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
 				ItemStack s = ent.getItem().split(count);
-				if(ent.getItem().isEmpty())ent.remove();
+				if(ent.getItem().isEmpty())ent.remove(RemovalReason.KILLED);
 				return s;
 			}
 			else return ItemStack.EMPTY;
@@ -80,7 +81,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 			ItemEntity ent = items.get(index);
 			if(ent.isAlive()){
 				ItemStack s = ent.getItem();
-				ent.remove();
+				ent.remove(RemovalReason.KILLED);
 				return s;
 			}
 			else return ItemStack.EMPTY;
@@ -95,7 +96,7 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 		BlockPos p = worldPosition.relative(f);
 		ItemEntity entityitem = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, stack);
 		entityitem.setDefaultPickUpDelay();
-		entityitem.setDeltaMovement(Vector3d.ZERO);
+		entityitem.setDeltaMovement(Vec3.ZERO);
 		level.addFreshEntity(entityitem);
 		items.add(entityitem);
 	}
@@ -106,16 +107,16 @@ public class TileEntityOpenCrate extends TileEntity implements ITickableTileEnti
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 	}
 
 	@Override

@@ -4,14 +4,15 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -19,16 +20,16 @@ import net.minecraftforge.client.model.data.ModelProperty;
 
 import com.tom.storagemod.StorageMod;
 
-public class TileEntityPainted extends TileEntity {
+public class TileEntityPainted extends BlockEntity {
 	public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
 	private BlockState blockState;
 
-	public TileEntityPainted() {
-		super(StorageMod.paintedTile);
+	public TileEntityPainted(BlockPos pos, BlockState state) {
+		super(StorageMod.paintedTile, pos, state);
 	}
 
-	public TileEntityPainted(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityPainted(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 	}
 
 	public boolean setPaintedBlockState(BlockState blockState) {
@@ -45,17 +46,17 @@ public class TileEntityPainted extends TileEntity {
 	}
 
 	@Override
-	public void load(BlockState st, @Nonnull CompoundNBT compound) {
-		super.load(st, compound);
-		blockState = NBTUtil.readBlockState(compound.getCompound("block"));
+	public void load(@Nonnull CompoundTag compound) {
+		super.load(compound);
+		blockState = NbtUtils.readBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
 
 	@Nonnull
 	@Override
-	public CompoundNBT save(@Nonnull CompoundNBT compound) {
+	public CompoundTag save(@Nonnull CompoundTag compound) {
 		if (blockState != null) {
-			compound.put("block", NBTUtil.writeBlockState(blockState));
+			compound.put("block", NbtUtils.writeBlockState(blockState));
 		}
 		return super.save(compound);
 	}
@@ -70,17 +71,17 @@ public class TileEntityPainted extends TileEntity {
 
 	@Nonnull
 	@Override
-	public CompoundNBT getUpdateTag() {
-		CompoundNBT updateTag = super.getUpdateTag();
+	public CompoundTag getUpdateTag() {
+		CompoundTag updateTag = super.getUpdateTag();
 		save(updateTag);
 		return updateTag;
 	}
 
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		CompoundNBT nbtTag = new CompoundNBT();
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		CompoundTag nbtTag = new CompoundTag();
 		save(nbtTag);
-		return new SUpdateTileEntityPacket(getBlockPos(), 1, nbtTag);
+		return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, nbtTag);
 	}
 
 	public BlockState getPaintedBlockState() {
@@ -88,17 +89,18 @@ public class TileEntityPainted extends TileEntity {
 	}
 
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
 		BlockState old = getPaintedBlockState();
-		CompoundNBT tagCompound = packet.getTag();
+		CompoundTag tagCompound = packet.getTag();
 		super.onDataPacket(net, packet);
-		load(level.getBlockState(worldPosition), tagCompound);
+		load(tagCompound);
 
 		if (level != null && level.isClientSide) {
 			// If needed send a render update.
 			if (! getPaintedBlockState().equals(old)) {
-				level.blockEntityChanged(getBlockPos(), this.getTileEntity());
+				level.blockEntityChanged(getBlockPos());
 			}
+			requestModelDataUpdate();
 		}
 	}
 }

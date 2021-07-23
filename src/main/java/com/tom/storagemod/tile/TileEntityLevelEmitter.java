@@ -5,19 +5,18 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -27,24 +26,25 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.BlockLevelEmitter;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.gui.ContainerLevelEmitter;
 
-public class TileEntityLevelEmitter extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
+public class TileEntityLevelEmitter extends BlockEntity implements TickableServer, MenuProvider {
 	private ItemStack filter = ItemStack.EMPTY;
 	private int count;
 	private LazyOptional<IItemHandler> top;
 	private boolean lessThan;
 
-	public TileEntityLevelEmitter() {
-		super(StorageMod.levelEmitterTile);
+	public TileEntityLevelEmitter(BlockPos pos, BlockState state) {
+		super(StorageMod.levelEmitterTile, pos, state);
 	}
 
 	@Override
-	public void tick() {
-		if(!level.isClientSide && level.getGameTime() % 20 == 1) {
+	public void updateServer() {
+		if(level.getGameTime() % 20 == 1) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
@@ -62,7 +62,7 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 						if(level.hasChunkAt(cp)) {
 							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
-								TileEntity te = level.getBlockEntity(cp);
+								BlockEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									top = ((TileEntityInventoryConnector) te).getInventory();
 								}
@@ -77,7 +77,7 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 				}
 			} else {
 				if(top == null || !top.isPresent()) {
-					TileEntity te = level.getBlockEntity(up);
+					BlockEntity te = level.getBlockEntity(up);
 					if(te != null) {
 						top = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 					}
@@ -120,16 +120,16 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT compound) {
-		compound.put("Filter", getFilter().save(new CompoundNBT()));
+	public CompoundTag save(CompoundTag compound) {
+		compound.put("Filter", getFilter().save(new CompoundTag()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
 		return super.save(compound);
 	}
 
 	@Override
-	public void load(BlockState stateIn, CompoundNBT nbtIn) {
-		super.load(stateIn, nbtIn);
+	public void load(CompoundTag nbtIn) {
+		super.load(nbtIn);
 		setFilter(ItemStack.of(nbtIn.getCompound("Filter")));
 		count = nbtIn.getInt("Count");
 		lessThan = nbtIn.getBoolean("lessThan");
@@ -160,12 +160,12 @@ public class TileEntityLevelEmitter extends TileEntity implements ITickableTileE
 	}
 
 	@Override
-	public Container createMenu(int p_createMenu_1_, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
+	public AbstractContainerMenu createMenu(int p_createMenu_1_, Inventory p_createMenu_2_, Player p_createMenu_3_) {
 		return new ContainerLevelEmitter(p_createMenu_1_, p_createMenu_2_, this);
 	}
 
 	@Override
-	public ITextComponent getDisplayName() {
-		return new TranslationTextComponent("ts.level_emitter");
+	public Component getDisplayName() {
+		return new TranslatableComponent("ts.level_emitter");
 	}
 }

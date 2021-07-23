@@ -3,8 +3,8 @@ package com.tom.storagemod;
 import java.util.Comparator;
 import java.util.function.Function;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
 	private ItemStack stack;
@@ -36,19 +36,19 @@ public class StoredItemStack {
 		return s;
 	}
 
-	public void writeToNBT(CompoundNBT tag) {
+	public void writeToNBT(CompoundTag tag) {
 		tag.putLong(ITEM_COUNT_NAME, getQuantity());
-		tag.put(ITEMSTACK_NAME, stack.save(new CompoundNBT()));
+		tag.put(ITEMSTACK_NAME, stack.save(new CompoundTag()));
 		tag.getCompound(ITEMSTACK_NAME).remove("Count");
 	}
 
-	public void writeToNBT(CompoundNBT tag, long q) {
+	public void writeToNBT(CompoundTag tag, long q) {
 		tag.putLong(ITEM_COUNT_NAME, q);
-		tag.put(ITEMSTACK_NAME, stack.save(new CompoundNBT()));
+		tag.put(ITEMSTACK_NAME, stack.save(new CompoundTag()));
 		tag.getCompound(ITEMSTACK_NAME).remove("Count");
 	}
 
-	public static StoredItemStack readFromNBT(CompoundNBT tag) {
+	public static StoredItemStack readFromNBT(CompoundTag tag) {
 		ItemStack cheat = ItemStack.of(tag);
 		tag.getCompound(ITEMSTACK_NAME).putByte("Count", (byte) 1);
 		StoredItemStack stack = new StoredItemStack(!cheat.isEmpty() ? cheat : ItemStack.of(tag.getCompound(ITEMSTACK_NAME)), !cheat.isEmpty() ? cheat.getCount() : tag.getLong(ITEM_COUNT_NAME));

@@ -1,18 +1,18 @@
 package com.tom.storagemod.gui;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotPhantom extends Slot {
 
-	public SlotPhantom(IInventory inv, int slotIndex, int posX, int posY) {
+	public SlotPhantom(Container inv, int slotIndex, int posX, int posY) {
 		super(inv, slotIndex, posX, posY);
 	}
 
 	@Override
-	public boolean mayPickup(PlayerEntity p_82869_1_) {
+	public boolean mayPickup(Player p_82869_1_) {
 		return false;
 	}
 

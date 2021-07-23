@@ -3,15 +3,15 @@ package com.tom.storagemod.network;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import com.tom.storagemod.StorageMod;
 
@@ -31,7 +31,7 @@ public class NetworkHandler {
 	public static void handleData(DataPacket packet, Supplier<NetworkEvent.Context> ctx) {
 		if(ctx.get().getDirection() == NetworkDirection.PLAY_TO_SERVER) {
 			ctx.get().enqueueWork(() -> {
-				ServerPlayerEntity sender = ctx.get().getSender();
+				ServerPlayer sender = ctx.get().getSender();
 				if(sender.containerMenu instanceof IDataReceiver) {
 					((IDataReceiver)sender.containerMenu).receive(packet.tag);
 				}
@@ -46,11 +46,11 @@ public class NetworkHandler {
 		ctx.get().setPacketHandled(true);
 	}
 
-	public static void sendDataToServer(CompoundNBT tag) {
+	public static void sendDataToServer(CompoundTag tag) {
 		INSTANCE.sendToServer(new DataPacket(tag));
 	}
 
-	public static void sendTo(ServerPlayerEntity pl, CompoundNBT tag) {
+	public static void sendTo(ServerPlayer pl, CompoundTag tag) {
 		INSTANCE.send(PacketDistributor.PLAYER.with(() -> pl), new DataPacket(tag));
 	}
 }

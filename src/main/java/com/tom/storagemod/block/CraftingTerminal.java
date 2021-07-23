@@ -2,11 +2,13 @@ package com.tom.storagemod.block;
 
 import java.util.List;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -22,14 +24,14 @@ public class CraftingTerminal extends StorageTerminalBase {
 	}
 
 	@Override
-	public TileEntity newBlockEntity(IBlockReader worldIn) {
-		return new TileEntityCraftingTerminal();
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityCraftingTerminal(pos, state);
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
-			ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
 		ClientProxy.tooltip("crafting_terminal", tooltip);
 	}
 }

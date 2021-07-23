@@ -5,53 +5,52 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.network.IDataReceiver;
 import com.tom.storagemod.network.NetworkHandler;
 
-import net.minecraft.client.gui.widget.button.Button.IPressable;
-
-public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> implements IDataReceiver {
+public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitter> implements IDataReceiver {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/level_emitter.png");
 	private GuiButton lessThanBtn;
-	private TextFieldWidget textF;
+	private EditBox textF;
 	private boolean lt;
 	private int count;
 	private List<AmountBtn> amountBtns = new ArrayList<>();
 
-	public GuiLevelEmitter(ContainerLevelEmitter screenContainer, PlayerInventory inv, ITextComponent titleIn) {
+	public GuiLevelEmitter(ContainerLevelEmitter screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn);
 	}
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(matrixStack);
 		amountBtns.forEach(AmountBtn::update);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(matrixStack, mouseX, mouseY);
 		if(lessThanBtn.isHovered()) {
-			renderComponentTooltip(matrixStack, Arrays.stream(I18n.get("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(StringTextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+			renderComponentTooltip(matrixStack, Arrays.stream(I18n.get("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
 	@Override
-	protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bind(gui);
+	protected void renderBg(PoseStack matrixStack, float partialTicks, int x, int y) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, gui);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
 		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
@@ -59,11 +58,10 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 
 	@Override
 	protected void init() {
-		children.clear();
-		buttons.clear();
+		clearWidgets();
 		amountBtns.clear();
 		super.init();
-		textF = new TextFieldWidget(font, leftPos + 70, topPos + 41, 89, font.lineHeight, new TranslationTextComponent("narrator.toms_storage.level_emitter_amount"));
+		textF = new EditBox(font, leftPos + 70, topPos + 41, 89, font.lineHeight, new TranslatableComponent("narrator.toms_storage.level_emitter_amount"));
 		textF.setMaxLength(100);
 		textF.setBordered(false);
 		textF.setVisible(true);
@@ -79,13 +77,13 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 			} catch (NumberFormatException e) {
 			}
 		});
-		addButton(textF);
+		addRenderableWidget(textF);
 		lessThanBtn = new GuiButton(leftPos - 18, topPos + 5, 0, b -> {
 			lt = !lt;
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
 		});
-		addButton(lessThanBtn);
+		addRenderableWidget(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));
 		amountBtns.add(new AmountBtn( 75, 0,  100, 32, 30));
@@ -98,7 +96,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 	}
 
 	@Override
-	public void receive(CompoundNBT tag) {
+	public void receive(CompoundTag tag) {
 		count = tag.getInt("count");
 		boolean lt = tag.getBoolean("lessThan");
 		lessThanBtn.state = lt ? 1 : 0;
@@ -111,7 +109,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		protected int state;
 		protected int texX = 176;
 		protected int texY = 0;
-		public GuiButton(int x, int y, int tile, IPressable pressable) {
+		public GuiButton(int x, int y, int tile, OnPress pressable) {
 			super(x, y, 16, 16, null, pressable);
 			this.tile = tile;
 		}
@@ -124,10 +122,10 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
+		public void renderButton(PoseStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				minecraft.getTextureManager().bind(gui);
-				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderTexture(0, gui);
 				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				//int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
@@ -139,7 +137,7 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 	}
 
 	private void send() {
-		CompoundNBT mainTag = new CompoundNBT();
+		CompoundTag mainTag = new CompoundTag();
 		mainTag.putInt("count", count);
 		mainTag.putBoolean("lessThan", lt);
 		NetworkHandler.sendDataToServer(mainTag);
@@ -149,8 +147,8 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 		private Button btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new Button(leftPos + x, topPos + y + 16, len, 20, new StringTextComponent((v > 0 ? "+" : "") + v), this::evt);
-			addButton(btn);
+			btn = new Button(leftPos + x, topPos + y + 16, len, 20, new TextComponent((v > 0 ? "+" : "") + v), this::evt);
+			addRenderableWidget(btn);
 			this.v = v;
 			this.sv = sv;
 		}
@@ -164,9 +162,9 @@ public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> impl
 
 		private void update() {
 			if(hasShiftDown()) {
-				btn.setMessage(new StringTextComponent((sv > 0 ? "+" : "") + sv));
+				btn.setMessage(new TextComponent((sv > 0 ? "+" : "") + sv));
 			} else {
-				btn.setMessage(new StringTextComponent((v > 0 ? "+" : "") + v));
+				btn.setMessage(new TextComponent((v > 0 ? "+" : "") + v));
 			}
 		}
 	}

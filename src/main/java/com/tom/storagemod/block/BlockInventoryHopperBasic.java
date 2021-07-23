@@ -3,43 +3,46 @@ package com.tom.storagemod.block;
 import java.util.Collections;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 
-public class BlockInventoryHopperBasic extends ContainerBlock implements IInventoryCable {
+public class BlockInventoryHopperBasic extends BaseEntityBlock implements IInventoryCable {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 
@@ -52,15 +55,22 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
-			ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_hopper", tooltip);
 	}
 
 	@Override
-	public TileEntity newBlockEntity(IBlockReader worldIn) {
-		return new TileEntityInventoryHopperBasic();
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityInventoryHopperBasic(pos, state);
 	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
+	}
+
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
 		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
@@ -72,22 +82,22 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
 	}
 
 	@Override
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, ENABLED);
 	}
 
 	@Override
-	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
 	}
 
 	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+	public List<BlockPos> next(Level world, BlockState state, BlockPos pos) {
 		return Collections.emptyList();
 	}
 
@@ -97,61 +107,61 @@ public class BlockInventoryHopperBasic extends ContainerBlock implements IInvent
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		switch (state.getValue(FACING)) {
 		case DOWN:
-			return VoxelShapes.or(box(5, 0, 5, 11, 6, 11), box(3, 6, 3, 13, 16, 13));
+			return Shapes.or(box(5, 0, 5, 11, 6, 11), box(3, 6, 3, 13, 16, 13));
 		case EAST:
-			return VoxelShapes.or(box(10, 5, 5, 16, 11, 11), box(0, 3, 3, 10, 13, 13));
+			return Shapes.or(box(10, 5, 5, 16, 11, 11), box(0, 3, 3, 10, 13, 13));
 		case NORTH:
-			return VoxelShapes.or(box(5, 5, 0, 11, 11, 6), box(3, 3, 6, 13, 13, 16));
+			return Shapes.or(box(5, 5, 0, 11, 11, 6), box(3, 3, 6, 13, 13, 16));
 		case SOUTH:
-			return VoxelShapes.or(box(5, 5, 10, 11, 11, 16), box(3, 3, 0, 13, 13, 10));
+			return Shapes.or(box(5, 5, 10, 11, 11, 16), box(3, 3, 0, 13, 13, 10));
 		case UP:
-			return VoxelShapes.or(box(5, 10, 5, 11, 16, 11), box(3, 0, 3, 13, 10, 13));
+			return Shapes.or(box(5, 10, 5, 11, 16, 11), box(3, 0, 3, 13, 10, 13));
 		case WEST:
-			return VoxelShapes.or(box(0, 5, 5, 6, 11, 11), box(6, 3, 3, 16, 13, 13));
+			return Shapes.or(box(0, 5, 5, 6, 11, 11), box(6, 3, 3, 16, 13, 13));
 		default:
 			break;
 		}
-		return VoxelShapes.block();
+		return Shapes.block();
 	}
 
 	@Override
-	public ActionResultType use(BlockState st, World world, BlockPos pos,
-			PlayerEntity player, Hand hand, BlockRayTraceResult trace) {
+	public InteractionResult use(BlockState st, Level world, BlockPos pos,
+			Player player, InteractionHand hand, BlockHitResult trace) {
 		if(!world.isClientSide) {
 			ItemStack is = player.getItemInHand(hand);
 			if(!is.isEmpty()) {
-				TileEntity te = world.getBlockEntity(pos);
+				BlockEntity te = world.getBlockEntity(pos);
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					((TileEntityInventoryHopperBasic)te).setFilter(is.copy());
-					ITextComponent txt = ((TileEntityInventoryHopperBasic)te).getFilter().getHoverName();
-					player.displayClientMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
+					Component txt = ((TileEntityInventoryHopperBasic)te).getFilter().getHoverName();
+					player.displayClientMessage(new TranslatableComponent("tooltip.toms_storage.filter_item", txt), true);
 				}
 			} else {
-				TileEntity te = world.getBlockEntity(pos);
+				BlockEntity te = world.getBlockEntity(pos);
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					if(player.isShiftKeyDown()) {
 						((TileEntityInventoryHopperBasic)te).setFilter(ItemStack.EMPTY);
-						player.displayClientMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", new TranslationTextComponent("tooltip.toms_storage.empty")), true);
+						player.displayClientMessage(new TranslatableComponent("tooltip.toms_storage.filter_item", new TranslatableComponent("tooltip.toms_storage.empty")), true);
 					} else {
 						ItemStack s = ((TileEntityInventoryHopperBasic)te).getFilter();
-						ITextComponent txt = s.isEmpty() ? new TranslationTextComponent("tooltip.toms_storage.empty") : s.getHoverName();
-						player.displayClientMessage(new TranslationTextComponent("tooltip.toms_storage.filter_item", txt), true);
+						Component txt = s.isEmpty() ? new TranslatableComponent("tooltip.toms_storage.empty") : s.getHoverName();
+						player.displayClientMessage(new TranslatableComponent("tooltip.toms_storage.filter_item", txt), true);
 					}
 				}
 			}
 		}
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		this.updateState(worldIn, pos, state);
 	}
 
-	private void updateState(World worldIn, BlockPos pos, BlockState state) {
+	private void updateState(Level worldIn, BlockPos pos, BlockState state) {
 		boolean flag = !worldIn.hasNeighborSignal(pos);
 		if (flag != state.getValue(ENABLED)) {
 			worldIn.setBlock(pos, state.setValue(ENABLED, Boolean.valueOf(flag)), 4);

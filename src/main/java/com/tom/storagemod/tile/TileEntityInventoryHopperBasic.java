@@ -1,8 +1,9 @@
 package com.tom.storagemod.tile;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -14,8 +15,8 @@ import com.tom.storagemod.block.BlockInventoryHopperBasic;
 public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBase {
 	private ItemStack filter = ItemStack.EMPTY;
 	private int cooldown;
-	public TileEntityInventoryHopperBasic() {
-		super(StorageMod.invHopperBasicTile);
+	public TileEntityInventoryHopperBasic(BlockPos pos, BlockState state) {
+		super(StorageMod.invHopperBasicTile, pos, state);
 	}
 
 	@Override
@@ -52,14 +53,14 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT compound) {
-		compound.put("Filter", getFilter().save(new CompoundNBT()));
+	public CompoundTag save(CompoundTag compound) {
+		compound.put("Filter", getFilter().save(new CompoundTag()));
 		return super.save(compound);
 	}
 
 	@Override
-	public void load(BlockState stateIn, CompoundNBT nbtIn) {
-		super.load(stateIn, nbtIn);
+	public void load(CompoundTag nbtIn) {
+		super.load(nbtIn);
 		setFilter(ItemStack.of(nbtIn.getCompound("Filter")));
 	}
 

@@ -1,33 +1,33 @@
 package com.tom.storagemod.gui;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.network.IDataReceiver;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.TileEntityLevelEmitter;
 
-public class ContainerLevelEmitter extends Container implements IDataReceiver {
-	private final IInventory inv;
+public class ContainerLevelEmitter extends AbstractContainerMenu implements IDataReceiver {
+	private final Container inv;
 	private TileEntityLevelEmitter te;
-	private PlayerInventory pinv;
+	private Inventory pinv;
 
-	public ContainerLevelEmitter(int p_i50087_1_, PlayerInventory p_i50087_2_) {
+	public ContainerLevelEmitter(int p_i50087_1_, Inventory p_i50087_2_) {
 		this(p_i50087_1_, p_i50087_2_, null);
 	}
 
-	public ContainerLevelEmitter(int p_i50088_1_, PlayerInventory p_i50088_2_, TileEntityLevelEmitter te) {
+	public ContainerLevelEmitter(int p_i50088_1_, Inventory p_i50088_2_, TileEntityLevelEmitter te) {
 		super(StorageMod.levelEmitterConatiner, p_i50088_1_);
-		this.inv = te == null ? new Inventory(1) : new IInventory() {
+		this.inv = te == null ? new SimpleContainer(1) : new Container() {
 
 			@Override
 			public void clearContent() {
@@ -48,7 +48,7 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 			}
 
 			@Override
-			public boolean stillValid(PlayerEntity player) {
+			public boolean stillValid(Player player) {
 				return false;
 			}
 
@@ -94,7 +94,7 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	 * Determines whether supplied player can use this container
 	 */
 	@Override
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return true;
 	}
 
@@ -103,7 +103,7 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	 * inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		Slot slot = this.slots.get(index);
 		if (slot != null && slot.hasItem()) {
 			if (index < 1) {
@@ -126,28 +126,28 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	 * Called when the container is closed.
 	 */
 	@Override
-	public void removed(PlayerEntity playerIn) {
+	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.inv.stopOpen(playerIn);
 	}
 
 	@Override
-	public ItemStack clicked(int slotId, int dragType, ClickType click, PlayerEntity player) {
+	public void clicked(int slotId, int dragType, ClickType click, Player player) {
 		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof SlotPhantom) {
-			ItemStack s = player.inventory.getCarried().copy();
+			ItemStack s = getCarried().copy();
 			if(!s.isEmpty())s.setCount(1);
 			slot.set(s);
-			return player.inventory.getCarried();
+			return;
 		}
-		return super.clicked(slotId, dragType, click, player);
+		super.clicked(slotId, dragType, click, player);
 	}
 
 	private int lastCount = 0;
 	private boolean lessThan = false;
 
 	@Override
-	public void receive(CompoundNBT tag) {
+	public void receive(CompoundTag tag) {
 		if(pinv.player.isSpectator() || te == null)return;
 		int count = tag.getInt("count");
 		boolean lt = tag.getBoolean("lessThan");
@@ -159,12 +159,12 @@ public class ContainerLevelEmitter extends Container implements IDataReceiver {
 	public void broadcastChanges() {
 		if(te == null)return;
 		if(lastCount != te.getCount() || lessThan != te.isLessThan()) {
-			CompoundNBT mainTag = new CompoundNBT();
+			CompoundTag mainTag = new CompoundTag();
 			mainTag.putInt("count", te.getCount());
 			mainTag.putBoolean("lessThan", te.isLessThan());
 			lastCount = te.getCount();
 			lessThan = te.isLessThan();
-			NetworkHandler.sendTo((ServerPlayerEntity) pinv.player, mainTag);
+			NetworkHandler.sendTo((ServerPlayer) pinv.player, mainTag);
 		}
 		super.broadcastChanges();
 	}

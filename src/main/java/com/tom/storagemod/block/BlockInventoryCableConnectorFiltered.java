@@ -3,46 +3,49 @@ package com.tom.storagemod.block;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ContainerBlock;
-import net.minecraft.block.SixWayBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
+import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
 
-public class BlockInventoryCableConnectorFiltered extends ContainerBlock implements IInventoryCable {
+public class BlockInventoryCableConnectorFiltered extends BaseEntityBlock implements IInventoryCable {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -70,41 +73,45 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
-			ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.filtered"));
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
+		tooltip.add(new TranslatableComponent("tooltip.toms_storage.filtered"));
 		ClientProxy.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override
-	public TileEntity newBlockEntity(IBlockReader worldIn) {
-		return new TileEntityInventoryCableConnectorFiltered();
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityInventoryCableConnectorFiltered(pos, state);
 	}
 
 	@Override
-	public BlockRenderType getRenderShape(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state,
+			BlockEntityType<T> type) {
+		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override
-	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
+	}
+
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, FACING);//COLOR
 	}
 
 	@Override
-	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
 		Direction f = stateIn.getValue(FACING);
 		if(facing == f)
-			return stateIn.setValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(facing), !facingState.isAir(worldIn, facingPos));
+			return stateIn.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(facing), !facingState.isAir());
 		else
-			return stateIn.setValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
+			return stateIn.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return withConnectionProperties(defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite()), context.getLevel(), context.getClickedPos())
-				//with(COLOR, context.getItem().hasTag() ? DyeColor.byId(context.getItem().getTag().getInt("color")) : DyeColor.WHITE).
-				;
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return withConnectionProperties(defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite()), context.getLevel(), context.getClickedPos());
 	}
 
 	@Override
@@ -113,7 +120,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 	}
 
 	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+	public List<BlockPos> next(Level world, BlockState state, BlockPos pos) {
 		Direction f = state.getValue(FACING);
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
@@ -122,7 +129,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 		return next;
 	}
 
-	public BlockState withConnectionProperties(BlockState state, IWorld blockView_1, BlockPos blockPos_1) {
+	public BlockState withConnectionProperties(BlockState state, LevelAccessor blockView_1, BlockPos blockPos_1) {
 		BlockState block_1 = blockView_1.getBlockState(blockPos_1.below());
 		BlockState block_2 = blockView_1.getBlockState(blockPos_1.above());
 		BlockState block_3 = blockView_1.getBlockState(blockPos_1.north());
@@ -144,20 +151,6 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 		Direction f = state.getValue(FACING);
 		return (dir != f && IInventoryCable.canConnect(block, dir)) || (dir == f && !block.isAir());
 	}
-
-	/*@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-		//this.shapes = this.makeShapes(0.125f);
-		ItemStack held = player.getHeldItem(handIn);
-		DyeColor color = DyeColor.getColor(held);
-		if(color != null) {
-			if(!player.isCreative())held.shrink(1);
-			worldIn.setBlockState(pos, state.with(COLOR, color));
-			return ActionResultType.SUCCESS;
-		}
-		return ActionResultType.PASS;
-	}*/
 
 	@Override
 	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {
@@ -189,7 +182,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return this.shapes[state.getValue(FACING).ordinal()][this.getShapeIndex(state)];
 	}
 
@@ -197,7 +190,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 		int i = 0;
 
 		for(int j = 0; j < FACING_VALUES.length; ++j) {
-			if (state.getValue(SixWayBlock.PROPERTY_BY_DIRECTION.get(FACING_VALUES[j]))) {
+			if (state.getValue(PipeBlock.PROPERTY_BY_DIRECTION.get(FACING_VALUES[j]))) {
 				i |= 1 << j;
 			}
 		}
@@ -212,7 +205,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 
 		for(int i = 0; i < FACING_VALUES.length; ++i) {
 			Direction direction = FACING_VALUES[i];
-			avoxelshape[i] = VoxelShapes.box(0.5D + Math.min((-apothem), direction.getStepX() * 0.5D), 0.5D + Math.min((-apothem), direction.getStepY() * 0.5D), 0.5D + Math.min((-apothem), direction.getStepZ() * 0.5D), 0.5D + Math.max(apothem, direction.getStepX() * 0.5D), 0.5D + Math.max(apothem, direction.getStepY() * 0.5D), 0.5D + Math.max(apothem, direction.getStepZ() * 0.5D));
+			avoxelshape[i] = Shapes.box(0.5D + Math.min((-apothem), direction.getStepX() * 0.5D), 0.5D + Math.min((-apothem), direction.getStepY() * 0.5D), 0.5D + Math.min((-apothem), direction.getStepZ() * 0.5D), 0.5D + Math.max(apothem, direction.getStepX() * 0.5D), 0.5D + Math.max(apothem, direction.getStepY() * 0.5D), 0.5D + Math.max(apothem, direction.getStepZ() * 0.5D));
 		}
 
 		VoxelShape[] avoxelshape1 = new VoxelShape[64];
@@ -222,7 +215,7 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 
 			for(int j = 0; j < FACING_VALUES.length; ++j) {
 				if ((k & 1 << j) != 0) {
-					voxelshape1 = VoxelShapes.or(voxelshape1, avoxelshape[j]);
+					voxelshape1 = Shapes.or(voxelshape1, avoxelshape[j]);
 				}
 			}
 
@@ -233,11 +226,11 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 
 		for(int i = 0; i < FACING_VALUES.length; ++i) {
 			Direction direction = FACING_VALUES[i];
-			VoxelShape s = VoxelShapes.or(createShape(direction, 16, 0, 16, 0, 2, 0),
+			VoxelShape s = Shapes.or(createShape(direction, 16, 0, 16, 0, 2, 0),
 					createShape(direction, 10, 3, 10, 3, 2, 2),
 					createShape(direction, 6, 5, 6, 5, 2, 4));
 			for (int j = 0; j < avoxelshape1.length; j++) {
-				ret[i][j] = VoxelShapes.or(avoxelshape1[j], s);
+				ret[i][j] = Shapes.or(avoxelshape1[j], s);
 			}
 		}
 
@@ -247,17 +240,17 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 	private static VoxelShape createShape(Direction dir, float width, float widthoff, float height, float heightoff, float depth, float depthoff) {
 		switch (dir) {
 		case DOWN:
-			return Block.box(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
+			return BlockInventoryCableConnector.box(heightoff, depthoff, widthoff, height+heightoff, depth+depthoff, width+widthoff);
 		case EAST:
-			return Block.box(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
+			return BlockInventoryCableConnector.box(16f-depth, heightoff, widthoff, 16f-depthoff, height+heightoff, width+widthoff);
 		case NORTH:
-			return Block.box(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
+			return BlockInventoryCableConnector.box(widthoff, heightoff, depthoff, width+widthoff, height+heightoff, depth+depthoff);
 		case SOUTH:
-			return Block.box(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
+			return BlockInventoryCableConnector.box(widthoff, heightoff, 16f-depth, width+widthoff, height+heightoff, 16f-depthoff);
 		case UP:
-			return Block.box(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
+			return BlockInventoryCableConnector.box(heightoff, 16f-depth, widthoff, height+heightoff, 16-depthoff, width+widthoff);
 		case WEST:
-			return Block.box(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
+			return BlockInventoryCableConnector.box(depthoff, heightoff, widthoff, depth+depthoff, height+heightoff, width+widthoff);
 		default:
 			break;
 		}
@@ -265,16 +258,16 @@ public class BlockInventoryCableConnectorFiltered extends ContainerBlock impleme
 	}
 
 	@Override
-	public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+			InteractionHand handIn, BlockHitResult hit) {
 		if (world.isClientSide) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 
-		TileEntity blockEntity_1 = world.getBlockEntity(pos);
-		if (blockEntity_1 instanceof INamedContainerProvider) {
-			player.openMenu((INamedContainerProvider)blockEntity_1);
+		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
+		if (blockEntity_1 instanceof MenuProvider) {
+			player.openMenu((MenuProvider)blockEntity_1);
 		}
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

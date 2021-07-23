@@ -2,40 +2,36 @@ package com.tom.storagemod.proxy;
 
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
@@ -57,15 +53,15 @@ public class ClientProxy implements IProxy {
 
 	@Override
 	public void clientSetup() {
-		ScreenManager.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
-		ScreenManager.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
-		ScreenManager.register(StorageMod.filteredConatiner, GuiFiltered::new);
-		ScreenManager.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
+		MenuScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
+		MenuScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
+		MenuScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
+		MenuScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
-		RenderTypeLookup.setRenderLayer(StorageMod.paintedTrim, e -> true);
-		RenderTypeLookup.setRenderLayer(StorageMod.invCableFramed, e -> true);
-		RenderTypeLookup.setRenderLayer(StorageMod.invProxy, e -> true);
-		RenderTypeLookup.setRenderLayer(StorageMod.levelEmitter, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.paintedTrim, e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableFramed, e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.invProxy, e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.levelEmitter, RenderType.cutout());
 		BlockColors colors = Minecraft.getInstance().getBlockColors();
 		colors.register((state, world, pos, tintIndex) -> {
 			if (world != null) {
@@ -90,52 +86,55 @@ public class ClientProxy implements IProxy {
 	private static void bindPaintedModel(ModelBakeEvent event, Block blockFor) {
 		ResourceLocation baseLoc = blockFor.delegate.name();
 		blockFor.getStateDefinition().getPossibleStates().forEach(st -> {
-			ModelResourceLocation resLoc = BlockModelShapes.stateToModelLocation(baseLoc, st);
+			ModelResourceLocation resLoc = BlockModelShaper.stateToModelLocation(baseLoc, st);
 			event.getModelRegistry().put(resLoc, new BakedPaintedModel(blockFor, event.getModelRegistry().get(resLoc)));
 		});
 	}
 
 	private static void renderWorldLastEvent(RenderWorldLastEvent evt) {
 		Minecraft mc = Minecraft.getInstance();
-		PlayerEntity player = mc.player;
+		Player player = mc.player;
 		if( player == null )
 			return;
 
 		if(!ItemWirelessTerminal.isPlayerHolding(player))
 			return;
 
-		BlockRayTraceResult lookingAt = (BlockRayTraceResult) player.pick(Config.wirelessRange, 0f, true);
+		BlockHitResult lookingAt = (BlockHitResult) player.pick(Config.wirelessRange, 0f, true);
 		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
 			BlockPos pos = lookingAt.getBlockPos();
-			Vector3d renderPos = mc.gameRenderer.getMainCamera().getPosition();
-			Tessellator.getInstance().getBuilder().begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-			MatrixStack ms = evt.getMatrixStack();
-			ms.translate(pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z);
-			float scale = 1.01f;
-			ms.scale(scale, scale, scale);
-			ms.translate(-0.001f, -0.001f, -0.001f);
-			drawShape(ms, Tessellator.getInstance().getBuilder(), state.getOcclusionShape(player.level, pos), 0, 0, 0, 1, 1, 1, 1);
-			Tessellator.getInstance().end();
+			Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
+			PoseStack ms = evt.getMatrixStack();
+			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
+			drawShape(ms, buf, state.getOcclusionShape(player.level, pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
+			mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
 		}
 	}
 
-	private static void drawShape(MatrixStack matrixStackIn, IVertexBuilder bufferIn, VoxelShape shapeIn, double xIn, double yIn, double zIn, float red, float green, float blue, float alpha) {
-		Matrix4f matrix4f = matrixStackIn.last().pose();
-		shapeIn.forAllEdges((p_230013_12_, p_230013_14_, p_230013_16_, p_230013_18_, p_230013_20_, p_230013_22_) -> {
-			bufferIn.vertex(matrix4f, (float)(p_230013_12_ + xIn), (float)(p_230013_14_ + yIn), (float)(p_230013_16_ + zIn)).color(red, green, blue, alpha).endVertex();
-			bufferIn.vertex(matrix4f, (float)(p_230013_18_ + xIn), (float)(p_230013_20_ + yIn), (float)(p_230013_22_ + zIn)).color(red, green, blue, alpha).endVertex();
+	private static void drawShape(PoseStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
+		PoseStack.Pose entry = matrices.last();
+		voxelShape.forAllEdges((k, l, m, n, o, p) -> {
+			float q = (float)(n - k);
+			float r = (float)(o - l);
+			float s = (float)(p - m);
+			float t = Mth.sqrt(q * q + r * r + s * s);
+			q /= t;
+			r /= t;
+			s /= t;
+			vertexConsumer.vertex(entry.pose(), (float)(k + d), (float)(l + e), (float)(m + f)).color(g, h, i, j).normal(entry.normal(), q, r, s).endVertex();
+			vertexConsumer.vertex(entry.pose(), (float)(n + d), (float)(o + e), (float)(p + f)).color(g, h, i, j).normal(entry.normal(), q, r, s).endVertex();
 		});
 	}
 
-	public static void tooltip(String key, List<ITextComponent> tooltip) {
+	public static void tooltip(String key, List<Component> tooltip) {
 		if(Screen.hasShiftDown()) {
 			String[] sp = I18n.get("tooltip.toms_storage." + key).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
-				tooltip.add(new StringTextComponent(sp[i]));
+				tooltip.add(new TextComponent(sp[i]));
 			}
 		} else {
-			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(TextFormatting.ITALIC, TextFormatting.GRAY));
+			tooltip.add(new TranslatableComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		}
 	}
 }

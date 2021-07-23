@@ -1,14 +1,14 @@
 package com.tom.storagemod.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemBlockPainted extends BlockItem {
 
@@ -21,14 +21,15 @@ public class ItemBlockPainted extends BlockItem {
 	}
 
 	@Override
-	public ITextComponent getName(ItemStack is) {
-		IFormattableTextComponent tc = (IFormattableTextComponent) super.getName(is);
+	public Component getName(ItemStack is) {
+		MutableComponent tc = (MutableComponent) super.getName(is);
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
-			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
+			BlockState st = NbtUtils.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
 			tc.append(" (");
-			tc.append(st.getBlock().getName().withStyle(TextFormatting.GREEN));
+			tc.append(st.getBlock().getName().withStyle(ChatFormatting.GREEN));
 			tc.append(")");
 		}
 		return tc;
 	}
+
 }

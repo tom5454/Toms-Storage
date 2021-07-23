@@ -2,17 +2,17 @@ package com.tom.storagemod.item;
 
 import java.util.List;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -21,8 +21,6 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.proxy.ClientProxy;
-
-import net.minecraft.item.Item.Properties;
 
 public class ItemWirelessTerminal extends Item {
 
@@ -33,23 +31,23 @@ public class ItemWirelessTerminal extends Item {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		ClientProxy.tooltip("wireless_terminal", tooltip);
 	}
 
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
-		BlockRayTraceResult lookingAt = (BlockRayTraceResult) playerIn.pick(Config.wirelessRange, 0f, true);
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+		BlockHitResult lookingAt = (BlockHitResult) playerIn.pick(Config.wirelessRange, 0f, true);
 		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
-			ActionResultType r = state.use(worldIn, playerIn, handIn, lookingAt);
-			return new ActionResult<>(r, playerIn.getItemInHand(handIn));
+			InteractionResult r = state.use(worldIn, playerIn, handIn, lookingAt);
+			return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
 		} else {
 			return super.use(worldIn, playerIn, handIn);
 		}
 	}
 
-	public static boolean isPlayerHolding(PlayerEntity player) {
+	public static boolean isPlayerHolding(Player player) {
 		return player.getMainHandItem().getItem() == StorageMod.wirelessTerminal ||
 				player.getOffhandItem().getItem() == StorageMod.wirelessTerminal;
 	}

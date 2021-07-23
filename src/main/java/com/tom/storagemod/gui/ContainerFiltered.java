@@ -1,24 +1,24 @@
 package com.tom.storagemod.gui;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.StorageMod;
 
-public class ContainerFiltered extends Container {
-	private final IInventory dispenserInventory;
+public class ContainerFiltered extends AbstractContainerMenu {
+	private final Container dispenserInventory;
 
-	public ContainerFiltered(int p_i50087_1_, PlayerInventory p_i50087_2_) {
-		this(p_i50087_1_, p_i50087_2_, new Inventory(9));
+	public ContainerFiltered(int p_i50087_1_, Inventory p_i50087_2_) {
+		this(p_i50087_1_, p_i50087_2_, new SimpleContainer(9));
 	}
 
-	public ContainerFiltered(int p_i50088_1_, PlayerInventory p_i50088_2_, IInventory p_i50088_3_) {
+	public ContainerFiltered(int p_i50088_1_, Inventory p_i50088_2_, Container p_i50088_3_) {
 		super(StorageMod.filteredConatiner, p_i50088_1_);
 		checkContainerSize(p_i50088_3_, 9);
 		this.dispenserInventory = p_i50088_3_;
@@ -46,7 +46,7 @@ public class ContainerFiltered extends Container {
 	 * Determines whether supplied player can use this container
 	 */
 	@Override
-	public boolean stillValid(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return this.dispenserInventory.stillValid(playerIn);
 	}
 
@@ -55,7 +55,7 @@ public class ContainerFiltered extends Container {
 	 * inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		Slot slot = this.slots.get(index);
 		if (slot != null && slot.hasItem()) {
 			if (index < 9) {
@@ -80,20 +80,20 @@ public class ContainerFiltered extends Container {
 	 * Called when the container is closed.
 	 */
 	@Override
-	public void removed(PlayerEntity playerIn) {
+	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.dispenserInventory.stopOpen(playerIn);
 	}
 
 	@Override
-	public ItemStack clicked(int slotId, int dragType, ClickType click, PlayerEntity player) {
+	public void clicked(int slotId, int dragType, ClickType click, Player player) {
 		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof SlotPhantom) {
-			ItemStack s = player.inventory.getCarried().copy();
+			ItemStack s = getCarried().copy();
 			if(!s.isEmpty())s.setCount(1);
 			slot.set(s);
-			return player.inventory.getCarried();
+			return;
 		}
-		return super.clicked(slotId, dragType, click, player);
+		super.clicked(slotId, dragType, click, player);
 	}
 }

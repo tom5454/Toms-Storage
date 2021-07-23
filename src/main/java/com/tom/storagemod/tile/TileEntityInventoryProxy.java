@@ -3,13 +3,13 @@ package com.tom.storagemod.tile;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -19,18 +19,19 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryProxy;
 import com.tom.storagemod.block.BlockInventoryProxy.DirectionWithNull;
 
-public class TileEntityInventoryProxy extends TileEntityPainted implements ITickableTileEntity {
+public class TileEntityInventoryProxy extends TileEntityPainted implements TickableServer {
 	private LazyOptional<IItemHandler> invHandler;
 	private LazyOptional<IItemHandler> pointedAt;
 	private LazyOptional<IItemHandler> filter;
 	private boolean ignoreCount;
 	private int globalCountLimit = 64;
 
-	public TileEntityInventoryProxy() {
-		super(StorageMod.invProxyTile);
+	public TileEntityInventoryProxy(BlockPos pos, BlockState state) {
+		super(StorageMod.invProxyTile, pos, state);
 	}
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
@@ -114,13 +115,13 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 			invHandler.invalidate();
 	}
 	@Override
-	public void tick() {
-		if(!level.isClientSide && level.getGameTime() % 20 == 18) {
+	public void updateServer() {
+		if(level.getGameTime() % 20 == 18) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(BlockInventoryProxy.FACING);
 			DirectionWithNull filter = state.getValue(BlockInventoryProxy.FILTER_FACING);
 			if(pointedAt == null || !pointedAt.isPresent()) {
-				TileEntity te = level.getBlockEntity(worldPosition.relative(facing));
+				BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
 				if(te != null && !(te instanceof TileEntityInventoryProxy)) {
 					pointedAt = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 				}
@@ -128,11 +129,11 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 			ignoreCount = false;
 			globalCountLimit = 64;
 			if(filter != DirectionWithNull.NULL) {
-				TileEntity te = level.getBlockEntity(worldPosition.relative(filter.getDir()));
+				BlockEntity te = level.getBlockEntity(worldPosition.relative(filter.getDir()));
 				if(te != null && !(te instanceof TileEntityInventoryProxy)) {
 					this.filter = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
-					if(te instanceof INamedContainerProvider) {
-						String[] sp = ((INamedContainerProvider)te).getDisplayName().getString().split(",");
+					if(te instanceof MenuProvider) {
+						String[] sp = ((MenuProvider)te).getDisplayName().getString().split(",");
 						for (String string : sp) {
 							String[] sp2 = string.split("=");
 							String key = sp2[0];
@@ -194,7 +195,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements ITick
 			}
 
 			f /= inventory.getSlots();
-			return MathHelper.floor(f * 14.0F) + ((i > 0) ? 1 : 0);
+			return Mth.floor(f * 14.0F) + ((i > 0) ? 1 : 0);
 		}, i -> true, 0);
 	}
 

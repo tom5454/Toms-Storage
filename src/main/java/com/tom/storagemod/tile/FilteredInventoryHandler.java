@@ -1,14 +1,14 @@
 package com.tom.storagemod.tile;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.items.IItemHandler;
 
 public class FilteredInventoryHandler implements IItemHandler {
 	private IItemHandler parent;
-	private IInventory filter;
-	public FilteredInventoryHandler(IItemHandler parent, IInventory filter) {
+	private Container filter;
+	public FilteredInventoryHandler(IItemHandler parent, Container filter) {
 		this.parent = parent;
 		this.filter = filter;
 	}

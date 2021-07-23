@@ -5,13 +5,12 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Function;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -21,14 +20,15 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 
-public class TileEntityInventoryCableConnectorBase extends TileEntity implements ITickableTileEntity {
+public class TileEntityInventoryCableConnectorBase extends BlockEntity implements TickableServer {
 
-	public TileEntityInventoryCableConnectorBase(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityInventoryCableConnectorBase(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 	}
 
 	protected TileEntityInventoryConnector master;
@@ -37,7 +37,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 	protected LinkedInv linv;
 
 	@Override
-	public void tick() {
+	public void updateServer() {
 		if(!level.isClientSide && level.getGameTime() % 20 == 19) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(BlockInventoryCableConnector.FACING);
@@ -55,7 +55,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 					if(level.hasChunkAt(cp)) {
 						state = level.getBlockState(cp);
 						if(state.getBlock() == StorageMod.connector) {
-							TileEntity te = level.getBlockEntity(cp);
+							BlockEntity te = level.getBlockEntity(cp);
 							if(te instanceof TileEntityInventoryConnector) {
 								master = (TileEntityInventoryConnector) te;
 								linv.time = level.getGameTime();
@@ -72,7 +72,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntity implements
 				}
 			}
 			if(pointedAt == null || !pointedAt.isPresent()) {
-				TileEntity te = level.getBlockEntity(worldPosition.relative(facing));
+				BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
 				if(te != null) {
 					pointedAt = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 				}

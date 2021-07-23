@@ -1,14 +1,15 @@
 package com.tom.storagemod.tile;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
@@ -16,11 +17,11 @@ import net.minecraftforge.items.IItemHandler;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.ContainerFiltered;
 
-public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements INamedContainerProvider {
-	private Inventory filter = new Inventory(9);
+public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements MenuProvider {
+	private SimpleContainer filter = new SimpleContainer(9);
 
-	public TileEntityInventoryCableConnectorFiltered() {
-		super(StorageMod.invCableConnectorFilteredTile);
+	public TileEntityInventoryCableConnectorFiltered(BlockPos pos, BlockState state) {
+		super(StorageMod.invCableConnectorFilteredTile, pos, state);
 	}
 
 	@Override
@@ -35,24 +36,24 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT tag) {
+	public CompoundTag save(CompoundTag tag) {
 		tag.put("filter", filter.createTag());
 		return super.save(tag);
 	}
 
 	@Override
-	public void load(BlockState state, CompoundNBT tag) {
-		super.load(state, tag);
+	public void load(CompoundTag tag) {
+		super.load(tag);
 		filter.fromTag(tag.getList("filter", 10));
 	}
 
 	@Override
-	public Container createMenu(int arg0, PlayerInventory arg1, PlayerEntity arg2) {
+	public AbstractContainerMenu createMenu(int arg0, Inventory arg1, Player arg2) {
 		return new ContainerFiltered(arg0, arg1, filter);
 	}
 
 	@Override
-	public ITextComponent getDisplayName() {
-		return new TranslationTextComponent("ts.connector_filtered");
+	public Component getDisplayName() {
+		return new TranslatableComponent("ts.connector_filtered");
 	}
 }

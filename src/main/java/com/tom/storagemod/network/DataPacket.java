@@ -1,20 +1,20 @@
 package com.tom.storagemod.network;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class DataPacket {
-	public CompoundNBT tag;
+	public CompoundTag tag;
 
-	public DataPacket(CompoundNBT tag) {
+	public DataPacket(CompoundTag tag) {
 		this.tag = tag;
 	}
 
-	public DataPacket(PacketBuffer pb) {
+	public DataPacket(FriendlyByteBuf pb) {
 		tag = pb.readAnySizeNbt();
 	}
 
-	public void toBytes(PacketBuffer pb) {
+	public void toBytes(FriendlyByteBuf pb) {
 		pb.writeNbt(tag);
 	}
 }

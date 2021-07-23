@@ -4,39 +4,38 @@ import java.lang.reflect.Field;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.recipebook.GhostRecipe;
-import net.minecraft.client.gui.recipebook.IRecipeShownListener;
-import net.minecraft.client.gui.recipebook.RecipeBookGui;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.ImageButton;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipeItemHelper;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.fml.ModList;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.widget.button.Button.IPressable;
-
-public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftingTerminal> implements IRecipeShownListener {
+public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftingTerminal> implements RecipeUpdateListener {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/crafting_terminal.png");
 	private static Field stackedContentsField, searchBarField, ghostRecipeField;
 	static {
 		try {
-			for (Field f : RecipeBookGui.class.getDeclaredFields()) {
-				if(f.getType() == RecipeItemHelper.class) {
+			for (Field f : RecipeBookComponent.class.getDeclaredFields()) {
+				if(f.getType() == StackedContents.class) {
 					f.setAccessible(true);
 					stackedContentsField = f;
-				} else if(f.getType() == TextFieldWidget.class) {
+				} else if(f.getType() == EditBox.class) {
 					f.setAccessible(true);
 					searchBarField = f;
 				} else if(f.getType() == GhostRecipe.class) {
@@ -48,18 +47,18 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			throw new RuntimeException(e);
 		}
 	}
-	private final RecipeBookGui recipeBookGui;
+	private final RecipeBookComponent recipeBookGui;
 	private boolean widthTooNarrow;
 	private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
-	private TextFieldWidget searchField;
+	private EditBox searchField;
 	private GhostRecipe ghostRecipe;
 	private GuiButton buttonPullFromInv;
 	private boolean pullFromInv;
 
-	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, PlayerInventory inv, ITextComponent titleIn) {
+	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn);
 
-		recipeBookGui = new RecipeBookGui();
+		recipeBookGui = new RecipeBookComponent();
 		try {
 			stackedContentsField.set(recipeBookGui, getMenu().new TerminalRecipeItemHelper());
 			ghostRecipe = (GhostRecipe) ghostRecipeField.get(recipeBookGui);
@@ -89,26 +88,26 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		super.init();
 		this.widthTooNarrow = this.width < 379;
 		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-		this.leftPos = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.imageWidth);
-		this.children.add(this.recipeBookGui);
+		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
+		addRenderableWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
 		GuiButtonClear btnClr = new GuiButtonClear(leftPos + 80, topPos + 110, b -> clearGrid());
-		addButton(btnClr);
-		buttonPullFromInv = addButton(new GuiButton(leftPos - 18, topPos + 5 + 18*4, 4, b -> {
+		addRenderableWidget(btnClr);
+		buttonPullFromInv = addWidget(new GuiButton(leftPos - 18, topPos + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
 			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();
 		}));
-		this.addButton(new ImageButton(this.leftPos + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
-			this.recipeBookGui.initVisuals(this.widthTooNarrow);
+		addRenderableWidget(new ImageButton(this.leftPos + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
+			this.recipeBookGui.initVisuals();
 			try {
-				searchField = (TextFieldWidget) searchBarField.get(recipeBookGui);
+				searchField = (EditBox) searchBarField.get(recipeBookGui);
 			} catch (Exception e) {
 				searchField = null;
 			}
 
 			this.recipeBookGui.toggleVisibility();
-			this.leftPos = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.imageWidth);
+			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
 			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.height / 2);
 			super.searchField.setX(this.leftPos + 82);
 			btnClr.setX(this.leftPos + 80);
@@ -141,7 +140,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			buttonPullFromInv.y = topPos + 5 + 18;
 			super.searchField.setX(this.leftPos + 82);
 			try {
-				searchField = (TextFieldWidget) searchBarField.get(recipeBookGui);
+				searchField = (EditBox) searchBarField.get(recipeBookGui);
 			} catch (Exception e) {
 				searchField = null;
 			}
@@ -165,20 +164,18 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void containerTick() {
+		super.containerTick();
 		this.recipeBookGui.tick();
 	}
 
 	@Override
-	public void render(MatrixStack st, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack st, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(st);
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
 			this.renderBg(st, partialTicks, mouseX, mouseY);
-			RenderSystem.disableLighting();
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
-			RenderSystem.disableLighting();
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 			super.render(st, mouseX, mouseY, partialTicks);
 			this.recipeBookGui.renderGhostRecipe(st, this.leftPos, this.topPos, true, partialTicks);
@@ -189,7 +186,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setInitialFocus(this.recipeBookGui);
 
 		if (buttonPullFromInv.isHovered()) {
-			renderTooltip(st, new TranslationTextComponent("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
+			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
 		}
 	}
 
@@ -234,7 +231,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	}
 
 	@Override
-	public RecipeBookGui getRecipeBookComponent() {
+	public RecipeBookComponent getRecipeBookComponent() {
 		return this.recipeBookGui;
 	}
 
@@ -266,7 +263,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 
 	public class GuiButtonClear extends Button {
 
-		public GuiButtonClear(int x, int y, IPressable pressable) {
+		public GuiButtonClear(int x, int y, OnPress pressable) {
 			super(x, y, 11, 11, null, pressable);
 		}
 
@@ -278,10 +275,10 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderButton(MatrixStack st, int mouseX, int mouseY, float pt) {
+		public void renderButton(PoseStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
-				mc.getTextureManager().bind(gui);
-				RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderTexture(0, gui);
 				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();

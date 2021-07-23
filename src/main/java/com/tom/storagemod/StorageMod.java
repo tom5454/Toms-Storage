@@ -3,13 +3,13 @@ package com.tom.storagemod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.block.Block;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -81,21 +81,21 @@ public class StorageMod {
 	public static ItemPaintKit paintingKit;
 	public static ItemWirelessTerminal wirelessTerminal;
 
-	public static TileEntityType<TileEntityInventoryConnector> connectorTile;
-	public static TileEntityType<TileEntityStorageTerminal> terminalTile;
-	public static TileEntityType<TileEntityOpenCrate> openCrateTile;
-	public static TileEntityType<TileEntityPainted> paintedTile;
-	public static TileEntityType<TileEntityInventoryCableConnector> invCableConnectorTile;
-	public static TileEntityType<TileEntityInventoryCableConnectorFiltered> invCableConnectorFilteredTile;
-	public static TileEntityType<TileEntityInventoryProxy> invProxyTile;
-	public static TileEntityType<TileEntityCraftingTerminal> craftingTerminalTile;
-	public static TileEntityType<TileEntityInventoryHopperBasic> invHopperBasicTile;
-	public static TileEntityType<TileEntityLevelEmitter> levelEmitterTile;
+	public static BlockEntityType<TileEntityInventoryConnector> connectorTile;
+	public static BlockEntityType<TileEntityStorageTerminal> terminalTile;
+	public static BlockEntityType<TileEntityOpenCrate> openCrateTile;
+	public static BlockEntityType<TileEntityPainted> paintedTile;
+	public static BlockEntityType<TileEntityInventoryCableConnector> invCableConnectorTile;
+	public static BlockEntityType<TileEntityInventoryCableConnectorFiltered> invCableConnectorFilteredTile;
+	public static BlockEntityType<TileEntityInventoryProxy> invProxyTile;
+	public static BlockEntityType<TileEntityCraftingTerminal> craftingTerminalTile;
+	public static BlockEntityType<TileEntityInventoryHopperBasic> invHopperBasicTile;
+	public static BlockEntityType<TileEntityLevelEmitter> levelEmitterTile;
 
-	public static ContainerType<ContainerStorageTerminal> storageTerminal;
-	public static ContainerType<ContainerCraftingTerminal> craftingTerminalCont;
-	public static ContainerType<ContainerFiltered> filteredConatiner;
-	public static ContainerType<ContainerLevelEmitter> levelEmitterConatiner;
+	public static MenuType<ContainerStorageTerminal> storageTerminal;
+	public static MenuType<ContainerCraftingTerminal> craftingTerminalCont;
+	public static MenuType<ContainerFiltered> filteredConatiner;
+	public static MenuType<ContainerLevelEmitter> levelEmitterConatiner;
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -127,7 +127,7 @@ public class StorageMod {
 		proxy.clientSetup();
 	}
 
-	public static final ItemGroup STORAGE_MOD_TAB = new ItemGroup("toms_storage") {
+	public static final CreativeModeTab STORAGE_MOD_TAB = new CreativeModeTab("toms_storage") {
 
 		@Override
 		@OnlyIn(Dist.CLIENT)
@@ -198,26 +198,26 @@ public class StorageMod {
 		}
 
 		@SubscribeEvent
-		public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> tileRegistryEvent) {
-			connectorTile = TileEntityType.Builder.of(TileEntityInventoryConnector::new, connector).build(null);
+		public static void onTileRegistry(final RegistryEvent.Register<BlockEntityType<?>> tileRegistryEvent) {
+			connectorTile = BlockEntityType.Builder.of(TileEntityInventoryConnector::new, connector).build(null);
 			connectorTile.setRegistryName("ts.inventory_connector.tile");
-			terminalTile = TileEntityType.Builder.of(TileEntityStorageTerminal::new, terminal).build(null);
+			terminalTile = BlockEntityType.Builder.of(TileEntityStorageTerminal::new, terminal).build(null);
 			terminalTile.setRegistryName("ts.storage_terminal.tile");
-			openCrateTile = TileEntityType.Builder.of(TileEntityOpenCrate::new, openCrate).build(null);
+			openCrateTile = BlockEntityType.Builder.of(TileEntityOpenCrate::new, openCrate).build(null);
 			openCrateTile.setRegistryName("ts.open_crate.tile");
-			paintedTile = TileEntityType.Builder.of(TileEntityPainted::new, paintedTrim, invCableFramed).build(null);
+			paintedTile = BlockEntityType.Builder.of(TileEntityPainted::new, paintedTrim, invCableFramed).build(null);
 			paintedTile.setRegistryName("ts.painted.tile");
-			invCableConnectorTile = TileEntityType.Builder.of(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
+			invCableConnectorTile = BlockEntityType.Builder.of(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
 			invCableConnectorTile.setRegistryName("ts.inventory_cable_connector.tile");
-			invCableConnectorFilteredTile = TileEntityType.Builder.of(TileEntityInventoryCableConnectorFiltered::new, invCableConnectorFiltered).build(null);
+			invCableConnectorFilteredTile = BlockEntityType.Builder.of(TileEntityInventoryCableConnectorFiltered::new, invCableConnectorFiltered).build(null);
 			invCableConnectorFilteredTile.setRegistryName("ts.inventory_cable_connector_filtered.tile");
-			invProxyTile = TileEntityType.Builder.of(TileEntityInventoryProxy::new, invProxy).build(null);
+			invProxyTile = BlockEntityType.Builder.of(TileEntityInventoryProxy::new, invProxy).build(null);
 			invProxyTile.setRegistryName("ts.inventory_proxy.tile");
-			craftingTerminalTile = TileEntityType.Builder.of(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
+			craftingTerminalTile = BlockEntityType.Builder.of(TileEntityCraftingTerminal::new, craftingTerminal).build(null);
 			craftingTerminalTile.setRegistryName("ts.crafting_terminal.tile");
-			invHopperBasicTile = TileEntityType.Builder.of(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
+			invHopperBasicTile = BlockEntityType.Builder.of(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
 			invHopperBasicTile.setRegistryName("ts.inventoty_hopper_basic.tile");
-			levelEmitterTile = TileEntityType.Builder.of(TileEntityLevelEmitter::new, levelEmitter).build(null);
+			levelEmitterTile = BlockEntityType.Builder.of(TileEntityLevelEmitter::new, levelEmitter).build(null);
 			levelEmitterTile.setRegistryName("ts.level_emitter.tile");
 			tileRegistryEvent.getRegistry().register(connectorTile);
 			tileRegistryEvent.getRegistry().register(terminalTile);
@@ -232,14 +232,14 @@ public class StorageMod {
 		}
 
 		@SubscribeEvent
-		public static void onContainerRegistry(final RegistryEvent.Register<ContainerType<?>> containerRegistryEvent) {
-			storageTerminal = new ContainerType<>(ContainerStorageTerminal::new);
+		public static void onContainerRegistry(final RegistryEvent.Register<MenuType<?>> containerRegistryEvent) {
+			storageTerminal = new MenuType<>(ContainerStorageTerminal::new);
 			storageTerminal.setRegistryName("ts.storage_terminal.container");
-			craftingTerminalCont = new ContainerType<>(ContainerCraftingTerminal::new);
+			craftingTerminalCont = new MenuType<>(ContainerCraftingTerminal::new);
 			craftingTerminalCont.setRegistryName("ts.crafting_terminal.container");
-			filteredConatiner = new ContainerType<>(ContainerFiltered::new);
+			filteredConatiner = new MenuType<>(ContainerFiltered::new);
 			filteredConatiner.setRegistryName("ts.filtered.container");
-			levelEmitterConatiner = new ContainerType<>(ContainerLevelEmitter::new);
+			levelEmitterConatiner = new MenuType<>(ContainerLevelEmitter::new);
 			levelEmitterConatiner.setRegistryName("ts.level_emitter.container");
 			containerRegistryEvent.getRegistry().register(storageTerminal);
 			containerRegistryEvent.getRegistry().register(craftingTerminalCont);

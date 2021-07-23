@@ -4,12 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -17,20 +16,21 @@ import net.minecraftforge.items.IItemHandler;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 
-public abstract class TileEntityInventoryHopperBase extends TileEntity implements ITickableTileEntity {
+public abstract class TileEntityInventoryHopperBase extends BlockEntity implements TickableServer {
 	protected boolean topNet, bottomNet;
 	protected LazyOptional<IItemHandler> top;
 	protected LazyOptional<IItemHandler> bottom;
-	public TileEntityInventoryHopperBase(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityInventoryHopperBase(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+		super(tileEntityTypeIn, pos, state);
 	}
 
 	@Override
-	public void tick() {
-		if(!level.isClientSide && level.getGameTime() % 20 == 1) {
+	public void updateServer() {
+		if(level.getGameTime() % 20 == 1) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
@@ -50,7 +50,7 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 						if(level.hasChunkAt(cp)) {
 							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
-								TileEntity te = level.getBlockEntity(cp);
+								BlockEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									top = ((TileEntityInventoryConnector) te).getInventory();
 								}
@@ -66,7 +66,7 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 			} else {
 				topNet = false;
 				if(top == null || !top.isPresent()) {
-					TileEntity te = level.getBlockEntity(up);
+					BlockEntity te = level.getBlockEntity(up);
 					if(te != null) {
 						top = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 					}
@@ -84,7 +84,7 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 						if(level.hasChunkAt(cp)) {
 							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
-								TileEntity te = level.getBlockEntity(cp);
+								BlockEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									bottom = ((TileEntityInventoryConnector) te).getInventory();
 								}
@@ -100,7 +100,7 @@ public abstract class TileEntityInventoryHopperBase extends TileEntity implement
 			} else {
 				bottomNet = false;
 				if(bottom == null || !bottom.isPresent()) {
-					TileEntity te = level.getBlockEntity(down);
+					BlockEntity te = level.getBlockEntity(down);
 					if(te != null) {
 						bottom = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
 					}

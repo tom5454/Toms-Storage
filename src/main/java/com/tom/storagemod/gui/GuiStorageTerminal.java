@@ -1,15 +1,17 @@
 package com.tom.storagemod.gui;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageTerminal> {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/storage_terminal.png");
 
-	public GuiStorageTerminal(ContainerStorageTerminal screenContainer, PlayerInventory inv, ITextComponent titleIn) {
+	public GuiStorageTerminal(ContainerStorageTerminal screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn);
 	}
 
@@ -22,8 +24,9 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 	}
 
 	@Override
-	protected void renderBg(MatrixStack st, float partialTicks, int mouseX, int mouseY) {
-		mc.textureManager.bind(gui);
+	protected void renderBg(PoseStack st, float partialTicks, int mouseX, int mouseY) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, gui);
 		this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
@@ -33,7 +36,7 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 	}
 
 	@Override
-	public void render(MatrixStack st, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack st, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(st);
 		super.render(st, mouseX, mouseY, partialTicks);
 	}

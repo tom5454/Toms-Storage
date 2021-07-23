@@ -8,16 +8,15 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Supplier;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.properties.ChestType;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -27,23 +26,24 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.ITrim;
 
-public class TileEntityInventoryConnector extends TileEntity implements ITickableTileEntity {
+public class TileEntityInventoryConnector extends BlockEntity implements TickableServer {
 	private List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
 	private List<LinkedInv> linkedInvs = new ArrayList<>();
 	private LazyOptional<IItemHandler> invHandler;
 	private int[] invSizes = new int[0];
 	private int invSize;
 
-	public TileEntityInventoryConnector() {
-		super(StorageMod.connectorTile);
+	public TileEntityInventoryConnector(BlockPos pos, BlockState state) {
+		super(StorageMod.connectorTile, pos, state);
 	}
 
 	@Override
-	public void tick() {
+	public void updateServer() {
 		long time = level.getGameTime();
-		if(!level.isClientSide && time % 20 == 0) {
+		if(time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			toCheck.add(worldPosition);
@@ -69,12 +69,12 @@ public class TileEntityInventoryConnector extends TileEntity implements ITickabl
 						if(state.getBlock() instanceof ITrim) {
 							toCheck.add(p);
 						} else {
-							TileEntity te = level.getBlockEntity(p);
+							BlockEntity te = level.getBlockEntity(p);
 							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
 								continue;
 							} else if(te != null && !Config.onlyTrims) {
 								LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
-								if(te instanceof ChestTileEntity) {//Check for double chests
+								if(te instanceof ChestBlockEntity) {//Check for double chests
 									Block block = state.getBlock();
 									if(block instanceof ChestBlock) {
 										ChestType type = state.getValue(ChestBlock.TYPE);
