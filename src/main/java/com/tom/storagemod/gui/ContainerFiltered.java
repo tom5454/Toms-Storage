@@ -84,5 +84,6 @@ public class ContainerFiltered extends ScreenHandler {
 			if(!s.isEmpty())s.setCount(1);
 			slot.setStack(s);
 		}
+		super.onSlotClick(slotId, dragType, click, player);
 	}
 }
