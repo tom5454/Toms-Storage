@@ -15,7 +15,6 @@ import net.minecraft.world.level.material.Material;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -23,7 +22,7 @@ import com.tom.storagemod.proxy.ClientProxy;
 public class BlockTrim extends Block implements ITrim, IPaintable {
 
 	public BlockTrim() {
-		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3));
 		setRegistryName("ts.trim");
 	}
 

@@ -32,8 +32,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import net.minecraftforge.common.ToolType;
-
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
@@ -48,7 +46,7 @@ public abstract class StorageTerminalBase extends BaseEntityBlock implements Sim
 	private static final VoxelShape SHAPE_U = Block.box(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 	private static final VoxelShape SHAPE_D = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public StorageTerminalBase() {
-		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE).lightLevel(s -> 6));
+		super(Block.Properties.of(Material.WOOD).strength(3).lightLevel(s -> 6));
 		registerDefaultState(defaultBlockState().setValue(TERMINAL_POS, TerminalPos.CENTER).setValue(WATERLOGGED, false).setValue(FACING, Direction.NORTH));
 	}
 

@@ -25,7 +25,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -34,7 +33,7 @@ import com.tom.storagemod.tile.TileEntityInventoryConnector;
 public class InventoryConnector extends BaseEntityBlock implements IInventoryCable {
 
 	public InventoryConnector() {
-		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3));
 		setRegistryName("ts.inventory_connector");
 	}
 

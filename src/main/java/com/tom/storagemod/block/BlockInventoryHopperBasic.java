@@ -36,7 +36,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -47,7 +46,7 @@ public class BlockInventoryHopperBasic extends BaseEntityBlock implements IInven
 	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 
 	public BlockInventoryHopperBasic() {
-		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
 		setRegistryName("ts.inventory_hopper_basic");
 		registerDefaultState(defaultBlockState()
 				.setValue(FACING, Direction.DOWN).setValue(ENABLED, Boolean.valueOf(true)));

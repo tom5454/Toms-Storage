@@ -27,7 +27,6 @@ import net.minecraft.world.level.material.Material;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.proxy.ClientProxy;
 
@@ -42,7 +41,7 @@ public class BlockInventoryCable extends PipeBlock implements SimpleWaterloggedB
 	public static final BooleanProperty[] DIR_TO_PROPERTY = new BooleanProperty[] {DOWN, UP, NORTH, SOUTH, WEST, EAST};
 
 	public BlockInventoryCable() {
-		super(0.125f, Block.Properties.of(Material.WOOD).strength(2).harvestTool(ToolType.AXE));
+		super(0.125f, Block.Properties.of(Material.WOOD).strength(2));
 		setRegistryName("ts.inventory_cable");
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)

@@ -37,7 +37,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -48,7 +47,7 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
 	public BlockLevelEmitter() {
-		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
 		setRegistryName("ts.level_emitter");
 		registerDefaultState(defaultBlockState()
 				.setValue(FACING, Direction.DOWN).setValue(POWERED, Boolean.valueOf(false)));

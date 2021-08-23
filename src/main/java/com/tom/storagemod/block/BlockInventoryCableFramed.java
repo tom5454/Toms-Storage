@@ -28,7 +28,6 @@ import net.minecraft.world.level.material.Material;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityPainted;
@@ -42,7 +41,7 @@ public class BlockInventoryCableFramed extends BaseEntityBlock implements IInven
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 
 	public BlockInventoryCableFramed() {
-		super(Block.Properties.of(Material.WOOD).strength(2).noOcclusion().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(2).noOcclusion());
 		setRegistryName("ts.inventory_cable_framed");
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)

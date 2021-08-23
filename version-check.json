@@ -13,10 +13,11 @@
     "1.16.4-recommended": "1.2.16",
     "1.16.5-latest": "1.2.16",
     "1.16.5-recommended": "1.2.16",
-	"1.17.1-latest": "1.2.17",
-    "1.17.1-recommended": "1.2.17"
+	"1.17.1-latest": "1.2.18",
+    "1.17.1-recommended": "1.2.18"
   },
   "1.17.1": {
+	"1.2.18": "Fixed tool type crash\nAdded JEI integration",
 	"1.2.17": "1.17 port"
   },
   "1.16.5": {

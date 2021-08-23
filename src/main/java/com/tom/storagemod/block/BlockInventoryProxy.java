@@ -39,7 +39,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -51,7 +50,7 @@ public class BlockInventoryProxy extends BaseEntityBlock implements IPaintable {
 	public static final EnumProperty<DirectionWithNull> FILTER_FACING = EnumProperty.create("filter_facing", DirectionWithNull.class);
 
 	public BlockInventoryProxy() {
-		super(Block.Properties.of(Material.WOOD).strength(3).harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3));
 		setRegistryName("ts.inventory_proxy");
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.DOWN).setValue(FILTER_FACING, DirectionWithNull.NULL));
 	}

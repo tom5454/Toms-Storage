@@ -33,7 +33,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -47,12 +46,11 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
-	//public static final EnumProperty<DyeColor> COLOR = EnumProperty.create("color", DyeColor.class);
 	private static final Direction[] FACING_VALUES = Direction.values();
 	protected VoxelShape[][] shapes;
 
 	public BlockInventoryCableConnector() {
-		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion().harvestTool(ToolType.AXE));
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
 		setRegistryName("ts.inventory_cable_connector");
 		this.shapes = this.makeShapes(0.125f);
 		registerDefaultState(defaultBlockState()
