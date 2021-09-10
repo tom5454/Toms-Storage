@@ -103,6 +103,9 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 									toCheck.add(p);
 									handlers.add(inv);
 								}
+								if(Config.multiblockInvs.contains(state.getBlock())) {
+									skipBlocks(p, checkedBlocks, toCheck, state.getBlock());
+								}
 							}
 						}
 					}
@@ -121,6 +124,27 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 			}
 		}
 	}
+
+	private void skipBlocks(BlockPos pos, Set<BlockPos> checkedBlocks, Stack<BlockPos> edges, Block block) {
+		Stack<BlockPos> toCheck = new Stack<>();
+		toCheck.add(pos);
+		edges.add(pos);
+		while(!toCheck.isEmpty()) {
+			BlockPos cp = toCheck.pop();
+			for (Direction d : Direction.values()) {
+				BlockPos p = cp.relative(d);
+				if(!checkedBlocks.contains(p) && p.distSqr(worldPosition) < Config.invRange) {
+					BlockState state = level.getBlockState(p);
+					if(state.getBlock() == block) {
+						checkedBlocks.add(p);
+						edges.add(p);
+						toCheck.add(p);
+					}
+				}
+			}
+		}
+	}
+
 	private boolean checkHandlers(InvHandler ih, int depth) {
 		if(depth > 3)return true;
 		for (LazyOptional<IItemHandler> lo : ih.getHandlers()) {
