@@ -1,5 +1,7 @@
 package com.tom.storagemod;
 
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +17,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -52,6 +55,7 @@ import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
 import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 
 public class StorageMod implements ModInitializer {
@@ -93,7 +97,10 @@ public class StorageMod implements ModInitializer {
 	public static ScreenHandlerType<ContainerFiltered> filteredConatiner;
 	public static ScreenHandlerType<ContainerLevelEmitter> levelEmitterConatiner;
 
-	public static Config CONFIG = AutoConfig.register(Config.class, GsonConfigSerializer::new).getConfig();
+	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
+	public static Config CONFIG = configHolder.getConfig();
+
+	public static Set<Block> multiblockInvs;
 
 	public StorageMod() {
 	}
@@ -196,6 +203,11 @@ public class StorageMod implements ModInitializer {
 		});
 
 		StorageTags.init();
+
+		configHolder.registerSaveListener((a, b) -> {
+			multiblockInvs = null;
+			return ActionResult.PASS;
+		});
 	}
 
 	private static void registerItemForBlock(Block block) {

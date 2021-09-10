@@ -24,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.ITrim;
@@ -118,6 +119,10 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 										toCheck.add(p);
 								}
 								if(ihr != null)handlers.add(new InventoryWrapper(ihr, d.getOpposite()));
+
+								if(Config.getMultiblockInvs().contains(state.getBlock())) {
+									skipBlocks(p, checkedBlocks, toCheck, state.getBlock());
+								}
 							}
 						}
 					}
@@ -136,6 +141,27 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 			}
 		}
 	}
+
+	private void skipBlocks(BlockPos pos, Set<BlockPos> checkedBlocks, Stack<BlockPos> edges, Block block) {
+		Stack<BlockPos> toCheck = new Stack<>();
+		toCheck.add(pos);
+		edges.add(pos);
+		while(!toCheck.isEmpty()) {
+			BlockPos cp = toCheck.pop();
+			for (Direction d : Direction.values()) {
+				BlockPos p = cp.offset(d);
+				if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < StorageMod.CONFIG.invRange) {
+					BlockState state = world.getBlockState(p);
+					if(state.getBlock() == block) {
+						checkedBlocks.add(p);
+						edges.add(p);
+						toCheck.add(p);
+					}
+				}
+			}
+		}
+	}
+
 	private boolean checkHandlers(TileEntityInventoryConnector ih, int depth) {
 		if(depth > 3)return true;
 		for (InventoryWrapper lo : ih.handlers) {

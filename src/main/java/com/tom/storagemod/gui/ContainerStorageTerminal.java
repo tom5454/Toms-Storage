@@ -309,6 +309,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	@Override
 	public void sendContentUpdates() {
+		super.sendContentUpdates();
 		if(te == null)return;
 		Map<StoredItemStack, Long> itemsCount = te.getStacks();
 		if(!this.itemsCount.equals(itemsCount)) {
@@ -329,7 +330,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 			NetworkHandler.sendTo(pinv.player, mainTag);
 			this.itemsCount = new HashMap<>(itemsCount);
 		}
-		super.sendContentUpdates();
 	}
 
 	public final void receiveClientTagPacket(NbtCompound message) {

@@ -1,5 +1,6 @@
 package com.tom.storagemod;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -12,6 +13,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -112,6 +114,14 @@ public class StorageModClient implements ClientModInitializer {
 
 			return true;
 		});
+
+		try {
+			Class<?> clz = Class.forName("com.kqp.inventorytabs.api.TabProviderRegistry");
+			Method regSimpleBlock = clz.getDeclaredMethod("registerSimpleBlock", Block.class);
+			regSimpleBlock.invoke(null, StorageMod.terminal);
+			regSimpleBlock.invoke(null, StorageMod.craftingTerminal);
+		} catch (Throwable e) {
+		}
 	}
 
 	private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
