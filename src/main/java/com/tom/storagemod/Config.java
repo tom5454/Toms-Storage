@@ -1,24 +1,38 @@
 package com.tom.storagemod;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.tuple.Pair;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class Config {
 	public static boolean onlyTrims;
 	public static int invRange;
 	public static int invConnectorMax = 0;
 	public static int wirelessRange;
+	public static Set<Block> multiblockInvs = new HashSet<>();
 
 	public static class Server {
 		public IntValue inventoryConnectorRange;
 		public IntValue inventoryCableConnectorMaxCables;
 		public IntValue wirelessRange;
 		public BooleanValue onlyTrimsConnect;
+		public ConfigValue<List<? extends String>> multiblockInvs;
 
 		private Server(ForgeConfigSpec.Builder builder) {
 			inventoryConnectorRange = builder.comment("Inventory Connector Range").
@@ -36,6 +50,10 @@ public class Config {
 			wirelessRange = builder.comment("Wireless terminal reach").
 					translation("tomsstorage.config.wireless_reach").
 					defineInRange("wirelessReach", 16, 4, 64);
+
+			multiblockInvs = builder.comment("Multiblock inventories").
+					translation("tomsstorage.config.multiblockInv").
+					defineList("multiblockInv", Collections.emptyList(), s -> true);
 		}
 	}
 
@@ -52,6 +70,8 @@ public class Config {
 		invRange = SERVER.inventoryConnectorRange.get() * SERVER.inventoryConnectorRange.get();
 		invConnectorMax = SERVER.inventoryCableConnectorMaxCables.get();
 		wirelessRange = SERVER.wirelessRange.get();
+		multiblockInvs = SERVER.multiblockInvs.get().stream().map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).
+				filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 	}
 
 	@SubscribeEvent

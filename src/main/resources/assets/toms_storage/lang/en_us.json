@@ -41,7 +41,7 @@
 	"tooltip.toms_storage.inventory_proxy.maxCount.arg": "<max value>",
 	"tooltip.toms_storage.inventory_proxy.maxCount.desc": "Set max stack count in empty slots",
 	"tooltip.toms_storage.inventory_cable": "Connects inventories across\\long distances. Inventory Cable Connectors\\have to be used to attach inventories\\One Inventory Connector must be\\present in the network.",
-	"tooltip.toms_storage.inventory_hopper": "Import of export from your Inventory Network\\Right click an item to set the filter.\\Shift click with an empty hand to clear filter.",
+	"tooltip.toms_storage.inventory_hopper": "Import or export from your Inventory Network\\Right click an item to set the filter.\\Shift click with an empty hand to clear filter.",
 	"tooltip.toms_storage.loop": "Loop detected in your storage system",
 	"tooltip.toms_storage.amount": "Item Amount: %d",
 	"tooltip.toms_storage.sorting_0": "Sort by Item Amount",
@@ -73,5 +73,6 @@
 	"tomsstorage.config.inventory_connector_range": "Inventory Connector Range",
 	"tomsstorage.config.only_trims_connect": "Only Allow Trims to Connect Inventories",
 	"tomsstorage.config.inv_cable_connector_max_scan": "Inventory Cable Connector Maximum number of cables",
-	"tomsstorage.config.wireless_reach": "Wireless terminal reach"
+	"tomsstorage.config.wireless_reach": "Wireless terminal reach",
+	"tomsstorage.config.multiblockInv": "Multiblock inventories"
 }

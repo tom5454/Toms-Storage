@@ -46,8 +46,6 @@ import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.jei.JEIHandler;
 import com.tom.storagemod.network.IDataReceiver;
 
-import net.minecraft.client.gui.widget.button.Button.IPressable;
-
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends ContainerScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
 
@@ -474,11 +472,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	@Override
 	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-		if (p_keyPressed_1_ == 256) {
-			this.minecraft.player.closeContainer();
-			return true;
-		}
-
 		return !this.searchField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.searchField.canConsumeInput() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 	}
 

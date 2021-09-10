@@ -13,7 +13,7 @@ import com.tom.storagemod.block.BlockInventoryHopperBasic;
 
 public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBase {
 	private ItemStack filter = ItemStack.EMPTY;
-	private int cooldown;
+	private int cooldown, lastItemSlot = -1;
 	public TileEntityInventoryHopperBasic() {
 		super(StorageMod.invHopperBasicTile);
 	}
@@ -29,18 +29,37 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 		boolean hasFilter = !getFilter().isEmpty();
 		IItemHandler top = this.top.orElse(EmptyHandler.INSTANCE);
 		IItemHandler bot = this.bottom.orElse(EmptyHandler.INSTANCE);
-		for (int i = 0; i < top.getSlots(); i++) {
+
+		if(lastItemSlot != -1 && lastItemSlot < top.getSlots()) {
 			if(hasFilter) {
-				ItemStack inSlot = top.getStackInSlot(i);
+				ItemStack inSlot = top.getStackInSlot(lastItemSlot);
 				if(!ItemStack.isSame(inSlot, getFilter()) || !ItemStack.tagMatches(inSlot, getFilter())) {
-					continue;
+					lastItemSlot = -1;
 				}
 			}
-			ItemStack extractItem = top.extractItem(i, 1, true);
+		}
+		if(lastItemSlot == -1) {
+			for (int i = 0; i < top.getSlots(); i++) {
+				if(hasFilter) {
+					ItemStack inSlot = top.getStackInSlot(i);
+					if(!ItemStack.isSame(inSlot, getFilter()) || !ItemStack.tagMatches(inSlot, getFilter())) {
+						continue;
+					}
+				}
+				ItemStack extractItem = top.extractItem(i, 1, true);
+				if (!extractItem.isEmpty()) {
+					lastItemSlot = i;
+					break;
+				}
+			}
+			cooldown = 10;
+		}
+		if(lastItemSlot != -1) {
+			ItemStack extractItem = top.extractItem(lastItemSlot, 1, true);
 			if (!extractItem.isEmpty()) {
 				ItemStack is = ItemHandlerHelper.insertItemStacked(bot, extractItem, true);
 				if(is.isEmpty()) {
-					is = ItemHandlerHelper.insertItemStacked(bot, top.extractItem(i, 1, false), false);
+					is = ItemHandlerHelper.insertItemStacked(bot, top.extractItem(lastItemSlot, 1, false), false);
 					cooldown = 10;
 					if(!is.isEmpty()) {
 						//Never?
