@@ -5,7 +5,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -146,7 +146,7 @@ public class ContainerLevelEmitter extends ScreenHandler implements IDataReceive
 	private boolean lessThan = false;
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(NbtCompound tag) {
 		if(pinv.player.isSpectator() || te == null)return;
 		int count = tag.getInt("count");
 		boolean lt = tag.getBoolean("lessThan");
@@ -158,7 +158,7 @@ public class ContainerLevelEmitter extends ScreenHandler implements IDataReceive
 	public void sendContentUpdates() {
 		if(te == null)return;
 		if(lastCount != te.getCount() || lessThan != te.isLessThan()) {
-			CompoundTag mainTag = new CompoundTag();
+			NbtCompound mainTag = new NbtCompound();
 			mainTag.putInt("count", te.getCount());
 			mainTag.putBoolean("lessThan", te.isLessThan());
 			lastCount = te.getCount();

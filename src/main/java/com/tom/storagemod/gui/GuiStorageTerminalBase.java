@@ -21,7 +21,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -89,7 +89,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		searchType = (s & 0b111_00_0_00) >> 5;
 		searchField.setFocusUnlocked((searchType & 1) == 0);
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
-			searchField.setFocused(true);
+			searchField.setTextFieldFocused(true);
 		}
 		buttonSortingType.state = type;
 		buttonDirection.state = rev ? 1 : 0;
@@ -104,9 +104,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	protected void sendUpdate() {
-		CompoundTag c = new CompoundTag();
+		NbtCompound c = new NbtCompound();
 		c.putInt("d", updateData());
-		CompoundTag msg = new CompoundTag();
+		NbtCompound msg = new NbtCompound();
 		msg.put("c", c);
 		handler.sendMessage(msg);
 	}
@@ -129,7 +129,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
 		this.searchField.setText(searchLast);
 		this.searchField.setMaxLength(100);
-		this.searchField.setHasBorder(false);
+		this.searchField.setDrawsBackground(false);
 		this.searchField.setVisible(true);
 		this.searchField.setEditableColor(16777215);
 		buttons.add(searchField);
@@ -228,7 +228,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 						REIPlugin.setReiSearchText(searchString);
 				}
 				if ((searchType & 2) > 0) {
-					CompoundTag nbt = new CompoundTag();
+					NbtCompound nbt = new NbtCompound();
 					nbt.putString("s", searchString);
 					handler.sendMessage(nbt);
 				}
@@ -374,11 +374,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}*/
 
 	protected void storageSlotClick(ItemStack slotStack, SlotAction act, int mod) {
-		CompoundTag c = new CompoundTag();
-		c.put("s", slotStack.toTag(new CompoundTag()));
+		NbtCompound c = new NbtCompound();
+		c.put("s", slotStack.writeNbt(new NbtCompound()));
 		c.putInt("a", act.ordinal());
 		c.putByte("m", (byte) mod);
-		CompoundTag msg = new CompoundTag();
+		NbtCompound msg = new NbtCompound();
 		msg.put("a", c);
 		handler.sendMessage(msg);
 	}
@@ -480,11 +480,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 	@Override
 	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-		if (p_keyPressed_1_ == 256) {
-			this.mc.player.closeScreen();
-			return true;
-		}
-
 		return !this.searchField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.searchField.isActive() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 	}
 
@@ -558,7 +553,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(NbtCompound tag) {
 		handler.receiveClientTagPacket(tag);
 		refreshItemList = true;
 	}

@@ -5,7 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
@@ -34,18 +34,18 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public void fromTag(BlockState st, CompoundTag compound) {
+	public void fromTag(BlockState st, NbtCompound compound) {
 		super.fromTag(st, compound);
 		blockState = NbtHelper.toBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compound) {
+	public NbtCompound writeNbt(NbtCompound compound) {
 		if (blockState != null) {
 			compound.put("block", NbtHelper.fromBlockState(blockState));
 		}
-		return super.toTag(compound);
+		return super.writeNbt(compound);
 	}
 
 	private void markDirtyClient() {
@@ -65,8 +65,8 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 
 	@Override
 	public BlockEntityUpdateS2CPacket toUpdatePacket() {
-		CompoundTag nbtTag = new CompoundTag();
-		toTag(nbtTag);
+		NbtCompound nbtTag = new NbtCompound();
+		writeNbt(nbtTag);
 		return new BlockEntityUpdateS2CPacket(getPos(), 127, nbtTag);
 	}
 
@@ -75,7 +75,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public void fromClientTag(CompoundTag tag) {
+	public void fromClientTag(NbtCompound tag) {
 		BlockState old = getPaintedBlockState();
 		blockState = NbtHelper.toBlockState(tag.getCompound("block"));
 		if (world != null && world.isClient) {
@@ -89,7 +89,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public CompoundTag toClientTag(CompoundTag tag) {
-		return toTag(tag);
+	public NbtCompound toClientTag(NbtCompound tag) {
+		return writeNbt(tag);
 	}
 }

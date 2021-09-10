@@ -1,8 +1,8 @@
 package com.tom.storagemod.rei;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
 import me.shedaniel.rei.api.AutoTransferHandler;
@@ -37,16 +37,16 @@ public class REIPlugin implements REIPluginV0 {
 					ItemStack[][] stacks = recipe.getInputEntries().stream().map(l ->
 					l.stream().map(EntryStack::getItemStack).filter(e -> e != null).toArray(ItemStack[]::new)
 							).toArray(ItemStack[][]::new);
-					CompoundTag compound = new CompoundTag();
-					ListTag list = new ListTag();
+					NbtCompound compound = new NbtCompound();
+					NbtList list = new NbtList();
 					for (int i = 0;i < stacks.length;++i) {
 						if (stacks[i] != null) {
-							CompoundTag CompoundTag = new CompoundTag();
+							NbtCompound CompoundTag = new NbtCompound();
 							CompoundTag.putByte("s", (byte) (recipe.getWidth() == 1 ? i * 3 : recipe.getWidth() == 2 ? ((i % 2) + i / 2 * 3) : i));
 							for (int j = 0;j < stacks[i].length && j < 3;j++) {
 								if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-									CompoundTag tag = new CompoundTag();
-									stacks[i][j].toTag(tag);
+									NbtCompound tag = new NbtCompound();
+									stacks[i][j].writeNbt(tag);
 									CompoundTag.put("i" + j, tag);
 								}
 							}

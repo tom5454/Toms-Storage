@@ -4,7 +4,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
 
 public class InfoHandler extends InventoryWrapper {
@@ -32,8 +32,8 @@ public class InfoHandler extends InventoryWrapper {
 
 	private static final ItemStack STACK = new ItemStack(Items.BARRIER, Integer.MAX_VALUE);
 	static {
-		STACK.setTag(new CompoundTag());
-		CompoundTag d = new CompoundTag();
+		STACK.setTag(new NbtCompound());
+		NbtCompound d = new NbtCompound();
 		STACK.getTag().put("display", d);
 		d.putString("Name", "{\"translate\":\"tooltip.toms_storage.loop\",\"color\":\"red\",\"italic\":false}");
 	}

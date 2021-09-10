@@ -7,7 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -38,15 +38,15 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag tag) {
-		tag.put("filter", filter.getTags());
-		return super.toTag(tag);
+	public NbtCompound writeNbt(NbtCompound tag) {
+		tag.put("filter", filter.toNbtList());
+		return super.writeNbt(tag);
 	}
 
 	@Override
-	public void fromTag(BlockState state, CompoundTag tag) {
+	public void fromTag(BlockState state, NbtCompound tag) {
 		super.fromTag(state, tag);
-		filter.readTags(tag.getList("filter", 10));
+		filter.readNbtList(tag.getList("filter", 10));
 	}
 
 	@Override

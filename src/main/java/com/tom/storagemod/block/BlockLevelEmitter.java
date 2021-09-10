@@ -157,7 +157,7 @@ public class BlockLevelEmitter extends BlockWithEntity implements IInventoryCabl
 			f = f / 16.0F;
 			double d3 = f * direction.getOffsetX();
 			double d4 = f * direction.getOffsetZ();
-			worldIn.addParticle(DustParticleEffect.RED, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D);
+			worldIn.addParticle(DustParticleEffect.DEFAULT, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D);
 		}
 	}
 

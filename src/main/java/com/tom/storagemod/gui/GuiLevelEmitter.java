@@ -11,7 +11,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -63,7 +63,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		super.init();
 		textF = new TextFieldWidget(textRenderer, x + 70, y + 41, 89, textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.level_emitter_amount"));
 		textF.setMaxLength(100);
-		textF.setHasBorder(false);
+		textF.setDrawsBackground(false);
 		textF.setVisible(true);
 		textF.setEditableColor(16777215);
 		textF.setText("1");
@@ -96,7 +96,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(NbtCompound tag) {
 		count = tag.getInt("count");
 		boolean lt = tag.getBoolean("lessThan");
 		lessThanBtn.state = lt ? 1 : 0;
@@ -137,7 +137,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 	}
 
 	private void send() {
-		CompoundTag mainTag = new CompoundTag();
+		NbtCompound mainTag = new NbtCompound();
 		mainTag.putInt("count", count);
 		mainTag.putBoolean("lessThan", lt);
 		NetworkHandler.sendToServer(mainTag);

@@ -213,7 +213,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			}
 			if(itemstack != null) {
 				super.searchField.setText(itemstack.getName().getString());
-				super.searchField.setFocused(false);
+				super.searchField.setTextFieldFocused(false);
 				return true;
 			}
 		}

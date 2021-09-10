@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -115,17 +115,17 @@ public class TileEntityLevelEmitter extends BlockEntity implements Tickable, Nam
 	}
 
 	@Override
-	public CompoundTag toTag(CompoundTag compound) {
-		compound.put("Filter", getFilter().toTag(new CompoundTag()));
+	public NbtCompound writeNbt(NbtCompound compound) {
+		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
-		return super.toTag(compound);
+		return super.writeNbt(compound);
 	}
 
 	@Override
-	public void fromTag(BlockState stateIn, CompoundTag nbtIn) {
+	public void fromTag(BlockState stateIn, NbtCompound nbtIn) {
 		super.fromTag(stateIn, nbtIn);
-		setFilter(ItemStack.fromTag(nbtIn.getCompound("Filter")));
+		setFilter(ItemStack.fromNbt(nbtIn.getCompound("Filter")));
 		count = nbtIn.getInt("Count");
 		lessThan = nbtIn.getBoolean("lessThan");
 	}

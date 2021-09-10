@@ -12,7 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -46,7 +46,7 @@ public class ItemPaintKit extends Item {
 				BlockEntity tile = context.getWorld().getBlockEntity(context.getBlockPos());
 				if(tile == null && state.isFullCube(context.getWorld(), context.getBlockPos())) {
 					ItemStack is = context.getStack();
-					if(!is.hasTag())is.setTag(new CompoundTag());
+					if(!is.hasTag())is.setTag(new NbtCompound());
 					is.getTag().put("block", NbtHelper.fromBlockState(state));
 					//ITextComponent tc = new TranslationTextComponent("tooltip.toms_storage.set_paint", state.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
 					//context.getPlayer().sendStatusMessage(tc, true);

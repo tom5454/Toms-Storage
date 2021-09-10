@@ -1,11 +1,13 @@
 package com.tom.storagemod;
 
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
@@ -13,9 +15,9 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -53,6 +55,7 @@ import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
+import me.sargunvohra.mcmods.autoconfig1u.ConfigHolder;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -96,7 +99,10 @@ public class StorageMod implements ModInitializer {
 	public static ScreenHandlerType<ContainerFiltered> filteredConatiner;
 	public static ScreenHandlerType<ContainerLevelEmitter> levelEmitterConatiner;
 
-	public static Config CONFIG = AutoConfig.register(Config.class, GsonConfigSerializer::new).getConfig();
+	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
+	public static Config CONFIG = configHolder.getConfig();
+
+	public static Set<Block> multiblockInvs;
 
 	public StorageMod() {
 	}
@@ -189,17 +195,21 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(invHopperBasic);
 		registerItemForBlock(levelEmitter);
 
-		ServerSidePacketRegistry.INSTANCE.register(NetworkHandler.DATA_C2S, (ctx, buf) -> {
-			CompoundTag tag = buf.method_30617();
-			ctx.getTaskQueue().submit(() -> {
-				ServerPlayerEntity sender = (ServerPlayerEntity) ctx.getPlayer();
-				if(sender.currentScreenHandler instanceof IDataReceiver) {
-					((IDataReceiver)sender.currentScreenHandler).receive(tag);
+		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_C2S, (s, p, h, buf, rp) -> {
+			NbtCompound tag = buf.readUnlimitedNbt();
+			s.submit(() -> {
+				if(p.currentScreenHandler instanceof IDataReceiver) {
+					((IDataReceiver)p.currentScreenHandler).receive(tag);
 				}
 			});
 		});
 
 		StorageTags.init();
+
+		configHolder.registerSaveListener((a, b) -> {
+			multiblockInvs = null;
+			return ActionResult.PASS;
+		});
 	}
 
 	private static void registerItemForBlock(Block block) {

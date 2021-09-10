@@ -1,5 +1,6 @@
 package com.tom.storagemod;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
@@ -10,16 +11,17 @@ import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelProviderException;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -49,11 +51,11 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.levelEmitter, RenderLayer.getCutout());
 
-		ClientSidePacketRegistry.INSTANCE.register(NetworkHandler.DATA_S2C, (ctx, buf) -> {
-			CompoundTag tag = buf.method_30617();
-			ctx.getTaskQueue().submit(() -> {
-				if(MinecraftClient.getInstance().currentScreen instanceof IDataReceiver) {
-					((IDataReceiver)MinecraftClient.getInstance().currentScreen).receive(tag);
+		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
+			NbtCompound tag = buf.readUnlimitedNbt();
+			mc.submit(() -> {
+				if(mc.currentScreen instanceof IDataReceiver) {
+					((IDataReceiver)mc.currentScreen).receive(tag);
 				}
 			});
 		});
@@ -81,6 +83,14 @@ public class StorageModClient implements ClientModInitializer {
 			}
 			return -1;
 		}, StorageMod.paintedTrim, StorageMod.invCablePainted);
+
+		try {
+			Class<?> clz = Class.forName("com.kqp.inventorytabs.api.TabProviderRegistry");
+			Method regSimpleBlock = clz.getDeclaredMethod("registerSimpleBlock", Block.class);
+			regSimpleBlock.invoke(null, StorageMod.terminal);
+			regSimpleBlock.invoke(null, StorageMod.craftingTerminal);
+		} catch (Throwable e) {
+		}
 	}
 
 	public static void tooltip(String key, List<Text> tooltip) {
