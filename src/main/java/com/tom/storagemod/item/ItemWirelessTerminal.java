@@ -22,9 +22,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.proxy.ClientProxy;
 
-import net.minecraft.item.Item.Properties;
-
-public class ItemWirelessTerminal extends Item {
+public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
 	public ItemWirelessTerminal() {
 		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
@@ -52,5 +50,10 @@ public class ItemWirelessTerminal extends Item {
 	public static boolean isPlayerHolding(PlayerEntity player) {
 		return player.getMainHandItem().getItem() == StorageMod.wirelessTerminal ||
 				player.getOffhandItem().getItem() == StorageMod.wirelessTerminal;
+	}
+
+	@Override
+	public int getRange(PlayerEntity pl, ItemStack stack) {
+		return Config.wirelessRange;
 	}
 }

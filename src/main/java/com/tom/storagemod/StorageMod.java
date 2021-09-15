@@ -41,6 +41,7 @@ import com.tom.storagemod.gui.ContainerCraftingTerminal;
 import com.tom.storagemod.gui.ContainerFiltered;
 import com.tom.storagemod.gui.ContainerLevelEmitter;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
+import com.tom.storagemod.item.ItemAdvWirelessTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
 import com.tom.storagemod.item.ItemWirelessTerminal;
@@ -80,6 +81,7 @@ public class StorageMod {
 
 	public static ItemPaintKit paintingKit;
 	public static ItemWirelessTerminal wirelessTerminal;
+	public static ItemAdvWirelessTerminal advWirelessTerminal;
 
 	public static TileEntityType<TileEntityInventoryConnector> connectorTile;
 	public static TileEntityType<TileEntityStorageTerminal> terminalTile;
@@ -174,6 +176,7 @@ public class StorageMod {
 		public static void onItemsRegistry(final RegistryEvent.Register<Item> itemRegistryEvent) {
 			paintingKit = new ItemPaintKit();
 			wirelessTerminal = new ItemWirelessTerminal();
+			advWirelessTerminal = new ItemAdvWirelessTerminal();
 
 			registerItemForBlock(itemRegistryEvent, connector);
 			registerItemForBlock(itemRegistryEvent, terminal);
@@ -191,6 +194,7 @@ public class StorageMod {
 
 			itemRegistryEvent.getRegistry().register(paintingKit);
 			itemRegistryEvent.getRegistry().register(wirelessTerminal);
+			itemRegistryEvent.getRegistry().register(advWirelessTerminal);
 		}
 
 		private static void registerItemForBlock(RegistryEvent.Register<Item> itemRegistryEvent, Block block) {

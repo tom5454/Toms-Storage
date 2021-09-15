@@ -24,13 +24,12 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
-import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.item.WirelessTerminal;
 
 public class TileEntityStorageTerminal extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 	private IItemHandler itemHandler;
@@ -130,8 +129,10 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	public boolean canInteractWith(PlayerEntity player) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
-		double dist = ItemWirelessTerminal.isPlayerHolding(player) ? Config.wirelessRange*2*Config.wirelessRange*2 : 64;
-		return !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > dist);
+		int d = 4;
+		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
+		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
+		return !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
 	}
 
 	public int getSorting() {
