@@ -15,6 +15,7 @@
 	
 	"item.toms_storage.ts.paint_kit": "Paint Kit",
 	"item.toms_storage.ts.wireless_terminal": "Wireless Terminal",
+	"item.toms_storage.ts.adv_wireless_terminal": "Advanced Wireless Terminal",
 	
 	"itemGroup.toms_storage.tab": "Tom's Simple Storage",
 	
@@ -64,16 +65,22 @@
 	"tooltip.toms_storage.level_emitter": "Emits a redstone signal based on Inventory System contents.",
 	"tooltip.toms_storage.lvlEm_lt_0": "Emit when more than specified in storage",
 	"tooltip.toms_storage.lvlEm_lt_1": "Emit when less than specified in storage",
+	"tooltip.toms_storage.adv_wireless_terminal": "Shift right click a terminal to bind it.",
+	"tooltip.toms_storage.adv_wireless_terminal.bound": "Bound to (%s, %s, %s) in %s",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
 	
 	"chat.toms_storage.inventory_connector.free_slots": "Inventory Connector: %d free/%d slots.",
+	"chat.toms_storage.terminal_bound": "Bound Advanced Wireless Terminal",
+	"chat.toms_storage.terminal_invalid_block": "Invalid block",
+	"chat.toms_storage.terminal_out_of_range": "Terminal out of range",
 	
 	"text.autoconfig.toms_storage.title": "Tom's Simple Storage Configuration",
 	"text.autoconfig.toms_storage.option.invRange": "Inventory Connector Range",
 	"text.autoconfig.toms_storage.option.onlyTrims": "Only Allow Trims to Connect Inventories",
 	"text.autoconfig.toms_storage.option.invConnectorMaxCables": "Inventory Cable Connector Maximum number of cables",
 	"text.autoconfig.toms_storage.option.wirelessRange": "Wireless terminal reach",
-	"text.autoconfig.toms_storage.option.multiblockInv": "Multiblock inventories"
+	"text.autoconfig.toms_storage.option.multiblockInv": "Multiblock inventories",
+	"text.autoconfig.toms_storage.option.advWirelessRange": "Advanced wireless terminal range"
 }
