@@ -26,6 +26,7 @@ public class Config {
 	public static int invConnectorMax = 0;
 	public static int wirelessRange;
 	public static Set<Block> multiblockInvs = new HashSet<>();
+	public static int advWirelessRange;
 
 	public static class Server {
 		public IntValue inventoryConnectorRange;
@@ -33,6 +34,7 @@ public class Config {
 		public IntValue wirelessRange;
 		public BooleanValue onlyTrimsConnect;
 		public ConfigValue<List<? extends String>> multiblockInvs;
+		public IntValue advWirelessRange;
 
 		private Server(ForgeConfigSpec.Builder builder) {
 			inventoryConnectorRange = builder.comment("Inventory Connector Range").
@@ -52,8 +54,12 @@ public class Config {
 					defineInRange("wirelessReach", 16, 4, 64);
 
 			multiblockInvs = builder.comment("Multiblock inventories").
-					translation("tomsstorage.config.multiblockInv").
+					translation("tomsstorage.config.multiblock_inv").
 					defineList("multiblockInv", Collections.emptyList(), s -> true);
+
+			advWirelessRange = builder.comment("Wireless terminal reach").
+					translation("tomsstorage.config.adv_wireless_range").
+					defineInRange("advWirelessRange", 64, 16, 512);
 		}
 	}
 
@@ -72,6 +78,7 @@ public class Config {
 		wirelessRange = SERVER.wirelessRange.get();
 		multiblockInvs = SERVER.multiblockInvs.get().stream().map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).
 				filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
+		advWirelessRange = SERVER.advWirelessRange.get();
 	}
 
 	@SubscribeEvent

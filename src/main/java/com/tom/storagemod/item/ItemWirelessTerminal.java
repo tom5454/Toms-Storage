@@ -22,7 +22,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.proxy.ClientProxy;
 
-public class ItemWirelessTerminal extends Item {
+public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
 	public ItemWirelessTerminal() {
 		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
@@ -50,5 +50,10 @@ public class ItemWirelessTerminal extends Item {
 	public static boolean isPlayerHolding(Player player) {
 		return player.getMainHandItem().getItem() == StorageMod.wirelessTerminal ||
 				player.getOffhandItem().getItem() == StorageMod.wirelessTerminal;
+	}
+
+	@Override
+	public int getRange(Player pl, ItemStack stack) {
+		return Config.wirelessRange;
 	}
 }
