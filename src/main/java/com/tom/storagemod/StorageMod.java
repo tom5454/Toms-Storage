@@ -40,6 +40,7 @@ import com.tom.storagemod.gui.ContainerCraftingTerminal;
 import com.tom.storagemod.gui.ContainerFiltered;
 import com.tom.storagemod.gui.ContainerLevelEmitter;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
+import com.tom.storagemod.item.ItemAdvWirelessTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
 import com.tom.storagemod.item.ItemWirelessTerminal;
@@ -80,6 +81,7 @@ public class StorageMod implements ModInitializer {
 
 	public static ItemPaintKit paintingKit;
 	public static ItemWirelessTerminal wirelessTerminal;
+	public static ItemAdvWirelessTerminal advWirelessTerminal;
 
 	public static BlockEntityType<TileEntityInventoryConnector> connectorTile;
 	public static BlockEntityType<TileEntityStorageTerminal> terminalTile;
@@ -132,6 +134,7 @@ public class StorageMod implements ModInitializer {
 
 		paintingKit = new ItemPaintKit();
 		wirelessTerminal = new ItemWirelessTerminal();
+		advWirelessTerminal = new ItemAdvWirelessTerminal();
 
 		connectorTile = BlockEntityType.Builder.create(TileEntityInventoryConnector::new, connector).build(null);
 		terminalTile = BlockEntityType.Builder.create(TileEntityStorageTerminal::new, terminal).build(null);
@@ -166,6 +169,7 @@ public class StorageMod implements ModInitializer {
 
 		Registry.register(Registry.ITEM, id("ts.paint_kit"), paintingKit);
 		Registry.register(Registry.ITEM, id("ts.wireless_terminal"), wirelessTerminal);
+		Registry.register(Registry.ITEM, id("ts.adv_wireless_terminal"), advWirelessTerminal);
 
 		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_connector.tile"), connectorTile);
 		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.storage_terminal.tile"), terminalTile);

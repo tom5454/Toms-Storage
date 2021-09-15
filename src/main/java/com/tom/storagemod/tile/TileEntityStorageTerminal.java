@@ -27,7 +27,7 @@ import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
-import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.util.IItemHandler;
 import com.tom.storagemod.util.InvWrapper;
 import com.tom.storagemod.util.ItemHandlerHelper;
@@ -125,8 +125,10 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 
 	public boolean canInteractWith(PlayerEntity player) {
 		if(world.getBlockEntity(pos) != this)return false;
-		double dist = ItemWirelessTerminal.isPlayerHolding(player) ? StorageMod.CONFIG.wirelessRange*2*StorageMod.CONFIG.wirelessRange*2 : 64;
-		return !(player.squaredDistanceTo(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > dist);
+		int d = 4;
+		if(player.getMainHandStack().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getMainHandStack().getItem()).getRange(player, player.getMainHandStack()));
+		if(player.getOffHandStack().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getOffHandStack().getItem()).getRange(player, player.getOffHandStack()));
+		return !(player.squaredDistanceTo(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > d*2*d*2);
 	}
 
 	public int getSorting() {

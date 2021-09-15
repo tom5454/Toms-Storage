@@ -20,7 +20,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.StorageTags;
 
-public class ItemWirelessTerminal extends Item {
+public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
 	public ItemWirelessTerminal() {
 		super(new Settings().group(StorageMod.STORAGE_MOD_TAB).maxCount(1));
@@ -47,5 +47,10 @@ public class ItemWirelessTerminal extends Item {
 	public static boolean isPlayerHolding(PlayerEntity player) {
 		return player.getStackInHand(Hand.MAIN_HAND).getItem() == StorageMod.wirelessTerminal ||
 				player.getStackInHand(Hand.OFF_HAND).getItem() == StorageMod.wirelessTerminal;
+	}
+
+	@Override
+	public int getRange(PlayerEntity pl, ItemStack stack) {
+		return StorageMod.CONFIG.wirelessRange;
 	}
 }

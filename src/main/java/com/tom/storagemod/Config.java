@@ -19,6 +19,7 @@ public class Config implements ConfigData {
 	public int wirelessRange = 16;
 	public int invConnectorMaxCables = 2048;
 	public List<String> multiblockInv = new ArrayList<>();
+	public int advWirelessRange = 64;
 
 	@Override
 	public void validatePostLoad() throws ValidationException {
@@ -33,6 +34,10 @@ public class Config implements ConfigData {
 		if(invConnectorMaxCables < 4) {
 			invConnectorMaxCables = 2048;
 			StorageMod.LOGGER.warn("Inventory Cable Range out of bounds, resetting to default");
+		}
+		if(advWirelessRange < 16 || advWirelessRange > 512) {
+			advWirelessRange = 64;
+			StorageMod.LOGGER.warn("Adv Wireless Range out of bounds, resetting to default");
 		}
 		StorageMod.LOGGER.info("Config loaded");
 	}
