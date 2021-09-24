@@ -546,7 +546,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	@Override
 	public boolean canUse(PlayerEntity paramPlayerEntity) {
-		return te.canInteractWith(paramPlayerEntity);
+		return te == null || te.canInteractWith(paramPlayerEntity);
 	}
 
 	@Override
