@@ -61,7 +61,8 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound compound) {
+	public void writeNbt(NbtCompound compound) {
+		super.writeNbt(compound);
 		NbtList listnbt = new NbtList();
 
 		for(int i = 0; i < craftMatrix.size(); ++i) {
@@ -75,7 +76,6 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		}
 
 		compound.put("CraftingTable", listnbt);
-		return super.writeNbt(compound);
 	}
 	private boolean reading;
 	@Override
@@ -149,7 +149,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 						if(is == null && (getSorting() & (1 << 8)) != 0) {
 							for(int j = 0;j<thePlayer.getInventory().size();j++) {
 								ItemStack st = thePlayer.getInventory().getStack(j);
-								if(ItemStack.areItemsEqual(slot, st) && ItemStack.areTagsEqual(slot, st)) {
+								if(ItemStack.areItemsEqual(slot, st) && ItemStack.areNbtEqual(slot, st)) {
 									st = thePlayer.getInventory().removeStack(j, 1);
 									if(!st.isEmpty()) {
 										is = new StoredItemStack(st, 1);

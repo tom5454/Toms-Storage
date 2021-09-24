@@ -96,7 +96,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public Sprite getSprite() {
+	public Sprite getParticleSprite() {
 		return sprite;
 	}
 

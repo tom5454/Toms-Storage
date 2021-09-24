@@ -39,9 +39,9 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound tag) {
+	public void writeNbt(NbtCompound tag) {
+		super.writeNbt(tag);
 		tag.put("filter", filter.toNbtList());
-		return super.writeNbt(tag);
 	}
 
 	@Override

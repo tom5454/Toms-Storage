@@ -36,11 +36,11 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, World worldIn, List<Text> tooltip, TooltipContext flagIn) {
 		StorageModClient.tooltip("adv_wireless_terminal", tooltip);
-		if(stack.hasTag() && stack.getTag().contains("BindX")) {
-			int x = stack.getTag().getInt("BindX");
-			int y = stack.getTag().getInt("BindY");
-			int z = stack.getTag().getInt("BindZ");
-			String dim = stack.getTag().getString("BindDim");
+		if(stack.hasNbt() && stack.getNbt().contains("BindX")) {
+			int x = stack.getNbt().getInt("BindX");
+			int y = stack.getNbt().getInt("BindY");
+			int z = stack.getNbt().getInt("BindZ");
+			String dim = stack.getNbt().getString("BindDim");
 			tooltip.add(new TranslatableText("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
 	}
@@ -48,11 +48,11 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	public TypedActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		ItemStack stack = playerIn.getStackInHand(handIn);
-		if(stack.hasTag() && stack.getTag().contains("BindX")) {
-			int x = stack.getTag().getInt("BindX");
-			int y = stack.getTag().getInt("BindY");
-			int z = stack.getTag().getInt("BindZ");
-			String dim = stack.getTag().getString("BindDim");
+		if(stack.hasNbt() && stack.getNbt().contains("BindX")) {
+			int x = stack.getNbt().getInt("BindX");
+			int y = stack.getNbt().getInt("BindY");
+			int z = stack.getNbt().getInt("BindZ");
+			String dim = stack.getNbt().getString("BindDim");
 			if(worldIn.getRegistryKey().getValue().toString().equals(dim)) {
 				if(playerIn.squaredDistanceTo(new Vec3d(x, y, z)) < StorageMod.CONFIG.advWirelessRange * StorageMod.CONFIG.advWirelessRange) {
 					BlockHitResult lookingAt = new BlockHitResult(new Vec3d(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
@@ -78,11 +78,11 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 			BlockState state = c.getWorld().getBlockState(pos);
 			if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
 				ItemStack stack = c.getStack();
-				if(!stack.hasTag())stack.setTag(new NbtCompound());
-				stack.getTag().putInt("BindX", pos.getX());
-				stack.getTag().putInt("BindY", pos.getY());
-				stack.getTag().putInt("BindZ", pos.getZ());
-				stack.getTag().putString("BindDim", c.getWorld().getRegistryKey().getValue().toString());
+				if(!stack.hasNbt())stack.setNbt(new NbtCompound());
+				stack.getNbt().putInt("BindX", pos.getX());
+				stack.getNbt().putInt("BindY", pos.getY());
+				stack.getNbt().putInt("BindZ", pos.getZ());
+				stack.getNbt().putString("BindDim", c.getWorld().getRegistryKey().getValue().toString());
 				if(c.getPlayer() != null)
 					c.getPlayer().sendMessage(new TranslatableText("chat.toms_storage.terminal_bound"), true);
 				return ActionResult.SUCCESS;

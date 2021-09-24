@@ -67,7 +67,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 		if(itemHandler == null)return null;
 		for (int i = 0; i < itemHandler.getSlots(); i++) {
 			ItemStack s = itemHandler.getStackInSlot(i);
-			if(ItemStack.areItemsEqual(s, st) && ItemStack.areTagsEqual(s, st)) {
+			if(ItemStack.areItemsEqual(s, st) && ItemStack.areNbtEqual(s, st)) {
 				ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
 				if(!pulled.isEmpty()) {
 					if(ret == null)ret = new StoredItemStack(pulled);
@@ -140,9 +140,9 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound compound) {
+	public void writeNbt(NbtCompound compound) {
+		super.writeNbt(compound);
 		compound.putInt("sort", sort);
-		return super.writeNbt(compound);
 	}
 
 	@Override

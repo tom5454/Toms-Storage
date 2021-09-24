@@ -5,10 +5,10 @@ import net.minecraft.item.ItemStack;
 public class ItemHandlerHelper {
 
 	public static boolean canItemStacksStack(ItemStack a, ItemStack b) {
-		if (a.isEmpty() || !a.isItemEqual(b) || a.hasTag() != b.hasTag()) {
+		if (a.isEmpty() || !a.isItemEqual(b) || a.hasNbt() != b.hasNbt()) {
 			return false;
 		}
-		return ((!a.hasTag() || a.getTag().equals(b.getTag())));
+		return ((!a.hasNbt() || a.getNbt().equals(b.getNbt())));
 	}
 
 	public static ItemStack copyStackWithSize(ItemStack itemStack, int size) {
@@ -34,10 +34,10 @@ public class ItemHandlerHelper {
         if (a.getHasSubtypes() && a.getMetadata() != b.getMetadata())
             return false;
 		 */
-		if (a.hasTag() != b.hasTag())
+		if (a.hasNbt() != b.hasNbt())
 			return false;
 
-		return (!a.hasTag() || a.getTag().equals(b.getTag()));
+		return (!a.hasNbt() || a.getNbt().equals(b.getNbt()));
 	}
 
 	public static ItemStack insertItemStacked(IItemHandler inventory, ItemStack stack, boolean simulate)

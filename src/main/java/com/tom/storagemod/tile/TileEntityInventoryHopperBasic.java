@@ -33,7 +33,7 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 		if(lastItemSlot != -1 && lastItemSlot < top.getSlots()) {
 			if(hasFilter) {
 				ItemStack inSlot = top.getStackInSlot(lastItemSlot);
-				if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areTagsEqual(inSlot, getFilter())) {
+				if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areNbtEqual(inSlot, getFilter())) {
 					lastItemSlot = -1;
 				}
 			}
@@ -42,7 +42,7 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 			for (int i = 0; i < top.getSlots(); i++) {
 				if(hasFilter) {
 					ItemStack inSlot = top.getStackInSlot(i);
-					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areTagsEqual(inSlot, getFilter())) {
+					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areNbtEqual(inSlot, getFilter())) {
 						continue;
 					}
 				}
@@ -71,9 +71,9 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound compound) {
+	public void writeNbt(NbtCompound compound) {
+		super.writeNbt(compound);
 		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
-		return super.writeNbt(compound);
 	}
 
 	@Override

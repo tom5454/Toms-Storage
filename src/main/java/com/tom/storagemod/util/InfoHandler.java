@@ -32,9 +32,9 @@ public class InfoHandler extends InventoryWrapper {
 
 	private static final ItemStack STACK = new ItemStack(Items.BARRIER, Integer.MAX_VALUE);
 	static {
-		STACK.setTag(new NbtCompound());
+		STACK.setNbt(new NbtCompound());
 		NbtCompound d = new NbtCompound();
-		STACK.getTag().put("display", d);
+		STACK.getNbt().put("display", d);
 		d.putString("Name", "{\"translate\":\"tooltip.toms_storage.loop\",\"color\":\"red\",\"italic\":false}");
 	}
 

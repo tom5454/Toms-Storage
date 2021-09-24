@@ -81,7 +81,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 				int counter = 0;
 				for (int i = 0; i < top.getSlots(); i++) {
 					ItemStack inSlot = top.getStackInSlot(i);
-					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areTagsEqual(inSlot, getFilter())) {
+					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areNbtEqual(inSlot, getFilter())) {
 						continue;
 					}
 					counter += inSlot.getCount();
@@ -107,11 +107,11 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound compound) {
+	public void writeNbt(NbtCompound compound) {
+		super.writeNbt(compound);
 		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
-		return super.writeNbt(compound);
 	}
 
 	@Override

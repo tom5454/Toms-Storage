@@ -46,8 +46,8 @@ public class ItemPaintKit extends Item {
 				BlockEntity tile = context.getWorld().getBlockEntity(context.getBlockPos());
 				if(tile == null && state.isFullCube(context.getWorld(), context.getBlockPos())) {
 					ItemStack is = context.getStack();
-					if(!is.hasTag())is.setTag(new NbtCompound());
-					is.getTag().put("block", NbtHelper.fromBlockState(state));
+					if(!is.hasNbt())is.setNbt(new NbtCompound());
+					is.getNbt().put("block", NbtHelper.fromBlockState(state));
 					//ITextComponent tc = new TranslationTextComponent("tooltip.toms_storage.set_paint", state.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
 					//context.getPlayer().sendStatusMessage(tc, true);
 				}
@@ -55,8 +55,8 @@ public class ItemPaintKit extends Item {
 			} else {
 				BlockState state = context.getWorld().getBlockState(context.getBlockPos());
 				ItemStack is = context.getStack();
-				if(is.hasTag() && is.getTag().contains("block") && state.getBlock() instanceof IPaintable) {
-					if(((IPaintable)state.getBlock()).paint(context.getWorld(), context.getBlockPos(), NbtHelper.toBlockState(is.getTag().getCompound("block")))) {
+				if(is.hasNbt() && is.getNbt().contains("block") && state.getBlock() instanceof IPaintable) {
+					if(((IPaintable)state.getBlock()).paint(context.getWorld(), context.getBlockPos(), NbtHelper.toBlockState(is.getNbt().getCompound("block")))) {
 						PlayerEntity playerentity = context.getPlayer();
 						context.getWorld().playSound(playerentity, context.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
 						if(playerentity != null) {
@@ -83,8 +83,8 @@ public class ItemPaintKit extends Item {
 	public Text getName(ItemStack is) {
 		Text tcS = super.getName(is);
 		MutableText tc = (MutableText) tcS;
-		if(is.hasTag() && is.getTag().contains("block")) {
-			BlockState st = NbtHelper.toBlockState(is.getTag().getCompound("block"));
+		if(is.hasNbt() && is.getNbt().contains("block")) {
+			BlockState st = NbtHelper.toBlockState(is.getNbt().getCompound("block"));
 			tc.append(" (");
 			tc.append(st.getBlock().getName().formatted(Formatting.GREEN));
 			tc.append(")");

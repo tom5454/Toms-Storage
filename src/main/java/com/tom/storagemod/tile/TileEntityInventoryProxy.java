@@ -162,12 +162,12 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 				if(fstack.isEmpty())return true;
 				if(stack == null) {
 					stack = w.getStack(slot);
-					if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areTagsEqual(stack, fstack)) {
+					if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areNbtEqual(stack, fstack)) {
 						return true;
 					}
 					return false;
 				}
-				if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areTagsEqual(stack, fstack)) {
+				if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areNbtEqual(stack, fstack)) {
 					if(ignoreCount)return true;
 					int count = w.getStack(slot).getCount();
 					if(count < fstack.getCount())
@@ -204,7 +204,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 				ItemStack fstack = fsize > j ? filter.getStack(j) : ItemStack.EMPTY;
 
 				if (!itemStack.isEmpty()) {
-					if(fstack.isEmpty() || (ItemStack.areItemsEqual(itemStack, fstack) && ItemStack.areTagsEqual(itemStack, fstack))) {
+					if(fstack.isEmpty() || (ItemStack.areItemsEqual(itemStack, fstack) && ItemStack.areNbtEqual(itemStack, fstack))) {
 						f += itemStack.getCount() / Math.min((ignoreCount || fstack.isEmpty() ? globalCountLimit : fstack.getCount()), itemStack.getMaxCount());
 						i++;
 					}

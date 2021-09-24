@@ -25,7 +25,7 @@ public class ItemBlockPainted extends BlockItem {
 	@Override
 	protected BlockState getPlacementState(ItemPlacementContext context) {
 		ItemStack is = context.getStack();
-		Block block = is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block") ? ((IPaintable)getBlock()).getPaintedBlock() : getBlock();
+		Block block = is.hasNbt() && is.getNbt().getCompound("BlockEntityTag").contains("block") ? ((IPaintable)getBlock()).getPaintedBlock() : getBlock();
 		BlockState blockState = block.getPlacementState(context);
 		return (blockState != null && canPlace(context, blockState)) ? blockState : null;
 	}
@@ -34,8 +34,8 @@ public class ItemBlockPainted extends BlockItem {
 	public Text getName(ItemStack is) {
 		Text tcS = super.getName(is);
 		MutableText tc = (MutableText) tcS;
-		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
-			BlockState st = NbtHelper.toBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
+		if(is.hasNbt() && is.getNbt().getCompound("BlockEntityTag").contains("block")) {
+			BlockState st = NbtHelper.toBlockState(is.getNbt().getCompound("BlockEntityTag").getCompound("block"));
 			tc.append(" (");
 			tc.append(st.getBlock().getName().formatted(Formatting.GREEN));
 			tc.append(")");

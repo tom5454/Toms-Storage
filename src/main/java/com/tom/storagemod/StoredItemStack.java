@@ -131,7 +131,7 @@ public class StoredItemStack {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((stack == null) ? 0 : stack.getItem().hashCode());
-		result = prime * result + ((stack == null || !stack.hasTag()) ? 0 : stack.getTag().hashCode());
+		result = prime * result + ((stack == null || !stack.hasNbt()) ? 0 : stack.getNbt().hashCode());
 		//System.out.println(result + " " + stack);
 		return result;
 	}
@@ -149,7 +149,7 @@ public class StoredItemStack {
 		//if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areTagsEqual(stack, other.stack)) return false;
+		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areNbtEqual(stack, other.stack)) return false;
 		return true;
 	}
 
@@ -159,7 +159,7 @@ public class StoredItemStack {
 		if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areTagsEqual(stack, other.stack)) return false;
+		} else if (!ItemStack.areItemsEqual(stack, other.stack) || !ItemStack.areNbtEqual(stack, other.stack)) return false;
 		return true;
 	}
 

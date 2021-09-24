@@ -1,6 +1,5 @@
 package com.tom.storagemod.tile;
 
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,8 +13,7 @@ import net.minecraft.util.math.ChunkPos;
 
 import com.tom.storagemod.StorageMod;
 
-public class TileEntityPainted extends BlockEntity implements BlockEntityClientSerializable {
-	//public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
+public class TileEntityPainted extends BlockEntity/* implements BlockEntityClientSerializable*/ {
 	private BlockState blockState;
 
 	public TileEntityPainted(BlockPos pos, BlockState state) {
@@ -42,11 +40,11 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound compound) {
+	public void writeNbt(NbtCompound compound) {
+		super.writeNbt(compound);
 		if (blockState != null) {
 			compound.put("block", NbtHelper.fromBlockState(blockState));
 		}
-		return super.writeNbt(compound);
 	}
 
 	private void markDirtyClient() {
@@ -60,22 +58,27 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 				player.networkHandler.sendPacket(toUpdatePacket());
 			});
 
-			sync();
+			//sync();
 		}
 	}
 
 	@Override
 	public BlockEntityUpdateS2CPacket toUpdatePacket() {
+		return BlockEntityUpdateS2CPacket.create(this);
+	}
+
+	@Override
+	public NbtCompound toInitialChunkDataNbt() {
 		NbtCompound nbtTag = new NbtCompound();
 		writeNbt(nbtTag);
-		return new BlockEntityUpdateS2CPacket(getPos(), 127, nbtTag);
+		return nbtTag;
 	}
 
 	public BlockState getPaintedBlockState() {
 		return blockState == null ? Blocks.AIR.getDefaultState() : blockState;
 	}
 
-	@Override
+	/*@Override
 	public void fromClientTag(NbtCompound tag) {
 		BlockState old = getPaintedBlockState();
 		blockState = NbtHelper.toBlockState(tag.getCompound("block"));
@@ -91,6 +94,7 @@ public class TileEntityPainted extends BlockEntity implements BlockEntityClientS
 
 	@Override
 	public NbtCompound toClientTag(NbtCompound tag) {
-		return writeNbt(tag);
-	}
+		writeNbt(tag);
+		return tag;
+	}*/
 }
