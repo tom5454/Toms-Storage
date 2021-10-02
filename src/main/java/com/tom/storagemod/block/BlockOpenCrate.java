@@ -19,8 +19,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockReader;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.proxy.ClientProxy;
@@ -40,7 +38,6 @@ public class BlockOpenCrate extends ContainerBlock {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("open_crate", tooltip);

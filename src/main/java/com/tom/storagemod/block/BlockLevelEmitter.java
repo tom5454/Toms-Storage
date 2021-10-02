@@ -52,7 +52,6 @@ public class BlockLevelEmitter extends ContainerBlock implements IInventoryCable
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("level_emitter", tooltip);

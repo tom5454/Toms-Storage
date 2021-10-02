@@ -21,8 +21,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.proxy.ClientProxy;
@@ -46,7 +44,6 @@ public class InventoryConnector extends ContainerBlock implements IInventoryCabl
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_connector", tooltip);

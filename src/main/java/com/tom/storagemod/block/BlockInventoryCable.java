@@ -25,8 +25,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 import com.tom.storagemod.proxy.ClientProxy;
@@ -55,7 +53,6 @@ public class BlockInventoryCable extends SixWayBlock implements IWaterLoggable, 
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip,
 			ITooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_cable", tooltip);

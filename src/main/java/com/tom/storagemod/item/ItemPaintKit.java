@@ -20,14 +20,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.IPaintable;
 import com.tom.storagemod.proxy.ClientProxy;
-
-import net.minecraft.item.Item.Properties;
 
 public class ItemPaintKit extends Item {
 
@@ -37,7 +32,6 @@ public class ItemPaintKit extends Item {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		ClientProxy.tooltip("paint_kit", tooltip);
 	}

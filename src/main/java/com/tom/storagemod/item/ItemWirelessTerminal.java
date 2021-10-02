@@ -14,9 +14,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
@@ -30,7 +27,6 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		ClientProxy.tooltip("wireless_terminal", tooltip);
 	}

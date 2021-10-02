@@ -20,9 +20,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
@@ -36,7 +33,6 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		ClientProxy.tooltip("adv_wireless_terminal", tooltip);
 		if(stack.hasTag() && stack.getTag().contains("BindX")) {

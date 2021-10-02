@@ -23,8 +23,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.tom.storagemod.network.IDataReceiver;
 import com.tom.storagemod.network.NetworkHandler;
 
-import net.minecraft.client.gui.widget.button.Button.IPressable;
-
 public class GuiLevelEmitter extends ContainerScreen<ContainerLevelEmitter> implements IDataReceiver {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/level_emitter.png");
 	private GuiButton lessThanBtn;

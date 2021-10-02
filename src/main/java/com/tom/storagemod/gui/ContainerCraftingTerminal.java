@@ -22,9 +22,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.play.server.SSetSlotPacket;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.google.common.collect.Lists;
 
 import com.tom.storagemod.StorageMod;
@@ -206,7 +203,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int getSize() {
 		return 10;
 	}
