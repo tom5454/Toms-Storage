@@ -5,6 +5,7 @@
 	"toms_storage:ts.inventory_cable_connector_filtered",
 	"toms_storage:ts.inventory_cable_connector",
 	"toms_storage:ts.inventory_cable_framed",
+	"toms_storage:ts.inventory_cable_painted",
 	"toms_storage:ts.inventory_cable",
 	"toms_storage:ts.inventory_connector",
 	"toms_storage:ts.inventory_hopper_basic",
