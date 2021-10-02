@@ -35,6 +35,11 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 				if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areTagsEqual(inSlot, getFilter())) {
 					lastItemSlot = -1;
 				}
+			} else {
+				ItemStack inSlot = top.getStackInSlot(lastItemSlot);
+				if(inSlot.isEmpty()) {
+					lastItemSlot = -1;
+				}
 			}
 		}
 		if(lastItemSlot == -1) {
