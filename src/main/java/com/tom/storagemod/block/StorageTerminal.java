@@ -10,9 +10,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
 
@@ -29,7 +26,6 @@ public class StorageTerminal extends StorageTerminalBase {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		ClientProxy.tooltip("storage_terminal", tooltip);

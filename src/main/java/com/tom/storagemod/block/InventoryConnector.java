@@ -23,9 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
@@ -54,7 +51,6 @@ public class InventoryConnector extends BaseEntityBlock implements IInventoryCab
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_connector", tooltip);

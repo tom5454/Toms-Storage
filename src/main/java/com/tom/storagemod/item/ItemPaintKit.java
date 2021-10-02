@@ -20,9 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.IPaintable;
 import com.tom.storagemod.proxy.ClientProxy;
@@ -35,7 +32,6 @@ public class ItemPaintKit extends Item {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack p_41421_, Level p_41422_, List<Component> tooltip, TooltipFlag p_41424_) {
 		ClientProxy.tooltip("paint_kit", tooltip);
 	}

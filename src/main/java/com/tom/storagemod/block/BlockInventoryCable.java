@@ -25,9 +25,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.proxy.ClientProxy;
 
 public class BlockInventoryCable extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable {
@@ -54,7 +51,6 @@ public class BlockInventoryCable extends PipeBlock implements SimpleWaterloggedB
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_cable", tooltip);

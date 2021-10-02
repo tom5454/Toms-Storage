@@ -37,9 +37,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
@@ -56,7 +53,6 @@ public class BlockInventoryProxy extends BaseEntityBlock implements IPaintable {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));

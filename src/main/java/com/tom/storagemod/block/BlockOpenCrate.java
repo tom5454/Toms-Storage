@@ -23,9 +23,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Material;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
@@ -50,7 +47,6 @@ public class BlockOpenCrate extends BaseEntityBlock {
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		ClientProxy.tooltip("open_crate", tooltip);

@@ -9,18 +9,24 @@
     "1.16.2-recommended": "1.2.8",
     "1.16.3-latest": "1.2.9",
     "1.16.3-recommended": "1.2.9",
-    "1.16.4-latest": "1.2.16",
-    "1.16.4-recommended": "1.2.16",
-    "1.16.5-latest": "1.2.16",
-    "1.16.5-recommended": "1.2.16",
-	"1.17.1-latest": "1.2.18",
-    "1.17.1-recommended": "1.2.18"
+    "1.16.4-latest": "1.2.19",
+    "1.16.4-recommended": "1.2.19",
+    "1.16.5-latest": "1.2.19",
+    "1.16.5-recommended": "1.2.19",
+	"1.17.1-latest": "1.2.21",
+    "1.17.1-recommended": "1.2.21"
   },
   "1.17.1": {
+	"1.2.21": "Fixed inventory hopper not pulling items when unfiltered (Closes #67, Closes #37)",
+	"1.2.20": "Added advanced wireless terminal\nFixed terminal couldn't be closed if the search field is focused (Closes #59)",
+	"1.2.19": "Improved inventory hopper tps (#43)\nAdded multiblock inventory blacklist to config (Closes #51, Closes #56, Closes 58)\nFixed terminal causing inventory desync (Closes #49)\nFixed typo in lang file (Closes #47)",
 	"1.2.18": "Fixed tool type crash\nAdded JEI integration",
 	"1.2.17": "1.17 port"
   },
   "1.16.5": {
+	"1.2.19": "Fixed inventory hopper not pulling items when unfiltered (Closes #67, Closes #37)",
+	"1.2.18": "Added advanced wireless terminal\nFixed terminal couldn't be closed if the search field is focused (Closes #59)",
+	"1.2.17": "Improved inventory hopper tps (#43)\nAdded multiblock inventory blacklist to config (Closes #51, Closes #56, Closes 58)\nFixed terminal causing inventory desync (Closes #49)\nFixed typo in lang file (Closes #47)",
   	"1.2.16": "Added Level emitter\nFixed terminal sorting\nImplemented Inventory Proxy filter feature from Fabric",
   	"1.2.15": "Fixed recipe book not working",
 	"1.2.14": "Fixed terminal gui desync",
@@ -28,6 +34,9 @@
   	"1.2.12": "Fixed button overlapping in terminal gui.\nFixed terminals being accessible in spectator mode."
   },
   "1.16.4": {
+	"1.2.19": "Fixed inventory hopper not pulling items when unfiltered (Closes #67, Closes #37)",
+	"1.2.18": "Added advanced wireless terminal\nFixed terminal couldn't be closed if the search field is focused (Closes #59)",
+	"1.2.17": "Improved inventory hopper tps (#43)\nAdded multiblock inventory blacklist to config (Closes #51, Closes #56, Closes 58)\nFixed terminal causing inventory desync (Closes #49)\nFixed typo in lang file (Closes #47)",
   	"1.2.16": "Added Level emitter\nFixed terminal sorting\nImplemented Inventory Proxy filter feature from Fabric",
   	"1.2.15": "Fixed recipe book not working",
 	"1.2.14": "Fixed terminal gui desync",

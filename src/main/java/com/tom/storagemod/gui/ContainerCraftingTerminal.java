@@ -21,9 +21,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.google.common.collect.Lists;
 
 import com.tom.storagemod.StorageMod;
@@ -204,7 +201,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public int getSize() {
 		return 10;
 	}

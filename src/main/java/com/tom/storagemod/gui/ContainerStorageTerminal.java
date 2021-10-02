@@ -26,9 +26,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -161,7 +158,6 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 			return slotIndex;
 		}
 
-		@OnlyIn(Dist.CLIENT)
 		public void drawSlot(PoseStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (mouseX >= gui.getGuiLeft() + xDisplayPosition - 1 && mouseY >= gui.getGuiTop() + yDisplayPosition - 1 && mouseX < gui.getGuiLeft() + xDisplayPosition + 17 && mouseY < gui.getGuiTop() + yDisplayPosition + 17) {
 				//RenderUtil.setColourWithAlphaPercent(0xFFFFFF, 60);
@@ -179,7 +175,6 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 			}
 		}
 
-		@OnlyIn(Dist.CLIENT)
 		public boolean drawTooltip(PoseStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 			if (stack != null) {
 				if (stack.getQuantity() > 9999) {
@@ -191,7 +186,6 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 			return mouseX >= (gui.getGuiLeft() + xDisplayPosition) - 1 && mouseY >= (gui.getGuiTop() + yDisplayPosition) - 1 && mouseX < (gui.getGuiLeft() + xDisplayPosition) + 17 && mouseY < (gui.getGuiTop() + yDisplayPosition) + 17;
 		}
 
-		@OnlyIn(Dist.CLIENT)
 		private void drawStackSize(PoseStack st, Font fr, long size, int x, int y) {
 			float scaleFactor = 0.6f;
 			//boolean unicodeFlag = fr.getUnicodeFlag();
@@ -246,7 +240,7 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 
 	@Override
 	public boolean stillValid(Player playerIn) {
-		return te.canInteractWith(playerIn);
+		return te == null || te.canInteractWith(playerIn);
 	}
 
 	public final void scrollTo(float p_148329_1_) {
@@ -274,7 +268,6 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 		storageSlotList.get(id).stack = stack;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public int drawSlots(PoseStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
 		for (int i = 0;i < storageSlotList.size();i++) {
 			storageSlotList.get(i).drawSlot(st, gui, mouseX, mouseY);

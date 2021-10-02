@@ -35,9 +35,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityLevelEmitter;
@@ -54,7 +51,6 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		ClientProxy.tooltip("level_emitter", tooltip);
@@ -156,7 +152,6 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		if (stateIn.getValue(POWERED)) {
 			Direction direction = stateIn.getValue(FACING).getOpposite();
