@@ -52,13 +52,11 @@ public class TileEntityPainted extends BlockEntity {
 		markDirtyClient();
 	}
 
-	@Nonnull
 	@Override
-	public CompoundTag save(@Nonnull CompoundTag compound) {
+	public void saveAdditional(@Nonnull CompoundTag compound) {
 		if (blockState != null) {
 			compound.put("block", NbtUtils.writeBlockState(blockState));
 		}
-		return super.save(compound);
 	}
 
 	private void markDirtyClient() {
@@ -72,16 +70,12 @@ public class TileEntityPainted extends BlockEntity {
 	@Nonnull
 	@Override
 	public CompoundTag getUpdateTag() {
-		CompoundTag updateTag = super.getUpdateTag();
-		save(updateTag);
-		return updateTag;
+		return saveWithFullMetadata();
 	}
 
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		CompoundTag nbtTag = new CompoundTag();
-		save(nbtTag);
-		return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, nbtTag);
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	public BlockState getPaintedBlockState() {
@@ -91,9 +85,7 @@ public class TileEntityPainted extends BlockEntity {
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
 		BlockState old = getPaintedBlockState();
-		CompoundTag tagCompound = packet.getTag();
 		super.onDataPacket(net, packet);
-		load(tagCompound);
 
 		if (level != null && level.isClientSide) {
 			// If needed send a render update.

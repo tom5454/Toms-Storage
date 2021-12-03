@@ -185,7 +185,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.recipeBookGui.renderTooltip(st, this.leftPos, this.topPos, mouseX, mouseY);
 		this.setInitialFocus(this.recipeBookGui);
 
-		if (buttonPullFromInv.isHovered()) {
+		if (buttonPullFromInv.isHoveredOrFocused()) {
 			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
 		}
 	}

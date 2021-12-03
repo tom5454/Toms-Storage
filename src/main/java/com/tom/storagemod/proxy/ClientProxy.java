@@ -26,7 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -91,7 +91,7 @@ public class ClientProxy implements IProxy {
 		});
 	}
 
-	private static void renderWorldLastEvent(RenderWorldLastEvent evt) {
+	private static void renderWorldLastEvent(RenderLevelLastEvent evt) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		if( player == null )
@@ -105,7 +105,7 @@ public class ClientProxy implements IProxy {
 		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
 			BlockPos pos = lookingAt.getBlockPos();
 			Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
-			PoseStack ms = evt.getMatrixStack();
+			PoseStack ms = evt.getPoseStack();
 			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
 			drawShape(ms, buf, state.getOcclusionShape(player.level, pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
 			mc.renderBuffers().bufferSource().endBatch(RenderType.lines());

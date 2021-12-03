@@ -92,7 +92,11 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 									}
 								}
 								if(inv.isPresent()) {
-									IItemHandler ihr = IProxy.resolve(inv.orElse(null));
+									IItemHandler blockHandler = inv.orElse(null);
+									if(blockHandler == null) {
+										StorageMod.LOGGER.warn("Broken modded block at " + p + " in " + level.dimension().location().toString() + " block id: " + state.getBlock().delegate.name().toString());
+									}
+									IItemHandler ihr = IProxy.resolve(blockHandler);
 									if(ihr instanceof InvHandler) {
 										InvHandler ih = (InvHandler) ihr;
 										if(checkHandlers(ih, 0)) {

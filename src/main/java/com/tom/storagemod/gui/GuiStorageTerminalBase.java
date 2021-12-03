@@ -290,13 +290,13 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		st.popPose();
 		this.renderTooltip(st, mouseX, mouseY);
 
-		if (buttonSortingType.isHovered()) {
+		if (buttonSortingType.isHoveredOrFocused()) {
 			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
 		}
-		if (buttonSearchType.isHovered()) {
+		if (buttonSearchType.isHoveredOrFocused()) {
 			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.search_" + buttonSearchType.state), mouseX, mouseY);
 		}
-		if (buttonCtrlMode.isHovered()) {
+		if (buttonCtrlMode.isHoveredOrFocused()) {
 			renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}

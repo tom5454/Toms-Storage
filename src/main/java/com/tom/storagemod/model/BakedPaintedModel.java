@@ -71,7 +71,7 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 		Supplier<BlockState> blockstateSupp = modelData.getData(TileEntityPainted.FACADE_STATE);
 		BlockState blockstate = null;
 		if(blockstateSupp != null)blockstate = blockstateSupp.get();
-		RenderType layer = MinecraftForgeClient.getRenderLayer();
+		RenderType layer = MinecraftForgeClient.getRenderType();
 		if (blockstate == null || blockstate == Blocks.AIR.defaultBlockState()) {
 			blockstate = state;
 			model = parent;

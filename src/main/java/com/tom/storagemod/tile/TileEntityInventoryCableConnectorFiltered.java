@@ -36,9 +36,8 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag tag) {
+	public void saveAdditional(CompoundTag tag) {
 		tag.put("filter", filter.createTag());
-		return super.save(tag);
 	}
 
 	@Override

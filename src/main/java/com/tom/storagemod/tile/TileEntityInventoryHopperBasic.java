@@ -77,9 +77,8 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
 		compound.put("Filter", getFilter().save(new CompoundTag()));
-		return super.save(compound);
 	}
 
 	@Override

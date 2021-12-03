@@ -145,9 +145,8 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
 		compound.putInt("sort", sort);
-		return super.save(compound);
 	}
 
 	@Override

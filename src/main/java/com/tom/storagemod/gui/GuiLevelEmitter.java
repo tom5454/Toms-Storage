@@ -42,7 +42,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 		amountBtns.forEach(AmountBtn::update);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(matrixStack, mouseX, mouseY);
-		if(lessThanBtn.isHovered()) {
+		if(lessThanBtn.isHoveredOrFocused()) {
 			renderComponentTooltip(matrixStack, Arrays.stream(I18n.get("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}

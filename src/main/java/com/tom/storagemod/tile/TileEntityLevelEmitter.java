@@ -120,11 +120,10 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
 		compound.put("Filter", getFilter().save(new CompoundTag()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
-		return super.save(compound);
 	}
 
 	@Override

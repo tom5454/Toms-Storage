@@ -23,7 +23,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import net.minecraftforge.fmllegacy.hooks.BasicEventHooks;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import com.tom.storagemod.StorageMod;
@@ -63,7 +63,9 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound) {
+		super.saveAdditional(compound);
+
 		ListTag listnbt = new ListTag();
 
 		for(int i = 0; i < craftMatrix.getContainerSize(); ++i) {
@@ -77,8 +79,8 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		}
 
 		compound.put("CraftingTable", listnbt);
-		return super.save(compound);
 	}
+
 	private boolean reading;
 	@Override
 	public void load(CompoundTag compound) {
@@ -124,7 +126,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		}
 
 		crafted.onCraftedBy(player.level, player, amountCrafted);
-		BasicEventHooks.firePlayerCraftingEvent(player, ItemHandlerHelper.copyStackWithSize(crafted, amountCrafted), craftMatrix);
+		ForgeEventFactory.firePlayerCraftingEvent(player, ItemHandlerHelper.copyStackWithSize(crafted, amountCrafted), craftMatrix);
 	}
 
 	public void craft(Player thePlayer) {
