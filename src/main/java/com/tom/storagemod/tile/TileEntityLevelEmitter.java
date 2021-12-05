@@ -108,7 +108,6 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 
 	@Override
 	public void writeNbt(NbtCompound compound) {
-		super.writeNbt(compound);
 		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);

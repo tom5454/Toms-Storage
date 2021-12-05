@@ -77,7 +77,6 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 
 	@Override
 	public void writeNbt(NbtCompound compound) {
-		super.writeNbt(compound);
 		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
 	}
 

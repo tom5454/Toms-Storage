@@ -41,7 +41,6 @@ public class TileEntityPainted extends BlockEntity/* implements BlockEntityClien
 
 	@Override
 	public void writeNbt(NbtCompound compound) {
-		super.writeNbt(compound);
 		if (blockState != null) {
 			compound.put("block", NbtHelper.fromBlockState(blockState));
 		}
@@ -49,7 +48,7 @@ public class TileEntityPainted extends BlockEntity/* implements BlockEntityClien
 
 	private void markDirtyClient() {
 		markDirty();
-		if (getWorld() != null) {
+		if (getWorld() != null && !world.isClient) {
 			BlockState state = getWorld().getBlockState(getPos());
 			getWorld().updateListeners(getPos(), state, state, 3);
 
@@ -69,9 +68,7 @@ public class TileEntityPainted extends BlockEntity/* implements BlockEntityClien
 
 	@Override
 	public NbtCompound toInitialChunkDataNbt() {
-		NbtCompound nbtTag = new NbtCompound();
-		writeNbt(nbtTag);
-		return nbtTag;
+		return createNbtWithIdentifyingData();
 	}
 
 	public BlockState getPaintedBlockState() {

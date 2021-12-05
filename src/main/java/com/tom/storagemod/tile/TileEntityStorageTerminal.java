@@ -141,7 +141,6 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 
 	@Override
 	public void writeNbt(NbtCompound compound) {
-		super.writeNbt(compound);
 		compound.putInt("sort", sort);
 	}
 
