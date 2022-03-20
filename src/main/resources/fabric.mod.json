@@ -9,8 +9,9 @@
     "tom5454"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage-fabric",
+    "sources": "https://github.com/tom5454/Toms-Storage/tree/fabric",
+	"issues": "https://github.com/tom5454/Toms-Storage/issues"
   },
 
   "license": "MIT",

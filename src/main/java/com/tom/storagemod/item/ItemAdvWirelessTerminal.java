@@ -15,11 +15,14 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageMod;
@@ -35,7 +38,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, World worldIn, List<Text> tooltip, TooltipContext flagIn) {
-		StorageModClient.tooltip("adv_wireless_terminal", tooltip);
+		StorageModClient.tooltip("adv_wireless_terminal", tooltip, StorageMod.CONFIG.advWirelessRange, StorageMod.CONFIG.wirelessTermBeaconLvl, StorageMod.CONFIG.wirelessTermBeaconLvlDim);
 		if(stack.hasNbt() && stack.getNbt().contains("BindX")) {
 			int x = stack.getNbt().getInt("BindX");
 			int y = stack.getNbt().getInt("BindY");
@@ -48,24 +51,23 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	public TypedActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		ItemStack stack = playerIn.getStackInHand(handIn);
-		if(stack.hasNbt() && stack.getNbt().contains("BindX")) {
+		if(stack.hasNbt() && stack.getNbt().contains("BindX") && !worldIn.isClient) {
 			int x = stack.getNbt().getInt("BindX");
 			int y = stack.getNbt().getInt("BindY");
 			int z = stack.getNbt().getInt("BindZ");
 			String dim = stack.getNbt().getString("BindDim");
-			if(worldIn.getRegistryKey().getValue().toString().equals(dim)) {
-				if(playerIn.squaredDistanceTo(new Vec3d(x, y, z)) < StorageMod.CONFIG.advWirelessRange * StorageMod.CONFIG.advWirelessRange) {
-					BlockHitResult lookingAt = new BlockHitResult(new Vec3d(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
-					BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
-					if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
-						ActionResult r = state.onUse(worldIn, playerIn, handIn, lookingAt);
-						return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
-					} else {
-						playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_invalid_block"), true);
-					}
+			World termWorld = worldIn.getServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, new Identifier(dim)));
+			if(termWorld.canSetBlock(new BlockPos(x, y, z))) {
+				BlockHitResult lookingAt = new BlockHitResult(new Vec3d(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
+				BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
+				if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
+					ActionResult r = state.onUse(termWorld, playerIn, handIn, lookingAt);
+					return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
 				} else {
-					playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
+					playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_invalid_block"), true);
 				}
+			} else {
+				playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
 			}
 		}
 		return TypedActionResult.pass(playerIn.getStackInHand(handIn));
@@ -76,7 +78,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 		if(c.shouldCancelInteraction() && !c.getWorld().isClient) {
 			BlockPos pos = c.getBlockPos();
 			BlockState state = c.getWorld().getBlockState(pos);
-			if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
+			if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
 				ItemStack stack = c.getStack();
 				if(!stack.hasNbt())stack.setNbt(new NbtCompound());
 				stack.getNbt().putInt("BindX", pos.getX());

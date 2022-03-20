@@ -19,6 +19,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -46,7 +47,7 @@ public abstract class StorageTerminalBase extends BlockWithEntity implements Wat
 	private static final VoxelShape SHAPE_U = Block.createCuboidShape(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
 	private static final VoxelShape SHAPE_D = Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public StorageTerminalBase() {
-		super(Block.Settings.of(Material.WOOD).strength(3).luminance(s -> 6));//.(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3).luminance(s -> 6));
 		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER));
 	}
 
@@ -68,8 +69,12 @@ public abstract class StorageTerminalBase extends BlockWithEntity implements Wat
 		}
 
 		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
-		if (blockEntity_1 instanceof TileEntityStorageTerminal) {
-			player.openHandledScreen((TileEntityStorageTerminal)blockEntity_1);
+		if (blockEntity_1 instanceof TileEntityStorageTerminal term) {
+			if(term.canInteractWith(player)) {
+				player.openHandledScreen(term);
+			} else {
+				player.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
+			}
 		}
 		return ActionResult.SUCCESS;
 	}

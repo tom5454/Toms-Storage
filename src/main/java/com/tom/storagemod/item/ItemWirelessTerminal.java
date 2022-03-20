@@ -29,14 +29,14 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, World worldIn, List<Text> tooltip, TooltipContext flagIn) {
-		StorageModClient.tooltip("wireless_terminal", tooltip);
+		StorageModClient.tooltip("wireless_terminal", tooltip, StorageMod.CONFIG.wirelessRange);
 	}
 
 	@Override
 	public TypedActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		BlockHitResult lookingAt = (BlockHitResult) playerIn.raycast(StorageMod.CONFIG.wirelessRange, 0f, true);
 		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
-		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
+		if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
 			ActionResult r = state.onUse(worldIn, playerIn, handIn, lookingAt);
 			return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
 		} else {

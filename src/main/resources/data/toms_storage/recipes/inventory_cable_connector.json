@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-  	" IP",
+  	" qP",
     "CcE",
     " DP"
   ],
@@ -21,8 +21,8 @@
     "E": {
       "item": "minecraft:ender_pearl"
     },
-    "I": {
-    	"item": "minecraft:iron_ingot"
+    "q": {
+      "item": "minecraft:quartz"
     }
   },
   "result": {

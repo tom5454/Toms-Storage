@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
   	"PCP",
-    "cGg",
+    "aGg",
     "PEP"
   ],
   "key": {
   	"P": {
       "tag": "minecraft:planks"
     },
-    "c": {
-      "item": "minecraft:chest"
+    "a": {
+      "item": "minecraft:spyglass"
     },
     "C": {
       "item": "minecraft:comparator"

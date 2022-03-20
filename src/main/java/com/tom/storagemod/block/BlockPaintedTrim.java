@@ -25,7 +25,7 @@ import com.tom.storagemod.tile.TileEntityPainted;
 public class BlockPaintedTrim extends BlockWithEntity implements ITrim, IPaintable {
 
 	public BlockPaintedTrim() {
-		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());
 	}
 
 	@Override
@@ -46,11 +46,6 @@ public class BlockPaintedTrim extends BlockWithEntity implements ITrim, IPaintab
 	@Override
 	public BlockRenderType getRenderType(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
-	}
-
-	@Override
-	public Block getPaintedBlock() {
-		return this;
 	}
 
 	@Override

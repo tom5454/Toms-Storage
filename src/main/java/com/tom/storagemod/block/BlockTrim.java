@@ -21,7 +21,7 @@ import com.tom.storagemod.StorageModClient;
 public class BlockTrim extends Block implements ITrim, IPaintable {
 
 	public BlockTrim() {
-		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3));
 	}
 
 	@Override
@@ -35,10 +35,5 @@ public class BlockTrim extends Block implements ITrim, IPaintable {
 	public boolean paint(World world, BlockPos pos, BlockState to) {
 		world.setBlockState(pos, StorageMod.paintedTrim.getDefaultState());
 		return StorageMod.paintedTrim.paint(world, pos, to);
-	}
-
-	@Override
-	public Block getPaintedBlock() {
-		return StorageMod.paintedTrim;
 	}
 }

@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ConnectingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.block.ShapeContext;
@@ -16,6 +17,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
@@ -23,8 +25,12 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -33,6 +39,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
@@ -45,12 +52,11 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 	public static final BooleanProperty EAST = Properties.EAST;
 	public static final BooleanProperty WEST = Properties.WEST;
 	public static final DirectionProperty FACING = Properties.FACING;
-	//public static final EnumProperty<DyeColor> COLOR = EnumProperty.create("color", DyeColor.class);
 	private static final Direction[] FACING_VALUES = Direction.values();
 	protected VoxelShape[][] shapes;
 
 	public BlockInventoryCableConnector() {
-		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());
 		this.shapes = this.makeShapes(0.125f);
 		setDefaultState(getDefaultState()
 				.with(DOWN, false)
@@ -67,6 +73,7 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
+		StorageModClient.tooltip("inventory_cable_connector_link", false, tooltip, StorageMod.CONFIG.invLinkBeaconLvl, StorageMod.CONFIG.invLinkBeaconLvlDim);
 	}
 
 	@Override
@@ -101,9 +108,7 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext context) {
-		return withConnectionProperties(getDefaultState().with(FACING, context.getSide().getOpposite()), context.getWorld(), context.getBlockPos())
-				//with(COLOR, context.getItem().hasTag() ? DyeColor.byId(context.getItem().getTag().getInt("color")) : DyeColor.WHITE).
-				;
+		return withConnectionProperties(getDefaultState().with(FACING, context.getSide().getOpposite()), context.getWorld(), context.getBlockPos());
 	}
 
 	@Override
@@ -138,25 +143,10 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 				.with(WEST, canConnect(state, block_6, Direction.WEST));
 	}
 
-	@SuppressWarnings("deprecation")
 	private boolean canConnect(BlockState state, BlockState block, Direction dir) {
 		Direction f = state.get(FACING);
 		return (dir != f && IInventoryCable.canConnect(block, dir)) || (dir == f && !block.isAir());
 	}
-
-	/*@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-		//this.shapes = this.makeShapes(0.125f);
-		ItemStack held = player.getHeldItem(handIn);
-		DyeColor color = DyeColor.getColor(held);
-		if(color != null) {
-			if(!player.isCreative())held.shrink(1);
-			worldIn.setBlockState(pos, state.with(COLOR, color));
-			return ActionResultType.SUCCESS;
-		}
-		return ActionResultType.PASS;
-	}*/
 
 	@Override
 	public BlockState rotate(BlockState blockState_1, BlockRotation blockRotation_1) {
@@ -265,5 +255,30 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 
 	public static VoxelShape createCuboidShape(double xMin, double yMin, double zMin, double xMax, double yMax, double zMax) {
 		return Block.createCuboidShape(Math.min(xMin, xMax), Math.min(yMin, yMax), Math.min(zMin, zMax), Math.max(xMin, xMax), Math.max(yMin, yMax), Math.max(zMin, zMax));
+	}
+
+	@Override
+	public ActionResult onUse(BlockState state, World world, BlockPos pos,
+			PlayerEntity player, Hand hand, BlockHitResult rtr) {
+		Direction f = state.get(FACING);
+		BlockState pointedAt = world.getBlockState(pos.offset(f));
+		if(player.getStackInHand(hand).isEmpty() && pointedAt.isOf(Blocks.BEACON)) {
+			if (world.isClient) {
+				return ActionResult.SUCCESS;
+			}
+
+			BlockEntity blockEntity_1 = world.getBlockEntity(pos);
+			if (blockEntity_1 instanceof TileEntityInventoryCableConnector) {
+				TileEntityInventoryCableConnector te = (TileEntityInventoryCableConnector) blockEntity_1;
+				if(te.stillValid(player))
+					player.openHandledScreen(te);
+				else {
+					player.sendMessage(new TranslatableText("chat.toms_storage.inv_link_access_denied"), true);
+					return ActionResult.PASS;
+				}
+			}
+			return ActionResult.SUCCESS;
+		}
+		return ActionResult.PASS;
 	}
 }

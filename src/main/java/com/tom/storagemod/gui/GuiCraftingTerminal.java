@@ -236,7 +236,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		public void renderButton(MatrixStack m, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
-				RenderSystem.setShaderTexture(0, gui);
+				RenderSystem.setShaderTexture(0, getGui());
 				this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				int i = this.getYImage(this.hovered);
 				RenderSystem.enableBlend();

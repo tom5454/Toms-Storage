@@ -13,7 +13,7 @@ import net.minecraft.util.math.ChunkPos;
 
 import com.tom.storagemod.StorageMod;
 
-public class TileEntityPainted extends BlockEntity/* implements BlockEntityClientSerializable*/ {
+public class TileEntityPainted extends BlockEntity {
 	private BlockState blockState;
 
 	public TileEntityPainted(BlockPos pos, BlockState state) {
@@ -48,15 +48,16 @@ public class TileEntityPainted extends BlockEntity/* implements BlockEntityClien
 
 	private void markDirtyClient() {
 		markDirty();
-		if (getWorld() != null && !world.isClient) {
+		if (getWorld() != null) {
 			BlockState state = getWorld().getBlockState(getPos());
 			getWorld().updateListeners(getPos(), state, state, 3);
 
-			ServerWorld world = (ServerWorld) getWorld();
-			world.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(getPos()), false).forEach(player -> {
-				player.networkHandler.sendPacket(toUpdatePacket());
-			});
-
+			if(!world.isClient) {
+				ServerWorld world = (ServerWorld) getWorld();
+				world.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(getPos()), false).forEach(player -> {
+					player.networkHandler.sendPacket(toUpdatePacket());
+				});
+			}
 			//sync();
 		}
 	}
@@ -74,24 +75,4 @@ public class TileEntityPainted extends BlockEntity/* implements BlockEntityClien
 	public BlockState getPaintedBlockState() {
 		return blockState == null ? Blocks.AIR.getDefaultState() : blockState;
 	}
-
-	/*@Override
-	public void fromClientTag(NbtCompound tag) {
-		BlockState old = getPaintedBlockState();
-		blockState = NbtHelper.toBlockState(tag.getCompound("block"));
-		if (world != null && world.isClient) {
-			// If needed send a render update.
-			if (! getPaintedBlockState().equals(old)) {
-				world.markDirty(getPos());
-				BlockState st = world.getBlockState(pos);
-				world.updateListeners(pos, st, st, 3);
-			}
-		}
-	}
-
-	@Override
-	public NbtCompound toClientTag(NbtCompound tag) {
-		writeNbt(tag);
-		return tag;
-	}*/
 }

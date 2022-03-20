@@ -25,7 +25,7 @@ import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InventoryWrapper;
 
-public class TileEntityInventoryCableConnectorBase extends BlockEntity implements TickableServer, Inventory, IProxy {
+public class TileEntityInventoryCableConnectorBase extends TileEntityPainted implements TickableServer, Inventory, IProxy {
 	protected TileEntityInventoryConnector master;
 	protected InventoryWrapper pointedAt, masterW;
 	protected LinkedInv linv;
@@ -51,7 +51,7 @@ public class TileEntityInventoryCableConnectorBase extends BlockEntity implement
 				BlockPos cp = toCheck.pop();
 				if(!checkedBlocks.contains(cp)) {
 					checkedBlocks.add(cp);
-					if(world.isChunkLoaded(cp)) {
+					if(world.canSetBlock(cp)) {
 						state = world.getBlockState(cp);
 						if(state.getBlock() == StorageMod.connector) {
 							BlockEntity te = world.getBlockEntity(cp);
@@ -71,13 +71,16 @@ public class TileEntityInventoryCableConnectorBase extends BlockEntity implement
 					if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
 				}
 			}
-			BlockPos p = pos.offset(facing);
-			Inventory inv = HopperBlockEntity.getInventoryAt(world, p);
-			if(inv != null) {
-				pointedAt = new InventoryWrapper(inv, facing.getOpposite());
-			} else {
-				pointedAt = null;
-			}
+			pointedAt = getPointedAt(pos.offset(facing), facing);
+		}
+	}
+
+	protected InventoryWrapper getPointedAt(BlockPos pos, Direction facing) {
+		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+		if(inv != null) {
+			return new InventoryWrapper(inv, facing.getOpposite());
+		} else {
+			return null;
 		}
 	}
 

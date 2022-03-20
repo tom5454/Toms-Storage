@@ -44,6 +44,7 @@ import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
+import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends HandledScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
@@ -288,7 +289,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		drawTexture(matrices, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
 		matrices.push();
 		DiffuseLighting.enableGuiDepthLighting();
-		slotIDUnderMouse = getScreenHandler().drawSlots(matrices, this, mouseX, mouseY);
+		slotIDUnderMouse = drawSlots(matrices, mouseX, mouseY);
 		matrices.pop();
 		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
 
@@ -296,11 +297,73 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
 		}
 		if (buttonSearchType.isHovered()) {
-			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.search_" + buttonSearchType.state), mouseX, mouseY);
+			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.search_" + buttonSearchType.state, "REI"), mouseX, mouseY);
 		}
 		if (buttonCtrlMode.isHovered()) {
 			renderTooltip(matrices, Arrays.stream(I18n.translate("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(LiteralText::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
+	}
+
+	protected int drawSlots(MatrixStack st, int mouseX, int mouseY) {
+		ContainerStorageTerminal term = getScreenHandler();
+		for (int i = 0;i < term.storageSlotList.size();i++) {
+			drawSlot(st, term.storageSlotList.get(i), mouseX, mouseY);
+		}
+		RenderSystem.disableDepthTest();
+		RenderSystem.disableBlend();
+		st.push();
+		st.translate(0, 0, 100);
+		for (int i = 0;i < term.storageSlotList.size();i++) {
+			if (drawTooltip(st, term.storageSlotList.get(i), mouseX, mouseY)) {
+				st.pop();
+				return i;
+			}
+		}
+		st.pop();
+		return -1;
+	}
+
+	public void drawSlot(MatrixStack st, SlotStorage slot, int mouseX, int mouseY) {
+		if (mouseX >= getGuiLeft() + slot.xDisplayPosition - 1 && mouseY >= getGuiTop() + slot.yDisplayPosition - 1 && mouseX < getGuiLeft() + slot.xDisplayPosition + 17 && mouseY < getGuiTop() + slot.yDisplayPosition + 17) {
+			int l = getGuiLeft() + slot.xDisplayPosition;
+			int t = getGuiTop() + slot.yDisplayPosition;
+			GuiStorageTerminal.fill(st, l, t, l+16, t+16, 0x80FFFFFF);
+
+		}
+		if (slot.stack != null) {
+			st.push();
+			renderItemInGui(st, slot.stack.getStack().copy().split(1), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
+			TextRenderer r = getFont();
+			this.drawStackSize(st, r, slot.stack.getQuantity(), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition);
+			st.pop();
+		}
+	}
+
+	public boolean drawTooltip(MatrixStack st, SlotStorage slot, int mouseX, int mouseY) {
+		if (slot.stack != null) {
+			if (slot.stack.getQuantity() > 9999) {
+				renderItemInGui(st, slot.stack.getStack(), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.translate("tooltip.toms_storage.amount", slot.stack.getQuantity()));
+			} else {
+				renderItemInGui(st, slot.stack.getStack(), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition, mouseX, mouseY, false, 0, true);
+			}
+		}
+		return mouseX >= (getGuiLeft() + slot.xDisplayPosition) - 1 && mouseY >= (getGuiTop() + slot.yDisplayPosition) - 1 && mouseX < (getGuiLeft() + slot.xDisplayPosition) + 17 && mouseY < (getGuiTop() + slot.yDisplayPosition) + 17;
+	}
+
+	private void drawStackSize(MatrixStack st, TextRenderer fr, long size, int x, int y) {
+		float scaleFactor = 0.6f;
+		RenderSystem.disableDepthTest();
+		RenderSystem.disableBlend();
+		String stackSize = ContainerStorageTerminal.formatNumber(size);
+		st.push();
+		st.scale(scaleFactor, scaleFactor, scaleFactor);
+		st.translate(0, 0, 450);
+		float inverseScaleFactor = 1.0f / scaleFactor;
+		int X = (int) (((float) x + 0 + 16.0f - fr.getWidth(stackSize) * scaleFactor) * inverseScaleFactor);
+		int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
+		fr.draw(st, stackSize, X, Y, 16777215);
+		st.pop();
+		RenderSystem.enableDepthTest();
 	}
 
 	protected boolean needsScrollBars() {
@@ -469,7 +532,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	@Override
 	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 		if (p_keyPressed_1_ == 256) {
-			this.onClose();
+			this.close();
 			return true;
 		}
 		return !this.searchField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.searchField.isActive() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;

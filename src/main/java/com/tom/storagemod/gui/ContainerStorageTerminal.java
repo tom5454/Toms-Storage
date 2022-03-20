@@ -12,9 +12,6 @@ import java.util.Map.Entry;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
@@ -28,8 +25,6 @@ import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.google.common.collect.Lists;
 
@@ -167,58 +162,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		public int getSlotIndex() {
 			return slotIndex;
 		}
-
-		@Environment(EnvType.CLIENT)
-		public void drawSlot(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
-			if (mouseX >= gui.getGuiLeft() + xDisplayPosition - 1 && mouseY >= gui.getGuiTop() + yDisplayPosition - 1 && mouseX < gui.getGuiLeft() + xDisplayPosition + 17 && mouseY < gui.getGuiTop() + yDisplayPosition + 17) {
-				//RenderUtil.setColourWithAlphaPercent(0xFFFFFF, 60);
-				int l = gui.getGuiLeft() + xDisplayPosition;
-				int t = gui.getGuiTop() + yDisplayPosition;
-				GuiStorageTerminal.fill(st, l, t, l+16, t+16, 0x80FFFFFF);
-
-			}
-			if (stack != null) {
-				st.push();
-				gui.renderItemInGui(st, stack.getStack().copy().split(1), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
-				TextRenderer r = gui.getFont();
-				this.drawStackSize(st, r, stack.getQuantity(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition);
-				st.pop();
-			}
-		}
-
-		@Environment(EnvType.CLIENT)
-		public boolean drawTooltip(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
-			if (stack != null) {
-				if (stack.getQuantity() > 9999) {
-					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.translate("tooltip.toms_storage.amount", stack.getQuantity()));
-				} else {
-					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
-				}
-			}
-			return mouseX >= (gui.getGuiLeft() + xDisplayPosition) - 1 && mouseY >= (gui.getGuiTop() + yDisplayPosition) - 1 && mouseX < (gui.getGuiLeft() + xDisplayPosition) + 17 && mouseY < (gui.getGuiTop() + yDisplayPosition) + 17;
-		}
-
-		@Environment(EnvType.CLIENT)
-		private void drawStackSize(MatrixStack st, TextRenderer fr, long size, int x, int y) {
-			float scaleFactor = 0.6f;
-			//boolean unicodeFlag = fr.getUnicodeFlag();
-			//fr.setUnicodeFlag(false);
-			//RenderSystem.disableLighting();
-			RenderSystem.disableDepthTest();
-			RenderSystem.disableBlend();
-			String stackSize = formatNumber(size);
-			st.push();
-			st.scale(scaleFactor, scaleFactor, scaleFactor);
-			st.translate(0, 0, 450);
-			float inverseScaleFactor = 1.0f / scaleFactor;
-			int X = (int) (((float) x + 0 + 16.0f - fr.getWidth(stackSize) * scaleFactor) * inverseScaleFactor);
-			int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-			fr.draw(st, stackSize, X, Y, 16777215);
-			st.pop();
-			//RenderSystem.enableLighting();
-			RenderSystem.enableDepthTest();
-			//fr.setUnicodeFlag(unicodeFlag);
-		}
 	}
 
 	public static String formatNumber(long number) {
@@ -251,11 +194,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		return slimResult;
 	}
 
-	/*@Override
-	public boolean isNotRestricted(PlayerEntity playerIn) {
-		return te == null ? true : te.canInteractWith(playerIn);
-	}*/
-
 	public final void scrollTo(float p_148329_1_) {
 		int i = (this.itemListClientSorted.size() + 9 - 1) / 9 - lines;
 		int j = (int) (p_148329_1_ * i + 0.5D);
@@ -279,23 +217,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	public final void setSlotContents(int id, StoredItemStack stack) {
 		storageSlotList.get(id).stack = stack;
-	}
-
-	@Environment(EnvType.CLIENT)
-	public int drawSlots(MatrixStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
-		for (int i = 0;i < storageSlotList.size();i++) {
-			storageSlotList.get(i).drawSlot(st, gui, mouseX, mouseY);
-		}
-		//RenderSystem.disableLighting();
-		RenderSystem.disableDepthTest();
-		RenderSystem.disableBlend();
-		st.push();
-		st.translate(0, 0, 100);
-		for (int i = 0;i < storageSlotList.size();i++) {
-			if (storageSlotList.get(i).drawTooltip(st, gui, mouseX, mouseY)) { st.pop(); return i; }
-		}
-		st.pop();
-		return -1;
 	}
 
 	public final SlotStorage getSlotByID(int id) {

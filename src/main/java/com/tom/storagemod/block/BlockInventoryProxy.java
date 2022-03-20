@@ -38,23 +38,25 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
+import com.tom.storagemod.tile.TileEntityPainted;
 
-public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
+public class BlockInventoryProxy extends BlockWithEntity implements IPaintable {
 	public static final DirectionProperty FACING = Properties.FACING;
 	public static final EnumProperty<DirectionWithNull> FILTER_FACING = EnumProperty.of("filter_facing", DirectionWithNull.class);
 
 	public BlockInventoryProxy() {
-		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3));
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		//tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
+		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_proxy", tooltip);
 		if(Screen.hasShiftDown()) {
 			tooltip.add(new TranslatableText("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", new TranslatableText("tooltip.toms_storage.inventory_proxy.ignoreSize")));
@@ -111,15 +113,6 @@ public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
 	public BlockRenderType getRenderType(BlockState p_149645_1_) {
 		return BlockRenderType.MODEL;
 	}
-
-	/*@Override
-	public boolean paint(World world, BlockPos pos, BlockState to) {
-		BlockEntity te = world.getBlockEntity(pos);
-		world.setBlockState(pos, world.getBlockState(pos).with(BlockInventoryCableFramed.PAINTED, true), 2);
-		if(te != null && te instanceof TileEntityPainted)
-			return ((TileEntityPainted)te).setPaintedBlockState(to);
-		return false;
-	}*/
 
 	@Override
 	public List<ItemStack> getDroppedStacks(BlockState state, net.minecraft.loot.context.LootContext.Builder builder) {
@@ -188,5 +181,20 @@ public class BlockInventoryProxy extends BlockWithEntity { /*IPaintable*/
 		public Direction getDir() {
 			return dir;
 		}
+	}
+
+	@Override
+	public boolean paint(World world, BlockPos pos, BlockState to) {
+		BlockState old = world.getBlockState(pos);
+		world.setBlockState(pos, StorageMod.invProxyPainted.getDefaultState().with(FACING, old.get(FACING)).with(FILTER_FACING, old.get(FILTER_FACING)), 2);
+		BlockEntity te = world.getBlockEntity(pos);
+		if(te != null && te instanceof TileEntityPainted)
+			return ((TileEntityPainted)te).setPaintedBlockState(to);
+		return false;
+	}
+
+	@Override
+	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+		return new ItemStack(StorageMod.invProxy);
 	}
 }

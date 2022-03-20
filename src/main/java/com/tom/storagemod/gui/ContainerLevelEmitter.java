@@ -94,7 +94,7 @@ public class ContainerLevelEmitter extends ScreenHandler implements IDataReceive
 	 */
 	@Override
 	public boolean canUse(PlayerEntity playerIn) {
-		return true;
+		return te != null ? te.stillValid(playerIn) : true;
 	}
 
 	/**

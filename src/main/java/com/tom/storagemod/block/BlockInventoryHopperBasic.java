@@ -45,7 +45,7 @@ public class BlockInventoryHopperBasic extends BlockWithEntity implements IInven
 	public static final BooleanProperty ENABLED = Properties.ENABLED;
 
 	public BlockInventoryHopperBasic() {
-		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());
 		setDefaultState(getDefaultState()
 				.with(FACING, Direction.DOWN).with(ENABLED, Boolean.valueOf(true)));
 	}

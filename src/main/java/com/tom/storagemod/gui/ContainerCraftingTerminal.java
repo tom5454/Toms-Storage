@@ -275,4 +275,9 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	public boolean canInsertIntoSlot(int id) {
 		return id > 0 && id < 10;
 	}
+
+	@Override
+	public List<StoredItemStack> getStoredItems() {
+		return itemList;
+	}
 }

@@ -25,6 +25,7 @@
       "recipes":[
          "toms_storage:inventory_cable_connector",
          "toms_storage:inventory_cable_connector_filtered",
+ 		 "toms_storage:inventory_cable_connector_framed",
          "toms_storage:inventory_connector",
          "toms_storage:wireless_terminal"
       ]

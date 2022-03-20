@@ -106,7 +106,8 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 											}
 										}
 									}
-								} else if(inv != null) {
+								}
+								if(inv != null) {
 									ihr = IProxy.resolve(inv);
 									if(ihr instanceof TileEntityInventoryConnector) {
 										TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;

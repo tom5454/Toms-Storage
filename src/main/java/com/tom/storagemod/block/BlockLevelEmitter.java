@@ -46,7 +46,7 @@ public class BlockLevelEmitter extends BlockWithEntity implements IInventoryCabl
 	public static final BooleanProperty POWERED = Properties.POWERED;
 
 	public BlockLevelEmitter() {
-		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3).nonOpaque());
 		setDefaultState(getDefaultState()
 				.with(FACING, Direction.DOWN).with(POWERED, Boolean.valueOf(false)));
 	}
@@ -91,11 +91,6 @@ public class BlockLevelEmitter extends BlockWithEntity implements IInventoryCabl
 			return 15;
 		}
 	}
-
-	/*@Override
-	public boolean canConnectRedstone(BlockState state, BlockView world, BlockPos pos, Direction side) {
-		return state.get(FACING) != side;
-	}*/
 
 	@Override
 	public BlockState rotate(BlockState state, BlockRotation rot) {

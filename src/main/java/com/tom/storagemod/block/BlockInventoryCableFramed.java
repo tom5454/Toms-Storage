@@ -40,7 +40,7 @@ public class BlockInventoryCableFramed extends Block implements IInventoryCable,
 	public static final BooleanProperty WEST = Properties.WEST;
 
 	public BlockInventoryCableFramed() {
-		super(Block.Settings.of(Material.WOOD).strength(2).nonOpaque());//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(2).nonOpaque());
 		setDefaultState(getDefaultState()
 				.with(DOWN, false)
 				.with(UP, false)
@@ -146,10 +146,5 @@ public class BlockInventoryCableFramed extends Block implements IInventoryCable,
 	@Override
 	public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
 		return false;
-	}
-
-	@Override
-	public Block getPaintedBlock() {
-		return StorageMod.invCablePainted;
 	}
 }

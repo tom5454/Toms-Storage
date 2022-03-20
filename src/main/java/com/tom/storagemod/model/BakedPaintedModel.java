@@ -39,7 +39,9 @@ import com.tom.storagemod.tile.TileEntityPainted;
 
 public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedModel {
 	private static final SpriteIdentifier ID = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(StorageMod.modid, "block/trim"));
+	private static final Identifier FALLBACK_ID = new Identifier("minecraft:block/stone");
 	private Sprite sprite;
+	private BakedModel fallback;
 	public BakedPaintedModel() {
 	}
 
@@ -92,7 +94,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 
 	@Override
 	public List<BakedQuad> getQuads(BlockState arg0, Direction arg1, Random arg2) {
-		return Collections.emptyList();
+		return fallback.getQuads(arg0, arg1, arg2);
 	}
 
 	@Override
@@ -128,6 +130,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	@Override
 	public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
 		sprite = textureGetter.apply(ID);
+		fallback = loader.bake(FALLBACK_ID, rotationContainer);
 		return this;
 	}
 

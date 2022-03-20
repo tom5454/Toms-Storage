@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
   	"RGB",
-    "a W",
+    "iaW",
     "bS "
   ],
   "key": {
@@ -22,10 +22,13 @@
       "item": "minecraft:blue_dye"
     },
     "W": {
-    	"tag": "minecraft:wool"
+      "tag": "minecraft:wool"
     },
     "S": {
-    	"item": "minecraft:stick"
+      "item": "minecraft:stick"
+    },
+	"i": {
+      "item": "minecraft:black_dye"
     }
   },
   "result": {

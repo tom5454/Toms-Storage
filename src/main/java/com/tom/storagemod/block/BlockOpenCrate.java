@@ -31,7 +31,7 @@ import com.tom.storagemod.tile.TileEntityOpenCrate;
 public class BlockOpenCrate extends BlockWithEntity {
 
 	public BlockOpenCrate() {
-		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
+		super(Block.Settings.of(Material.WOOD).strength(3));
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class BlockOpenCrate extends BlockWithEntity {
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
 		return this.getDefaultState().
-				with(Properties.FACING, ctx.getPlayerFacing().getOpposite());
+				with(Properties.FACING, ctx.getPlayerLookDirection().getOpposite());
 	}
 
 	@Override

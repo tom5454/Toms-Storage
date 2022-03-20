@@ -1,7 +1,9 @@
 package com.tom.storagemod;
 
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -9,10 +11,12 @@ import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelProviderException;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
+import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -38,11 +42,14 @@ import net.minecraft.util.shape.VoxelShape;
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
 import com.tom.storagemod.gui.GuiFiltered;
+import com.tom.storagemod.gui.GuiInventoryLink;
 import com.tom.storagemod.gui.GuiLevelEmitter;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
 import com.tom.storagemod.tile.TileEntityPainted;
+
+import io.netty.buffer.ByteBufInputStream;
 
 public class StorageModClient implements ClientModInitializer {
 	protected static final Identifier PAINT = new Identifier(StorageMod.modid, "paint");
@@ -53,11 +60,13 @@ public class StorageModClient implements ClientModInitializer {
 		ScreenRegistry.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
 		ScreenRegistry.register(StorageMod.filteredConatiner, GuiFiltered::new);
 		ScreenRegistry.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
+		ScreenRegistry.register(StorageMod.inventoryLink, GuiInventoryLink::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.paintedTrim, RenderLayer.getTranslucent());
-		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCableFramed, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.levelEmitter, RenderLayer.getCutout());
+		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCableConnectorPainted, RenderLayer.getTranslucent());
+		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invProxyPainted, RenderLayer.getTranslucent());
 
 		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
 			NbtCompound tag = buf.readUnlimitedNbt();
@@ -90,7 +99,7 @@ public class StorageModClient implements ClientModInitializer {
 				}
 			}
 			return -1;
-		}, StorageMod.paintedTrim, StorageMod.invCablePainted);
+		}, StorageMod.paintedTrim, StorageMod.invCablePainted, StorageMod.invCableConnectorPainted, StorageMod.invProxyPainted);
 
 		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
 			MinecraftClient mc = MinecraftClient.getInstance();
@@ -103,7 +112,7 @@ public class StorageModClient implements ClientModInitializer {
 
 			BlockHitResult lookingAt = (BlockHitResult) player.raycast(StorageMod.CONFIG.wirelessRange, 0f, true);
 			BlockState state = mc.world.getBlockState(lookingAt.getBlockPos());
-			if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
+			if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
 				BlockPos pos = lookingAt.getBlockPos();
 				Vec3d renderPos = mc.gameRenderer.getCamera().getPos();
 				VertexConsumer buf = mc.getBufferBuilders().getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
@@ -122,6 +131,19 @@ public class StorageModClient implements ClientModInitializer {
 			regSimpleBlock.invoke(null, StorageMod.craftingTerminal);
 		} catch (Throwable e) {
 		}
+
+		ClientLoginNetworking.registerGlobalReceiver(StorageMod.id("config"), (mc, handler, buf, fc) -> {
+			Config read;
+			try (InputStreamReader reader = new InputStreamReader(new ByteBufInputStream(buf))){
+				read = Config.gson.fromJson(reader, Config.class);
+			} catch (Exception e) {
+				StorageMod.LOGGER.warn("Error loading server config", e);
+				return CompletableFuture.completedFuture(null);
+			}
+			StorageMod.CONFIG = read;
+			StorageMod.LOGGER.info("Received server config");
+			return CompletableFuture.completedFuture(PacketByteBufs.empty());
+		});
 	}
 
 	private static void drawShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
@@ -139,15 +161,18 @@ public class StorageModClient implements ClientModInitializer {
 		});
 	}
 
-	public static void tooltip(String key, List<Text> tooltip) {
+	public static void tooltip(String key, List<Text> tooltip, Object... args) {
+		tooltip(key, true, tooltip, args);
+	}
+
+	public static void tooltip(String key, boolean shift, List<Text> tooltip, Object... args) {
 		if(Screen.hasShiftDown()) {
-			String[] sp = I18n.translate("tooltip.toms_storage." + key).split("\\\\");
+			String[] sp = I18n.translate("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
 				tooltip.add(new LiteralText(sp[i]));
 			}
-		} else {
+		} else if(shift) {
 			tooltip.add(new TranslatableText("tooltip.toms_storage.hold_shift_for_info").formatted(Formatting.ITALIC, Formatting.GRAY));
 		}
 	}
-
 }
