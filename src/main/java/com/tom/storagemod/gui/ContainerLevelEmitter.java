@@ -95,7 +95,7 @@ public class ContainerLevelEmitter extends AbstractContainerMenu implements IDat
 	 */
 	@Override
 	public boolean stillValid(Player playerIn) {
-		return true;
+		return te != null ? te.stillValid(playerIn) : true;
 	}
 
 	/**

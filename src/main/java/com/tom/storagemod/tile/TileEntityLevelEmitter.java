@@ -59,7 +59,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 					BlockPos cp = toCheck.pop();
 					if(!checkedBlocks.contains(cp)) {
 						checkedBlocks.add(cp);
-						if(level.hasChunkAt(cp)) {
+						if(level.isLoaded(cp)) {
 							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
 								BlockEntity te = level.getBlockEntity(cp);
@@ -166,5 +166,13 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 	@Override
 	public Component getDisplayName() {
 		return new TranslatableComponent("ts.level_emitter");
+	}
+
+	public boolean stillValid(Player p_59619_) {
+		if (this.level.getBlockEntity(this.worldPosition) != this) {
+			return false;
+		} else {
+			return !(p_59619_.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > 64.0D);
+		}
 	}
 }

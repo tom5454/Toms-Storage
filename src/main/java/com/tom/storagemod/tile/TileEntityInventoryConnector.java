@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,19 +21,19 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.ITrim;
+import com.tom.storagemod.util.IProxy;
+import com.tom.storagemod.util.InfoHandler;
+import com.tom.storagemod.util.MultiItemHandler;
 
 public class TileEntityInventoryConnector extends BlockEntity implements TickableServer {
-	private List<LazyOptional<IItemHandler>> handlers = new ArrayList<>();
+	private MultiItemHandler handlers = new MultiItemHandler();
 	private List<LinkedInv> linkedInvs = new ArrayList<>();
-	private LazyOptional<IItemHandler> invHandler;
-	private int[] invSizes = new int[0];
-	private int invSize;
+	private LazyOptional<IItemHandler> invHandler = LazyOptional.of(() -> handlers);
 
 	public TileEntityInventoryConnector(BlockPos pos, BlockState state) {
 		super(StorageMod.connectorTile, pos, state);
@@ -55,7 +54,19 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 					toRM.add(inv);
 					continue;
 				}
-				handlers.add(inv.handler.get());
+				LazyOptional<IItemHandler> i = inv.handler.get();
+				if(i.isPresent()) {
+					IItemHandler blockHandler = i.orElse(null);
+					IItemHandler ihr = IProxy.resolve(blockHandler);
+					if(ihr instanceof MultiItemHandler) {
+						MultiItemHandler ih = (MultiItemHandler) ihr;
+						if(checkHandlers(ih, 0)) {
+							if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+							continue;
+						}
+					}
+					handlers.add(i);
+				}
 			}
 			linkedInvs.removeAll(toRM);
 			Collections.sort(linkedInvs);
@@ -97,8 +108,8 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 										StorageMod.LOGGER.warn("Broken modded block at " + p + " in " + level.dimension().location().toString() + " block id: " + state.getBlock().delegate.name().toString());
 									}
 									IItemHandler ihr = IProxy.resolve(blockHandler);
-									if(ihr instanceof InvHandler) {
-										InvHandler ih = (InvHandler) ihr;
+									if(ihr instanceof MultiItemHandler) {
+										MultiItemHandler ih = (MultiItemHandler) ihr;
 										if(checkHandlers(ih, 0)) {
 											if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
 											continue;
@@ -115,17 +126,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 					}
 				}
 			}
-			if(invSizes.length != handlers.size())invSizes = new int[handlers.size()];
-			invSize = 0;
-			for (int i = 0; i < invSizes.length; i++) {
-				IItemHandler ih = handlers.get(i).orElse(null);
-				if(ih == null)invSizes[i] = 0;
-				else {
-					int s = ih.getSlots();
-					invSizes[i] = s;
-					invSize += s;
-				}
-			}
+			handlers.refresh();
 		}
 	}
 
@@ -149,12 +150,13 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 		}
 	}
 
-	private boolean checkHandlers(InvHandler ih, int depth) {
+	private boolean checkHandlers(MultiItemHandler ih, int depth) {
 		if(depth > 3)return true;
 		for (LazyOptional<IItemHandler> lo : ih.getHandlers()) {
 			IItemHandler ihr = IProxy.resolve(lo.orElse(null));
-			if(ihr instanceof InvHandler) {
-				if(checkHandlers((InvHandler) ihr, depth+1))return true;
+			if(ihr == handlers)return true;
+			if(ihr instanceof MultiItemHandler) {
+				if(checkHandlers((MultiItemHandler) ihr, depth+1))return true;
 			}
 		}
 		return false;
@@ -169,102 +171,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	}
 
 	public LazyOptional<IItemHandler> getInventory() {
-		if (this.invHandler == null)
-			this.invHandler = LazyOptional.of(InvHandler::new);
 		return this.invHandler;
-	}
-
-	private class InvHandler implements IItemHandler {
-		private boolean calling;
-
-		@Override
-		public boolean isItemValid(int slot, ItemStack stack) {
-			if(calling)return false;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					boolean r = handlers.get(i).orElse(EmptyHandler.INSTANCE).isItemValid(slot, stack);
-					calling = false;
-					return r;
-				}
-			}
-			calling = false;
-			return false;
-		}
-
-		@Override
-		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-			if(calling)return stack;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).insertItem(slot, stack, simulate);
-					calling = false;
-					return s;
-				}
-			}
-			calling = false;
-			return stack;
-		}
-
-		@Override
-		public ItemStack getStackInSlot(int slot) {
-			if(calling)return ItemStack.EMPTY;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).getStackInSlot(slot);
-					calling = false;
-					return s;
-				}
-			}
-			calling = false;
-			return ItemStack.EMPTY;
-		}
-
-		@Override
-		public int getSlots() {
-			return invSize;
-		}
-
-		@Override
-		public int getSlotLimit(int slot) {
-			if(calling)return 0;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					int r = handlers.get(i).orElse(EmptyHandler.INSTANCE).getSlotLimit(slot);
-					calling = false;
-					return r;
-				}
-			}
-			calling = false;
-			return 0;
-		}
-
-		@Override
-		public ItemStack extractItem(int slot, int amount, boolean simulate) {
-			if(calling)return ItemStack.EMPTY;
-			calling = true;
-			for (int i = 0; i < invSizes.length; i++) {
-				if(slot >= invSizes[i])slot -= invSizes[i];
-				else {
-					ItemStack s = handlers.get(i).orElse(EmptyHandler.INSTANCE).extractItem(slot, amount, simulate);
-					calling = false;
-					return s;
-				}
-			}
-			calling = false;
-			return ItemStack.EMPTY;
-		}
-
-		public List<LazyOptional<IItemHandler>> getHandlers() {
-			return handlers;
-		}
 	}
 
 	@Override
@@ -296,7 +203,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	public int getFreeSlotCount() {
 		return getInventory().lazyMap(inv -> {
 			int empty = 0;
-			for(int i = 0;i<invSize;i++) {
+			for(int i = 0;i<handlers.getSlots();i++) {
 				if(inv.getStackInSlot(i).isEmpty())empty++;
 			}
 			return empty;
@@ -304,6 +211,6 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	}
 
 	public int getInvSize() {
-		return invSize;
+		return handlers.getSlots();
 	}
 }

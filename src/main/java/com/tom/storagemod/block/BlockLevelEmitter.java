@@ -90,10 +90,10 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 		}
 	}
 
-	/*@Override
+	@Override
 	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
 		return state.getValue(FACING) != side;
-	}*/
+	}
 
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {

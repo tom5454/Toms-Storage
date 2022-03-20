@@ -1,4 +1,4 @@
-package com.tom.storagemod.tile;
+package com.tom.storagemod.util;
 
 import java.util.function.Supplier;
 
@@ -12,4 +12,5 @@ public interface IProxy extends Supplier<IItemHandler> {
 		else
 			return in;
 	}
+
 }

@@ -22,6 +22,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryProxy;
 import com.tom.storagemod.block.BlockInventoryProxy.DirectionWithNull;
+import com.tom.storagemod.util.IProxy;
 
 public class TileEntityInventoryProxy extends TileEntityPainted implements TickableServer {
 	private LazyOptional<IItemHandler> invHandler;

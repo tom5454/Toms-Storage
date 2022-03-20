@@ -23,6 +23,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -131,7 +132,9 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 
 	public void craft(Player thePlayer) {
 		if(currentRecipe != null) {
+			ForgeHooks.setCraftingPlayer(thePlayer);
 			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
+			ForgeHooks.setCraftingPlayer(null);
 			boolean playerInvUpdate = false;
 			for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
 				ItemStack slot = craftMatrix.getItem(i);

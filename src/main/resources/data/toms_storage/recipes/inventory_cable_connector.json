@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-  	" WP",
+  	" qP",
     "CcE",
     " DP"
   ],
@@ -21,8 +21,8 @@
     "E": {
       "tag": "forge:ender_pearls"
     },
-    "W": {
-    	"tag": "minecraft:wool"
+    "q": {
+      "item": "minecraft:quartz"
     }
   },
   "result": {

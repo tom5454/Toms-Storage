@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,9 +23,6 @@ import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
-
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.google.common.collect.Lists;
 
@@ -157,55 +152,6 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 		public int getSlotIndex() {
 			return slotIndex;
 		}
-
-		public void drawSlot(PoseStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
-			if (mouseX >= gui.getGuiLeft() + xDisplayPosition - 1 && mouseY >= gui.getGuiTop() + yDisplayPosition - 1 && mouseX < gui.getGuiLeft() + xDisplayPosition + 17 && mouseY < gui.getGuiTop() + yDisplayPosition + 17) {
-				//RenderUtil.setColourWithAlphaPercent(0xFFFFFF, 60);
-				int l = gui.getGuiLeft() + xDisplayPosition;
-				int t = gui.getGuiTop() + yDisplayPosition;
-				GuiStorageTerminal.fill(st, l, t, l+16, t+16, 0x80FFFFFF);
-
-			}
-			if (stack != null) {
-				st.pushPose();
-				gui.renderItemInGui(st, stack.getStack().copy().split(1), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
-				Font r = gui.getFont();
-				this.drawStackSize(st, r, stack.getQuantity(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition);
-				st.popPose();
-			}
-		}
-
-		public boolean drawTooltip(PoseStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
-			if (stack != null) {
-				if (stack.getQuantity() > 9999) {
-					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.get("tooltip.toms_storage.amount", stack.getQuantity()));
-				} else {
-					gui.renderItemInGui(st, stack.getStack(), gui.getGuiLeft() + xDisplayPosition, gui.getGuiTop() + yDisplayPosition, mouseX, mouseY, false, 0, true);
-				}
-			}
-			return mouseX >= (gui.getGuiLeft() + xDisplayPosition) - 1 && mouseY >= (gui.getGuiTop() + yDisplayPosition) - 1 && mouseX < (gui.getGuiLeft() + xDisplayPosition) + 17 && mouseY < (gui.getGuiTop() + yDisplayPosition) + 17;
-		}
-
-		private void drawStackSize(PoseStack st, Font fr, long size, int x, int y) {
-			float scaleFactor = 0.6f;
-			//boolean unicodeFlag = fr.getUnicodeFlag();
-			//fr.setUnicodeFlag(false);
-			//RenderSystem.disableLighting();
-			RenderSystem.disableDepthTest();
-			RenderSystem.disableBlend();
-			String stackSize = formatNumber(size);
-			st.pushPose();
-			st.scale(scaleFactor, scaleFactor, scaleFactor);
-			st.translate(0, 0, 450);
-			float inverseScaleFactor = 1.0f / scaleFactor;
-			int X = (int) (((float) x + 0 + 16.0f - fr.width(stackSize) * scaleFactor) * inverseScaleFactor);
-			int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-			fr.drawShadow(st, stackSize, X, Y, 16777215);
-			st.popPose();
-			//RenderSystem.enableLighting();
-			RenderSystem.enableDepthTest();
-			//fr.setUnicodeFlag(unicodeFlag);
-		}
 	}
 
 	public static String formatNumber(long number) {
@@ -266,21 +212,6 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 
 	public final void setSlotContents(int id, StoredItemStack stack) {
 		storageSlotList.get(id).stack = stack;
-	}
-
-	public int drawSlots(PoseStack st, GuiStorageTerminalBase gui, int mouseX, int mouseY) {
-		for (int i = 0;i < storageSlotList.size();i++) {
-			storageSlotList.get(i).drawSlot(st, gui, mouseX, mouseY);
-		}
-		RenderSystem.disableDepthTest();
-		RenderSystem.disableBlend();
-		st.pushPose();
-		st.translate(0, 0, 100);
-		for (int i = 0;i < storageSlotList.size();i++) {
-			if (storageSlotList.get(i).drawTooltip(st, gui, mouseX, mouseY)) { st.popPose(); return i; }
-		}
-		st.popPose();
-		return -1;
 	}
 
 	public final SlotStorage getSlotByID(int id) {

@@ -93,7 +93,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setInitialFocus(this.recipeBookGui);
 		GuiButtonClear btnClr = new GuiButtonClear(leftPos + 80, topPos + 110, b -> clearGrid());
 		addRenderableWidget(btnClr);
-		buttonPullFromInv = addWidget(new GuiButton(leftPos - 18, topPos + 5 + 18*4, 4, b -> {
+		buttonPullFromInv = addRenderableWidget(new GuiButton(leftPos - 18, topPos + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
 			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();
@@ -278,7 +278,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		public void renderButton(PoseStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
-				RenderSystem.setShaderTexture(0, gui);
+				RenderSystem.setShaderTexture(0, getGui());
 				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 				int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();

@@ -15,15 +15,18 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.TickerUtil.TickableServer;
@@ -38,6 +41,8 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 	private int sort;
 	private String lastSearch = "";
 	private boolean updateItems;
+	private int beaconLevel;
+
 	public TileEntityStorageTerminal(BlockPos pos, BlockState state) {
 		super(StorageMod.terminalTile, pos, state);
 	}
@@ -65,7 +70,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 		if(stack != null && itemHandler != null && max > 0) {
 			ItemStack st = stack.getStack();
 			StoredItemStack ret = null;
-			for (int i = 0; i < itemHandler.getSlots(); i++) {
+			for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
 				ItemStack s = itemHandler.getStackInSlot(i);
 				if(ItemStack.isSame(s, st) && ItemStack.tagMatches(s, st)) {
 					ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
@@ -126,14 +131,31 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 			}
 			updateItems = false;
 		}
+		if(level.getGameTime() % 40 == 5) {
+			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(8)).mapToInt(p -> {
+				if(level.isLoaded(p)) {
+					BlockState st = level.getBlockState(p);
+					if(st.is(Blocks.BEACON)) {
+						return TileEntityInventoryCableConnector.calcBeaconLevel(level, p.getX(), p.getY(), p.getZ());
+					}
+				}
+				return 0;
+			}).max().orElse(0);
+		}
 	}
 
 	public boolean canInteractWith(Player player) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
 		int d = 4;
-		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
-		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
-		return !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
+		int termReach = 0;
+		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
+		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
+		if(beaconLevel >= Config.wirelessTermBeaconLvl && termReach > 0) {
+			if(beaconLevel >= Config.wirelessTermBeaconLvlDim)return true;
+			else return player.getLevel() == level;
+		}
+		d = Math.max(d, termReach);
+		return player.getLevel() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
 	}
 
 	public int getSorting() {

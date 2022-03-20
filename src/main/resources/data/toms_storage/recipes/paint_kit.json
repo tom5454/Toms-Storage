@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
   	"RGB",
-    "a W",
+    "iaW",
     "bS "
   ],
   "key": {
@@ -26,6 +26,9 @@
     },
     "S": {
     	"tag": "forge:rods/wooden"
+    },
+	"i": {
+    	"tag": "forge:dyes/black"
     }
   },
   "result": {

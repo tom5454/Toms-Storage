@@ -47,7 +47,7 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 					BlockPos cp = toCheck.pop();
 					if(!checkedBlocks.contains(cp)) {
 						checkedBlocks.add(cp);
-						if(level.hasChunkAt(cp)) {
+						if(level.isLoaded(cp)) {
 							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
 								BlockEntity te = level.getBlockEntity(cp);
@@ -81,7 +81,7 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 					BlockPos cp = toCheck.pop();
 					if(!checkedBlocks.contains(cp)) {
 						checkedBlocks.add(cp);
-						if(level.hasChunkAt(cp)) {
+						if(level.isLoaded(cp)) {
 							state = level.getBlockState(cp);
 							if(state.getBlock() == StorageMod.connector) {
 								BlockEntity te = level.getBlockEntity(cp);

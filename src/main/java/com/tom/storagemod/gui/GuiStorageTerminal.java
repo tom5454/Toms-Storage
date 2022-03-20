@@ -26,7 +26,7 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 	@Override
 	protected void renderBg(PoseStack st, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, gui);
+		RenderSystem.setShaderTexture(0, getGui());
 		this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 	}
 

@@ -27,6 +27,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import com.tom.storagemod.block.BlockInventoryCable;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.BlockInventoryCableConnectorFiltered;
+import com.tom.storagemod.block.BlockInventoryCableConnectorFramed;
 import com.tom.storagemod.block.BlockInventoryCableFramed;
 import com.tom.storagemod.block.BlockInventoryHopperBasic;
 import com.tom.storagemod.block.BlockInventoryProxy;
@@ -39,6 +40,7 @@ import com.tom.storagemod.block.InventoryConnector;
 import com.tom.storagemod.block.StorageTerminal;
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
 import com.tom.storagemod.gui.ContainerFiltered;
+import com.tom.storagemod.gui.ContainerInventoryLink;
 import com.tom.storagemod.gui.ContainerLevelEmitter;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.ItemAdvWirelessTerminal;
@@ -74,6 +76,7 @@ public class StorageMod {
 	public static BlockInventoryCableFramed invCableFramed;
 	public static BlockInventoryCableConnector invCableConnector;
 	public static BlockInventoryCableConnectorFiltered invCableConnectorFiltered;
+	public static BlockInventoryCableConnectorFramed invCableConnectorFramed;
 	public static BlockInventoryProxy invProxy;
 	public static CraftingTerminal craftingTerminal;
 	public static BlockInventoryHopperBasic invHopperBasic;
@@ -98,6 +101,7 @@ public class StorageMod {
 	public static MenuType<ContainerCraftingTerminal> craftingTerminalCont;
 	public static MenuType<ContainerFiltered> filteredConatiner;
 	public static MenuType<ContainerLevelEmitter> levelEmitterConatiner;
+	public static MenuType<ContainerInventoryLink> inventoryLink;
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -105,14 +109,11 @@ public class StorageMod {
 	public StorageMod() {
 		// Register the setup method for modloading
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-		// Register the enqueueIMC method for modloading
-		//FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
-		// Register the processIMC method for modloading
-		//FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 		// Register the doClientStuff method for modloading
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.serverSpec);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
 		FMLJavaModLoadingContext.get().getModEventBus().register(Config.class);
 
 		// Register ourselves for server and other game events we are interested in
@@ -129,7 +130,7 @@ public class StorageMod {
 		proxy.clientSetup();
 	}
 
-	public static final CreativeModeTab STORAGE_MOD_TAB = new CreativeModeTab("toms_storage") {
+	public static final CreativeModeTab STORAGE_MOD_TAB = new CreativeModeTab("toms_storage.tab") {
 
 		@Override
 		@OnlyIn(Dist.CLIENT)
@@ -157,19 +158,10 @@ public class StorageMod {
 			craftingTerminal = new CraftingTerminal();
 			invHopperBasic = new BlockInventoryHopperBasic();
 			levelEmitter = new BlockLevelEmitter();
-			blockRegistryEvent.getRegistry().register(connector);
-			blockRegistryEvent.getRegistry().register(terminal);
-			blockRegistryEvent.getRegistry().register(openCrate);
-			blockRegistryEvent.getRegistry().register(inventoryTrim);
-			blockRegistryEvent.getRegistry().register(paintedTrim);
-			blockRegistryEvent.getRegistry().register(invCable);
-			blockRegistryEvent.getRegistry().register(invCableFramed);
-			blockRegistryEvent.getRegistry().register(invCableConnector);
-			blockRegistryEvent.getRegistry().register(invCableConnectorFiltered);
-			blockRegistryEvent.getRegistry().register(invProxy);
-			blockRegistryEvent.getRegistry().register(craftingTerminal);
-			blockRegistryEvent.getRegistry().register(invHopperBasic);
-			blockRegistryEvent.getRegistry().register(levelEmitter);
+			invCableConnectorFramed = new BlockInventoryCableConnectorFramed();
+			blockRegistryEvent.getRegistry().registerAll(connector, terminal, openCrate, inventoryTrim, paintedTrim, invCable,
+					invCableFramed, invCableConnector, invCableConnectorFiltered, invProxy, craftingTerminal, invHopperBasic,
+					levelEmitter, invCableConnectorFramed);
 		}
 
 		@SubscribeEvent
@@ -191,10 +183,9 @@ public class StorageMod {
 			registerItemForBlock(itemRegistryEvent, craftingTerminal);
 			registerItemForBlock(itemRegistryEvent, invHopperBasic);
 			registerItemForBlock(itemRegistryEvent, levelEmitter);
+			registerItemForBlock(itemRegistryEvent, invCableConnectorFramed);
 
-			itemRegistryEvent.getRegistry().register(paintingKit);
-			itemRegistryEvent.getRegistry().register(wirelessTerminal);
-			itemRegistryEvent.getRegistry().register(advWirelessTerminal);
+			itemRegistryEvent.getRegistry().registerAll(paintingKit, wirelessTerminal, advWirelessTerminal);
 		}
 
 		private static void registerItemForBlock(RegistryEvent.Register<Item> itemRegistryEvent, Block block) {
@@ -211,7 +202,7 @@ public class StorageMod {
 			openCrateTile.setRegistryName("ts.open_crate.tile");
 			paintedTile = BlockEntityType.Builder.of(TileEntityPainted::new, paintedTrim, invCableFramed).build(null);
 			paintedTile.setRegistryName("ts.painted.tile");
-			invCableConnectorTile = BlockEntityType.Builder.of(TileEntityInventoryCableConnector::new, invCableConnector).build(null);
+			invCableConnectorTile = BlockEntityType.Builder.of(TileEntityInventoryCableConnector::new, invCableConnector, invCableConnectorFramed).build(null);
 			invCableConnectorTile.setRegistryName("ts.inventory_cable_connector.tile");
 			invCableConnectorFilteredTile = BlockEntityType.Builder.of(TileEntityInventoryCableConnectorFiltered::new, invCableConnectorFiltered).build(null);
 			invCableConnectorFilteredTile.setRegistryName("ts.inventory_cable_connector_filtered.tile");
@@ -223,16 +214,9 @@ public class StorageMod {
 			invHopperBasicTile.setRegistryName("ts.inventoty_hopper_basic.tile");
 			levelEmitterTile = BlockEntityType.Builder.of(TileEntityLevelEmitter::new, levelEmitter).build(null);
 			levelEmitterTile.setRegistryName("ts.level_emitter.tile");
-			tileRegistryEvent.getRegistry().register(connectorTile);
-			tileRegistryEvent.getRegistry().register(terminalTile);
-			tileRegistryEvent.getRegistry().register(openCrateTile);
-			tileRegistryEvent.getRegistry().register(paintedTile);
-			tileRegistryEvent.getRegistry().register(invCableConnectorTile);
-			tileRegistryEvent.getRegistry().register(invCableConnectorFilteredTile);
-			tileRegistryEvent.getRegistry().register(invProxyTile);
-			tileRegistryEvent.getRegistry().register(craftingTerminalTile);
-			tileRegistryEvent.getRegistry().register(invHopperBasicTile);
-			tileRegistryEvent.getRegistry().register(levelEmitterTile);
+			tileRegistryEvent.getRegistry().registerAll(connectorTile, terminalTile, openCrateTile, paintedTile,
+					invCableConnectorTile, invCableConnectorFilteredTile, invProxyTile, craftingTerminalTile,
+					invHopperBasicTile, levelEmitterTile);
 		}
 
 		@SubscribeEvent
@@ -245,10 +229,10 @@ public class StorageMod {
 			filteredConatiner.setRegistryName("ts.filtered.container");
 			levelEmitterConatiner = new MenuType<>(ContainerLevelEmitter::new);
 			levelEmitterConatiner.setRegistryName("ts.level_emitter.container");
-			containerRegistryEvent.getRegistry().register(storageTerminal);
-			containerRegistryEvent.getRegistry().register(craftingTerminalCont);
-			containerRegistryEvent.getRegistry().register(filteredConatiner);
-			containerRegistryEvent.getRegistry().register(levelEmitterConatiner);
+			inventoryLink = new MenuType<>(ContainerInventoryLink::new);
+			inventoryLink.setRegistryName("ts.inventory_link.container");
+			containerRegistryEvent.getRegistry().registerAll(storageTerminal, craftingTerminalCont, filteredConatiner,
+					levelEmitterConatiner, inventoryLink);
 		}
 	}
 }

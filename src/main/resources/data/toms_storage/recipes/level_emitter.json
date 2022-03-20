@@ -1,6 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
+	" t ",
     "PcP",
     " H "
   ],
@@ -13,7 +14,10 @@
     },
     "H": {
       "item": "minecraft:comparator"
-    }
+    },
+	"t": {
+		"item": "minecraft:redstone_torch"
+	}
   },
   "result": {
     "item": "toms_storage:ts.level_emitter"

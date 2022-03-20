@@ -38,6 +38,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
 import com.tom.storagemod.gui.GuiFiltered;
+import com.tom.storagemod.gui.GuiInventoryLink;
 import com.tom.storagemod.gui.GuiLevelEmitter;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
@@ -57,10 +58,12 @@ public class ClientProxy implements IProxy {
 		MenuScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
 		MenuScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
 		MenuScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
+		MenuScreens.register(StorageMod.inventoryLink, GuiInventoryLink::new);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.paintedTrim, e -> true);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableFramed, e -> true);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.invProxy, e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableConnectorFramed, e -> true);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.levelEmitter, RenderType.cutout());
 		BlockColors colors = Minecraft.getInstance().getBlockColors();
 		colors.register((state, world, pos, tintIndex) -> {
@@ -73,7 +76,7 @@ public class ClientProxy implements IProxy {
 				}
 			}
 			return -1;
-		}, StorageMod.paintedTrim, StorageMod.invCableFramed, StorageMod.invProxy);
+		}, StorageMod.paintedTrim, StorageMod.invCableFramed, StorageMod.invProxy, StorageMod.invCableConnectorFramed);
 		MinecraftForge.EVENT_BUS.addListener(ClientProxy::renderWorldLastEvent);
 	}
 
@@ -81,6 +84,7 @@ public class ClientProxy implements IProxy {
 		bindPaintedModel(event, StorageMod.paintedTrim);
 		bindPaintedModel(event, StorageMod.invCableFramed);
 		bindPaintedModel(event, StorageMod.invProxy);
+		bindPaintedModel(event, StorageMod.invCableConnectorFramed);
 	}
 
 	private static void bindPaintedModel(ModelBakeEvent event, Block blockFor) {
@@ -102,7 +106,7 @@ public class ClientProxy implements IProxy {
 
 		BlockHitResult lookingAt = (BlockHitResult) player.pick(Config.wirelessRange, 0f, true);
 		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
-		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
+		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 			BlockPos pos = lookingAt.getBlockPos();
 			Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
 			PoseStack ms = evt.getPoseStack();
@@ -127,13 +131,17 @@ public class ClientProxy implements IProxy {
 		});
 	}
 
-	public static void tooltip(String key, List<Component> tooltip) {
+	public static void tooltip(String key, List<Component> tooltip, Object... args) {
+		tooltip(key, true, tooltip, args);
+	}
+
+	public static void tooltip(String key, boolean addShift, List<Component> tooltip, Object... args) {
 		if(Screen.hasShiftDown()) {
-			String[] sp = I18n.get("tooltip.toms_storage." + key).split("\\\\");
+			String[] sp = I18n.get("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
 				tooltip.add(new TextComponent(sp[i]));
 			}
-		} else {
+		} else if(addShift) {
 			tooltip.add(new TranslatableComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		}
 	}

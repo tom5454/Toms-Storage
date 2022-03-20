@@ -291,4 +291,9 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			((TileEntityCraftingTerminal) te).handlerItemTransfer(pinv.player, stacks);
 		}
 	}
+
+	@Override
+	public List<StoredItemStack> getStoredItems() {
+		return itemList;
+	}
 }

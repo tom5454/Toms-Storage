@@ -43,6 +43,7 @@ import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
+import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
 import com.tom.storagemod.network.IDataReceiver;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends AbstractContainerScreen<T> implements IDataReceiver {
@@ -286,7 +287,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.blit(st, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
 		st.pushPose();
 		//RenderHelper.turnBackOn();
-		slotIDUnderMouse = getMenu().drawSlots(st, this, mouseX, mouseY);
+		slotIDUnderMouse = drawSlots(st, mouseX, mouseY);
 		st.popPose();
 		this.renderTooltip(st, mouseX, mouseY);
 
@@ -294,11 +295,73 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
 		}
 		if (buttonSearchType.isHoveredOrFocused()) {
-			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.search_" + buttonSearchType.state), mouseX, mouseY);
+			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.search_" + buttonSearchType.state, "JEI"), mouseX, mouseY);
 		}
 		if (buttonCtrlMode.isHoveredOrFocused()) {
 			renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
 		}
+	}
+
+	protected int drawSlots(PoseStack st, int mouseX, int mouseY) {
+		ContainerStorageTerminal term = getMenu();
+		for (int i = 0;i < term.storageSlotList.size();i++) {
+			drawSlot(st, term.storageSlotList.get(i), mouseX, mouseY);
+		}
+		RenderSystem.disableDepthTest();
+		RenderSystem.disableBlend();
+		st.pushPose();
+		st.translate(0, 0, 100);
+		for (int i = 0;i < term.storageSlotList.size();i++) {
+			if (drawTooltip(st, term.storageSlotList.get(i), mouseX, mouseY)) {
+				st.popPose();
+				return i;
+			}
+		}
+		st.popPose();
+		return -1;
+	}
+
+	protected void drawSlot(PoseStack st, SlotStorage slot, int mouseX, int mouseY) {
+		if (mouseX >= getGuiLeft() + slot.xDisplayPosition - 1 && mouseY >= getGuiTop() + slot.yDisplayPosition - 1 && mouseX < getGuiLeft() + slot.xDisplayPosition + 17 && mouseY < getGuiTop() + slot.yDisplayPosition + 17) {
+			int l = getGuiLeft() + slot.xDisplayPosition;
+			int t = getGuiTop() + slot.yDisplayPosition;
+			fill(st, l, t, l+16, t+16, 0x80FFFFFF);
+
+		}
+		if (slot.stack != null) {
+			st.pushPose();
+			renderItemInGui(st, slot.stack.getStack().copy().split(1), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition, 0, 0, false, 0xFFFFFF, false);
+			Font r = getFont();
+			drawStackSize(st, r, slot.stack.getQuantity(), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition);
+			st.popPose();
+		}
+	}
+
+	protected boolean drawTooltip(PoseStack st, SlotStorage slot, int mouseX, int mouseY) {
+		if (slot.stack != null) {
+			if (slot.stack.getQuantity() > 9999) {
+				renderItemInGui(st, slot.stack.getStack(), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition, mouseX, mouseY, false, 0, true, I18n.get("tooltip.toms_storage.amount", slot.stack.getQuantity()));
+			} else {
+				renderItemInGui(st, slot.stack.getStack(), getGuiLeft() + slot.xDisplayPosition, getGuiTop() + slot.yDisplayPosition, mouseX, mouseY, false, 0, true);
+			}
+		}
+		return mouseX >= (getGuiLeft() + slot.xDisplayPosition) - 1 && mouseY >= (getGuiTop() + slot.yDisplayPosition) - 1 && mouseX < (getGuiLeft() + slot.xDisplayPosition) + 17 && mouseY < (getGuiTop() + slot.yDisplayPosition) + 17;
+	}
+
+	private void drawStackSize(PoseStack st, Font fr, long size, int x, int y) {
+		float scaleFactor = 0.6f;
+		RenderSystem.disableDepthTest();
+		RenderSystem.disableBlend();
+		String stackSize = ContainerStorageTerminal.formatNumber(size);
+		st.pushPose();
+		st.scale(scaleFactor, scaleFactor, scaleFactor);
+		st.translate(0, 0, 450);
+		float inverseScaleFactor = 1.0f / scaleFactor;
+		int X = (int) (((float) x + 0 + 16.0f - fr.width(stackSize) * scaleFactor) * inverseScaleFactor);
+		int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
+		fr.drawShadow(st, stackSize, X, Y, 16777215);
+		st.popPose();
+		RenderSystem.enableDepthTest();
 	}
 
 	protected boolean needsScrollBars() {

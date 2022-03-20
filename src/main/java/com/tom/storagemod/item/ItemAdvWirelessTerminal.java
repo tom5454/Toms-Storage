@@ -4,9 +4,12 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -34,7 +37,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-		ClientProxy.tooltip("adv_wireless_terminal", tooltip);
+		ClientProxy.tooltip("adv_wireless_terminal", tooltip, Config.advWirelessRange, Config.wirelessTermBeaconLvl, Config.wirelessTermBeaconLvlDim);
 		if(stack.hasTag() && stack.getTag().contains("BindX")) {
 			int x = stack.getTag().getInt("BindX");
 			int y = stack.getTag().getInt("BindY");
@@ -47,24 +50,23 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		ItemStack stack = playerIn.getItemInHand(handIn);
-		if(stack.hasTag() && stack.getTag().contains("BindX")) {
+		if(stack.hasTag() && stack.getTag().contains("BindX") && !worldIn.isClientSide) {
 			int x = stack.getTag().getInt("BindX");
 			int y = stack.getTag().getInt("BindY");
 			int z = stack.getTag().getInt("BindZ");
 			String dim = stack.getTag().getString("BindDim");
-			if(worldIn.dimension().location().toString().equals(dim)) {
-				if(playerIn.distanceToSqr(new Vec3(x, y, z)) < Config.advWirelessRange * Config.advWirelessRange) {
-					BlockHitResult lookingAt = new BlockHitResult(new Vec3(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
-					BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
-					if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
-						InteractionResult r = state.use(worldIn, playerIn, handIn, lookingAt);
-						return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
-					} else {
-						playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_invalid_block"), true);
-					}
+			Level termWorld = worldIn.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dim)));
+			if(termWorld.isLoaded(new BlockPos(x, y, z))) {
+				BlockHitResult lookingAt = new BlockHitResult(new Vec3(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
+				BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
+				if(state.is(StorageTags.REMOTE_ACTIVATE)) {
+					InteractionResult r = state.use(termWorld, playerIn, handIn, lookingAt);
+					return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
 				} else {
-					playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_out_of_range"), true);
+					playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_invalid_block"), true);
 				}
+			} else {
+				playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_out_of_range"), true);
 			}
 		}
 		return InteractionResultHolder.pass(playerIn.getItemInHand(handIn));
@@ -75,7 +77,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 		if(c.isSecondaryUseActive() && !c.getLevel().isClientSide) {
 			BlockPos pos = c.getClickedPos();
 			BlockState state = c.getLevel().getBlockState(pos);
-			if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
+			if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 				ItemStack stack = c.getItemInHand();
 				if(!stack.hasTag())stack.setTag(new CompoundTag());
 				stack.getTag().putInt("BindX", pos.getX());

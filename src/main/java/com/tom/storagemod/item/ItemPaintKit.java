@@ -17,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -42,12 +43,10 @@ public class ItemPaintKit extends Item {
 			if(context.isSecondaryUseActive()) {
 				BlockState state = context.getLevel().getBlockState(context.getClickedPos());
 				BlockEntity tile = context.getLevel().getBlockEntity(context.getClickedPos());
-				if(tile == null && state.canOcclude()) {
+				if(tile == null && state.canOcclude() && Block.isShapeFullBlock(state.getShape(context.getLevel(), context.getClickedPos()))) {
 					ItemStack is = context.getItemInHand();
 					if(!is.hasTag())is.setTag(new CompoundTag());
 					is.getTag().put("block", NbtUtils.writeBlockState(state));
-					//ITextComponent tc = new TranslationTextComponent("tooltip.toms_storage.set_paint", state.getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GREEN));
-					//context.getPlayer().sendStatusMessage(tc, true);
 				}
 				return InteractionResult.SUCCESS;
 			} else {

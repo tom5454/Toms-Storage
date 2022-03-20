@@ -28,14 +28,14 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-		ClientProxy.tooltip("wireless_terminal", tooltip);
+		ClientProxy.tooltip("wireless_terminal", tooltip, Config.wirelessRange);
 	}
 
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		BlockHitResult lookingAt = (BlockHitResult) playerIn.pick(Config.wirelessRange, 0f, true);
 		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
-		if(StorageTags.REMOTE_ACTIVATE.contains(state.getBlock())) {
+		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 			InteractionResult r = state.use(worldIn, playerIn, handIn, lookingAt);
 			return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
 		} else {

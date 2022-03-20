@@ -24,8 +24,9 @@ import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
+import com.tom.storagemod.util.IProxy;
 
-public class TileEntityInventoryCableConnectorBase extends BlockEntity implements TickableServer {
+public class TileEntityInventoryCableConnectorBase extends TileEntityPainted implements TickableServer {
 
 	public TileEntityInventoryCableConnectorBase(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 		super(tileEntityTypeIn, pos, state);
@@ -52,7 +53,7 @@ public class TileEntityInventoryCableConnectorBase extends BlockEntity implement
 				BlockPos cp = toCheck.pop();
 				if(!checkedBlocks.contains(cp)) {
 					checkedBlocks.add(cp);
-					if(level.hasChunkAt(cp)) {
+					if(level.isLoaded(cp)) {
 						state = level.getBlockState(cp);
 						if(state.getBlock() == StorageMod.connector) {
 							BlockEntity te = level.getBlockEntity(cp);
@@ -71,12 +72,16 @@ public class TileEntityInventoryCableConnectorBase extends BlockEntity implement
 					if(checkedBlocks.size() > Config.invConnectorMax)break;
 				}
 			}
-			if(pointedAt == null || !pointedAt.isPresent()) {
-				BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
-				if(te != null) {
-					pointedAt = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
-				}
-			}
+			pointedAt = getPointedAt(worldPosition.relative(facing), facing);
+		}
+	}
+
+	protected LazyOptional<IItemHandler> getPointedAt(BlockPos pos, Direction facing) {
+		BlockEntity te = level.getBlockEntity(pos);
+		if(te != null) {
+			return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
+		} else {
+			return null;
 		}
 	}
 
@@ -84,16 +89,20 @@ public class TileEntityInventoryCableConnectorBase extends BlockEntity implement
 		return pointedAt == null ? LazyOptional.empty() : pointedAt;
 	}
 
-	protected LazyOptional<IItemHandler> getCapability() {
+	protected LazyOptional<IItemHandler> makeCapability() {
 		return LazyOptional.of(InvHandler::new);
+	}
+
+	protected LazyOptional<IItemHandler> getCapability() {
+		if (this.invHandler == null)
+			this.invHandler = makeCapability();
+		return this.invHandler;
 	}
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			if (this.invHandler == null)
-				this.invHandler = getCapability();
-			return this.invHandler.cast();
+			return this.getCapability().cast();
 		}
 		return super.getCapability(cap, side);
 	}

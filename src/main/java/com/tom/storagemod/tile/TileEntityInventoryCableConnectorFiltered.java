@@ -16,9 +16,16 @@ import net.minecraftforge.items.IItemHandler;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.ContainerFiltered;
+import com.tom.storagemod.util.FilteredInventoryHandler;
 
 public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements MenuProvider {
-	private SimpleContainer filter = new SimpleContainer(9);
+	private SimpleContainer filter = new SimpleContainer(9) {
+
+		@Override
+		public boolean stillValid(Player p_59619_) {
+			return TileEntityInventoryCableConnectorFiltered.this.stillValid(p_59619_);
+		}
+	};
 
 	public TileEntityInventoryCableConnectorFiltered(BlockPos pos, BlockState state) {
 		super(StorageMod.invCableConnectorFilteredTile, pos, state);
@@ -54,5 +61,13 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	@Override
 	public Component getDisplayName() {
 		return new TranslatableComponent("ts.connector_filtered");
+	}
+
+	public boolean stillValid(Player p_59619_) {
+		if (this.level.getBlockEntity(this.worldPosition) != this) {
+			return false;
+		} else {
+			return !(p_59619_.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > 64.0D);
+		}
 	}
 }

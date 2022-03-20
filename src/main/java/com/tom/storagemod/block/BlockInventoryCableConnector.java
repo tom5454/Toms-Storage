@@ -6,6 +6,10 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -14,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -27,10 +32,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
@@ -47,8 +54,12 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 	protected VoxelShape[][] shapes;
 
 	public BlockInventoryCableConnector() {
-		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
+		this(false);
 		setRegistryName("ts.inventory_cable_connector");
+	}
+
+	protected BlockInventoryCableConnector(boolean dummy) {
+		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
 		this.shapes = this.makeShapes(0.125f);
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)
@@ -64,6 +75,7 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		ClientProxy.tooltip("inventory_cable_connector", tooltip);
+		ClientProxy.tooltip("inventory_cable_connector_link", false, tooltip, Config.invLinkBeaconLvl, Config.invLinkBeaconLvlDim);
 	}
 
 	@Override
@@ -99,7 +111,6 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return withConnectionProperties(defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite()), context.getLevel(), context.getClickedPos())
-				//with(COLOR, context.getItem().hasTag() ? DyeColor.byId(context.getItem().getTag().getInt("color")) : DyeColor.WHITE).
 				;
 	}
 
@@ -140,20 +151,6 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 		Direction f = state.getValue(FACING);
 		return (dir != f && IInventoryCable.canConnect(block, dir)) || (dir == f && !block.isAir());
 	}
-
-	/*@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
-			Hand handIn, BlockRayTraceResult hit) {
-		//this.shapes = this.makeShapes(0.125f);
-		ItemStack held = player.getHeldItem(handIn);
-		DyeColor color = DyeColor.getColor(held);
-		if(color != null) {
-			if(!player.isCreative())held.shrink(1);
-			worldIn.setBlockState(pos, state.with(COLOR, color));
-			return ActionResultType.SUCCESS;
-		}
-		return ActionResultType.PASS;
-	}*/
 
 	@Override
 	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {
@@ -262,5 +259,30 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 
 	public static VoxelShape box(double xMin, double yMin, double zMin, double xMax, double yMax, double zMax) {
 		return Block.box(Math.min(xMin, xMax), Math.min(yMin, yMax), Math.min(zMin, zMax), Math.max(xMin, xMax), Math.max(yMin, yMax), Math.max(zMin, zMax));
+	}
+
+	@Override
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
+			InteractionHand handIn, BlockHitResult hit) {
+		Direction f = state.getValue(FACING);
+		BlockState pointedAt = world.getBlockState(pos.relative(f));
+		if(player.getItemInHand(handIn).isEmpty() && pointedAt.is(Blocks.BEACON)) {
+			if (world.isClientSide) {
+				return InteractionResult.SUCCESS;
+			}
+
+			BlockEntity blockEntity_1 = world.getBlockEntity(pos);
+			if (blockEntity_1 instanceof TileEntityInventoryCableConnector) {
+				TileEntityInventoryCableConnector te = (TileEntityInventoryCableConnector) blockEntity_1;
+				if(te.stillValid(player))
+					player.openMenu(te);
+				else {
+					player.displayClientMessage(new TranslatableComponent("chat.toms_storage.inv_link_access_denied"), true);
+					return InteractionResult.PASS;
+				}
+			}
+			return InteractionResult.SUCCESS;
+		}
+		return InteractionResult.PASS;
 	}
 }
