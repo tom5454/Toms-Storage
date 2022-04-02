@@ -46,6 +46,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	public void updateServer() {
 		long time = world.getTime();
 		if(time % 20 == 0) {
+			CablePathCache.Clear();
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			toCheck.add(pos);
