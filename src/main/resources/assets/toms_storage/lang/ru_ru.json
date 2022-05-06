@@ -17,7 +17,7 @@
 	"item.toms_storage.ts.wireless_terminal": "Беспроводной терминал",
 	"item.toms_storage.ts.adv_wireless_terminal": "Улучшенный беспроводной терминал",
 	
-	"itemGroup.toms_storage": "Tom's Simple Storage",
+	"itemGroup.toms_storage.tab": "Tom's Simple Storage",
 	
 	"ts.storage_terminal": "Терминал хран.",
 	"ts.crafting_terminal": "Крафт. Терминал",
