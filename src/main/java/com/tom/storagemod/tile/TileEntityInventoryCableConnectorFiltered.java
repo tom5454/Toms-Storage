@@ -11,7 +11,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
@@ -57,6 +56,6 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 
 	@Override
 	public Text getDisplayName() {
-		return new TranslatableText("ts.connector_filtered");
+		return Text.translatable("ts.connector_filtered");
 	}
 }

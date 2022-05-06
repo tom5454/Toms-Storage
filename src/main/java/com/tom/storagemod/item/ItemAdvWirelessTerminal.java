@@ -12,7 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -44,7 +43,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 			int y = stack.getNbt().getInt("BindY");
 			int z = stack.getNbt().getInt("BindZ");
 			String dim = stack.getNbt().getString("BindDim");
-			tooltip.add(new TranslatableText("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
+			tooltip.add(Text.translatable("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
 	}
 
@@ -64,10 +63,10 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 					ActionResult r = state.onUse(termWorld, playerIn, handIn, lookingAt);
 					return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
 				} else {
-					playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_invalid_block"), true);
+					playerIn.sendMessage(Text.translatable("chat.toms_storage.terminal_invalid_block"), true);
 				}
 			} else {
-				playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
+				playerIn.sendMessage(Text.translatable("chat.toms_storage.terminal_out_of_range"), true);
 			}
 		}
 		return TypedActionResult.pass(playerIn.getStackInHand(handIn));
@@ -86,7 +85,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 				stack.getNbt().putInt("BindZ", pos.getZ());
 				stack.getNbt().putString("BindDim", c.getWorld().getRegistryKey().getValue().toString());
 				if(c.getPlayer() != null)
-					c.getPlayer().sendMessage(new TranslatableText("chat.toms_storage.terminal_bound"), true);
+					c.getPlayer().sendMessage(Text.translatable("chat.toms_storage.terminal_bound"), true);
 				return ActionResult.SUCCESS;
 			}
 		}

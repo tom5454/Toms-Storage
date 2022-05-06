@@ -15,12 +15,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.model.UnbakedModel;
@@ -28,9 +28,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -56,11 +54,11 @@ public class StorageModClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		ScreenRegistry.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
-		ScreenRegistry.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
-		ScreenRegistry.register(StorageMod.filteredConatiner, GuiFiltered::new);
-		ScreenRegistry.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
-		ScreenRegistry.register(StorageMod.inventoryLink, GuiInventoryLink::new);
+		HandledScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
+		HandledScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
+		HandledScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
+		HandledScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
+		HandledScreens.register(StorageMod.inventoryLink, GuiInventoryLink::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.paintedTrim, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
@@ -169,10 +167,10 @@ public class StorageModClient implements ClientModInitializer {
 		if(Screen.hasShiftDown()) {
 			String[] sp = I18n.translate("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
-				tooltip.add(new LiteralText(sp[i]));
+				tooltip.add(Text.literal(sp[i]));
 			}
 		} else if(shift) {
-			tooltip.add(new TranslatableText("tooltip.toms_storage.hold_shift_for_info").formatted(Formatting.ITALIC, Formatting.GRAY));
+			tooltip.add(Text.translatable("tooltip.toms_storage.hold_shift_for_info").formatted(Formatting.ITALIC, Formatting.GRAY));
 		}
 	}
 }

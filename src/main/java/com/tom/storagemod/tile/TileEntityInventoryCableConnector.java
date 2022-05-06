@@ -14,7 +14,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -111,7 +110,7 @@ public class TileEntityInventoryCableConnector extends TileEntityInventoryCableC
 
 	@Override
 	public Text getDisplayName() {
-		return new TranslatableText("ts.inventory_connector");
+		return Text.translatable("ts.inventory_connector");
 	}
 
 	@Override

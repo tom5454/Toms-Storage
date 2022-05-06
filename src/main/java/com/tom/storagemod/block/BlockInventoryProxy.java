@@ -26,7 +26,6 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -56,11 +55,11 @@ public class BlockInventoryProxy extends BlockWithEntity implements IPaintable {
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
+		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_proxy", tooltip);
 		if(Screen.hasShiftDown()) {
-			tooltip.add(new TranslatableText("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", new TranslatableText("tooltip.toms_storage.inventory_proxy.ignoreSize")));
-			tooltip.add(new TranslatableText("tooltip.toms_storage.inventory_proxy.value", "maxCount", new TranslatableText("tooltip.toms_storage.inventory_proxy.maxCount.arg"), new TranslatableText("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
+			tooltip.add(Text.translatable("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", Text.translatable("tooltip.toms_storage.inventory_proxy.ignoreSize")));
+			tooltip.add(Text.translatable("tooltip.toms_storage.inventory_proxy.value", "maxCount", Text.translatable("tooltip.toms_storage.inventory_proxy.maxCount.arg"), Text.translatable("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
 		}
 	}
 

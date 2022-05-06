@@ -14,7 +14,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
@@ -34,7 +33,7 @@ public class BlockInventoryCableFramedPainted extends BlockWithEntity implements
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
+		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 

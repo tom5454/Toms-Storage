@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.AbstractRandom;
 import net.minecraft.world.BlockRenderView;
 
 import com.mojang.datafixers.util.Pair;
@@ -52,7 +52,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 
 	@Override
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos,
-			Supplier<Random> randomSupplier, RenderContext context) {
+			Supplier<AbstractRandom> randomSupplier, RenderContext context) {
 		BlockEntity tile = blockView.getBlockEntity(pos);
 		if(tile instanceof TileEntityPainted) {
 			try {
@@ -83,7 +83,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitItemQuads(ItemStack stack, Supplier<AbstractRandom> randomSupplier, RenderContext context) {
 
 	}
 
@@ -93,7 +93,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public List<BakedQuad> getQuads(BlockState arg0, Direction arg1, Random arg2) {
+	public List<BakedQuad> getQuads(BlockState arg0, Direction arg1, AbstractRandom arg2) {
 		return fallback.getQuads(arg0, arg1, arg2);
 	}
 

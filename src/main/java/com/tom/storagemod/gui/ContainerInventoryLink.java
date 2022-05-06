@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 
@@ -73,5 +74,10 @@ public class ContainerInventoryLink extends ScreenHandler implements IDataReceiv
 			sentList = true;
 		}
 		super.sendContentUpdates();
+	}
+
+	@Override
+	public ItemStack transferSlot(PlayerEntity player, int index) {
+		return ItemStack.EMPTY;
 	}
 }

@@ -13,9 +13,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -43,7 +41,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.drawMouseoverTooltip(matrixStack, mouseX, mouseY);
 		if(lessThanBtn.isHovered()) {
-			renderTooltip(matrixStack, Arrays.stream(I18n.translate("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(LiteralText::new).collect(Collectors.toList()), mouseX, mouseY);
+			renderTooltip(matrixStack, Arrays.stream(I18n.translate("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(Text::literal).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
@@ -61,7 +59,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		clearChildren();
 		amountBtns.clear();
 		super.init();
-		textF = new TextFieldWidget(textRenderer, x + 70, y + 41, 89, textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.level_emitter_amount"));
+		textF = new TextFieldWidget(textRenderer, x + 70, y + 41, 89, textRenderer.fontHeight, Text.translatable("narrator.toms_storage.level_emitter_amount"));
 		textF.setMaxLength(100);
 		textF.setDrawsBackground(false);
 		textF.setVisible(true);
@@ -148,7 +146,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		private ButtonWidget btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new ButtonWidget(GuiLevelEmitter.this.x + x, GuiLevelEmitter.this.y + y + 16, len, 20, new LiteralText((v > 0 ? "+" : "") + v), this::evt);
+			btn = new ButtonWidget(GuiLevelEmitter.this.x + x, GuiLevelEmitter.this.y + y + 16, len, 20, Text.literal((v > 0 ? "+" : "") + v), this::evt);
 			addDrawableChild(btn);
 			this.v = v;
 			this.sv = sv;
@@ -163,9 +161,9 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 
 		private void update() {
 			if(hasShiftDown()) {
-				btn.setMessage(new LiteralText((sv > 0 ? "+" : "") + sv));
+				btn.setMessage(Text.literal((sv > 0 ? "+" : "") + sv));
 			} else {
-				btn.setMessage(new LiteralText((v > 0 ? "+" : "") + v));
+				btn.setMessage(Text.literal((v > 0 ? "+" : "") + v));
 			}
 		}
 	}

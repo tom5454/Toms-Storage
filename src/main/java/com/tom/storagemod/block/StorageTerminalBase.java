@@ -19,7 +19,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -73,7 +73,7 @@ public abstract class StorageTerminalBase extends BlockWithEntity implements Wat
 			if(term.canInteractWith(player)) {
 				player.openHandledScreen(term);
 			} else {
-				player.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
+				player.sendMessage(Text.translatable("chat.toms_storage.terminal_out_of_range"), true);
 			}
 		}
 		return ActionResult.SUCCESS;

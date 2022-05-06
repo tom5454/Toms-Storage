@@ -22,10 +22,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -125,7 +123,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		clearChildren();
 		playerInventoryTitleY = backgroundHeight - 92;
 		super.init();
-		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
+		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, Text.translatable("narrator.toms_storage.terminal_search"));
 		this.searchField.setText(searchLast);
 		this.searchField.setMaxLength(100);
 		this.searchField.setDrawsBackground(false);
@@ -294,13 +292,13 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
 
 		if (buttonSortingType.isHovered()) {
-			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
+			renderTooltip(matrices, Text.translatable("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
 		}
 		if (buttonSearchType.isHovered()) {
-			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.search_" + buttonSearchType.state, "REI"), mouseX, mouseY);
+			renderTooltip(matrices, Text.translatable("tooltip.toms_storage.search_" + buttonSearchType.state, "REI"), mouseX, mouseY);
 		}
 		if (buttonCtrlMode.isHovered()) {
-			renderTooltip(matrices, Arrays.stream(I18n.translate("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(LiteralText::new).collect(Collectors.toList()), mouseX, mouseY);
+			renderTooltip(matrices, Arrays.stream(I18n.translate("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(Text::literal).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
@@ -508,7 +506,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				// list.add(I18n.format("tomsmod.gui.amount", stack.stackSize));
 				if (extraInfo != null && extraInfo.length > 0) {
 					for (int i = 0; i < extraInfo.length; i++) {
-						list.add(new LiteralText(extraInfo[i]));
+						list.add(Text.literal(extraInfo[i]));
 					}
 				}
 				for (int i = 0;i < list.size();++i) {
@@ -573,7 +571,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		protected int texX = 194;
 		protected int texY = 30;
 		public GuiButton(int x, int y, int tile, PressAction pressable) {
-			super(x, y, 16, 16, new LiteralText(""), pressable);
+			super(x, y, 16, 16, Text.literal(""), pressable);
 			this.tile = tile;
 		}
 

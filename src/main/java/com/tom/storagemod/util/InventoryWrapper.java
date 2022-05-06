@@ -103,6 +103,6 @@ public class InventoryWrapper {
 
 	@Override
 	public String toString() {
-		return inv instanceof Nameable ? ((Nameable)inv).getName().asString() : "";
+		return inv instanceof Nameable ? ((Nameable)inv).getName().getString() : "";
 	}
 }

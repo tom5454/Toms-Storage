@@ -56,7 +56,7 @@ public class StoredItemStack {
 
 		@Override
 		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getName().asString().compareTo(in2.getStack().getName().asString()) : -1);
+			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getName().getString().compareTo(in2.getStack().getName().getString()) : -1);
 			return this.reversed ? -c : c;
 		}
 
@@ -137,7 +137,7 @@ public class StoredItemStack {
 	}
 
 	public String getDisplayName() {
-		return stack.getName().asString();
+		return stack.getName().getString();
 	}
 
 	@Override

@@ -18,7 +18,6 @@ import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -41,6 +40,11 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		public boolean canUse(PlayerEntity paramPlayerEntity) {
 			return false;
 		}
+
+		@Override
+		public ItemStack transferSlot(PlayerEntity player, int index) {
+			return ItemStack.EMPTY;
+		}
 	};
 	private CraftingRecipe currentRecipe;
 	private final CraftingInventory craftMatrix = new CraftingInventory(craftingContainer, 3, 3);
@@ -57,7 +61,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 
 	@Override
 	public Text getDisplayName() {
-		return new TranslatableText("ts.crafting_terminal");
+		return Text.translatable("ts.crafting_terminal");
 	}
 
 	@Override

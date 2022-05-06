@@ -18,7 +18,6 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
@@ -54,7 +53,7 @@ public class BlockInventoryCableFramed extends Block implements IInventoryCable,
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
+		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 

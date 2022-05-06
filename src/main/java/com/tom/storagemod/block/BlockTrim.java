@@ -10,7 +10,6 @@ import net.minecraft.block.Material;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -27,7 +26,7 @@ public class BlockTrim extends Block implements ITrim, IPaintable {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView world, List<Text> tooltip, TooltipContext options) {
-		tooltip.add(new TranslatableText("tooltip.toms_storage.paintable"));
+		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("trim", tooltip);
 	}
 

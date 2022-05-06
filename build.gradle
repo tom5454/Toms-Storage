@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -35,7 +35,7 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:8.0.442"){
+	/*modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:8.0.442"){
 		exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
     }
@@ -46,10 +46,10 @@ dependencies {
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:8.0.442"){
         exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
-    }
+    }*/
 }
 
-minecraft {
+loom {
 	accessWidenerPath = file("src/main/resources/tomsstorage.accesswidener")
 }
 

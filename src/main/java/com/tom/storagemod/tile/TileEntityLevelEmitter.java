@@ -13,7 +13,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
@@ -152,7 +151,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 
 	@Override
 	public Text getDisplayName() {
-		return new TranslatableText("ts.level_emitter");
+		return Text.translatable("ts.level_emitter");
 	}
 
 	public boolean stillValid(PlayerEntity p_59619_) {

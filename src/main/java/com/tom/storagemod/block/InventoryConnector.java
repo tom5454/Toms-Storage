@@ -17,7 +17,6 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -70,7 +69,7 @@ public class InventoryConnector extends BlockWithEntity implements IInventoryCab
 			BlockEntity tile = world.getBlockEntity(pos);
 			if(tile instanceof TileEntityInventoryConnector) {
 				TileEntityInventoryConnector te = (TileEntityInventoryConnector) tile;
-				player.sendMessage(new TranslatableText("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.size()), true);
+				player.sendMessage(Text.translatable("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.size()), true);
 			}
 		}
 		return ActionResult.SUCCESS;

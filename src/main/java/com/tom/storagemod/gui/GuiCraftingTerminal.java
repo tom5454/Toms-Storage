@@ -14,9 +14,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -144,7 +142,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.setFocused(this.recipeBookGui);
 
 		if (buttonPullFromInv.isHovered()) {
-			renderTooltip(st, new TranslatableText("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
+			renderTooltip(st, Text.translatable("tooltip.toms_storage.pull_" + buttonPullFromInv.state), mouseX, mouseY);
 		}
 	}
 
@@ -222,7 +220,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	public class GuiButtonClear extends ButtonWidget {
 
 		public GuiButtonClear(int x, int y, PressAction pressable) {
-			super(x, y, 11, 11, new LiteralText(""), pressable);
+			super(x, y, 11, 11, Text.literal(""), pressable);
 		}
 
 		public void setX(int i) {

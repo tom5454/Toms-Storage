@@ -23,7 +23,6 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -134,18 +133,18 @@ public class BlockInventoryHopperBasic extends BlockWithEntity implements IInven
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					((TileEntityInventoryHopperBasic)te).setFilter(is.copy());
 					Text txt = ((TileEntityInventoryHopperBasic)te).getFilter().getName();
-					player.sendMessage(new TranslatableText("tooltip.toms_storage.filter_item", txt), true);
+					player.sendMessage(Text.translatable("tooltip.toms_storage.filter_item", txt), true);
 				}
 			} else {
 				BlockEntity te = world.getBlockEntity(pos);
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					if(player.isSneaking()) {
 						((TileEntityInventoryHopperBasic)te).setFilter(ItemStack.EMPTY);
-						player.sendMessage(new TranslatableText("tooltip.toms_storage.filter_item", new TranslatableText("tooltip.toms_storage.empty")), true);
+						player.sendMessage(Text.translatable("tooltip.toms_storage.filter_item", Text.translatable("tooltip.toms_storage.empty")), true);
 					} else {
 						ItemStack s = ((TileEntityInventoryHopperBasic)te).getFilter();
-						Text txt = s.isEmpty() ? new TranslatableText("tooltip.toms_storage.empty") : s.getName();
-						player.sendMessage(new TranslatableText("tooltip.toms_storage.filter_item", txt), true);
+						Text txt = s.isEmpty() ? Text.translatable("tooltip.toms_storage.empty") : s.getName();
+						player.sendMessage(Text.translatable("tooltip.toms_storage.filter_item", txt), true);
 					}
 				}
 			}

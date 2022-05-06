@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -28,7 +27,7 @@ public class BlockInventoryCableConnectorFiltered extends BlockInventoryCableCon
 	@Environment(EnvType.CLIENT)
 	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
 			TooltipContext flagIn) {
-		tooltip.add(new TranslatableText("tooltip.toms_storage.filtered"));
+		tooltip.add(Text.translatable("tooltip.toms_storage.filtered"));
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
 

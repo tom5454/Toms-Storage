@@ -25,7 +25,6 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -273,7 +272,7 @@ public class BlockInventoryCableConnector extends BlockWithEntity implements IIn
 				if(te.stillValid(player))
 					player.openHandledScreen(te);
 				else {
-					player.sendMessage(new TranslatableText("chat.toms_storage.inv_link_access_denied"), true);
+					player.sendMessage(Text.translatable("chat.toms_storage.inv_link_access_denied"), true);
 					return ActionResult.PASS;
 				}
 			}

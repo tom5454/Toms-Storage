@@ -15,7 +15,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
@@ -24,6 +23,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -168,11 +168,11 @@ public class StorageMod implements ModInitializer {
 		invHopperBasicTile = FabricBlockEntityTypeBuilder.create(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
 		levelEmitterTile = FabricBlockEntityTypeBuilder.create(TileEntityLevelEmitter::new, levelEmitter).build(null);
 
-		storageTerminal = ScreenHandlerRegistry.registerSimple(id("ts.storage_terminal.container"), ContainerStorageTerminal::new);
-		craftingTerminalCont = ScreenHandlerRegistry.registerSimple(id("ts.crafting_terminal.container"), ContainerCraftingTerminal::new);
-		filteredConatiner = ScreenHandlerRegistry.registerSimple(id("ts.filtered.container"), ContainerFiltered::new);
-		levelEmitterConatiner = ScreenHandlerRegistry.registerSimple(id("ts.level_emitter.container"), ContainerLevelEmitter::new);
-		inventoryLink = ScreenHandlerRegistry.registerSimple(id("ts.inventory_link.container"), ContainerInventoryLink::new);
+		storageTerminal = registerSimple(id("ts.storage_terminal.container"), ContainerStorageTerminal::new);
+		craftingTerminalCont = registerSimple(id("ts.crafting_terminal.container"), ContainerCraftingTerminal::new);
+		filteredConatiner = registerSimple(id("ts.filtered.container"), ContainerFiltered::new);
+		levelEmitterConatiner = registerSimple(id("ts.level_emitter.container"), ContainerLevelEmitter::new);
+		inventoryLink = registerSimple(id("ts.inventory_link.container"), ContainerInventoryLink::new);
 
 		Registry.register(Registry.BLOCK, id("ts.inventory_connector"), connector);
 		Registry.register(Registry.BLOCK, id("ts.storage_terminal"), terminal);
@@ -254,6 +254,11 @@ public class StorageMod implements ModInitializer {
 			multiblockInvs = null;
 			return ActionResult.PASS;
 		});
+	}
+
+	private static <T extends ScreenHandler> ScreenHandlerType<T> registerSimple(Identifier id, ScreenHandlerType.Factory<T> factory) {
+		ScreenHandlerType<T> type = new ScreenHandlerType<>(factory);
+		return Registry.register(Registry.SCREEN_HANDLER, id, type);
 	}
 
 	private static void registerItemForBlock(Block block) {
