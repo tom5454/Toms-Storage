@@ -29,6 +29,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.block.BlockInventoryCable;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
@@ -112,6 +115,7 @@ public class StorageMod implements ModInitializer {
 	public static ScreenHandlerType<ContainerLevelEmitter> levelEmitterConatiner;
 	public static ScreenHandlerType<ContainerInventoryLink> inventoryLink;
 
+	public static final Gson gson = new GsonBuilder().create();
 	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
 	private static Config LOADED_CONFIG = configHolder.getConfig();
 	public static Config CONFIG = new Config();
@@ -233,7 +237,7 @@ public class StorageMod implements ModInitializer {
 		ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, sync) -> {
 			PacketByteBuf packet = PacketByteBufs.create();
 			try (OutputStreamWriter writer = new OutputStreamWriter(new ByteBufOutputStream(packet))){
-				Config.gson.toJson(LOADED_CONFIG, writer);
+				gson.toJson(LOADED_CONFIG, writer);
 			} catch (IOException e) {
 				LOGGER.warn("Error sending config sync", e);
 			}

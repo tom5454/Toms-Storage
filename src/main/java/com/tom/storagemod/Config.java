@@ -10,14 +10,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import me.shedaniel.autoconfig.ConfigData;
 
 @me.shedaniel.autoconfig.annotation.Config(name = "toms_storage")
 public class Config implements ConfigData {
-	public static final Gson gson = new GsonBuilder().create();
 	public boolean onlyTrims = false;
 	public int invRange = 16;
 	public int wirelessRange = 16;

@@ -135,7 +135,7 @@ public class StorageModClient implements ClientModInitializer {
 		ClientLoginNetworking.registerGlobalReceiver(StorageMod.id("config"), (mc, handler, buf, fc) -> {
 			Config read;
 			try (InputStreamReader reader = new InputStreamReader(new ByteBufInputStream(buf))){
-				read = Config.gson.fromJson(reader, Config.class);
+				read = StorageMod.gson.fromJson(reader, Config.class);
 			} catch (Exception e) {
 				StorageMod.LOGGER.warn("Error loading server config", e);
 				return CompletableFuture.completedFuture(null);

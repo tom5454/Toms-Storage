@@ -31,20 +31,26 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:3.0.0") {
+	modImplementation("com.terraformersmc:modmenu:3.1.0") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:7.0.339"){
-        exclude(group: "net.fabricmc.fabric-api")
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:8.0.442"){
+		exclude(group: "net.fabricmc.fabric-api")
+        exclude(group: "me.shedaniel.cloth")
     }
-    modRuntime("me.shedaniel:RoughlyEnoughItems-fabric:7.0.339"){
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:8.0.442") {
+       exclude(group: "net.fabricmc.fabric-api")
+       exclude(group: "me.shedaniel.cloth")
+    }
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:8.0.442"){
         exclude(group: "net.fabricmc.fabric-api")
+        exclude(group: "me.shedaniel.cloth")
     }
 }
 
 minecraft {
-	accessWidener = file("src/main/resources/tomsstorage.accesswidener")
+	accessWidenerPath = file("src/main/resources/tomsstorage.accesswidener")
 }
 
 processResources {
