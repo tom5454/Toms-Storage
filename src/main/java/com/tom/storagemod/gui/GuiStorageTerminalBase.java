@@ -131,6 +131,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.searchField.setBordered(false);
 		this.searchField.setVisible(true);
 		this.searchField.setTextColor(16777215);
+		this.searchField.setValue(searchLast);
+		searchLast = "";
 		addRenderableWidget(searchField);
 		buttonSortingType = addRenderableWidget(new GuiButton(leftPos - 18, topPos + 5, 0, b -> {
 			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());

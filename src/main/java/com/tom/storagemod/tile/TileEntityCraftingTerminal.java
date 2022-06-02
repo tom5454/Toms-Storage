@@ -115,7 +115,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 			craft(player);
 			craftedItemsList.add(crafted.copy());
 			amountCrafted += crafted.getCount();
-		} while(ItemStack.isSame(crafted, craftResult.getItem(0)) && (amountCrafted+crafted.getCount()) < crafted.getMaxStackSize());
+		} while(ItemStack.isSame(crafted, craftResult.getItem(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxStackSize());
 
 		for (ItemStack craftedItem : craftedItemsList) {
 			if (!player.getInventory().add(craftedItem.copy())) {

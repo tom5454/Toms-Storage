@@ -50,23 +50,27 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
 		ItemStack stack = playerIn.getItemInHand(handIn);
-		if(stack.hasTag() && stack.getTag().contains("BindX") && !worldIn.isClientSide) {
-			int x = stack.getTag().getInt("BindX");
-			int y = stack.getTag().getInt("BindY");
-			int z = stack.getTag().getInt("BindZ");
-			String dim = stack.getTag().getString("BindDim");
-			Level termWorld = worldIn.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dim)));
-			if(termWorld.isLoaded(new BlockPos(x, y, z))) {
-				BlockHitResult lookingAt = new BlockHitResult(new Vec3(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
-				BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
-				if(state.is(StorageTags.REMOTE_ACTIVATE)) {
-					InteractionResult r = state.use(termWorld, playerIn, handIn, lookingAt);
-					return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
+		if(stack.hasTag() && stack.getTag().contains("BindX")) {
+			if(!worldIn.isClientSide) {
+				int x = stack.getTag().getInt("BindX");
+				int y = stack.getTag().getInt("BindY");
+				int z = stack.getTag().getInt("BindZ");
+				String dim = stack.getTag().getString("BindDim");
+				Level termWorld = worldIn.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dim)));
+				if(termWorld.isLoaded(new BlockPos(x, y, z))) {
+					BlockHitResult lookingAt = new BlockHitResult(new Vec3(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
+					BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
+					if(state.is(StorageTags.REMOTE_ACTIVATE)) {
+						InteractionResult r = state.use(termWorld, playerIn, handIn, lookingAt);
+						return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
+					} else {
+						playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_invalid_block"), true);
+					}
 				} else {
-					playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_invalid_block"), true);
+					playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_out_of_range"), true);
 				}
 			} else {
-				playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_out_of_range"), true);
+				return InteractionResultHolder.consume(playerIn.getItemInHand(handIn));
 			}
 		}
 		return InteractionResultHolder.pass(playerIn.getItemInHand(handIn));
@@ -74,20 +78,23 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 
 	@Override
 	public InteractionResult useOn(UseOnContext c) {
-		if(c.isSecondaryUseActive() && !c.getLevel().isClientSide) {
-			BlockPos pos = c.getClickedPos();
-			BlockState state = c.getLevel().getBlockState(pos);
-			if(state.is(StorageTags.REMOTE_ACTIVATE)) {
-				ItemStack stack = c.getItemInHand();
-				if(!stack.hasTag())stack.setTag(new CompoundTag());
-				stack.getTag().putInt("BindX", pos.getX());
-				stack.getTag().putInt("BindY", pos.getY());
-				stack.getTag().putInt("BindZ", pos.getZ());
-				stack.getTag().putString("BindDim", c.getLevel().dimension().location().toString());
-				if(c.getPlayer() != null)
-					c.getPlayer().displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_bound"), true);
-				return InteractionResult.SUCCESS;
-			}
+		if(c.isSecondaryUseActive()) {
+			if(!c.getLevel().isClientSide) {
+				BlockPos pos = c.getClickedPos();
+				BlockState state = c.getLevel().getBlockState(pos);
+				if(state.is(StorageTags.REMOTE_ACTIVATE)) {
+					ItemStack stack = c.getItemInHand();
+					if(!stack.hasTag())stack.setTag(new CompoundTag());
+					stack.getTag().putInt("BindX", pos.getX());
+					stack.getTag().putInt("BindY", pos.getY());
+					stack.getTag().putInt("BindZ", pos.getZ());
+					stack.getTag().putString("BindDim", c.getLevel().dimension().location().toString());
+					if(c.getPlayer() != null)
+						c.getPlayer().displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_bound"), true);
+					return InteractionResult.SUCCESS;
+				}
+			} else
+				return InteractionResult.CONSUME;
 		}
 		return InteractionResult.PASS;
 	}
