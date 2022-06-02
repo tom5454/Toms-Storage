@@ -96,5 +96,11 @@ publishing {
 	repositories {
 		// uncomment to publish to the local maven
 		// mavenLocal()
+		def mavenURL = System.getProperty("mavenDir")
+		if ("${mavenURL}" != "null") {
+			maven {
+				url = file(mavenURL)
+			}
+		}
 	}
 }

@@ -114,7 +114,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 			craft(player);
 			craftedItemsList.add(crafted.copy());
 			amountCrafted += crafted.getCount();
-		} while(ItemStack.areItemsEqual(crafted, craftResult.getStack(0)) && (amountCrafted+crafted.getCount()) < crafted.getMaxCount());
+		} while(ItemStack.areItemsEqual(crafted, craftResult.getStack(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxCount());
 
 		for (ItemStack craftedItem : craftedItemsList) {
 			if (!player.getInventory().insertStack(craftedItem.copy())) {
@@ -126,7 +126,6 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		}
 
 		crafted.onCraft(player.world, player, amountCrafted);
-		//BasicEventHooks.firePlayerCraftingEvent(player, ItemHandlerHelper.copyStackWithSize(crafted, amountCrafted), craftMatrix);
 	}
 
 	public void craft(PlayerEntity thePlayer) {

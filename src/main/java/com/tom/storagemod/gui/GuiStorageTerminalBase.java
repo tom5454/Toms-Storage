@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -129,6 +130,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.searchField.setDrawsBackground(false);
 		this.searchField.setVisible(true);
 		this.searchField.setEditableColor(16777215);
+		this.searchField.setText(searchLast);
+		searchLast = "";
 		addDrawableChild(searchField);
 		buttonSortingType = addDrawableChild(new GuiButton(x - 18, y + 5, 0, b -> {
 			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());
@@ -143,7 +146,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			refreshItemList = true;
 		}));
 		buttonSearchType = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*2, 2, b -> {
-			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);//ModList.get().isLoaded("jei") ||
+			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal || FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) ? 0b111 : 0b011);
 			buttonSearchType.state = searchType;
 			sendUpdate();
 		}) {

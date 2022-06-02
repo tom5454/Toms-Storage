@@ -31,7 +31,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.AbstractRandom;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -150,7 +150,7 @@ public class BlockLevelEmitter extends BlockWithEntity implements IInventoryCabl
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, AbstractRandom rand) {
+	public void randomDisplayTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
 		if (stateIn.get(POWERED)) {
 			Direction direction = stateIn.get(FACING).getOpposite();
 			double d0 = pos.getX() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;
