@@ -52,7 +52,7 @@ public class TileEntityPainted extends BlockEntity {
 			BlockState state = getWorld().getBlockState(getPos());
 			getWorld().updateListeners(getPos(), state, state, 3);
 
-			if(!world.isClient) {
+			if(world instanceof ServerWorld) {
 				ServerWorld world = (ServerWorld) getWorld();
 				world.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(getPos()), false).forEach(player -> {
 					player.networkHandler.sendPacket(toUpdatePacket());

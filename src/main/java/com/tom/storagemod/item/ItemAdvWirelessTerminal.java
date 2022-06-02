@@ -51,23 +51,27 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	public TypedActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		ItemStack stack = playerIn.getStackInHand(handIn);
-		if(stack.hasNbt() && stack.getNbt().contains("BindX") && !worldIn.isClient) {
-			int x = stack.getNbt().getInt("BindX");
-			int y = stack.getNbt().getInt("BindY");
-			int z = stack.getNbt().getInt("BindZ");
-			String dim = stack.getNbt().getString("BindDim");
-			World termWorld = worldIn.getServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, new Identifier(dim)));
-			if(termWorld.canSetBlock(new BlockPos(x, y, z))) {
-				BlockHitResult lookingAt = new BlockHitResult(new Vec3d(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
-				BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
-				if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
-					ActionResult r = state.onUse(termWorld, playerIn, handIn, lookingAt);
-					return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
+		if(stack.hasNbt() && stack.getNbt().contains("BindX")) {
+			if(!worldIn.isClient) {
+				int x = stack.getNbt().getInt("BindX");
+				int y = stack.getNbt().getInt("BindY");
+				int z = stack.getNbt().getInt("BindZ");
+				String dim = stack.getNbt().getString("BindDim");
+				World termWorld = worldIn.getServer().getWorld(RegistryKey.of(Registry.WORLD_KEY, new Identifier(dim)));
+				if(termWorld.canSetBlock(new BlockPos(x, y, z))) {
+					BlockHitResult lookingAt = new BlockHitResult(new Vec3d(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
+					BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
+					if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
+						ActionResult r = state.onUse(termWorld, playerIn, handIn, lookingAt);
+						return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
+					} else {
+						playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_invalid_block"), true);
+					}
 				} else {
-					playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_invalid_block"), true);
+					playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
 				}
 			} else {
-				playerIn.sendMessage(new TranslatableText("chat.toms_storage.terminal_out_of_range"), true);
+				return TypedActionResult.consume(playerIn.getStackInHand(handIn));
 			}
 		}
 		return TypedActionResult.pass(playerIn.getStackInHand(handIn));
@@ -75,20 +79,23 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext c) {
-		if(c.shouldCancelInteraction() && !c.getWorld().isClient) {
-			BlockPos pos = c.getBlockPos();
-			BlockState state = c.getWorld().getBlockState(pos);
-			if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
-				ItemStack stack = c.getStack();
-				if(!stack.hasNbt())stack.setNbt(new NbtCompound());
-				stack.getNbt().putInt("BindX", pos.getX());
-				stack.getNbt().putInt("BindY", pos.getY());
-				stack.getNbt().putInt("BindZ", pos.getZ());
-				stack.getNbt().putString("BindDim", c.getWorld().getRegistryKey().getValue().toString());
-				if(c.getPlayer() != null)
-					c.getPlayer().sendMessage(new TranslatableText("chat.toms_storage.terminal_bound"), true);
-				return ActionResult.SUCCESS;
-			}
+		if(c.shouldCancelInteraction()) {
+			if(!c.getWorld().isClient) {
+				BlockPos pos = c.getBlockPos();
+				BlockState state = c.getWorld().getBlockState(pos);
+				if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
+					ItemStack stack = c.getStack();
+					if(!stack.hasNbt())stack.setNbt(new NbtCompound());
+					stack.getNbt().putInt("BindX", pos.getX());
+					stack.getNbt().putInt("BindY", pos.getY());
+					stack.getNbt().putInt("BindZ", pos.getZ());
+					stack.getNbt().putString("BindDim", c.getWorld().getRegistryKey().getValue().toString());
+					if(c.getPlayer() != null)
+						c.getPlayer().sendMessage(new TranslatableText("chat.toms_storage.terminal_bound"), true);
+					return ActionResult.SUCCESS;
+				}
+			} else
+				return ActionResult.CONSUME;
 		}
 		return ActionResult.PASS;
 	}

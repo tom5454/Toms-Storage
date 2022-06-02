@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -45,6 +46,7 @@ import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
+import com.tom.storagemod.rei.REIPlugin;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends HandledScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
@@ -125,12 +127,14 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		clearChildren();
 		playerInventoryTitleY = backgroundHeight - 92;
 		super.init();
-		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new LiteralText(""));
+		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.terminal_search"));
 		this.searchField.setText(searchLast);
 		this.searchField.setMaxLength(100);
 		this.searchField.setDrawsBackground(false);
 		this.searchField.setVisible(true);
 		this.searchField.setEditableColor(16777215);
+		this.searchField.setText(searchLast);
+		searchLast = "";
 		addDrawableChild(searchField);
 		buttonSortingType = addDrawableChild(new GuiButton(x - 18, y + 5, 0, b -> {
 			comparator = SortingTypes.VALUES[(comparator.type() + 1) % SortingTypes.VALUES.length].create(comparator.isReversed());
@@ -145,7 +149,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			refreshItemList = true;
 		}));
 		buttonSearchType = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*2, 2, b -> {
-			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal) ? 0b111 : 0b011);//ModList.get().isLoaded("jei") ||
+			searchType = (searchType + 1) & ((this instanceof GuiCraftingTerminal || FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) ? 0b111 : 0b011);
 			buttonSearchType.state = searchType;
 			sendUpdate();
 		}) {
@@ -223,8 +227,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				getScreenHandler().scrollTo(0);
 				this.currentScroll = 0;
 				if ((searchType & 4) > 0) {
-					/*if(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
-						REIPlugin.setReiSearchText(searchString);*/
+					if(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
+						REIPlugin.setReiSearchText(searchString);
 				}
 				if ((searchType & 2) > 0) {
 					NbtCompound nbt = new NbtCompound();
