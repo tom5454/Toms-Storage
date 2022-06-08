@@ -32,7 +32,7 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 	private int globalCountLimit = 64;
 
 	public TileEntityInventoryProxy(BlockPos pos, BlockState state) {
-		super(StorageMod.invProxyTile, pos, state);
+		super(StorageMod.invProxyTile.get(), pos, state);
 	}
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {

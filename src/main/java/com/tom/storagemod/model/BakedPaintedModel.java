@@ -2,7 +2,6 @@ package com.tom.storagemod.model;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
@@ -14,6 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -66,7 +66,7 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand, IModelData modelData) {
+	public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand, IModelData modelData) {
 		BakedModel model = null;
 		Supplier<BlockState> blockstateSupp = modelData.getData(TileEntityPainted.FACADE_STATE);
 		BlockState blockstate = null;

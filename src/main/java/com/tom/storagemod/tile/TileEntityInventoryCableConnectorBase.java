@@ -55,7 +55,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 					checkedBlocks.add(cp);
 					if(level.isLoaded(cp)) {
 						state = level.getBlockState(cp);
-						if(state.getBlock() == StorageMod.connector) {
+						if(state.getBlock() == StorageMod.connector.get()) {
 							BlockEntity te = level.getBlockEntity(cp);
 							if(te instanceof TileEntityInventoryConnector) {
 								master = (TileEntityInventoryConnector) te;

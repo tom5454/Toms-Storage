@@ -29,7 +29,6 @@ public class ItemPaintKit extends Item {
 
 	public ItemPaintKit() {
 		super(new Properties().durability(100).tab(StorageMod.STORAGE_MOD_TAB));
-		setRegistryName("ts.paint_kit");
 	}
 
 	@Override

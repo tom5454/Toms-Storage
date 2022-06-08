@@ -31,7 +31,6 @@ public class BlockOpenCrate extends BaseEntityBlock {
 
 	public BlockOpenCrate() {
 		super(Block.Properties.of(Material.WOOD).strength(3));
-		setRegistryName("ts.open_crate");
 		registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN));
 	}
 

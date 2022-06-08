@@ -12,8 +12,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -43,7 +41,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(matrixStack, mouseX, mouseY);
 		if(lessThanBtn.isHoveredOrFocused()) {
-			renderComponentTooltip(matrixStack, Arrays.stream(I18n.get("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+			renderComponentTooltip(matrixStack, Arrays.stream(I18n.get("tooltip.toms_storage.lvlEm_lt_" + lessThanBtn.state).split("\\\\")).map(Component::literal).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
@@ -61,7 +59,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 		clearWidgets();
 		amountBtns.clear();
 		super.init();
-		textF = new EditBox(font, leftPos + 70, topPos + 41, 89, font.lineHeight, new TranslatableComponent("narrator.toms_storage.level_emitter_amount"));
+		textF = new EditBox(font, leftPos + 70, topPos + 41, 89, font.lineHeight, Component.translatable("narrator.toms_storage.level_emitter_amount"));
 		textF.setMaxLength(100);
 		textF.setBordered(false);
 		textF.setVisible(true);
@@ -147,7 +145,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 		private Button btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new Button(leftPos + x, topPos + y + 16, len, 20, new TextComponent((v > 0 ? "+" : "") + v), this::evt);
+			btn = new Button(leftPos + x, topPos + y + 16, len, 20, Component.literal((v > 0 ? "+" : "") + v), this::evt);
 			addRenderableWidget(btn);
 			this.v = v;
 			this.sv = sv;
@@ -162,9 +160,9 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 
 		private void update() {
 			if(hasShiftDown()) {
-				btn.setMessage(new TextComponent((sv > 0 ? "+" : "") + sv));
+				btn.setMessage(Component.literal((sv > 0 ? "+" : "") + sv));
 			} else {
-				btn.setMessage(new TextComponent((v > 0 ? "+" : "") + v));
+				btn.setMessage(Component.literal((v > 0 ? "+" : "") + v));
 			}
 		}
 	}

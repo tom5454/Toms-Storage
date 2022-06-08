@@ -17,7 +17,6 @@ public class StorageTerminal extends StorageTerminalBase {
 
 	public StorageTerminal() {
 		super();
-		setRegistryName("ts.storage_terminal");
 	}
 
 	@Override

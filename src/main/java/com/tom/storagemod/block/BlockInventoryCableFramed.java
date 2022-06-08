@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -39,7 +38,6 @@ public class BlockInventoryCableFramed extends BaseEntityBlock implements IInven
 
 	public BlockInventoryCableFramed() {
 		super(Block.Properties.of(Material.WOOD).strength(2).noOcclusion());
-		setRegistryName("ts.inventory_cable_framed");
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)
 				.setValue(UP, false)
@@ -52,7 +50,7 @@ public class BlockInventoryCableFramed extends BaseEntityBlock implements IInven
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("inventory_cable", tooltip);
 	}
 

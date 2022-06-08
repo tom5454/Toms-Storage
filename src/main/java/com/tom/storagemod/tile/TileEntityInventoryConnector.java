@@ -21,6 +21,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
@@ -36,7 +37,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	private LazyOptional<IItemHandler> invHandler = LazyOptional.of(() -> handlers);
 
 	public TileEntityInventoryConnector(BlockPos pos, BlockState state) {
-		super(StorageMod.connectorTile, pos, state);
+		super(StorageMod.connectorTile.get(), pos, state);
 	}
 
 	@Override
@@ -105,7 +106,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 								if(inv.isPresent()) {
 									IItemHandler blockHandler = inv.orElse(null);
 									if(blockHandler == null) {
-										StorageMod.LOGGER.warn("Broken modded block at " + p + " in " + level.dimension().location().toString() + " block id: " + state.getBlock().delegate.name().toString());
+										StorageMod.LOGGER.warn("Broken modded block at " + p + " in " + level.dimension().location().toString() + " block id: " + ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString());
 									}
 									IItemHandler ihr = IProxy.resolve(blockHandler);
 									if(ihr instanceof MultiItemHandler) {

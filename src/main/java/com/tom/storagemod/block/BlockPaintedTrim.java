@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,13 +25,12 @@ public class BlockPaintedTrim extends BaseEntityBlock implements ITrim, IPaintab
 
 	public BlockPaintedTrim() {
 		super(Block.Properties.of(Material.WOOD).strength(3));
-		setRegistryName("ts.painted_trim");
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("trim", tooltip);
 	}
 
@@ -57,6 +55,6 @@ public class BlockPaintedTrim extends BaseEntityBlock implements ITrim, IPaintab
 	@Override
 	public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos,
 			Player player) {
-		return new ItemStack(StorageMod.inventoryTrim);
+		return new ItemStack(StorageMod.inventoryTrim.get());
 	}
 }

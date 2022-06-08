@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.MenuProvider;
@@ -38,7 +37,7 @@ public class TileEntityInventoryCableConnector extends TileEntityInventoryCableC
 	private boolean remote;
 
 	public TileEntityInventoryCableConnector(BlockPos pos, BlockState state) {
-		super(StorageMod.invCableConnectorTile, pos, state);
+		super(StorageMod.invCableConnectorTile.get(), pos, state);
 	}
 
 	@Override
@@ -115,7 +114,7 @@ public class TileEntityInventoryCableConnector extends TileEntityInventoryCableC
 
 	@Override
 	public Component getDisplayName() {
-		return new TranslatableComponent("ts.inventory_connector");
+		return Component.translatable("ts.inventory_connector");
 	}
 
 	@Override

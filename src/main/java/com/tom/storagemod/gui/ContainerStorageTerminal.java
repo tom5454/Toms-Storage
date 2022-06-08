@@ -60,7 +60,7 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 	public String search;
 
 	public ContainerStorageTerminal(int id, Inventory inv, TileEntityStorageTerminal te) {
-		this(StorageMod.storageTerminal, id, inv, te);
+		this(StorageMod.storageTerminal.get(), id, inv, te);
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
@@ -80,7 +80,7 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 	}
 
 	public ContainerStorageTerminal(int id, Inventory inv) {
-		this(StorageMod.storageTerminal, id, inv);
+		this(StorageMod.storageTerminal.get(), id, inv);
 		this.addPlayerSlots(inv, 8, 120);
 	}
 

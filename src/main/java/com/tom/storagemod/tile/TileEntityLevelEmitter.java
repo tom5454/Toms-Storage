@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +38,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 	private boolean lessThan;
 
 	public TileEntityLevelEmitter(BlockPos pos, BlockState state) {
-		super(StorageMod.levelEmitterTile, pos, state);
+		super(StorageMod.levelEmitterTile.get(), pos, state);
 	}
 
 	@Override
@@ -61,7 +60,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 						checkedBlocks.add(cp);
 						if(level.isLoaded(cp)) {
 							state = level.getBlockState(cp);
-							if(state.getBlock() == StorageMod.connector) {
+							if(state.getBlock() == StorageMod.connector.get()) {
 								BlockEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									top = ((TileEntityInventoryConnector) te).getInventory();
@@ -165,7 +164,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 
 	@Override
 	public Component getDisplayName() {
-		return new TranslatableComponent("ts.level_emitter");
+		return Component.translatable("ts.level_emitter");
 	}
 
 	public boolean stillValid(Player p_59619_) {

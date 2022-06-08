@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -55,7 +54,6 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 
 	public BlockInventoryCableConnector() {
 		this(false);
-		setRegistryName("ts.inventory_cable_connector");
 	}
 
 	protected BlockInventoryCableConnector(boolean dummy) {
@@ -277,7 +275,7 @@ public class BlockInventoryCableConnector extends BaseEntityBlock implements IIn
 				if(te.stillValid(player))
 					player.openMenu(te);
 				else {
-					player.displayClientMessage(new TranslatableComponent("chat.toms_storage.inv_link_access_denied"), true);
+					player.displayClientMessage(Component.translatable("chat.toms_storage.inv_link_access_denied"), true);
 					return InteractionResult.PASS;
 				}
 			}

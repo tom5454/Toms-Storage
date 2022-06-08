@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +30,6 @@ public class InventoryConnector extends BaseEntityBlock implements IInventoryCab
 
 	public InventoryConnector() {
 		super(Block.Properties.of(Material.WOOD).strength(3));
-		setRegistryName("ts.inventory_connector");
 	}
 
 	@Override
@@ -68,7 +66,7 @@ public class InventoryConnector extends BaseEntityBlock implements IInventoryCab
 			BlockEntity tile = worldIn.getBlockEntity(pos);
 			if(tile instanceof TileEntityInventoryConnector) {
 				TileEntityInventoryConnector te = (TileEntityInventoryConnector) tile;
-				player.displayClientMessage(new TranslatableComponent("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.getInvSize()), true);
+				player.displayClientMessage(Component.translatable("chat.toms_storage.inventory_connector.free_slots", te.getFreeSlotCount(), te.getInvSize()), true);
 			}
 		}
 		return InteractionResult.SUCCESS;

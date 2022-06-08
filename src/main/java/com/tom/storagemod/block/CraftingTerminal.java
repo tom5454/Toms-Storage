@@ -17,7 +17,6 @@ public class CraftingTerminal extends StorageTerminalBase {
 
 	public CraftingTerminal() {
 		super();
-		setRegistryName("ts.crafting_terminal");
 	}
 
 	@Override

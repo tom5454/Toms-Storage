@@ -7,7 +7,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -32,7 +31,6 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 
 	public ItemAdvWirelessTerminal() {
 		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
-		setRegistryName("ts.adv_wireless_terminal");
 	}
 
 	@Override
@@ -43,7 +41,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 			int y = stack.getTag().getInt("BindY");
 			int z = stack.getTag().getInt("BindZ");
 			String dim = stack.getTag().getString("BindDim");
-			tooltip.add(new TranslatableComponent("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
+			tooltip.add(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
 	}
 
@@ -64,10 +62,10 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 						InteractionResult r = state.use(termWorld, playerIn, handIn, lookingAt);
 						return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
 					} else {
-						playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_invalid_block"), true);
+						playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_invalid_block"), true);
 					}
 				} else {
-					playerIn.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_out_of_range"), true);
+					playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_out_of_range"), true);
 				}
 			} else {
 				return InteractionResultHolder.consume(playerIn.getItemInHand(handIn));
@@ -90,7 +88,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 					stack.getTag().putInt("BindZ", pos.getZ());
 					stack.getTag().putString("BindDim", c.getLevel().dimension().location().toString());
 					if(c.getPlayer() != null)
-						c.getPlayer().displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_bound"), true);
+						c.getPlayer().displayClientMessage(Component.translatable("chat.toms_storage.terminal_bound"), true);
 					return InteractionResult.SUCCESS;
 				}
 			} else

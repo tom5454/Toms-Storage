@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
@@ -22,13 +21,12 @@ public class BlockInventoryCableConnectorFramed extends BlockInventoryCableConne
 
 	public BlockInventoryCableConnectorFramed() {
 		super(false);
-		setRegistryName("ts.inventory_cable_connector_framed");
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("inventory_cable_connector", tooltip);
 	}
 

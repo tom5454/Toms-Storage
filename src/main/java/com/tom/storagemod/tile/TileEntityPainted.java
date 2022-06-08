@@ -25,7 +25,7 @@ public class TileEntityPainted extends BlockEntity {
 	private BlockState blockState;
 
 	public TileEntityPainted(BlockPos pos, BlockState state) {
-		super(StorageMod.paintedTile, pos, state);
+		super(StorageMod.paintedTile.get(), pos, state);
 	}
 
 	public TileEntityPainted(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {

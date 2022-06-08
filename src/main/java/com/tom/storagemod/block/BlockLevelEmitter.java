@@ -2,12 +2,12 @@ package com.tom.storagemod.block;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -45,7 +45,6 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 
 	public BlockLevelEmitter() {
 		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
-		setRegistryName("ts.level_emitter");
 		registerDefaultState(defaultBlockState()
 				.setValue(FACING, Direction.DOWN).setValue(POWERED, Boolean.valueOf(false)));
 	}
@@ -152,7 +151,7 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 	}
 
 	@Override
-	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, RandomSource rand) {
 		if (stateIn.getValue(POWERED)) {
 			Direction direction = stateIn.getValue(FACING).getOpposite();
 			double d0 = pos.getX() + 0.5D + (rand.nextDouble() - 0.5D) * 0.2D;

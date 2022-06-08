@@ -23,7 +23,6 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
 	public ItemWirelessTerminal() {
 		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
-		setRegistryName("ts.wireless_terminal");
 	}
 
 	@Override
@@ -44,8 +43,8 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 	}
 
 	public static boolean isPlayerHolding(Player player) {
-		return player.getMainHandItem().getItem() == StorageMod.wirelessTerminal ||
-				player.getOffhandItem().getItem() == StorageMod.wirelessTerminal;
+		return player.getMainHandItem().getItem() == StorageMod.wirelessTerminal.get() ||
+				player.getOffhandItem().getItem() == StorageMod.wirelessTerminal.get();
 	}
 
 	@Override

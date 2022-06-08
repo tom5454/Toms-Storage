@@ -1,5 +1,7 @@
 package com.tom.storagemod.item;
 
+import java.util.function.Function;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
@@ -10,14 +12,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.tom.storagemod.StorageMod;
+
 public class ItemBlockPainted extends BlockItem {
 
-	public ItemBlockPainted(Block block, Item.Properties p) {
-		super(block, p);
-		setRegistryName(block.getRegistryName());
+	public static Function<Block, Item> makeHidden() {
+		return b -> new ItemBlockPainted(b, new Item.Properties());
 	}
-	public ItemBlockPainted(Block block) {
-		this(block, new Item.Properties());
+
+	public static Function<Block, Item> make() {
+		return b -> new ItemBlockPainted(b, new Item.Properties().tab(StorageMod.STORAGE_MOD_TAB));
+	}
+
+	private ItemBlockPainted(Block block, Item.Properties p) {
+		super(block, p);
 	}
 
 	@Override

@@ -14,8 +14,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +27,7 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegistryObject;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -54,17 +53,17 @@ public class ClientProxy implements IProxy {
 
 	@Override
 	public void clientSetup() {
-		MenuScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
-		MenuScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
-		MenuScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
-		MenuScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
-		MenuScreens.register(StorageMod.inventoryLink, GuiInventoryLink::new);
+		MenuScreens.register(StorageMod.storageTerminal.get(), GuiStorageTerminal::new);
+		MenuScreens.register(StorageMod.craftingTerminalCont.get(), GuiCraftingTerminal::new);
+		MenuScreens.register(StorageMod.filteredConatiner.get(), GuiFiltered::new);
+		MenuScreens.register(StorageMod.levelEmitterConatiner.get(), GuiLevelEmitter::new);
+		MenuScreens.register(StorageMod.inventoryLink.get(), GuiInventoryLink::new);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
-		ItemBlockRenderTypes.setRenderLayer(StorageMod.paintedTrim, e -> true);
-		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableFramed, e -> true);
-		ItemBlockRenderTypes.setRenderLayer(StorageMod.invProxy, e -> true);
-		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableConnectorFramed, e -> true);
-		ItemBlockRenderTypes.setRenderLayer(StorageMod.levelEmitter, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.paintedTrim.get(), e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableFramed.get(), e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.invProxy.get(), e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableConnectorFramed.get(), e -> true);
+		ItemBlockRenderTypes.setRenderLayer(StorageMod.levelEmitter.get(), RenderType.cutout());
 		BlockColors colors = Minecraft.getInstance().getBlockColors();
 		colors.register((state, world, pos, tintIndex) -> {
 			if (world != null) {
@@ -76,7 +75,7 @@ public class ClientProxy implements IProxy {
 				}
 			}
 			return -1;
-		}, StorageMod.paintedTrim, StorageMod.invCableFramed, StorageMod.invProxy, StorageMod.invCableConnectorFramed);
+		}, StorageMod.paintedTrim.get(), StorageMod.invCableFramed.get(), StorageMod.invProxy.get(), StorageMod.invCableConnectorFramed.get());
 		MinecraftForge.EVENT_BUS.addListener(ClientProxy::renderWorldLastEvent);
 	}
 
@@ -87,11 +86,11 @@ public class ClientProxy implements IProxy {
 		bindPaintedModel(event, StorageMod.invCableConnectorFramed);
 	}
 
-	private static void bindPaintedModel(ModelBakeEvent event, Block blockFor) {
-		ResourceLocation baseLoc = blockFor.delegate.name();
-		blockFor.getStateDefinition().getPossibleStates().forEach(st -> {
+	private static void bindPaintedModel(ModelBakeEvent event, RegistryObject<? extends Block> block) {
+		ResourceLocation baseLoc = block.getId();
+		block.get().getStateDefinition().getPossibleStates().forEach(st -> {
 			ModelResourceLocation resLoc = BlockModelShaper.stateToModelLocation(baseLoc, st);
-			event.getModelRegistry().put(resLoc, new BakedPaintedModel(blockFor, event.getModelRegistry().get(resLoc)));
+			event.getModelRegistry().put(resLoc, new BakedPaintedModel(block.get(), event.getModelRegistry().get(resLoc)));
 		});
 	}
 
@@ -139,10 +138,10 @@ public class ClientProxy implements IProxy {
 		if(Screen.hasShiftDown()) {
 			String[] sp = I18n.get("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
-				tooltip.add(new TextComponent(sp[i]));
+				tooltip.add(Component.literal(sp[i]));
 			}
 		} else if(addShift) {
-			tooltip.add(new TranslatableComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+			tooltip.add(Component.translatable("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		}
 	}
 }

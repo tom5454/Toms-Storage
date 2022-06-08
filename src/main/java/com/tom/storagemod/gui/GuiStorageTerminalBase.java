@@ -20,8 +20,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -44,7 +43,6 @@ import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
-import com.tom.storagemod.jei.JEIHandler;
 import com.tom.storagemod.network.IDataReceiver;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends AbstractContainerScreen<T> implements IDataReceiver {
@@ -126,7 +124,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		clearWidgets();
 		inventoryLabelY = imageHeight - 92;
 		super.init();
-		this.searchField = new EditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, new TranslatableComponent("narrator.toms_storage.terminal_search"));
+		this.searchField = new EditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, Component.translatable("narrator.toms_storage.terminal_search"));
 		this.searchField.setMaxLength(100);
 		this.searchField.setBordered(false);
 		this.searchField.setVisible(true);
@@ -200,7 +198,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
 					StoredItemStack is = getMenu().itemListClient.get(i);
 					if (is != null && is.getStack() != null) {
-						String dspName = searchMod ? is.getStack().getItem().delegate.name().getNamespace() : is.getStack().getHoverName().getString();
+						String dspName = searchMod ? ForgeRegistries.ITEMS.getKey(is.getStack().getItem()).getNamespace() : is.getStack().getHoverName().getString();
 						notDone = true;
 						if (m.matcher(dspName.toLowerCase()).find()) {
 							addStackToClientList(is);
@@ -224,8 +222,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				getMenu().scrollTo(0);
 				this.currentScroll = 0;
 				if ((searchType & 4) > 0) {
-					if(ModList.get().isLoaded("jei"))
-						JEIHandler.setJeiSearchText(searchString);
+					/*if(ModList.get().isLoaded("jei"))
+						JEIHandler.setJeiSearchText(searchString);*/
 				}
 				if ((searchType & 2) > 0) {
 					CompoundTag nbt = new CompoundTag();
@@ -295,13 +293,13 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		this.renderTooltip(st, mouseX, mouseY);
 
 		if (buttonSortingType.isHoveredOrFocused()) {
-			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
+			renderTooltip(st, Component.translatable("tooltip.toms_storage.sorting_" + buttonSortingType.state), mouseX, mouseY);
 		}
 		if (buttonSearchType.isHoveredOrFocused()) {
-			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.search_" + buttonSearchType.state, "JEI"), mouseX, mouseY);
+			renderTooltip(st, Component.translatable("tooltip.toms_storage.search_" + buttonSearchType.state, "JEI"), mouseX, mouseY);
 		}
 		if (buttonCtrlMode.isHoveredOrFocused()) {
-			renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+			renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(Component::literal).collect(Collectors.toList()), mouseX, mouseY);
 		}
 	}
 
@@ -513,7 +511,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				// list.add(I18n.format("tomsmod.gui.amount", stack.stackSize));
 				if (extraInfo != null && extraInfo.length > 0) {
 					for (int i = 0; i < extraInfo.length; i++) {
-						list.add(new TextComponent(extraInfo[i]));
+						list.add(Component.literal(extraInfo[i]));
 					}
 				}
 				for (int i = 0;i < list.size();++i) {

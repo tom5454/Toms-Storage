@@ -39,7 +39,6 @@ public class BlockInventoryCable extends PipeBlock implements SimpleWaterloggedB
 
 	public BlockInventoryCable() {
 		super(0.125f, Block.Properties.of(Material.WOOD).strength(2));
-		setRegistryName("ts.inventory_cable");
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)
 				.setValue(UP, false)

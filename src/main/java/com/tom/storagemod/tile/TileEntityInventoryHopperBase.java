@@ -49,7 +49,7 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 						checkedBlocks.add(cp);
 						if(level.isLoaded(cp)) {
 							state = level.getBlockState(cp);
-							if(state.getBlock() == StorageMod.connector) {
+							if(state.getBlock() == StorageMod.connector.get()) {
 								BlockEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									top = ((TileEntityInventoryConnector) te).getInventory();
@@ -83,7 +83,7 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 						checkedBlocks.add(cp);
 						if(level.isLoaded(cp)) {
 							state = level.getBlockState(cp);
-							if(state.getBlock() == StorageMod.connector) {
+							if(state.getBlock() == StorageMod.connector.get()) {
 								BlockEntity te = level.getBlockEntity(cp);
 								if(te instanceof TileEntityInventoryConnector) {
 									bottom = ((TileEntityInventoryConnector) te).getInventory();

@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.network.IDataReceiver;
@@ -24,7 +25,7 @@ public class ContainerInventoryLink extends AbstractContainerMenu implements IDa
 	}
 
 	public ContainerInventoryLink(int id, Inventory playerInv, TileEntityInventoryCableConnector tile) {
-		super(StorageMod.inventoryLink, id);
+		super(StorageMod.inventoryLink.get(), id);
 		this.te = tile;
 		this.pinv = playerInv;
 	}
@@ -74,5 +75,10 @@ public class ContainerInventoryLink extends AbstractContainerMenu implements IDa
 			sentList = true;
 		}
 		super.broadcastChanges();
+	}
+
+	@Override
+	public ItemStack quickMoveStack(Player p_38941_, int p_38942_) {
+		return ItemStack.EMPTY;
 	}
 }

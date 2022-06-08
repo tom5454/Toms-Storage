@@ -67,7 +67,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	public ContainerCraftingTerminal(int id, Inventory inv, TileEntityCraftingTerminal te) {
-		super(StorageMod.craftingTerminalCont, id, inv, te);
+		super(StorageMod.craftingTerminalCont.get(), id, inv, te);
 		craftMatrix = te.getCraftingInv();
 		craftResult = te.getCraftResult();
 		init();
@@ -76,7 +76,7 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	}
 
 	public ContainerCraftingTerminal(int id, Inventory inv) {
-		super(StorageMod.craftingTerminalCont, id, inv);
+		super(StorageMod.craftingTerminalCont.get(), id, inv);
 		craftMatrix = new CraftingContainer(this, 3, 3);
 		craftResult = new ResultContainer();
 		init();

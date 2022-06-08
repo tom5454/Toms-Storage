@@ -19,7 +19,7 @@ public class ContainerFiltered extends AbstractContainerMenu {
 	}
 
 	public ContainerFiltered(int p_i50088_1_, Inventory p_i50088_2_, Container p_i50088_3_) {
-		super(StorageMod.filteredConatiner, p_i50088_1_);
+		super(StorageMod.filteredConatiner.get(), p_i50088_1_);
 		checkContainerSize(p_i50088_3_, 9);
 		this.dispenserInventory = p_i50088_3_;
 		p_i50088_3_.startOpen(p_i50088_2_.player);

@@ -21,7 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -151,7 +150,7 @@ public class GuiInventoryLink extends AbstractContainerScreen<ContainerInventory
 			NetworkHandler.sendDataToServer(tag);
 		});
 		remoteBtn.texY = 32;
-		textF = new EditBox(font, leftPos + 13, topPos + 28, 105, font.lineHeight, new TranslatableComponent("narrator.toms_storage.inventory_link_channel"));
+		textF = new EditBox(font, leftPos + 13, topPos + 28, 105, font.lineHeight, Component.translatable("narrator.toms_storage.inventory_link_channel"));
 		textF.setMaxLength(50);
 		textF.setBordered(false);
 		textF.setVisible(true);
@@ -299,11 +298,11 @@ public class GuiInventoryLink extends AbstractContainerScreen<ContainerInventory
 		this.renderTooltip(st, mouseX, mouseY);
 
 		if (publicBtn.isHoveredOrFocused()) {
-			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.link_public_" + publicBtn.state), mouseX, mouseY);
+			renderTooltip(st, Component.translatable("tooltip.toms_storage.link_public_" + publicBtn.state), mouseX, mouseY);
 		}
 
 		if (remoteBtn.isHoveredOrFocused()) {
-			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.link_remote_" + remoteBtn.state), mouseX, mouseY);
+			renderTooltip(st, Component.translatable("tooltip.toms_storage.link_remote_" + remoteBtn.state), mouseX, mouseY);
 		}
 	}
 

@@ -2,7 +2,7 @@ package com.tom.storagemod.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -73,7 +73,7 @@ public abstract class StorageTerminalBase extends BaseEntityBlock implements Sim
 			if(term.canInteractWith(player)) {
 				player.openMenu(term);
 			} else {
-				player.displayClientMessage(new TranslatableComponent("chat.toms_storage.terminal_out_of_range"), true);
+				player.displayClientMessage(Component.translatable("chat.toms_storage.terminal_out_of_range"), true);
 			}
 		}
 		return InteractionResult.SUCCESS;

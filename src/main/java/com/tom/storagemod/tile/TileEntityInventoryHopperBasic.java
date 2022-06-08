@@ -16,7 +16,7 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 	private ItemStack filter = ItemStack.EMPTY;
 	private int cooldown, lastItemSlot = -1;
 	public TileEntityInventoryHopperBasic(BlockPos pos, BlockState state) {
-		super(StorageMod.invHopperBasicTile, pos, state);
+		super(StorageMod.invHopperBasicTile.get(), pos, state);
 	}
 
 	@Override

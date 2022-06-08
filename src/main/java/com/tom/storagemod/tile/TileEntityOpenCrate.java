@@ -30,7 +30,7 @@ public class TileEntityOpenCrate extends BlockEntity implements TickableServer, 
 	private LazyOptional<IItemHandlerModifiable> chestHandler;
 
 	public TileEntityOpenCrate(BlockPos pos, BlockState state) {
-		super(StorageMod.openCrateTile, pos, state);
+		super(StorageMod.openCrateTile.get(), pos, state);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class TileEntityOpenCrate extends BlockEntity implements TickableServer, 
 	public void setItem(int index, ItemStack stack) {
 		BlockState state = level.getBlockState(worldPosition);
 		Direction f = Direction.UP;
-		if(state.getBlock() == StorageMod.openCrate)f = state.getValue(BlockStateProperties.FACING);
+		if(state.getBlock() == StorageMod.openCrate.get())f = state.getValue(BlockStateProperties.FACING);
 		BlockPos p = worldPosition.relative(f);
 		ItemEntity entityitem = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, stack);
 		entityitem.setDefaultPickUpDelay();

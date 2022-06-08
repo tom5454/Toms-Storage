@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -44,7 +43,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 	private int beaconLevel;
 
 	public TileEntityStorageTerminal(BlockPos pos, BlockState state) {
-		super(StorageMod.terminalTile, pos, state);
+		super(StorageMod.terminalTile.get(), pos, state);
 	}
 
 	public TileEntityStorageTerminal(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
@@ -58,7 +57,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 
 	@Override
 	public Component getDisplayName() {
-		return new TranslatableComponent("ts.storage_terminal");
+		return Component.translatable("ts.storage_terminal");
 	}
 
 	public Map<StoredItemStack, Long> getStacks() {

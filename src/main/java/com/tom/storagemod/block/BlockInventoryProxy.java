@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -48,18 +47,17 @@ public class BlockInventoryProxy extends BaseEntityBlock implements IPaintable {
 
 	public BlockInventoryProxy() {
 		super(Block.Properties.of(Material.WOOD).strength(3));
-		setRegistryName("ts.inventory_proxy");
 		registerDefaultState(defaultBlockState().setValue(FACING, Direction.DOWN).setValue(FILTER_FACING, DirectionWithNull.NULL));
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientProxy.tooltip("inventory_proxy", tooltip);
 		if(Screen.hasShiftDown()) {
-			tooltip.add(new TranslatableComponent("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", new TranslatableComponent("tooltip.toms_storage.inventory_proxy.ignoreSize")));
-			tooltip.add(new TranslatableComponent("tooltip.toms_storage.inventory_proxy.value", "maxCount", new TranslatableComponent("tooltip.toms_storage.inventory_proxy.maxCount.arg"), new TranslatableComponent("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
+			tooltip.add(Component.translatable("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", Component.translatable("tooltip.toms_storage.inventory_proxy.ignoreSize")));
+			tooltip.add(Component.translatable("tooltip.toms_storage.inventory_proxy.value", "maxCount", Component.translatable("tooltip.toms_storage.inventory_proxy.maxCount.arg"), Component.translatable("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
 		}
 	}
 

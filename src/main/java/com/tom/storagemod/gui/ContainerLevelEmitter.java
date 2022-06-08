@@ -26,7 +26,7 @@ public class ContainerLevelEmitter extends AbstractContainerMenu implements IDat
 	}
 
 	public ContainerLevelEmitter(int p_i50088_1_, Inventory p_i50088_2_, TileEntityLevelEmitter te) {
-		super(StorageMod.levelEmitterConatiner, p_i50088_1_);
+		super(StorageMod.levelEmitterConatiner.get(), p_i50088_1_);
 		this.inv = te == null ? new SimpleContainer(1) : new Container() {
 
 			@Override

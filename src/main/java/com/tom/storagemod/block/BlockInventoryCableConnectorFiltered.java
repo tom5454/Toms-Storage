@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -24,13 +23,12 @@ public class BlockInventoryCableConnectorFiltered extends BlockInventoryCableCon
 
 	public BlockInventoryCableConnectorFiltered() {
 		super(false);
-		setRegistryName("ts.inventory_cable_connector_filtered");
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		tooltip.add(new TranslatableComponent("tooltip.toms_storage.filtered"));
+		tooltip.add(Component.translatable("tooltip.toms_storage.filtered"));
 		ClientProxy.tooltip("inventory_cable_connector", tooltip);
 	}
 

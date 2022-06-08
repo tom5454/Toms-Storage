@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -44,7 +43,6 @@ public class BlockInventoryHopperBasic extends BaseEntityBlock implements IInven
 
 	public BlockInventoryHopperBasic() {
 		super(Block.Properties.of(Material.WOOD).strength(3).noOcclusion());
-		setRegistryName("ts.inventory_hopper_basic");
 		registerDefaultState(defaultBlockState()
 				.setValue(FACING, Direction.DOWN).setValue(ENABLED, Boolean.valueOf(true)));
 	}
@@ -132,18 +130,18 @@ public class BlockInventoryHopperBasic extends BaseEntityBlock implements IInven
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					((TileEntityInventoryHopperBasic)te).setFilter(is.copy());
 					Component txt = ((TileEntityInventoryHopperBasic)te).getFilter().getHoverName();
-					player.displayClientMessage(new TranslatableComponent("tooltip.toms_storage.filter_item", txt), true);
+					player.displayClientMessage(Component.translatable("tooltip.toms_storage.filter_item", txt), true);
 				}
 			} else {
 				BlockEntity te = world.getBlockEntity(pos);
 				if(te instanceof TileEntityInventoryHopperBasic) {
 					if(player.isShiftKeyDown()) {
 						((TileEntityInventoryHopperBasic)te).setFilter(ItemStack.EMPTY);
-						player.displayClientMessage(new TranslatableComponent("tooltip.toms_storage.filter_item", new TranslatableComponent("tooltip.toms_storage.empty")), true);
+						player.displayClientMessage(Component.translatable("tooltip.toms_storage.filter_item", Component.translatable("tooltip.toms_storage.empty")), true);
 					} else {
 						ItemStack s = ((TileEntityInventoryHopperBasic)te).getFilter();
-						Component txt = s.isEmpty() ? new TranslatableComponent("tooltip.toms_storage.empty") : s.getHoverName();
-						player.displayClientMessage(new TranslatableComponent("tooltip.toms_storage.filter_item", txt), true);
+						Component txt = s.isEmpty() ? Component.translatable("tooltip.toms_storage.empty") : s.getHoverName();
+						player.displayClientMessage(Component.translatable("tooltip.toms_storage.filter_item", txt), true);
 					}
 				}
 			}

@@ -9,7 +9,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
@@ -44,13 +43,18 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 				onCraftingMatrixChanged();
 			}
 		}
+
+		@Override
+		public ItemStack quickMoveStack(Player p_38941_, int p_38942_) {
+			return ItemStack.EMPTY;
+		}
 	};
 	private CraftingRecipe currentRecipe;
 	private final CraftingContainer craftMatrix = new CraftingContainer(craftingContainer, 3, 3);
 	private ResultContainer craftResult = new ResultContainer();
 	private HashSet<ContainerCraftingTerminal> craftingListeners = new HashSet<>();
 	public TileEntityCraftingTerminal(BlockPos pos, BlockState state) {
-		super(StorageMod.craftingTerminalTile, pos, state);
+		super(StorageMod.craftingTerminalTile.get(), pos, state);
 	}
 
 	@Override
@@ -60,7 +64,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 
 	@Override
 	public Component getDisplayName() {
-		return new TranslatableComponent("ts.crafting_terminal");
+		return Component.translatable("ts.crafting_terminal");
 	}
 
 	@Override

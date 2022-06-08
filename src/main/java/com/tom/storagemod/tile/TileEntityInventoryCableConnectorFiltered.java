@@ -3,7 +3,6 @@ package com.tom.storagemod.tile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,7 +27,7 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	};
 
 	public TileEntityInventoryCableConnectorFiltered(BlockPos pos, BlockState state) {
-		super(StorageMod.invCableConnectorFilteredTile, pos, state);
+		super(StorageMod.invCableConnectorFilteredTile.get(), pos, state);
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 
 	@Override
 	public Component getDisplayName() {
-		return new TranslatableComponent("ts.connector_filtered");
+		return Component.translatable("ts.connector_filtered");
 	}
 
 	public boolean stillValid(Player p_59619_) {
