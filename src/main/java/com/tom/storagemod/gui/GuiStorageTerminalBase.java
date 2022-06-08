@@ -44,6 +44,7 @@ import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
+import com.tom.storagemod.rei.REIPlugin;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends HandledScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
@@ -224,8 +225,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				getScreenHandler().scrollTo(0);
 				this.currentScroll = 0;
 				if ((searchType & 4) > 0) {
-					/*if(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
-						REIPlugin.setReiSearchText(searchString);*/
+					if(FabricLoader.getInstance().isModLoaded("roughlyenoughitems"))
+						REIPlugin.setReiSearchText(searchString);
 				}
 				if ((searchType & 2) > 0) {
 					NbtCompound nbt = new NbtCompound();
