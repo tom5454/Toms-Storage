@@ -8,7 +8,8 @@ import com.tom.storagemod.gui.GuiCraftingTerminal;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.constants.VanillaRecipeCategoryUid;
+import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
@@ -24,7 +25,7 @@ public class JEIHandler implements IModPlugin {
 
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-		registration.addRecipeClickArea(GuiCraftingTerminal.class, 83, 125, 28, 23, new ResourceLocation[] { VanillaRecipeCategoryUid.CRAFTING });
+		registration.addRecipeClickArea(GuiCraftingTerminal.class, 83, 125, 28, 23, new RecipeType[] { RecipeTypes.CRAFTING });
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class JEIHandler implements IModPlugin {
 
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		registration.addRecipeCatalyst(new ItemStack(StorageMod.craftingTerminal), new ResourceLocation[] { VanillaRecipeCategoryUid.CRAFTING });
+		registration.addRecipeCatalyst(new ItemStack(StorageMod.craftingTerminal), new RecipeType[] { RecipeTypes.CRAFTING });
 	}
 	private static IJeiRuntime jeiRuntime;
 	@Override

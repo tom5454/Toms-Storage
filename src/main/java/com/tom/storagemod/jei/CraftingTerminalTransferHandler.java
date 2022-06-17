@@ -20,7 +20,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
 
-import mezz.jei.api.constants.VanillaRecipeCategoryUid;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -62,7 +62,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 			Set<StoredItemStack> stored = new HashSet<>(term.getStoredItems());
 			for (IRecipeSlotView view : views) {
 				if(view.getRole() == RecipeIngredientRole.INPUT || view.getRole() == RecipeIngredientRole.CATALYST) {
-					ItemStack[] list = view.getIngredients(VanillaTypes.ITEM).toArray(ItemStack[]::new);
+					ItemStack[] list = view.getIngredients(VanillaTypes.ITEM_STACK).toArray(ItemStack[]::new);
 					if(list.length == 0)inputs.add(null);
 					else {
 						inputs.add(list);
@@ -99,14 +99,18 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 					if (stacks[i] != null) {
 						CompoundTag CompoundNBT = new CompoundTag();
 						CompoundNBT.putByte("s", (byte) i);
-						for (int j = 0;j < stacks[i].length && j < 3;j++) {
+						int k = 0;
+						for (int j = 0;j < stacks[i].length && k < 9;j++) {
 							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-								CompoundTag tag = new CompoundTag();
-								stacks[i][j].save(tag);
-								CompoundNBT.put("i" + j, tag);
+								StoredItemStack s = new StoredItemStack(stacks[i][j]);
+								if(stored.contains(s)) {
+									CompoundTag tag = new CompoundTag();
+									stacks[i][j].save(tag);
+									CompoundNBT.put("i" + (k++), tag);
+								}
 							}
 						}
-						CompoundNBT.putByte("l", (byte) Math.min(3, stacks[i].length));
+						CompoundNBT.putByte("l", (byte) Math.min(9, k));
 						list.add(CompoundNBT);
 					}
 				}
@@ -125,7 +129,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 
 	public static void registerTransferHandlers(IRecipeTransferRegistration recipeTransferRegistry) {
 		for (int i = 0;i < containerClasses.size();i++)
-			recipeTransferRegistry.addRecipeTransferHandler(new CraftingTerminalTransferHandler(containerClasses.get(i), recipeTransferRegistry.getTransferHelper()), VanillaRecipeCategoryUid.CRAFTING);
+			recipeTransferRegistry.addRecipeTransferHandler(new CraftingTerminalTransferHandler(containerClasses.get(i), recipeTransferRegistry.getTransferHelper()), RecipeTypes.CRAFTING);
 	}
 
 	@Override
