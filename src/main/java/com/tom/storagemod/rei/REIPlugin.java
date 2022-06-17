@@ -47,8 +47,8 @@ public class REIPlugin implements REIClientPlugin {
 					IREIAutoFillTerminal term = (IREIAutoFillTerminal) context.getMenu();
 					List<Integer> missing = new ArrayList<>();
 					int width = recipe instanceof SimpleGridMenuDisplay ? ((SimpleGridMenuDisplay)recipe).getWidth() : Integer.MAX_VALUE;
+					Set<StoredItemStack> stored = new HashSet<>(term.getStoredItems());
 					{
-						Set<StoredItemStack> stored = new HashSet<>(term.getStoredItems());
 						int i = 0;
 						for (ItemStack[] list : stacks) {
 							if(list.length > 0) {
@@ -84,14 +84,18 @@ public class REIPlugin implements REIClientPlugin {
 							if (stacks[i] != null) {
 								NbtCompound CompoundTag = new NbtCompound();
 								CompoundTag.putByte("s", (byte) (width == 1 ? i * 3 : width == 2 ? ((i % 2) + i / 2 * 3) : i));
-								for (int j = 0;j < stacks[i].length && j < 3;j++) {
+								int k = 0;
+								for (int j = 0;j < stacks[i].length && k < 9;j++) {
 									if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-										NbtCompound tag = new NbtCompound();
-										stacks[i][j].writeNbt(tag);
-										CompoundTag.put("i" + j, tag);
+										StoredItemStack s = new StoredItemStack(stacks[i][j]);
+										if(stored.contains(s)) {
+											NbtCompound tag = new NbtCompound();
+											stacks[i][j].writeNbt(tag);
+											CompoundTag.put("i" + (k++), tag);
+										}
 									}
 								}
-								CompoundTag.putByte("l", (byte) Math.min(3, stacks[i].length));
+								CompoundTag.putByte("l", (byte) Math.min(9, k));
 								list.add(CompoundTag);
 							}
 						}
