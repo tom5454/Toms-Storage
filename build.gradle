@@ -8,6 +8,7 @@ maven { url 'https://jitpack.io' }
 jcenter()
 maven { url "https://maven.shedaniel.me/" }
 maven { url "https://maven.terraformersmc.com/releases/"}
+maven { url "https://dvs1.progwml6.com/files/maven" }
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -35,18 +36,20 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:9.0.466"){
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:9.0.480"){
 		exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
     }
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:9.0.466") {
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:9.0.480") {
        exclude(group: "net.fabricmc.fabric-api")
        exclude(group: "me.shedaniel.cloth")
     }
-    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:9.0.466"){
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:9.0.480"){
         exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
     }
+    //modCompileOnly("mezz.jei:jei-1.19-fabric-api:11.0.0.206")
+    //modRuntimeOnly("mezz.jei:jei-1.19-fabric:11.0.0.206")
 }
 
 loom {

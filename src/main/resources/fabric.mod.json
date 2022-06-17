@@ -27,6 +27,9 @@
     ],
     "modmenu": [
       "com.tom.storagemod.ModMenu"
+    ],
+	"rei_client": [
+    	"com.tom.storagemod.rei.REIPlugin"
     ]
   },
   "mixins": [
