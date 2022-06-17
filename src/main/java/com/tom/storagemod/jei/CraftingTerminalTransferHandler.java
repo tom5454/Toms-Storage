@@ -3,28 +3,32 @@ package com.tom.storagemod.jei;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.gui.ContainerCraftingTerminal;
 
-import mezz.jei.api.constants.VanillaRecipeCategoryUid;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
@@ -62,7 +66,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 			Set<StoredItemStack> stored = new HashSet<>(term.getStoredItems());
 			for (IRecipeSlotView view : views) {
 				if(view.getRole() == RecipeIngredientRole.INPUT || view.getRole() == RecipeIngredientRole.CATALYST) {
-					ItemStack[] list = view.getIngredients(VanillaTypes.ITEM).toArray(ItemStack[]::new);
+					ItemStack[] list = view.getIngredients(VanillaTypes.ITEM_STACK).toArray(ItemStack[]::new);
 					if(list.length == 0)inputs.add(null);
 					else {
 						inputs.add(list);
@@ -99,14 +103,18 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 					if (stacks[i] != null) {
 						CompoundTag CompoundNBT = new CompoundTag();
 						CompoundNBT.putByte("s", (byte) i);
-						for (int j = 0;j < stacks[i].length && j < 3;j++) {
+						int k = 0;
+						for (int j = 0;j < stacks[i].length && k < 9;j++) {
 							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-								CompoundTag tag = new CompoundTag();
-								stacks[i][j].save(tag);
-								CompoundNBT.put("i" + j, tag);
+								StoredItemStack s = new StoredItemStack(stacks[i][j]);
+								if(stored.contains(s)) {
+									CompoundTag tag = new CompoundTag();
+									stacks[i][j].save(tag);
+									CompoundNBT.put("i" + (k++), tag);
+								}
 							}
 						}
-						CompoundNBT.putByte("l", (byte) Math.min(3, stacks[i].length));
+						CompoundNBT.putByte("l", (byte) Math.min(9, k));
 						list.add(CompoundNBT);
 					}
 				}
@@ -115,7 +123,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 			}
 
 			if(!missing.isEmpty()) {
-				return new TransferWarning(helper.createUserErrorForMissingSlots(new TranslatableComponent("tooltip.toms_storage.items_missing"), missing));
+				return new TransferWarning(helper.createUserErrorForMissingSlots(Component.translatable("tooltip.toms_storage.items_missing"), missing));
 			}
 		} else {
 			return ERROR_INSTANCE;
@@ -125,12 +133,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 
 	public static void registerTransferHandlers(IRecipeTransferRegistration recipeTransferRegistry) {
 		for (int i = 0;i < containerClasses.size();i++)
-			recipeTransferRegistry.addRecipeTransferHandler(new CraftingTerminalTransferHandler(containerClasses.get(i), recipeTransferRegistry.getTransferHelper()), VanillaRecipeCategoryUid.CRAFTING);
-	}
-
-	@Override
-	public Class<CraftingRecipe> getRecipeClass() {
-		return CraftingRecipe.class;
+			recipeTransferRegistry.addRecipeTransferHandler(new CraftingTerminalTransferHandler(containerClasses.get(i), recipeTransferRegistry.getTransferHelper()), RecipeTypes.CRAFTING);
 	}
 
 	private static class TransferWarning implements IRecipeTransferError {
@@ -150,5 +153,16 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 				int recipeY) {
 			this.parent.showError(matrixStack, mouseX, mouseY, recipeLayout, recipeX, recipeY);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Optional<MenuType<C>> getMenuType() {
+		return Optional.<MenuType<C>>ofNullable((MenuType<C>) StorageMod.craftingTerminalCont.get());
+	}
+
+	@Override
+	public RecipeType<CraftingRecipe> getRecipeType() {
+		return RecipeTypes.CRAFTING;
 	}
 }

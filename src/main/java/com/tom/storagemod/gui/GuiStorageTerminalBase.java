@@ -43,6 +43,7 @@ import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.StoredItemStack.SortingTypes;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
+import com.tom.storagemod.jei.JEIHandler;
 import com.tom.storagemod.network.IDataReceiver;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends AbstractContainerScreen<T> implements IDataReceiver {
@@ -222,8 +223,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				getMenu().scrollTo(0);
 				this.currentScroll = 0;
 				if ((searchType & 4) > 0) {
-					/*if(ModList.get().isLoaded("jei"))
-						JEIHandler.setJeiSearchText(searchString);*/
+					if(ModList.get().isLoaded("jei"))
+						JEIHandler.setJeiSearchText(searchString);
 				}
 				if ((searchType & 2) > 0) {
 					CompoundTag nbt = new CompoundTag();
