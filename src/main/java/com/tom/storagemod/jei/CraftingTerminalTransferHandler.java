@@ -103,7 +103,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 						for (int j = 0;j < stacks[i].length && k < 9;j++) {
 							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 								StoredItemStack s = new StoredItemStack(stacks[i][j]);
-								if(stored.contains(s)) {
+								if(stored.contains(s) || player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
 									CompoundTag tag = new CompoundTag();
 									stacks[i][j].save(tag);
 									CompoundNBT.put("i" + (k++), tag);
