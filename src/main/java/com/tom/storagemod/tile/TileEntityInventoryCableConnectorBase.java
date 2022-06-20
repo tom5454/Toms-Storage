@@ -25,7 +25,8 @@ import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InventoryWrapper;
 
-public class TileEntityInventoryCableConnectorBase extends TileEntityPainted implements TickableServer, Inventory, IProxy {
+public class TileEntityInventoryCableConnectorBase extends TileEntityPainted
+		implements TickableServer, Inventory, IProxy {
 	protected TileEntityInventoryConnector master;
 	protected InventoryWrapper pointedAt, masterW;
 	protected LinkedInv linv;
@@ -36,39 +37,61 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 
 	@Override
 	public void updateServer() {
-		if(world.getTime() % 20 == 19) {
+		if (world.getTime() % 20 == 19) {
+			Stack<BlockPos> inventoryCableStack = new Stack<>();
 			BlockState state = world.getBlockState(pos);
 			Direction facing = state.get(BlockInventoryCableConnector.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			checkedBlocks.add(pos);
-			toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, pos));
-			if(master != null)master.unLink(linv);
+			toCheck.addAll(((IInventoryCable) state.getBlock()).next(world, state, pos));
+			if (master != null)
+				master.unLink(linv);
 			master = null;
 			linv = new LinkedInv();
 			masterW = null;
-			while(!toCheck.isEmpty()) {
+			while (!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
-				if(!checkedBlocks.contains(cp)) {
+				// Try find connector from cache
+				BlockPos connectorBlockPos = CablePathCache.tryGet(cp);
+				if (connectorBlockPos != null) {
+					BlockEntity te = world.getBlockEntity(connectorBlockPos);
+					if (te instanceof TileEntityInventoryConnector) {
+						master = (TileEntityInventoryConnector) te;
+						linv.time = world.getTime();
+						linv.handler = this::applyFilter;
+						master.addLinked(linv);
+						masterW = new InventoryWrapper(master, facing);
+						toCheck.clear();
+						break;
+					}
+				}
+
+				if (!checkedBlocks.contains(cp)) {
 					checkedBlocks.add(cp);
-					if(world.canSetBlock(cp)) {
+					if (world.canSetBlock(cp)) {
 						state = world.getBlockState(cp);
-						if(state.getBlock() == StorageMod.connector) {
+						if (state.getBlock() == StorageMod.connector) {
 							BlockEntity te = world.getBlockEntity(cp);
-							if(te instanceof TileEntityInventoryConnector) {
+							if (te instanceof TileEntityInventoryConnector) {
 								master = (TileEntityInventoryConnector) te;
 								linv.time = world.getTime();
 								linv.handler = this::applyFilter;
 								master.addLinked(linv);
 								masterW = new InventoryWrapper(master, facing);
+								for (BlockPos pos : inventoryCableStack) {
+									CablePathCache.Put(pos, cp);
+								}
 							}
 							break;
 						}
-						if(state.getBlock() instanceof IInventoryCable) {
-							toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+						if (state.getBlock() instanceof IInventoryCable) {
+							inventoryCableStack.add(cp);
+							toCheck.addAll(((IInventoryCable) state.getBlock()).next(world, state, cp));
 						}
 					}
-					if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
+					if (checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)
+						break;
 				}
 			}
 			pointedAt = getPointedAt(pos.offset(facing), facing);
@@ -77,7 +100,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 
 	protected InventoryWrapper getPointedAt(BlockPos pos, Direction facing) {
 		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
-		if(inv != null) {
+		if (inv != null) {
 			return new InventoryWrapper(inv, facing.getOpposite());
 		} else {
 			return null;
@@ -89,10 +112,12 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 	}
 
 	private boolean calling;
+
 	public <R> R call(Function<InventoryWrapper, R> func, Predicate<InventoryWrapper> accessCheck, R def) {
-		if(calling)return def;
+		if (calling)
+			return def;
 		calling = true;
-		if(masterW != null && accessCheck.test(masterW)) {
+		if (masterW != null && accessCheck.test(masterW)) {
 			R r = func.apply(masterW);
 			calling = false;
 			return r;
