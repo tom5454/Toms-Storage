@@ -6,6 +6,7 @@
         "1": "toms_storage:block/inventory_hopper_basic"
     },
     "parent": "block/block",
+	"render_type": "cutout",
     "elements": [
         {
             "name": "bottom",

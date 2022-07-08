@@ -4,8 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -19,11 +21,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.ChunkRenderTypeSet;
+import net.minecraftforge.client.model.IDynamicBakedModel;
+import net.minecraftforge.client.model.data.ModelData;
 
-import com.tom.storagemod.tile.TileEntityPainted;
+import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class BakedPaintedModel implements IDynamicBakedModel {
 	private Block blockFor;
@@ -53,10 +55,9 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public TextureAtlasSprite getParticleIcon() {
-		return parent.getParticleIcon();
+		return parent.getParticleIcon(ModelData.EMPTY);
 	}
 
 	@Override
@@ -64,30 +65,32 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public List<BakedQuad> getQuads(BlockState state, Direction side, RandomSource rand, IModelData modelData) {
+	public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side,
+			@NotNull RandomSource rand, @NotNull ModelData modelData, @Nullable RenderType layer) {
 		BakedModel model = null;
-		Supplier<BlockState> blockstateSupp = modelData.getData(TileEntityPainted.FACADE_STATE);
+		Supplier<BlockState> blockstateSupp = modelData.get(PaintedBlockEntity.FACADE_STATE);
 		BlockState blockstate = null;
 		if(blockstateSupp != null)blockstate = blockstateSupp.get();
-		RenderType layer = MinecraftForgeClient.getRenderType();
 		if (blockstate == null || blockstate == Blocks.AIR.defaultBlockState()) {
 			blockstate = state;
 			model = parent;
 			if(layer != null && layer != RenderType.solid())return Collections.emptyList();
 		}
 
-		if (layer != null && ! ItemBlockRenderTypes.canRenderInLayer(blockstate, layer)) { // always render in the null layer or the block-breaking textures don't show up
-			return Collections.emptyList();
-		}
 		if(model == null)
 			model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(blockstate);
-		return model.getQuads(blockstate, side, rand);
+		return model.getQuads(blockstate, side, rand, ModelData.EMPTY, layer);
 	}
 
 	@Override
-	public IModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, IModelData tileData) {
+	public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData) {
 		return tileData;
+	}
+
+	@Override
+	public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand,
+			@NotNull ModelData data) {
+		return ChunkRenderTypeSet.all();
 	}
 }

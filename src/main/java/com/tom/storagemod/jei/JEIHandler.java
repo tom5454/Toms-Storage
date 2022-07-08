@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.StorageMod;
-import com.tom.storagemod.gui.GuiCraftingTerminal;
+import com.tom.storagemod.gui.CraftingTerminalScreen;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -25,7 +25,7 @@ public class JEIHandler implements IModPlugin {
 
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-		registration.addRecipeClickArea(GuiCraftingTerminal.class, 83, 125, 28, 23, new RecipeType[] { RecipeTypes.CRAFTING });
+		registration.addRecipeClickArea(CraftingTerminalScreen.class, 83, 125, 28, 23, new RecipeType[] { RecipeTypes.CRAFTING });
 	}
 
 	@Override

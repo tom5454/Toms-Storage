@@ -21,7 +21,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
-import com.tom.storagemod.gui.ContainerCraftingTerminal;
+import com.tom.storagemod.gui.CraftingTerminalMenu;
 
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
@@ -42,7 +42,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 		@Override public IRecipeTransferError.Type getType() { return IRecipeTransferError.Type.INTERNAL; }
 	};
 	static {
-		containerClasses.add(ContainerCraftingTerminal.class);
+		containerClasses.add(CraftingTerminalMenu.class);
 	}
 
 	public CraftingTerminalTransferHandler(Class<C> containerClass, IRecipeTransferHandlerHelper helper) {
