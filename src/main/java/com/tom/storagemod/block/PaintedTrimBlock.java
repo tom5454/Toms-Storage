@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
 
-import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class PaintedTrimBlock extends BaseEntityBlock implements ITrim, IPaintable {

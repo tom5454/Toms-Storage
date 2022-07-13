@@ -21,8 +21,8 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
-import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.block.IInventoryCable;
+import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.tile.InventoryConnectorBlockEntity.LinkedInv;
 import com.tom.storagemod.util.IProxy;
 

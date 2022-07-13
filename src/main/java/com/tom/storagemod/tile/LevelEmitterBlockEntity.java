@@ -26,9 +26,9 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
+import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.block.LevelEmitterBlock;
-import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.gui.LevelEmitterMenu;
 
 public class LevelEmitterBlockEntity extends BlockEntity implements TickableServer, MenuProvider {

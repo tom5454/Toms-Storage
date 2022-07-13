@@ -2,6 +2,8 @@ package com.tom.storagemod;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -15,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -42,6 +45,10 @@ import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class StorageModClient {
 
+	public static void preInit() {
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::registerColors);
+	}
+
 	public static void clientSetup() {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::bakeModels);
 		MenuScreens.register(StorageMod.storageTerminal.get(), StorageTerminalScreen::new);
@@ -53,17 +60,19 @@ public class StorageModClient {
 	}
 
 	public static void registerColors(RegisterColorHandlersEvent.Block event) {
-		event.register((state, world, pos, tintIndex) -> {
-			if (world != null) {
-				try {
-					BlockState mimicBlock = ((PaintedBlockEntity)world.getBlockEntity(pos)).getPaintedBlockState();
-					return Minecraft.getInstance().getBlockColors().getColor(mimicBlock, world, pos, tintIndex);
-				} catch (Exception var8) {
-					return -1;
-				}
+		event.register(StorageModClient::getColor, StorageMod.paintedTrim.get(), StorageMod.invCableFramed.get(), StorageMod.invProxy.get(), StorageMod.invCableConnectorFramed.get());
+	}
+
+	private static int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tintIndex) {
+		if (world != null) {
+			try {
+				BlockState mimicBlock = ((PaintedBlockEntity)world.getBlockEntity(pos)).getPaintedBlockState();
+				return Minecraft.getInstance().getBlockColors().getColor(mimicBlock, world, pos, tintIndex);
+			} catch (Exception var8) {
+				return -1;
 			}
-			return -1;
-		}, StorageMod.paintedTrim.get(), StorageMod.invCableFramed.get(), StorageMod.invProxy.get(), StorageMod.invCableConnectorFramed.get());
+		}
+		return -1;
 	}
 
 	private static void bakeModels(ModelEvent.BakingCompleted event) {

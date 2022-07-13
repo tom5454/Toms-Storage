@@ -18,7 +18,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.3.7'
+version = '1.3.8'
 group = 'com.tom5454.toms_storage' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'toms_storage-1.19'
 
@@ -150,10 +150,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:11.0.0.206")
-    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:11.0.0.206")
+    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:11.0.0.211")
+    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:11.0.0.211")
   	// at runtime, use the full JEI jar
-  	//runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.206")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.211")
 }
 
 // Example for how to get properties into the manifest for reading at runtime.

@@ -17,8 +17,8 @@ import net.minecraftforge.items.IItemHandler;
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
-import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.block.IInventoryCable;
+import com.tom.storagemod.block.InventoryCableConnectorBlock;
 
 public abstract class AbstractInventoryHopperBlockEntity extends BlockEntity implements TickableServer {
 	protected boolean topNet, bottomNet;

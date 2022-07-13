@@ -36,8 +36,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.Config;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.InventoryCableConnectorBlockEntity;
 

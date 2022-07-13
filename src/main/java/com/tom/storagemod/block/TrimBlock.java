@@ -12,8 +12,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
-import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 
 public class TrimBlock extends Block implements ITrim, IPaintable {
 

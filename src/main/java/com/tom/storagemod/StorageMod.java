@@ -21,8 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplie
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -122,7 +122,7 @@ public class StorageMod {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 		// Register the doClientStuff method for modloading
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerColors);
+		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> StorageModClient::preInit);
 
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
@@ -167,10 +167,6 @@ public class StorageMod {
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
 		StorageModClient.clientSetup();
-	}
-
-	private void registerColors(RegisterColorHandlersEvent.Block event) {
-		StorageModClient.registerColors(event);
 	}
 
 	public static final CreativeModeTab STORAGE_MOD_TAB = new CreativeModeTab("toms_storage.tab") {
