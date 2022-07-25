@@ -1,8 +1,9 @@
 # Tom's Storage
+**Downloads: [Forge](https://www.curseforge.com/minecraft/mc-mods/toms-storage) ꞏ [Fabric](https://www.curseforge.com/minecraft/mc-mods/toms-storage-fabric)**
+
 ![Banner](https://github.com/tom5454/Toms-Storage/blob/master/banner.png)
 
 **A simple, Vanilla-style storage mod for Minecraft.**
-
 
 ## Spotlights
 
