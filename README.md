@@ -1,7 +1,8 @@
-![Banner](https://github.com/tom5454/Toms-Storage/blob/master/banner.png)
 # Tom's Storage
+![Banner](https://github.com/tom5454/Toms-Storage/blob/master/banner.png)
 
-A simple, Vanilla-style storage mod for Minecraft.
+**A simple, Vanilla-style storage mod for Minecraft.**
+
 
 ## Spotlights
 
