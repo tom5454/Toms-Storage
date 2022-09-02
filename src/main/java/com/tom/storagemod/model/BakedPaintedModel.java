@@ -35,7 +35,7 @@ import net.minecraft.world.BlockRenderView;
 import com.mojang.datafixers.util.Pair;
 
 import com.tom.storagemod.StorageMod;
-import com.tom.storagemod.tile.TileEntityPainted;
+import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedModel {
 	private static final SpriteIdentifier ID = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(StorageMod.modid, "block/trim"));
@@ -54,9 +54,9 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos,
 			Supplier<Random> randomSupplier, RenderContext context) {
 		BlockEntity tile = blockView.getBlockEntity(pos);
-		if(tile instanceof TileEntityPainted) {
+		if(tile instanceof PaintedBlockEntity) {
 			try {
-				BlockState st = ((TileEntityPainted)tile).getPaintedBlockState();
+				BlockState st = ((PaintedBlockEntity)tile).getPaintedBlockState();
 				BakedModel model = MinecraftClient.getInstance().getBlockRenderManager().getModel(st);
 				if(model instanceof FabricBakedModel)
 					((FabricBakedModel)model).emitBlockQuads(blockView, st, pos, randomSupplier, context);

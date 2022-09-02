@@ -7,7 +7,6 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Nameable;
 import net.minecraft.util.math.Direction;
 
 public class InventoryWrapper {
@@ -24,10 +23,6 @@ public class InventoryWrapper {
 	protected InventoryWrapper() {
 		this.inv = DUMMY;
 		this.dir = Direction.DOWN;
-	}
-
-	public IItemHandler wrap() {
-		return InvWrapper.wrap(inv, dir);
 	}
 
 	public int size() {
@@ -99,10 +94,5 @@ public class InventoryWrapper {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public String toString() {
-		return inv instanceof Nameable ? ((Nameable)inv).getName().getString() : "";
 	}
 }

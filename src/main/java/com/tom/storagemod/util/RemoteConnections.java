@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -15,7 +17,6 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
@@ -87,17 +88,17 @@ public class RemoteConnections extends PersistentState {
 			connectors.add(pos);
 		}
 
-		public InventoryWrapper findOthers(ServerWorld world, BlockPos blockPos, int lvl) {
+		public Storage<ItemVariant> findOthers(ServerWorld world, BlockPos blockPos, int lvl) {
 			DimPos pos = new DimPos(world, blockPos);
 			connectors.add(pos);
 			Iterator<DimPos> posItr = connectors.iterator();
-			MultiItemHandler handler = new MultiItemHandler();
+			MergedStorage handler = new MergedStorage();
 			while (posItr.hasNext()) {
 				DimPos dimPos = posItr.next();
 				if(!dimPos.equals(pos)) {
 					BlockEntity te = dimPos.getTileEntity(world);
 					if(te instanceof IInventoryLink link) {
-						InventoryWrapper h = link.getInventoryFrom(world, lvl);
+						Storage<ItemVariant> h = link.getInventoryFrom(world, lvl);
 						if(h != null)
 							handler.add(h);
 					} else {
@@ -105,8 +106,8 @@ public class RemoteConnections extends PersistentState {
 					}
 				}
 			}
-			handler.refresh();
-			return new InventoryWrapper(handler, Direction.DOWN);
+			//handler.refresh();
+			return handler;
 		}
 
 		public void save(NbtCompound t) {

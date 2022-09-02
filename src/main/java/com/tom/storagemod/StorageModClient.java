@@ -38,14 +38,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
-import com.tom.storagemod.gui.GuiCraftingTerminal;
-import com.tom.storagemod.gui.GuiFiltered;
-import com.tom.storagemod.gui.GuiInventoryLink;
-import com.tom.storagemod.gui.GuiLevelEmitter;
-import com.tom.storagemod.gui.GuiStorageTerminal;
-import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.gui.CraftingTerminalScreen;
+import com.tom.storagemod.gui.FilteredScreen;
+import com.tom.storagemod.gui.InventoryLinkScreen;
+import com.tom.storagemod.gui.LevelEmitterScreen;
+import com.tom.storagemod.gui.StorageTerminalScreen;
+import com.tom.storagemod.item.WirelessTerminalItem;
 import com.tom.storagemod.model.BakedPaintedModel;
-import com.tom.storagemod.tile.TileEntityPainted;
+import com.tom.storagemod.tile.PaintedBlockEntity;
 
 import io.netty.buffer.ByteBufInputStream;
 
@@ -54,11 +54,11 @@ public class StorageModClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		HandledScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
-		HandledScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
-		HandledScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
-		HandledScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
-		HandledScreens.register(StorageMod.inventoryLink, GuiInventoryLink::new);
+		HandledScreens.register(StorageMod.storageTerminal, StorageTerminalScreen::new);
+		HandledScreens.register(StorageMod.craftingTerminalCont, CraftingTerminalScreen::new);
+		HandledScreens.register(StorageMod.filteredConatiner, FilteredScreen::new);
+		HandledScreens.register(StorageMod.levelEmitterConatiner, LevelEmitterScreen::new);
+		HandledScreens.register(StorageMod.inventoryLink, InventoryLinkScreen::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.paintedTrim, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
@@ -90,7 +90,7 @@ public class StorageModClient implements ClientModInitializer {
 		ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
 			if (world != null) {
 				try {
-					BlockState mimicBlock = ((TileEntityPainted)world.getBlockEntity(pos)).getPaintedBlockState();
+					BlockState mimicBlock = ((PaintedBlockEntity)world.getBlockEntity(pos)).getPaintedBlockState();
 					return MinecraftClient.getInstance().getBlockColors().getColor(mimicBlock, world, pos, tintIndex);
 				} catch (Exception var8) {
 					return -1;
@@ -105,7 +105,7 @@ public class StorageModClient implements ClientModInitializer {
 			if( player == null )
 				return true;
 
-			if(!ItemWirelessTerminal.isPlayerHolding(player))
+			if(!WirelessTerminalItem.isPlayerHolding(player))
 				return true;
 
 			BlockHitResult lookingAt = (BlockHitResult) player.raycast(StorageMod.CONFIG.wirelessRange, 0f, true);
