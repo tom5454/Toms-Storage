@@ -1,8 +1,7 @@
 package com.tom.storagemod.tile;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -16,8 +15,7 @@ import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.ContainerFiltered;
-import com.tom.storagemod.util.FilteredInventoryWrapper;
-import com.tom.storagemod.util.InventoryWrapper;
+import com.tom.storagemod.util.FilteredStorage;
 
 public class TileEntityInventoryCableConnectorFiltered extends TileEntityInventoryCableConnectorBase implements NamedScreenHandlerFactory {
 	private SimpleInventory filter = new SimpleInventory(9);
@@ -27,15 +25,10 @@ public class TileEntityInventoryCableConnectorFiltered extends TileEntityInvento
 	}
 
 	@Override
-	public <R> R call(Function<InventoryWrapper, R> func, Predicate<InventoryWrapper> accessCheck, R def) {
-		return super.call(func, accessCheck, def);
-	}
-
-	@Override
-	protected InventoryWrapper applyFilter() {
-		InventoryWrapper w = super.applyFilter();
+	protected Storage<ItemVariant> applyFilter() {
+		Storage<ItemVariant> w = super.applyFilter();
 		if(w == null)return null;
-		return new FilteredInventoryWrapper(w, filter);
+		return new FilteredStorage(w, filter);
 	}
 
 	@Override

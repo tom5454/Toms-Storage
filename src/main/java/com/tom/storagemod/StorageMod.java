@@ -2,6 +2,8 @@ package com.tom.storagemod;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +17,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
@@ -24,6 +26,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -57,6 +60,7 @@ import com.tom.storagemod.item.ItemAdvWirelessTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
 import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.tile.SidedStorageBlockEntity;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
@@ -168,11 +172,11 @@ public class StorageMod implements ModInitializer {
 		invHopperBasicTile = FabricBlockEntityTypeBuilder.create(TileEntityInventoryHopperBasic::new, invHopperBasic).build(null);
 		levelEmitterTile = FabricBlockEntityTypeBuilder.create(TileEntityLevelEmitter::new, levelEmitter).build(null);
 
-		storageTerminal = ScreenHandlerRegistry.registerSimple(id("ts.storage_terminal.container"), ContainerStorageTerminal::new);
-		craftingTerminalCont = ScreenHandlerRegistry.registerSimple(id("ts.crafting_terminal.container"), ContainerCraftingTerminal::new);
-		filteredConatiner = ScreenHandlerRegistry.registerSimple(id("ts.filtered.container"), ContainerFiltered::new);
-		levelEmitterConatiner = ScreenHandlerRegistry.registerSimple(id("ts.level_emitter.container"), ContainerLevelEmitter::new);
-		inventoryLink = ScreenHandlerRegistry.registerSimple(id("ts.inventory_link.container"), ContainerInventoryLink::new);
+		storageTerminal = registerSimple(id("ts.storage_terminal.container"), ContainerStorageTerminal::new);
+		craftingTerminalCont = registerSimple(id("ts.crafting_terminal.container"), ContainerCraftingTerminal::new);
+		filteredConatiner = registerSimple(id("ts.filtered.container"), ContainerFiltered::new);
+		levelEmitterConatiner = registerSimple(id("ts.level_emitter.container"), ContainerLevelEmitter::new);
+		inventoryLink = registerSimple(id("ts.inventory_link.container"), ContainerInventoryLink::new);
 
 		Registry.register(Registry.BLOCK, id("ts.inventory_connector"), connector);
 		Registry.register(Registry.BLOCK, id("ts.storage_terminal"), terminal);
@@ -196,16 +200,16 @@ public class StorageMod implements ModInitializer {
 		Registry.register(Registry.ITEM, id("ts.wireless_terminal"), wirelessTerminal);
 		Registry.register(Registry.ITEM, id("ts.adv_wireless_terminal"), advWirelessTerminal);
 
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_connector.tile"), connectorTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.storage_terminal.tile"), terminalTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.open_crate.tile"), openCrateTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.painted.tile"), paintedTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_cable_connector.tile"), invCableConnectorTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_cable_connector_filtered.tile"), invCableConnectorFilteredTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_proxy.tile"), invProxyTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.crafting_terminal.tile"), craftingTerminalTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventoty_hopper_basic.tile"), invHopperBasicTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.level_emitter.tile"), levelEmitterTile);
+		registerBEType("ts.inventory_connector.tile", connectorTile);
+		registerBEType("ts.storage_terminal.tile", terminalTile);
+		registerBEType("ts.open_crate.tile", openCrateTile);
+		registerBEType("ts.painted.tile", paintedTile);
+		registerBEType("ts.inventory_cable_connector.tile", invCableConnectorTile);
+		registerBEType("ts.inventory_cable_connector_filtered.tile", invCableConnectorFilteredTile);
+		registerBEType("ts.inventory_proxy.tile", invProxyTile);
+		registerBEType("ts.crafting_terminal.tile", craftingTerminalTile);
+		registerBEType("ts.inventoty_hopper_basic.tile", invHopperBasicTile);
+		registerBEType("ts.level_emitter.tile", levelEmitterTile);
 
 		registerItemForBlock(connector);
 		registerItemForBlock(terminal);
@@ -234,6 +238,15 @@ public class StorageMod implements ModInitializer {
 		ServerLoginNetworking.registerGlobalReceiver(id("config"), (server, handler, understood, buf, sync, respSender) -> {
 		});
 
+		//1.19 backport
+		ItemStorage.SIDED.registerForBlockEntities((blockEntity, direction) -> {
+			if (blockEntity instanceof SidedStorageBlockEntity sidedStorageBlockEntity) {
+				return sidedStorageBlockEntity.getItemStorage(direction);
+			}
+
+			return null;
+		}, types.toArray(BlockEntityType[]::new));
+
 		ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, sync) -> {
 			PacketByteBuf packet = PacketByteBufs.create();
 			try (OutputStreamWriter writer = new OutputStreamWriter(new ByteBufOutputStream(packet))){
@@ -254,6 +267,17 @@ public class StorageMod implements ModInitializer {
 			multiblockInvs = null;
 			return ActionResult.PASS;
 		});
+	}
+
+	private static List<BlockEntityType<?>> types = new ArrayList<>();
+	private static void registerBEType(String name, BlockEntityType<?> type) {
+		Registry.register(Registry.BLOCK_ENTITY_TYPE, id(name), type);
+		types.add(type);
+	}
+
+	private static <T extends ScreenHandler> ScreenHandlerType<T> registerSimple(Identifier id, ScreenHandlerType.Factory<T> factory) {
+		ScreenHandlerType<T> type = new ScreenHandlerType<>(factory);
+		return Registry.register(Registry.SCREEN_HANDLER, id, type);
 	}
 
 	private static void registerItemForBlock(Block block) {

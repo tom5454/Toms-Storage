@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,18 +22,14 @@ import net.minecraft.util.math.Direction;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
-import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.BlockLevelEmitter;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.gui.ContainerLevelEmitter;
-import com.tom.storagemod.util.EmptyHandler;
-import com.tom.storagemod.util.IItemHandler;
-import com.tom.storagemod.util.InventoryWrapper;
 
 public class TileEntityLevelEmitter extends BlockEntity implements TickableServer, NamedScreenHandlerFactory {
 	private ItemStack filter = ItemStack.EMPTY;
 	private int count;
-	private InventoryWrapper top;
+	private Storage<ItemVariant> top;
 	private boolean lessThan;
 
 	public TileEntityLevelEmitter(BlockPos pos, BlockState state) {
@@ -41,7 +40,7 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 	public void updateServer() {
 		if(world.getTime() % 20 == 1) {
 			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryCableConnector.FACING);
+			Direction facing = state.get(BlockLevelEmitter.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			checkedBlocks.add(pos);
@@ -70,22 +69,17 @@ public class TileEntityLevelEmitter extends BlockEntity implements TickableServe
 						if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
 					}
 				}
+			} else {
+				top = ItemStorage.SIDED.find(world, up, state, world.getBlockEntity(up), facing);
 			}
 		}
 		if(world.getTime() % 10 == 2 && top != null) {
 			BlockState state = world.getBlockState(pos);
 			boolean p = state.get(BlockLevelEmitter.POWERED);
 			boolean currState = false;
-			IItemHandler top = this.top == null ? EmptyHandler.INSTANCE : this.top.wrap();
 			if(!filter.isEmpty()) {
-				int counter = 0;
-				for (int i = 0; i < top.getSlots(); i++) {
-					ItemStack inSlot = top.getStackInSlot(i);
-					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areNbtEqual(inSlot, getFilter())) {
-						continue;
-					}
-					counter += inSlot.getCount();
-				}
+				long counter = top.simulateExtract(ItemVariant.of(filter), count + 1, null);
+
 				if(lessThan) {
 					currState = counter < count;
 				} else {

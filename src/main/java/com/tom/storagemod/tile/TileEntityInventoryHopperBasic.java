@@ -1,5 +1,8 @@
 package com.tom.storagemod.tile;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -7,13 +10,10 @@ import net.minecraft.util.math.BlockPos;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.BlockInventoryHopperBasic;
-import com.tom.storagemod.util.EmptyHandler;
-import com.tom.storagemod.util.IItemHandler;
-import com.tom.storagemod.util.ItemHandlerHelper;
 
 public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBase {
 	private ItemStack filter = ItemStack.EMPTY;
-	private int cooldown, lastItemSlot = -1;
+	private int cooldown;
 	public TileEntityInventoryHopperBasic(BlockPos pos, BlockState state) {
 		super(StorageMod.invHopperBasicTile, pos, state);
 	}
@@ -26,51 +26,15 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 			return;
 		}
 		if(!this.getCachedState().get(BlockInventoryHopperBasic.ENABLED))return;
-		boolean hasFilter = !getFilter().isEmpty();
-		IItemHandler top = this.top == null ? EmptyHandler.INSTANCE : this.top.wrap();
-		IItemHandler bot = this.bottom == null ? EmptyHandler.INSTANCE : this.bottom.wrap();
 
-		if(lastItemSlot != -1 && lastItemSlot < top.getSlots()) {
-			if(hasFilter) {
-				ItemStack inSlot = top.getStackInSlot(lastItemSlot);
-				if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areNbtEqual(inSlot, getFilter())) {
-					lastItemSlot = -1;
-				}
-			} else {
-				ItemStack inSlot = top.getStackInSlot(lastItemSlot);
-				if(inSlot.isEmpty()) {
-					lastItemSlot = -1;
-				}
-			}
-		}
-		if(lastItemSlot == -1) {
-			for (int i = 0; i < top.getSlots(); i++) {
-				if(hasFilter) {
-					ItemStack inSlot = top.getStackInSlot(i);
-					if(!ItemStack.areItemsEqual(inSlot, getFilter()) || !ItemStack.areNbtEqual(inSlot, getFilter())) {
-						continue;
-					}
-				}
-				ItemStack extractItem = top.extractItem(i, 1, true);
-				if (!extractItem.isEmpty()) {
-					lastItemSlot = i;
-					break;
-				}
-			}
-			cooldown = 10;
-		}
-		if(lastItemSlot != -1) {
-			ItemStack extractItem = top.extractItem(lastItemSlot, 1, true);
-			if (!extractItem.isEmpty()) {
-				ItemStack is = ItemHandlerHelper.insertItemStacked(bot, extractItem, true);
-				if(is.isEmpty()) {
-					is = ItemHandlerHelper.insertItemStacked(bot, top.extractItem(lastItemSlot, 1, false), false);
-					cooldown = 10;
-					if(!is.isEmpty()) {
-						//Never?
-					}
-					return;
-				}
+		try (Transaction tr = Transaction.openOuter()) {
+			ItemVariant iv = getFilter().isEmpty() ? null : ItemVariant.of(getFilter());
+			if(StorageUtil.move(top, bottom, i -> {
+				if(iv == null)return true;
+				return iv.equals(i);
+			}, 1, tr) == 1) {
+				tr.commit();
+				cooldown = 10;
 			}
 		}
 	}

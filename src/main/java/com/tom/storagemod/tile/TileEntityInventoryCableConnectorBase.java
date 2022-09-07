@@ -1,19 +1,24 @@
 package com.tom.storagemod.tile;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
+import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
@@ -23,11 +28,10 @@ import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.tile.TileEntityInventoryConnector.LinkedInv;
 import com.tom.storagemod.util.IProxy;
-import com.tom.storagemod.util.InventoryWrapper;
 
-public class TileEntityInventoryCableConnectorBase extends TileEntityPainted implements TickableServer, Inventory, IProxy {
+public class TileEntityInventoryCableConnectorBase extends TileEntityPainted implements TickableServer, SidedStorageBlockEntity, Storage<ItemVariant>, IProxy {
 	protected TileEntityInventoryConnector master;
-	protected InventoryWrapper pointedAt, masterW;
+	protected Storage<ItemVariant> pointedAt, masterW;
 	protected LinkedInv linv;
 
 	public TileEntityInventoryCableConnectorBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -60,7 +64,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 								linv.time = world.getTime();
 								linv.handler = this::applyFilter;
 								master.addLinked(linv);
-								masterW = new InventoryWrapper(master, facing);
+								masterW = master.getInventory();
 							}
 							break;
 						}
@@ -75,81 +79,44 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 		}
 	}
 
-	protected InventoryWrapper getPointedAt(BlockPos pos, Direction facing) {
-		Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
-		if(inv != null) {
-			return new InventoryWrapper(inv, facing.getOpposite());
-		} else {
-			return null;
+	protected Storage<ItemVariant> getPointedAt(BlockPos pos, Direction facing) {
+		Storage<ItemVariant> itemHandler = ItemStorage.SIDED.find(world, pos, facing.getOpposite());
+		if(itemHandler == null) {
+			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+			if(inv != null)itemHandler = InventoryStorage.of(inv, facing.getOpposite());
 		}
+		return itemHandler;
 	}
 
-	protected InventoryWrapper applyFilter() {
+	protected Storage<ItemVariant> applyFilter() {
 		return pointedAt;
 	}
 
-	private boolean calling;
-	public <R> R call(Function<InventoryWrapper, R> func, Predicate<InventoryWrapper> accessCheck, R def) {
-		if(calling)return def;
-		calling = true;
-		if(masterW != null && accessCheck.test(masterW)) {
-			R r = func.apply(masterW);
-			calling = false;
-			return r;
-		}
-		calling = false;
-		return def;
+	@Override
+	public Storage<ItemVariant> get() {
+		return pointedAt;
 	}
 
 	@Override
-	public int size() {
-		return call(InventoryWrapper::size, i -> true, 0);
+	public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+		if(masterW == null)return 0L;
+		return masterW.insert(resource, maxAmount, transaction);
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return call(InventoryWrapper::isEmpty, i -> true, true);
+	public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+		if(masterW == null)return 0L;
+		return masterW.extract(resource, maxAmount, transaction);
 	}
 
 	@Override
-	public void clear() {
+	public Iterator<? extends StorageView<ItemVariant>> iterator(TransactionContext transaction) {
+		if(masterW == null)return Collections.emptyIterator();
+		return masterW.iterator(transaction);
 	}
 
 	@Override
-	public ItemStack getStack(int paramInt) {
-		return call(i -> i.getStack(paramInt), i -> true, ItemStack.EMPTY);
-	}
-
-	@Override
-	public ItemStack removeStack(int paramInt1, int paramInt2) {
-		return call(i -> i.removeStack(paramInt1, paramInt2), i -> true, ItemStack.EMPTY);
-	}
-
-	@Override
-	public ItemStack removeStack(int paramInt) {
-		return call(i -> i.removeStack(paramInt), i -> true, ItemStack.EMPTY);
-	}
-
-	@Override
-	public void setStack(int paramInt, ItemStack paramItemStack) {
-		call(i -> {
-			i.setStack(paramInt, paramItemStack);
-			return Unit.INSTANCE;
-		}, i -> true, Unit.INSTANCE);
-	}
-
-	@Override
-	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
-		return false;
-	}
-
-	@Override
-	public Inventory get() {
-		return masterW != null ? masterW.getInventory() : null;
-	}
-
-	@Override
-	public boolean isValid(int slot, ItemStack stack) {
-		return call(i -> i.isValid(slot, stack, false), i -> true, false);
+	public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
+		return this;
 	}
 }

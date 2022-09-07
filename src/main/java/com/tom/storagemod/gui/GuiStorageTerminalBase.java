@@ -89,7 +89,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		int type = (s & 0b000_11_0_00) >> 3;
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
 		searchType = (s & 0b111_00_0_00) >> 5;
-		searchField.setFocusUnlocked((searchType & 1) == 0);
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
 			searchField.setTextFieldFocused(true);
 		}
@@ -183,16 +182,17 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getScreenHandler().itemListClientSorted.clear();
 			boolean searchMod = false;
+			String search = searchString;
 			if (searchString.startsWith("@")) {
 				searchMod = true;
-				searchString = searchString.substring(1);
+				search = searchString.substring(1);
 			}
 			Pattern m = null;
 			try {
-				m = Pattern.compile(searchString.toLowerCase(), Pattern.CASE_INSENSITIVE);
+				m = Pattern.compile(search.toLowerCase(), Pattern.CASE_INSENSITIVE);
 			} catch (Throwable ignore) {
 				try {
-					m = Pattern.compile(Pattern.quote(searchString.toLowerCase()), Pattern.CASE_INSENSITIVE);
+					m = Pattern.compile(Pattern.quote(search.toLowerCase()), Pattern.CASE_INSENSITIVE);
 				} catch (Throwable __) {
 					return;
 				}
@@ -617,5 +617,16 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	public void receive(NbtCompound tag) {
 		handler.receiveClientTagPacket(tag);
 		refreshItemList = true;
+	}
+
+	public ItemStack getStackUnderMouse(int mouseX, int mouseY) {
+		ContainerStorageTerminal term = getScreenHandler();
+		for (int i = 0;i < term.storageSlotList.size();i++) {
+			SlotStorage slot = term.storageSlotList.get(i);
+			if (mouseX >= (getGuiLeft() + slot.xDisplayPosition) - 1 && mouseY >= (getGuiTop() + slot.yDisplayPosition) - 1 && mouseX < (getGuiLeft() + slot.xDisplayPosition) + 17 && mouseY < (getGuiTop() + slot.yDisplayPosition) + 17) {
+				return slot.stack != null ? slot.stack.getStack() : ItemStack.EMPTY;
+			}
+		}
+		return ItemStack.EMPTY;
 	}
 }

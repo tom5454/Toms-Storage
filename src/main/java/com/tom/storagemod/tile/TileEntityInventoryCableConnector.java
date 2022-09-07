@@ -2,6 +2,8 @@ package com.tom.storagemod.tile;
 
 import java.util.UUID;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BeaconBlockEntity;
@@ -23,7 +25,6 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
 import com.tom.storagemod.gui.ContainerInventoryLink;
 import com.tom.storagemod.util.IInventoryLink;
-import com.tom.storagemod.util.InventoryWrapper;
 import com.tom.storagemod.util.RemoteConnections;
 import com.tom.storagemod.util.RemoteConnections.Channel;
 
@@ -55,7 +56,7 @@ public class TileEntityInventoryCableConnector extends TileEntityInventoryCableC
 	}
 
 	@Override
-	protected InventoryWrapper getPointedAt(BlockPos pos, Direction facing) {
+	protected Storage<ItemVariant> getPointedAt(BlockPos pos, Direction facing) {
 		if(beaconLevel >= 0) {
 			if(channel != null && beaconLevel > 0) {
 				Channel chn = RemoteConnections.get(world).getChannel(channel);
@@ -135,10 +136,10 @@ public class TileEntityInventoryCableConnector extends TileEntityInventoryCableC
 	}
 
 	@Override
-	public InventoryWrapper getInventoryFrom(ServerWorld fromWorld, int fromLevel) {
+	public Storage<ItemVariant> getInventoryFrom(ServerWorld fromWorld, int fromLevel) {
 		if(!remote || beaconLevel < StorageMod.CONFIG.invLinkBeaconLvl)return null;
-		if(beaconLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim || fromLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim)return new InventoryWrapper(this, Direction.DOWN);
-		if(fromWorld.getRegistryKey().equals(world.getRegistryKey()))return new InventoryWrapper(this, Direction.DOWN);
+		if(beaconLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim || fromLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim)return this;
+		if(fromWorld.getRegistryKey().equals(world.getRegistryKey()))return this;
 		return null;
 	}
 

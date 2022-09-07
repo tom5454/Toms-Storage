@@ -4,6 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -14,14 +18,13 @@ import net.minecraft.util.math.Direction;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
-import com.tom.storagemod.block.BlockInventoryCableConnector;
+import com.tom.storagemod.block.BlockInventoryHopperBasic;
 import com.tom.storagemod.block.IInventoryCable;
-import com.tom.storagemod.util.InventoryWrapper;
 
 public abstract class TileEntityInventoryHopperBase extends BlockEntity implements TickableServer {
 	protected boolean topNet, bottomNet;
-	protected InventoryWrapper top;
-	protected InventoryWrapper bottom;
+	protected Storage<ItemVariant> top;
+	protected Storage<ItemVariant> bottom;
 	public TileEntityInventoryHopperBase(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
 		super(tileEntityTypeIn, pos, state);
 	}
@@ -30,7 +33,7 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 	public void updateServer() {
 		if(!world.isClient && world.getTime() % 20 == 1) {
 			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(BlockInventoryCableConnector.FACING);
+			Direction facing = state.get(BlockInventoryHopperBasic.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			checkedBlocks.add(pos);
@@ -63,11 +66,10 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 				}
 			} else {
 				topNet = false;
-				Inventory inv = HopperBlockEntity.getInventoryAt(world, up);
-				if(inv != null) {
-					top = new InventoryWrapper(inv, facing);
-				} else {
-					top = null;
+				top = ItemStorage.SIDED.find(world, up, facing);
+				if(top == null) {
+					Inventory inv = HopperBlockEntity.getInventoryAt(world, up);
+					if(inv != null)top = InventoryStorage.of(inv, facing);
 				}
 			}
 			state = world.getBlockState(down);
@@ -97,11 +99,10 @@ public abstract class TileEntityInventoryHopperBase extends BlockEntity implemen
 				}
 			} else {
 				bottomNet = false;
-				Inventory inv = HopperBlockEntity.getInventoryAt(world, down);
-				if(inv != null) {
-					bottom = new InventoryWrapper(inv, facing.getOpposite());
-				} else {
-					bottom = null;
+				bottom = ItemStorage.SIDED.find(world, down, facing.getOpposite());
+				if(bottom == null) {
+					Inventory inv = HopperBlockEntity.getInventoryAt(world, down);
+					if(inv != null)bottom = InventoryStorage.of(inv, facing.getOpposite());
 				}
 			}
 		}

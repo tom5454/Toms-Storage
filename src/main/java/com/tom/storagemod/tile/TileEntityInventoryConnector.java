@@ -6,23 +6,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import org.jetbrains.annotations.Nullable;
+
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
-import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Unit;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
@@ -30,13 +31,11 @@ import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.ITrim;
 import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InfoHandler;
-import com.tom.storagemod.util.InventoryWrapper;
+import com.tom.storagemod.util.MergedStorage;
 
-public class TileEntityInventoryConnector extends BlockEntity implements TickableServer, Inventory {
-	private List<InventoryWrapper> handlers = new ArrayList<>();
+public class TileEntityInventoryConnector extends BlockEntity implements TickableServer, SidedStorageBlockEntity {
+	private MergedStorage handlers = new MergedStorage();
 	private List<LinkedInv> linkedInvs = new ArrayList<>();
-	private int[] invSizes = new int[0];
-	private int invSize;
 
 	public TileEntityInventoryConnector(BlockPos pos, BlockState state) {
 		super(StorageMod.connectorTile, pos, state);
@@ -57,13 +56,12 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 					toRM.add(inv);
 					continue;
 				}
-				InventoryWrapper w = inv.handler.get();
+				Storage<ItemVariant> w = inv.handler.get();
 				if(w != null) {
-					Inventory ihr = IProxy.resolve(w.getInventory());
-					if(ihr instanceof TileEntityInventoryConnector) {
-						TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
+					Storage<ItemVariant> ihr = IProxy.resolve(w);
+					if(ihr instanceof MergedStorage ih) {
 						if(checkHandlers(ih, 0)) {
-							if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+							if(!handlers.getStorages().contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
 							continue;
 						}
 					}
@@ -87,12 +85,10 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnectorBase) {
 								continue;
 							} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
-								Inventory ihr = null;
-								Inventory inv = getInventoryAt(world, p);
+								Storage<ItemVariant> inv = ItemStorage.SIDED.find(world, p, state, te, d.getOpposite());
 								if(te instanceof ChestBlockEntity) {//Check for double chests
 									Block block = state.getBlock();
 									if(block instanceof ChestBlock) {
-										ihr = ChestBlock.getInventory((ChestBlock)block, state, world, p, true);
 										ChestType type = state.get(ChestBlock.CHEST_TYPE);
 										if (type != ChestType.SINGLE) {
 											BlockPos opos = p.offset(ChestBlock.getFacing(state));
@@ -108,18 +104,16 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 									}
 								}
 								if(inv != null) {
-									ihr = IProxy.resolve(inv);
-									if(ihr instanceof TileEntityInventoryConnector) {
-										TileEntityInventoryConnector ih = (TileEntityInventoryConnector) ihr;
+									Storage<ItemVariant> ihr = IProxy.resolve(inv);
+									if(ihr instanceof MergedStorage ih) {
 										if(checkHandlers(ih, 0)) {
-											if(!handlers.contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
+											if(!handlers.getStorages().contains(InfoHandler.INSTANCE))handlers.add(InfoHandler.INSTANCE);
 											continue;
 										}
 									}
-									if(!(te instanceof TileEntityInventoryCableConnectorBase))
-										toCheck.add(p);
+									toCheck.add(p);
+									handlers.add(inv);
 								}
-								if(ihr != null)handlers.add(new InventoryWrapper(ihr, d.getOpposite()));
 
 								if(Config.getMultiblockInvs().contains(state.getBlock())) {
 									skipBlocks(p, checkedBlocks, toCheck, state.getBlock());
@@ -127,17 +121,6 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 							}
 						}
 					}
-				}
-			}
-			if(invSizes.length != handlers.size())invSizes = new int[handlers.size()];
-			invSize = 0;
-			for (int i = 0; i < invSizes.length; i++) {
-				InventoryWrapper ih = handlers.get(i);
-				if(ih == null)invSizes[i] = 0;
-				else {
-					int s = ih.size();
-					invSizes[i] = s;
-					invSize += s;
 				}
 			}
 		}
@@ -163,79 +146,16 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 		}
 	}
 
-	private boolean checkHandlers(TileEntityInventoryConnector ih, int depth) {
+	private boolean checkHandlers(MergedStorage ih, int depth) {
 		if(depth > 3)return true;
-		for (InventoryWrapper lo : ih.handlers) {
-			Inventory ihr = IProxy.resolve(lo.getInventory());
-			if(ihr == this)return true;
-			if(ihr instanceof TileEntityInventoryConnector) {
-				if(checkHandlers((TileEntityInventoryConnector) ihr, depth+1))return true;
+		for (Storage<ItemVariant> lo : ih.getStorages()) {
+			Storage<ItemVariant> ihr = IProxy.resolve(lo);
+			if(ihr == handlers)return true;
+			if(ihr instanceof MergedStorage i) {
+				if(checkHandlers(i, depth+1))return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean calling;
-	public <R> R call(BiFunction<InventoryWrapper, Integer, R> func, int slot, R def) {
-		if(calling)return def;
-		calling = true;
-		for (int i = 0; i < invSizes.length; i++) {
-			if(slot >= invSizes[i])slot -= invSizes[i];
-			else {
-				R r = func.apply(handlers.get(i), slot);
-				calling = false;
-				return r;
-			}
-		}
-		calling = false;
-		return def;
-	}
-
-	@Override
-	public void clear() {
-	}
-
-	@Override
-	public int size() {
-		return invSize;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
-
-	@Override
-	public ItemStack getStack(int paramInt) {
-		return call(InventoryWrapper::getStack, paramInt, ItemStack.EMPTY);
-	}
-
-	@Override
-	public ItemStack removeStack(int paramInt1, int paramInt2) {
-		return call((i, s) -> i.removeStack(s, paramInt2), paramInt1, ItemStack.EMPTY);
-	}
-
-	@Override
-	public ItemStack removeStack(int paramInt) {
-		return call(InventoryWrapper::removeStack, paramInt, ItemStack.EMPTY);
-	}
-
-	@Override
-	public void setStack(int paramInt, ItemStack paramItemStack) {
-		call((i, s) -> {
-			i.setStack(s, paramItemStack);
-			return Unit.INSTANCE;
-		}, paramInt, Unit.INSTANCE);
-	}
-
-	@Override
-	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
-		return false;
-	}
-
-	@Override
-	public boolean isValid(int slot, ItemStack stack) {
-		return call((i, s) -> i.isValid(s, stack, false), slot, false);
 	}
 
 	public void addLinked(LinkedInv inv) {
@@ -243,7 +163,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	}
 
 	public static class LinkedInv implements Comparable<LinkedInv> {
-		public Supplier<InventoryWrapper> handler;
+		public Supplier<Storage<ItemVariant>> handler;
 		public long time;
 		public int priority;
 
@@ -257,34 +177,24 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 		linkedInvs.remove(linv);
 	}
 
-	public InventoryWrapper getInventory() {
-		return new InventoryWrapper(this, Direction.DOWN);
+	public Storage<ItemVariant> getInventory() {
+		return handlers;
 	}
 
-	public int getFreeSlotCount() {
-		int empty = 0;
-		for(int i = 0;i<invSize;i++) {
-			if(getStack(i).isEmpty())empty++;
-		}
-		return empty;
-	}
-
-	public static Inventory getInventoryAt(World world, BlockPos blockPos) {
-		Inventory inventory = null;
-		BlockState blockState = world.getBlockState(blockPos);
-		Block block = blockState.getBlock();
-		if (block instanceof InventoryProvider) {
-			inventory = ((InventoryProvider) block).getInventory(blockState, world, blockPos);
-		} else if (blockState.hasBlockEntity()) {
-			BlockEntity blockEntity = world.getBlockEntity(blockPos);
-			if (blockEntity instanceof Inventory) {
-				inventory = (Inventory) blockEntity;
-				if (inventory instanceof ChestBlockEntity && block instanceof ChestBlock) {
-					inventory = ChestBlock.getInventory((ChestBlock) block, blockState, world, blockPos, true);
-				}
+	public Pair<Integer, Integer> getUsage() {
+		int slots = 0;
+		int free = 0;
+		try (Transaction transaction = Transaction.openOuter()) {
+			for (StorageView<ItemVariant> view : handlers.iterable(transaction)) {
+				slots++;
+				if(view.isResourceBlank())free++;
 			}
 		}
+		return new Pair<>(slots, free);
+	}
 
-		return inventory;
+	@Override
+	public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
+		return handlers;
 	}
 }

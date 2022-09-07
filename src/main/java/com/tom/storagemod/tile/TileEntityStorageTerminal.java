@@ -2,8 +2,12 @@ package com.tom.storagemod.tile;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -30,12 +34,10 @@ import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.WirelessTerminal;
-import com.tom.storagemod.util.IItemHandler;
-import com.tom.storagemod.util.InvWrapper;
-import com.tom.storagemod.util.ItemHandlerHelper;
+import com.tom.storagemod.util.Util;
 
 public class TileEntityStorageTerminal extends BlockEntity implements NamedScreenHandlerFactory, TickableServer {
-	private IItemHandler itemHandler;
+	private Storage<ItemVariant> itemHandler;
 	private Map<StoredItemStack, Long> items = new HashMap<>();
 	private int sort;
 	private String lastSearch = "";
@@ -67,29 +69,26 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 
 	public StoredItemStack pullStack(StoredItemStack stack, long max) {
 		ItemStack st = stack.getStack();
-		StoredItemStack ret = null;
 		if(itemHandler == null)return null;
-		for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
-			ItemStack s = itemHandler.getStackInSlot(i);
-			if(ItemStack.areItemsEqual(s, st) && ItemStack.areNbtEqual(s, st)) {
-				ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
-				if(!pulled.isEmpty()) {
-					if(ret == null)ret = new StoredItemStack(pulled);
-					else ret.grow(pulled.getCount());
-					max -= pulled.getCount();
-					if(max < 1)break;
-				}
+
+		try (Transaction transaction = Transaction.openOuter()) {
+			long ext = itemHandler.extract(ItemVariant.of(stack.getStack()), max, transaction);
+			if(ext > 0) {
+				transaction.commit();
+				return new StoredItemStack(st, ext);
 			}
 		}
-		return ret;
+		return null;
 	}
 
 	public StoredItemStack pushStack(StoredItemStack stack) {
 		if(stack != null && itemHandler != null) {
-			ItemStack is = ItemHandlerHelper.insertItemStacked(itemHandler, stack.getActualStack(), false);
-			if(is.isEmpty())return null;
-			else {
-				return new StoredItemStack(is);
+			try (Transaction transaction = Transaction.openOuter()) {
+				long ins = itemHandler.insert(ItemVariant.of(stack.getStack()), stack.getQuantity(), transaction);
+				if(ins == 0)return stack;
+				transaction.commit();
+				if(ins == stack.getQuantity())return null;
+				return new StoredItemStack(stack.getStack(), stack.getQuantity() - ins);
 			}
 		}
 		return stack;
@@ -117,11 +116,17 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 			if(p == TerminalPos.UP)d = Direction.UP;
 			if(p == TerminalPos.DOWN)d = Direction.DOWN;
 			items.clear();
-			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
-			if(inv != null) {
-				itemHandler = InvWrapper.wrap(inv, d.getOpposite());
-				IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
-				map(StoredItemStack::new).forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
+			itemHandler = ItemStorage.SIDED.find(world, pos.offset(d), d.getOpposite());
+			if(itemHandler == null) {
+				Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
+				if(inv != null)itemHandler = InventoryStorage.of(inv, d.getOpposite());
+			}
+			if(itemHandler != null) {
+				try (Transaction transaction = Transaction.openOuter()) {
+					Util.stream(itemHandler.iterator(transaction)).
+					filter(s -> !s.isResourceBlank()).distinct().map(s -> new StoredItemStack(s.getResource().toStack(), s.getAmount())).
+					forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
+				}
 			}
 			updateItems = false;
 		}

@@ -128,42 +128,50 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		if(currentRecipe != null) {
 			DefaultedList<ItemStack> remainder = currentRecipe.getRemainder(craftMatrix);
 			boolean playerInvUpdate = false;
-			for (int i = 0; i < craftMatrix.size(); i++) {
+			for (int i = 0; i < remainder.size(); ++i) {
 				ItemStack slot = craftMatrix.getStack(i);
-				if (i < remainder.size() && !remainder.get(i).isEmpty()) {
-					if (!slot.isEmpty() && slot.getCount() > 1) {
-						ItemStack is = pushStack(remainder.get(i).copy());
-						if(!is.isEmpty()) {
-							if(!thePlayer.getInventory().insertStack(is)) {
-								ItemScatterer.spawn(world, thePlayer.getX(), thePlayer.getY(), thePlayer.getZ(), is);
-							}
-						}
-						craftMatrix.removeStack(i, 1);
-					} else {
-						craftMatrix.setStack(i, remainder.get(i).copy());
-					}
-				} else if (!slot.isEmpty()) {
-					if (slot.getCount() == 1) {
-						StoredItemStack is = pullStack(new StoredItemStack(slot), 1);
-						if(is == null && (getSorting() & (1 << 8)) != 0) {
-							for(int j = 0;j<thePlayer.getInventory().size();j++) {
-								ItemStack st = thePlayer.getInventory().getStack(j);
-								if(ItemStack.areItemsEqual(slot, st) && ItemStack.areNbtEqual(slot, st)) {
-									st = thePlayer.getInventory().removeStack(j, 1);
-									if(!st.isEmpty()) {
-										is = new StoredItemStack(st, 1);
-										playerInvUpdate = true;
-										break;
-									}
+				ItemStack oldItem = slot.copy();
+				ItemStack rem = remainder.get(i);
+				if (!slot.isEmpty()) {
+					craftMatrix.removeStack(i, 1);
+					slot = craftMatrix.getStack(i);
+				}
+				if(slot.isEmpty() && !oldItem.isEmpty()) {
+					StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
+					if(is == null && (getSorting() & (1 << 8)) != 0) {
+						for(int j = 0;j<thePlayer.getInventory().size();j++) {
+							ItemStack st = thePlayer.getInventory().getStack(j);
+							if(ItemStack.areItemsEqual(oldItem, st) && ItemStack.areNbtEqual(oldItem, st)) {
+								st = thePlayer.getInventory().removeStack(j, 1);
+								if(!st.isEmpty()) {
+									is = new StoredItemStack(st, 1);
+									playerInvUpdate = true;
+									break;
 								}
 							}
 						}
-						if(is == null)craftMatrix.setStack(i, ItemStack.EMPTY);
-						else craftMatrix.setStack(i, is.getActualStack());
-					} else {
-						craftMatrix.removeStack(i, 1);
+					}
+					if(is != null) {
+						craftMatrix.setStack(i, is.getActualStack());
+						slot = craftMatrix.getStack(i);
 					}
 				}
+				if (rem.isEmpty()) {
+					continue;
+				}
+				if (slot.isEmpty()) {
+					craftMatrix.setStack(i, rem);
+					continue;
+				}
+				if (ItemStack.areItemsEqualIgnoreDamage(slot, rem) && ItemStack.areNbtEqual(slot, rem)) {
+					rem.increment(slot.getCount());
+					craftMatrix.setStack(i, rem);
+					continue;
+				}
+				rem = pushStack(rem);
+				if(rem.isEmpty())continue;
+				if (thePlayer.getInventory().insertStack(rem)) continue;
+				thePlayer.dropItem(rem, false);
 			}
 			if(playerInvUpdate)thePlayer.currentScreenHandler.sendContentUpdates();
 			onCraftingMatrixChanged();

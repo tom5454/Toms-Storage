@@ -26,10 +26,6 @@ public class InventoryWrapper {
 		this.dir = Direction.DOWN;
 	}
 
-	public IItemHandler wrap() {
-		return InvWrapper.wrap(inv, dir);
-	}
-
 	public int size() {
 		return inv.size();
 	}
