@@ -11,6 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.Tooltip;
 
 @me.shedaniel.autoconfig.annotation.Config(name = "toms_storage")
 public class Config implements ConfigData {
@@ -20,9 +21,10 @@ public class Config implements ConfigData {
 	public int invConnectorMaxCables = 2048;
 	public List<String> multiblockInv = new ArrayList<>();
 	public int advWirelessRange = 64;
+	@Tooltip
 	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlDim = 4;
 	public int invLinkBeaconLvl = 1, invLinkBeaconLvlDim = 2;
-	public int invDupScanSize = 100;
+	/*public int invDupScanSize = 100;*/
 
 	@Override
 	public void validatePostLoad() throws ValidationException {
@@ -58,10 +60,10 @@ public class Config implements ConfigData {
 			invLinkBeaconLvlDim = 2;
 			StorageMod.LOGGER.warn("invLinkBeaconLvlDim out of bounds, resetting to default");
 		}
-		if(invDupScanSize < 0) {
+		/*if(invDupScanSize < 0) {
 			invDupScanSize = 100;
 			StorageMod.LOGGER.warn("invDupScanSize out of bounds, resetting to default");
-		}
+		}*/
 		StorageMod.LOGGER.info("Config loaded");
 	}
 

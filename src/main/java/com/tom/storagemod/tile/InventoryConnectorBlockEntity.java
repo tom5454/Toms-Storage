@@ -33,7 +33,7 @@ import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InfoHandler;
 import com.tom.storagemod.util.MergedStorage;
 
-public class InventoryConnectorBlockEntity extends BlockEntity implements TickableServer, SidedStorageBlockEntity/*, Inventory*/ {
+public class InventoryConnectorBlockEntity extends BlockEntity implements TickableServer, SidedStorageBlockEntity {
 	private MergedStorage handlers = new MergedStorage();
 	private List<LinkedInv> linkedInvs = new ArrayList<>();
 
@@ -111,8 +111,7 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 											continue;
 										}
 									}
-									if(!(te instanceof AbstractInventoryCableConnectorBlockEntity))
-										toCheck.add(p);
+									toCheck.add(p);
 									handlers.add(inv);
 								}
 

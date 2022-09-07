@@ -22,7 +22,6 @@ import net.minecraft.util.math.Direction;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.IInventoryCable;
-import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.block.LevelEmitterBlock;
 import com.tom.storagemod.gui.LevelEmitterMenu;
 
@@ -40,7 +39,7 @@ public class LevelEmitterBlockEntity extends BlockEntity implements TickableServ
 	public void updateServer() {
 		if(world.getTime() % 20 == 1) {
 			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(InventoryCableConnectorBlock.FACING);
+			Direction facing = state.get(LevelEmitterBlock.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
 			checkedBlocks.add(pos);

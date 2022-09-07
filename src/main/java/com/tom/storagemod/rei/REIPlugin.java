@@ -12,18 +12,23 @@ import net.minecraft.nbt.NbtList;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
+import com.tom.storagemod.gui.AbstractStorageTerminalScreen;
 
+import dev.architectury.event.CompoundEventResult;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.client.registry.transfer.TransferHandler;
 import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.SimpleGridMenuDisplay;
+import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 
@@ -133,5 +138,16 @@ public class REIPlugin implements REIClientPlugin {
 	@Override
 	public void registerCategories(CategoryRegistry registry) {
 		registry.addWorkstations(BuiltinPlugin.CRAFTING, EntryStacks.of(StorageMod.craftingTerminal));
+	}
+
+	@Override
+	public void registerScreens(ScreenRegistry registry) {
+		registry.registerFocusedStack((scr, point) -> {
+			if(scr instanceof AbstractStorageTerminalScreen<?> t) {
+				ItemStack stack = t.getStackUnderMouse(point.x, point.y);
+				if(!stack.isEmpty())return CompoundEventResult.interruptTrue(EntryStack.of(VanillaEntryTypes.ITEM, stack));
+			}
+			return CompoundEventResult.pass();
+		});
 	}
 }
