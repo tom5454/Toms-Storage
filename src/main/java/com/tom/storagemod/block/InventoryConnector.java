@@ -23,8 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
-import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryConnector;
 
 public class InventoryConnector extends BaseEntityBlock implements IInventoryCable {
@@ -53,7 +53,7 @@ public class InventoryConnector extends BaseEntityBlock implements IInventoryCab
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		ClientProxy.tooltip("inventory_connector", tooltip);
+		StorageModClient.tooltip("inventory_connector", tooltip);
 	}
 
 	@Override

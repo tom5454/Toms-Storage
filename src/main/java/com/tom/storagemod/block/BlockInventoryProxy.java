@@ -37,8 +37,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
-import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryProxy;
 import com.tom.storagemod.tile.TileEntityPainted;
 
@@ -56,7 +56,7 @@ public class BlockInventoryProxy extends BaseEntityBlock implements IPaintable {
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("inventory_proxy", tooltip);
+		StorageModClient.tooltip("inventory_proxy", tooltip);
 		if(Screen.hasShiftDown()) {
 			tooltip.add(new TranslatableComponent("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", new TranslatableComponent("tooltip.toms_storage.inventory_proxy.ignoreSize")));
 			tooltip.add(new TranslatableComponent("tooltip.toms_storage.inventory_proxy.value", "maxCount", new TranslatableComponent("tooltip.toms_storage.inventory_proxy.maxCount.arg"), new TranslatableComponent("tooltip.toms_storage.inventory_proxy.maxCount.desc")));

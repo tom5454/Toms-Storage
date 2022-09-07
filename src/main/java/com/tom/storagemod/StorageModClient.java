@@ -1,4 +1,4 @@
-package com.tom.storagemod.proxy;
+package com.tom.storagemod;
 
 import java.util.List;
 
@@ -33,9 +33,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import com.tom.storagemod.Config;
-import com.tom.storagemod.StorageMod;
-import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.gui.GuiCraftingTerminal;
 import com.tom.storagemod.gui.GuiFiltered;
 import com.tom.storagemod.gui.GuiInventoryLink;
@@ -45,21 +42,15 @@ import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
 import com.tom.storagemod.tile.TileEntityPainted;
 
-public class ClientProxy implements IProxy {
+public class StorageModClient {
 
-	@Override
-	public void setup() {
-
-	}
-
-	@Override
-	public void clientSetup() {
+	public static void clientSetup() {
 		MenuScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
 		MenuScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
 		MenuScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
 		MenuScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
 		MenuScreens.register(StorageMod.inventoryLink, GuiInventoryLink::new);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientProxy::bakeModels);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::bakeModels);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.paintedTrim, e -> true);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.invCableFramed, e -> true);
 		ItemBlockRenderTypes.setRenderLayer(StorageMod.invProxy, e -> true);
@@ -77,7 +68,7 @@ public class ClientProxy implements IProxy {
 			}
 			return -1;
 		}, StorageMod.paintedTrim, StorageMod.invCableFramed, StorageMod.invProxy, StorageMod.invCableConnectorFramed);
-		MinecraftForge.EVENT_BUS.addListener(ClientProxy::renderWorldLastEvent);
+		MinecraftForge.EVENT_BUS.addListener(StorageModClient::renderWorldLastEvent);
 	}
 
 	private static void bakeModels(ModelBakeEvent event) {

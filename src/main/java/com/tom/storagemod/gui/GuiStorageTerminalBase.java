@@ -24,7 +24,11 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -88,7 +92,6 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		int type = (s & 0b000_11_0_00) >> 3;
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
 		searchType = (s & 0b111_00_0_00) >> 5;
-		searchField.setCanLoseFocus((searchType & 1) == 0);
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
 			searchField.setFocus(true);
 		}
@@ -181,16 +184,17 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getMenu().itemListClientSorted.clear();
 			boolean searchMod = false;
+			String search = searchString;
 			if (searchString.startsWith("@")) {
 				searchMod = true;
-				searchString = searchString.substring(1);
+				search = searchString.substring(1);
 			}
 			Pattern m = null;
 			try {
-				m = Pattern.compile(searchString.toLowerCase(), Pattern.CASE_INSENSITIVE);
+				m = Pattern.compile(search.toLowerCase(), Pattern.CASE_INSENSITIVE);
 			} catch (Throwable ignore) {
 				try {
-					m = Pattern.compile(Pattern.quote(searchString.toLowerCase()), Pattern.CASE_INSENSITIVE);
+					m = Pattern.compile(Pattern.quote(search.toLowerCase()), Pattern.CASE_INSENSITIVE);
 				} catch (Throwable __) {
 					return;
 				}
@@ -609,5 +613,38 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	public void receive(CompoundTag tag) {
 		menu.receiveClientNBTPacket(tag);
 		refreshItemList = true;
+	}
+
+	private FakeSlot fakeSlotUnderMouse = new FakeSlot();
+	private static class FakeSlot extends Slot {
+		private static final Container DUMMY = new SimpleContainer(1);
+
+		public FakeSlot() {
+			super(DUMMY, 0, Integer.MIN_VALUE, Integer.MIN_VALUE);
+		}
+
+		@Override
+		public boolean allowModification(Player p_150652_) {
+			return false;
+		}
+
+		@Override
+		public void set(ItemStack p_40240_) {}
+
+		@Override
+		public ItemStack remove(int p_40227_) {
+			return ItemStack.EMPTY;
+		}
+	}
+
+	@Override
+	public Slot getSlotUnderMouse() {
+		Slot s = super.getSlotUnderMouse();
+		if(s != null)return s;
+		if(slotIDUnderMouse > -1 && getMenu().getSlotByID(slotIDUnderMouse).stack != null) {
+			fakeSlotUnderMouse.container.setItem(0, getMenu().getSlotByID(slotIDUnderMouse).stack.getStack());
+			return fakeSlotUnderMouse;
+		}
+		return null;
 	}
 }

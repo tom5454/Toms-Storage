@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityPainted;
 
 public class BlockInventoryCableFramed extends BaseEntityBlock implements IInventoryCable, IPaintable {
@@ -53,7 +53,7 @@ public class BlockInventoryCableFramed extends BaseEntityBlock implements IInven
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("inventory_cable", tooltip);
+		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override

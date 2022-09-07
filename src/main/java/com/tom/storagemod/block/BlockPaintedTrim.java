@@ -19,7 +19,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
 
 import com.tom.storagemod.StorageMod;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityPainted;
 
 public class BlockPaintedTrim extends BaseEntityBlock implements ITrim, IPaintable {
@@ -33,7 +33,7 @@ public class BlockPaintedTrim extends BaseEntityBlock implements ITrim, IPaintab
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("trim", tooltip);
+		StorageModClient.tooltip("trim", tooltip);
 	}
 
 	@Override

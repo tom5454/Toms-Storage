@@ -22,8 +22,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.block.IPaintable;
-import com.tom.storagemod.proxy.ClientProxy;
 
 public class ItemPaintKit extends Item {
 
@@ -34,7 +34,7 @@ public class ItemPaintKit extends Item {
 
 	@Override
 	public void appendHoverText(ItemStack p_41421_, Level p_41422_, List<Component> tooltip, TooltipFlag p_41424_) {
-		ClientProxy.tooltip("paint_kit", tooltip);
+		StorageModClient.tooltip("paint_kit", tooltip);
 	}
 
 	@Override

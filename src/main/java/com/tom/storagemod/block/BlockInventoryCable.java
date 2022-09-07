@@ -25,7 +25,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 
 public class BlockInventoryCable extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
@@ -53,7 +53,7 @@ public class BlockInventoryCable extends PipeBlock implements SimpleWaterloggedB
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		ClientProxy.tooltip("inventory_cable", tooltip);
+		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override

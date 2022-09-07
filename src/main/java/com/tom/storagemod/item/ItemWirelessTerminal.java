@@ -16,8 +16,8 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.StorageTags;
-import com.tom.storagemod.proxy.ClientProxy;
 
 public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
@@ -28,7 +28,7 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-		ClientProxy.tooltip("wireless_terminal", tooltip, Config.wirelessRange);
+		StorageModClient.tooltip("wireless_terminal", tooltip, Config.wirelessRange);
 	}
 
 	@Override

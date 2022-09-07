@@ -81,7 +81,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 							toCheck.add(p);
 						} else {
 							BlockEntity te = level.getBlockEntity(p);
-							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnector) {
+							if (te instanceof TileEntityInventoryConnector || te instanceof TileEntityInventoryProxy || te instanceof TileEntityInventoryCableConnectorBase) {
 								continue;
 							} else if(te != null && !Config.onlyTrims) {
 								LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());

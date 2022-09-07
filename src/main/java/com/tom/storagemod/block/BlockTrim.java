@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
 import com.tom.storagemod.StorageMod;
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 
 public class BlockTrim extends Block implements ITrim, IPaintable {
 
@@ -27,7 +27,7 @@ public class BlockTrim extends Block implements ITrim, IPaintable {
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("trim", tooltip);
+		StorageModClient.tooltip("trim", tooltip);
 	}
 
 	@Override

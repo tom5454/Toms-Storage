@@ -25,8 +25,8 @@ import net.minecraft.world.phys.Vec3;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.StorageTags;
-import com.tom.storagemod.proxy.ClientProxy;
 
 public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 
@@ -37,7 +37,7 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-		ClientProxy.tooltip("adv_wireless_terminal", tooltip, Config.advWirelessRange, Config.wirelessTermBeaconLvl, Config.wirelessTermBeaconLvlDim);
+		StorageModClient.tooltip("adv_wireless_terminal", tooltip, Config.advWirelessRange, Config.wirelessTermBeaconLvl, Config.wirelessTermBeaconLvlDim);
 		if(stack.hasTag() && stack.getTag().contains("BindX")) {
 			int x = stack.getTag().getInt("BindX");
 			int y = stack.getTag().getInt("BindY");

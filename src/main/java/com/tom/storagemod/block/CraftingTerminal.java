@@ -10,7 +10,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 
 public class CraftingTerminal extends StorageTerminalBase {
@@ -28,6 +28,6 @@ public class CraftingTerminal extends StorageTerminalBase {
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		ClientProxy.tooltip("crafting_terminal", tooltip);
+		StorageModClient.tooltip("crafting_terminal", tooltip);
 	}
 }

@@ -16,7 +16,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -48,9 +47,6 @@ import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.network.NetworkHandler;
-import com.tom.storagemod.proxy.ClientProxy;
-import com.tom.storagemod.proxy.IProxy;
-import com.tom.storagemod.proxy.ServerProxy;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
@@ -66,7 +62,6 @@ import com.tom.storagemod.tile.TileEntityStorageTerminal;
 @Mod(StorageMod.modid)
 public class StorageMod {
 	public static final String modid = "toms_storage";
-	public static IProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 	public static InventoryConnector connector;
 	public static StorageTerminal terminal;
 	public static BlockTrim inventoryTrim;
@@ -122,12 +117,11 @@ public class StorageMod {
 
 	private void setup(final FMLCommonSetupEvent event) {
 		LOGGER.info("Tom's Storage Setup starting");
-		proxy.setup();
 		NetworkHandler.init();
 	}
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
-		proxy.clientSetup();
+		StorageModClient.clientSetup();
 	}
 
 	public static final CreativeModeTab STORAGE_MOD_TAB = new CreativeModeTab("toms_storage.tab") {

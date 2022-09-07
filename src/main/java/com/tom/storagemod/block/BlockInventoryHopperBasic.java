@@ -34,8 +34,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
-import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityInventoryHopperBasic;
 
 public class BlockInventoryHopperBasic extends BaseEntityBlock implements IInventoryCable {
@@ -52,7 +52,7 @@ public class BlockInventoryHopperBasic extends BaseEntityBlock implements IInven
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		ClientProxy.tooltip("inventory_hopper", tooltip);
+		StorageModClient.tooltip("inventory_hopper", tooltip);
 	}
 
 	@Override

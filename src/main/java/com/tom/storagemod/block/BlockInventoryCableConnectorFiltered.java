@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnectorFiltered;
 
 public class BlockInventoryCableConnectorFiltered extends BlockInventoryCableConnector {
@@ -31,7 +31,7 @@ public class BlockInventoryCableConnectorFiltered extends BlockInventoryCableCon
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.filtered"));
-		ClientProxy.tooltip("inventory_cable_connector", tooltip);
+		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override

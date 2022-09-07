@@ -15,7 +15,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.tom.storagemod.proxy.ClientProxy;
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.TileEntityPainted;
 
 public class BlockInventoryCableConnectorFramed extends BlockInventoryCableConnector implements IPaintable {
@@ -29,7 +29,7 @@ public class BlockInventoryCableConnectorFramed extends BlockInventoryCableConne
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		tooltip.add(new TranslatableComponent("tooltip.toms_storage.paintable"));
-		ClientProxy.tooltip("inventory_cable_connector", tooltip);
+		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override

@@ -35,8 +35,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
-import com.tom.storagemod.proxy.ClientProxy;
 import com.tom.storagemod.tile.TileEntityLevelEmitter;
 
 public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCable {
@@ -53,7 +53,7 @@ public class BlockLevelEmitter extends BaseEntityBlock implements IInventoryCabl
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
-		ClientProxy.tooltip("level_emitter", tooltip);
+		StorageModClient.tooltip("level_emitter", tooltip);
 	}
 
 	@Override
