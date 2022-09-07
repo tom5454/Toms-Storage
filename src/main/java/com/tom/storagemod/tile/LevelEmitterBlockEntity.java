@@ -17,9 +17,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 
@@ -78,7 +78,7 @@ public class LevelEmitterBlockEntity extends BlockEntity implements TickableServ
 				if(top == null || !top.isPresent()) {
 					BlockEntity te = level.getBlockEntity(up);
 					if(te != null) {
-						top = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
+						top = te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing);
 					}
 				}
 			}

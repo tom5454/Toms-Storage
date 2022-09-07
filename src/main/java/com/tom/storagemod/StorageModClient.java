@@ -47,10 +47,10 @@ public class StorageModClient {
 
 	public static void preInit() {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::registerColors);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::bakeModels);
 	}
 
 	public static void clientSetup() {
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::bakeModels);
 		MenuScreens.register(StorageMod.storageTerminal.get(), StorageTerminalScreen::new);
 		MenuScreens.register(StorageMod.craftingTerminalCont.get(), CraftingTerminalScreen::new);
 		MenuScreens.register(StorageMod.filteredConatiner.get(), FilteredScreen::new);

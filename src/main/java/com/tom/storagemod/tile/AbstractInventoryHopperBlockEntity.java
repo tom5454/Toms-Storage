@@ -10,8 +10,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import com.tom.storagemod.Config;
@@ -68,7 +68,7 @@ public abstract class AbstractInventoryHopperBlockEntity extends BlockEntity imp
 				if(top == null || !top.isPresent()) {
 					BlockEntity te = level.getBlockEntity(up);
 					if(te != null) {
-						top = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
+						top = te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing);
 					}
 				}
 			}
@@ -102,7 +102,7 @@ public abstract class AbstractInventoryHopperBlockEntity extends BlockEntity imp
 				if(bottom == null || !bottom.isPresent()) {
 					BlockEntity te = level.getBlockEntity(down);
 					if(te != null) {
-						bottom = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
+						bottom = te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
 					}
 				}
 			}

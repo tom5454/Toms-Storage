@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 
@@ -79,7 +79,7 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 	protected LazyOptional<IItemHandler> getPointedAt(BlockPos pos, Direction facing) {
 		BlockEntity te = level.getBlockEntity(pos);
 		if(te != null) {
-			return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
+			return te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
 		} else {
 			return null;
 		}
@@ -101,7 +101,7 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
 			return this.getCapability().cast();
 		}
 		return super.getCapability(cap, side);

@@ -12,8 +12,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.EmptyHandler;
@@ -36,7 +36,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(InventoryProxyBlock.FACING);
 			if(side != facing) {
@@ -124,7 +124,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 			if(pointedAt == null || !pointedAt.isPresent()) {
 				BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
 				if(te != null && !(te instanceof InventoryProxyBlockEntity)) {
-					pointedAt = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
+					pointedAt = te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
 				}
 			}
 			ignoreCount = false;
@@ -132,7 +132,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 			if(filter != DirectionWithNull.NULL) {
 				BlockEntity te = level.getBlockEntity(worldPosition.relative(filter.getDir()));
 				if(te != null && !(te instanceof InventoryProxyBlockEntity)) {
-					this.filter = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing.getOpposite());
+					this.filter = te.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
 					if(te instanceof MenuProvider) {
 						String[] sp = ((MenuProvider)te).getDisplayName().getString().split(",");
 						for (String string : sp) {

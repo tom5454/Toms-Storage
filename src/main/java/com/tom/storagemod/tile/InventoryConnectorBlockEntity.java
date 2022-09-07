@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -82,10 +82,10 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 							toCheck.add(p);
 						} else {
 							BlockEntity te = level.getBlockEntity(p);
-							if (te instanceof InventoryConnectorBlockEntity || te instanceof InventoryProxyBlockEntity || te instanceof InventoryCableConnectorBlockEntity) {
+							if (te instanceof InventoryConnectorBlockEntity || te instanceof InventoryProxyBlockEntity || te instanceof AbstractInventoryCableConnectorBlockEntity) {
 								continue;
 							} else if(te != null && !Config.onlyTrims) {
-								LazyOptional<IItemHandler> inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
+								LazyOptional<IItemHandler> inv = te.getCapability(ForgeCapabilities.ITEM_HANDLER, d.getOpposite());
 								if(te instanceof ChestBlockEntity) {//Check for double chests
 									Block block = state.getBlock();
 									if(block instanceof ChestBlock) {
@@ -165,7 +165,7 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
 			return getInventory().cast();
 		}
 		return super.getCapability(cap, side);

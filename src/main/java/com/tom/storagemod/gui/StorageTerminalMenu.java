@@ -252,7 +252,9 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> imple
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {
 			CompoundTag tag = list.getCompound(i);
-			itemList.add(StoredItemStack.readFromNBT(tag));
+			StoredItemStack stack = StoredItemStack.readFromNBT(tag);
+			if(stack != null)
+				itemList.add(stack);
 		}
 		itemListClient = new ArrayList<>(itemList);
 		pinv.setChanged();

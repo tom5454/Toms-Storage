@@ -22,7 +22,6 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -136,46 +135,52 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 
 	public void craft(Player thePlayer) {
 		if(currentRecipe != null) {
-			ForgeHooks.setCraftingPlayer(thePlayer);
 			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
-			ForgeHooks.setCraftingPlayer(null);
 			boolean playerInvUpdate = false;
-			for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
+			for (int i = 0; i < remainder.size(); ++i) {
 				ItemStack slot = craftMatrix.getItem(i);
-				if (i < remainder.size() && !remainder.get(i).isEmpty()) {
-					if (!slot.isEmpty() && slot.getCount() > 1) {
-						ItemStack is = pushStack(remainder.get(i).copy());
-						if(!is.isEmpty()) {
-							if(!thePlayer.getInventory().add(is)) {
-								Containers.dropItemStack(level, thePlayer.getX(), thePlayer.getY(), thePlayer.getZ(), is);
-							}
-						}
-						craftMatrix.removeItem(i, 1);
-					} else {
-						craftMatrix.setItem(i, remainder.get(i).copy());
-					}
-				} else if (!slot.isEmpty()) {
-					if (slot.getCount() == 1) {
-						StoredItemStack is = pullStack(new StoredItemStack(slot), 1);
-						if(is == null && (getSorting() & (1 << 8)) != 0) {
-							for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
-								ItemStack st = thePlayer.getInventory().getItem(j);
-								if(ItemStack.isSame(slot, st) && ItemStack.tagMatches(slot, st)) {
-									st = thePlayer.getInventory().removeItem(j, 1);
-									if(!st.isEmpty()) {
-										is = new StoredItemStack(st, 1);
-										playerInvUpdate = true;
-										break;
-									}
+				ItemStack oldItem = slot.copy();
+				ItemStack rem = remainder.get(i);
+				if (!slot.isEmpty()) {
+					craftMatrix.removeItem(i, 1);
+					slot = craftMatrix.getItem(i);
+				}
+				if(slot.isEmpty() && !oldItem.isEmpty()) {
+					StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
+					if(is == null && (getSorting() & (1 << 8)) != 0) {
+						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
+							ItemStack st = thePlayer.getInventory().getItem(j);
+							if(ItemStack.isSame(oldItem, st) && ItemStack.tagMatches(oldItem, st)) {
+								st = thePlayer.getInventory().removeItem(j, 1);
+								if(!st.isEmpty()) {
+									is = new StoredItemStack(st, 1);
+									playerInvUpdate = true;
+									break;
 								}
 							}
 						}
-						if(is == null)craftMatrix.setItem(i, ItemStack.EMPTY);
-						else craftMatrix.setItem(i, is.getActualStack());
-					} else {
-						craftMatrix.removeItem(i, 1);
+					}
+					if(is != null) {
+						craftMatrix.setItem(i, is.getActualStack());
+						slot = craftMatrix.getItem(i);
 					}
 				}
+				if (rem.isEmpty()) {
+					continue;
+				}
+				if (slot.isEmpty()) {
+					craftMatrix.setItem(i, rem);
+					continue;
+				}
+				if (ItemStack.isSameIgnoreDurability(slot, rem) && ItemStack.tagMatches(slot, rem)) {
+					rem.grow(slot.getCount());
+					craftMatrix.setItem(i, rem);
+					continue;
+				}
+				rem = pushStack(rem);
+				if(rem.isEmpty())continue;
+				if (thePlayer.getInventory().add(rem)) continue;
+				thePlayer.drop(rem, false);
 			}
 			if(playerInvUpdate)thePlayer.containerMenu.broadcastChanges();
 			onCraftingMatrixChanged();

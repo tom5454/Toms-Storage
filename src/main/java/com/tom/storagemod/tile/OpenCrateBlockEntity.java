@@ -17,8 +17,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
@@ -130,7 +130,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements TickableServer,
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
 			if (this.chestHandler == null)
 				this.chestHandler = LazyOptional.of(this::createHandler);
 			return this.chestHandler.cast();
