@@ -94,7 +94,7 @@ public class TileEntityInventoryCableConnectorBase extends TileEntityPainted imp
 
 	@Override
 	public Storage<ItemVariant> get() {
-		return pointedAt;
+		return masterW;
 	}
 
 	@Override

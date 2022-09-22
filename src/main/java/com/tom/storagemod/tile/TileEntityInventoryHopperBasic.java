@@ -35,6 +35,8 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 			}, 1, tr) == 1) {
 				tr.commit();
 				cooldown = 10;
+			} else {
+				cooldown = 5;
 			}
 		}
 	}
