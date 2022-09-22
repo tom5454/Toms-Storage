@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -9,6 +9,7 @@ jcenter()
 maven { url "https://maven.shedaniel.me/" }
 maven { url "https://maven.terraformersmc.com/releases/"}
 maven { url "https://dvs1.progwml6.com/files/maven" }
+maven { url "https://maven.architectury.dev/" }
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -32,24 +33,26 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:4.0.0") {
+	modImplementation("com.terraformersmc:modmenu:4.0.6") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:9.0.480"){
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:9.1.530"){
 		exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
+        exclude(group: "dev.architectury")
     }
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:9.0.480") {
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:9.1.530") {
        exclude(group: "net.fabricmc.fabric-api")
        exclude(group: "me.shedaniel.cloth")
+       exclude(group: "dev.architectury")
     }
-    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:9.0.480"){
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:9.1.530"){
         exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
+        exclude(group: "dev.architectury")
     }
-    //modCompileOnly("mezz.jei:jei-1.19-fabric-api:11.0.0.206")
-    //modRuntimeOnly("mezz.jei:jei-1.19-fabric:11.0.0.206")
+    modImplementation("dev.architectury:architectury-fabric:6.2.43")
 }
 
 loom {

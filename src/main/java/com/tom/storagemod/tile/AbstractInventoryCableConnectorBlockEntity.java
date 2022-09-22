@@ -95,7 +95,7 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 
 	@Override
 	public Storage<ItemVariant> get() {
-		return pointedAt;
+		return masterW;
 	}
 
 	@Override
