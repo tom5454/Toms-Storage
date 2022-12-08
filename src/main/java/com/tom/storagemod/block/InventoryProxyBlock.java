@@ -6,36 +6,36 @@ import java.util.Map;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
@@ -43,101 +43,101 @@ import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.InventoryProxyBlockEntity;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 
-public class InventoryProxyBlock extends BlockWithEntity implements IPaintable {
-	public static final DirectionProperty FACING = Properties.FACING;
-	public static final EnumProperty<DirectionWithNull> FILTER_FACING = EnumProperty.of("filter_facing", DirectionWithNull.class);
+public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable {
+	public static final DirectionProperty FACING = BlockStateProperties.FACING;
+	public static final EnumProperty<DirectionWithNull> FILTER_FACING = EnumProperty.create("filter_facing", DirectionWithNull.class);
 
 	public InventoryProxyBlock() {
-		super(Block.Settings.of(Material.WOOD).strength(3));
+		super(Block.Properties.of(Material.WOOD).strength(3));
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
-		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_proxy", tooltip);
 		if(Screen.hasShiftDown()) {
-			tooltip.add(Text.translatable("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", Text.translatable("tooltip.toms_storage.inventory_proxy.ignoreSize")));
-			tooltip.add(Text.translatable("tooltip.toms_storage.inventory_proxy.value", "maxCount", Text.translatable("tooltip.toms_storage.inventory_proxy.maxCount.arg"), Text.translatable("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
+			tooltip.add(Component.translatable("tooltip.toms_storage.inventory_proxy.key", "ignoreSize", Component.translatable("tooltip.toms_storage.inventory_proxy.ignoreSize")));
+			tooltip.add(Component.translatable("tooltip.toms_storage.inventory_proxy.value", "maxCount", Component.translatable("tooltip.toms_storage.inventory_proxy.maxCount.arg"), Component.translatable("tooltip.toms_storage.inventory_proxy.maxCount.desc")));
 		}
 	}
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
 			BlockHitResult hit) {
-		ItemStack stack = player.getStackInHand(hand);
-		if(stack.getItem() == Items.DIAMOND && state.get(FACING) != hit.getSide()) {
-			if(state.get(FILTER_FACING) == DirectionWithNull.NULL && !player.getAbilities().creativeMode) {
-				stack.decrement(1);
+		ItemStack stack = player.getItemInHand(hand);
+		if(stack.getItem() == Items.DIAMOND && state.getValue(FACING) != hit.getDirection()) {
+			if(state.getValue(FILTER_FACING) == DirectionWithNull.NULL && !player.getAbilities().instabuild) {
+				stack.shrink(1);
 			}
-			world.setBlockState(pos, state.with(FILTER_FACING, DirectionWithNull.of(hit.getSide())));
-			return ActionResult.SUCCESS;
+			world.setBlockAndUpdate(pos, state.setValue(FILTER_FACING, DirectionWithNull.of(hit.getDirection())));
+			return InteractionResult.SUCCESS;
 		}
-		return ActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new InventoryProxyBlockEntity(pos, state);
 	}
 
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state,
 			BlockEntityType<T> type) {
 		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override
-	public BlockState rotate(BlockState state, BlockRotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+	public BlockState rotate(BlockState state, Rotation rot) {
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	public BlockState mirror(BlockState state, BlockMirror mirrorIn) {
-		return state.rotate(mirrorIn.getRotation(state.get(FACING)));
+	public BlockState mirror(BlockState state, Mirror mirrorIn) {
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext context) {
-		return getDefaultState().with(FACING, context.getSide().getOpposite());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
 	}
 
 	@Override
-	protected void appendProperties(Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		builder.add(FACING, FILTER_FACING);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
 	}
 
 	@Override
-	public List<ItemStack> getDroppedStacks(BlockState state, net.minecraft.loot.context.LootContext.Builder builder) {
-		List<ItemStack> stacks = super.getDroppedStacks(state, builder);
-		if(state.get(FILTER_FACING) != DirectionWithNull.NULL)
+	public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+		List<ItemStack> stacks = super.getDrops(state, builder);
+		if(state.getValue(FILTER_FACING) != DirectionWithNull.NULL)
 			stacks.add(new ItemStack(Items.DIAMOND));
 		return stacks;
 	}
 
 	@Override
-	public boolean hasComparatorOutput(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+	public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
 		BlockEntity te = world.getBlockEntity(pos);
-		if(state.get(FILTER_FACING) != DirectionWithNull.NULL) {
+		if(state.getValue(FILTER_FACING) != DirectionWithNull.NULL) {
 			if(te instanceof InventoryProxyBlockEntity) {
 				return ((InventoryProxyBlockEntity) te).getComparatorOutput();
 			}
 		}
-		return ScreenHandler.calculateComparatorOutput(te);
+		return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(te);
 	}
 
-	public static enum DirectionWithNull implements StringIdentifiable {
+	public static enum DirectionWithNull implements StringRepresentable {
 		NULL("notset"),
 		DOWN(Direction.DOWN),
 		UP(Direction.UP),
@@ -159,7 +159,7 @@ public class InventoryProxyBlock extends BlockWithEntity implements IPaintable {
 		}
 
 		private DirectionWithNull(Direction dir) {
-			this.name = dir.asString();
+			this.name = dir.getSerializedName();
 			this.dir = dir;
 		}
 
@@ -173,7 +173,7 @@ public class InventoryProxyBlock extends BlockWithEntity implements IPaintable {
 		}
 
 		@Override
-		public String asString() {
+		public String getSerializedName() {
 			return name;
 		}
 
@@ -183,9 +183,9 @@ public class InventoryProxyBlock extends BlockWithEntity implements IPaintable {
 	}
 
 	@Override
-	public boolean paint(World world, BlockPos pos, BlockState to) {
+	public boolean paint(Level world, BlockPos pos, BlockState to) {
 		BlockState old = world.getBlockState(pos);
-		world.setBlockState(pos, StorageMod.invProxyPainted.getDefaultState().with(FACING, old.get(FACING)).with(FILTER_FACING, old.get(FILTER_FACING)), 2);
+		world.setBlock(pos, StorageMod.invProxyPainted.defaultBlockState().setValue(FACING, old.getValue(FACING)).setValue(FILTER_FACING, old.getValue(FILTER_FACING)), 2);
 		BlockEntity te = world.getBlockEntity(pos);
 		if(te != null && te instanceof PaintedBlockEntity)
 			return ((PaintedBlockEntity)te).setPaintedBlockState(to);
@@ -193,7 +193,7 @@ public class InventoryProxyBlock extends BlockWithEntity implements IPaintable {
 	}
 
 	@Override
-	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
 		return new ItemStack(StorageMod.invProxy);
 	}
 }

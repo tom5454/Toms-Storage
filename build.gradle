@@ -10,6 +10,10 @@ maven { url "https://maven.shedaniel.me/" }
 maven { url "https://maven.terraformersmc.com/releases/"}
 maven { url "https://dvs1.progwml6.com/files/maven" }
 maven { url "https://maven.architectury.dev/" }
+maven {
+		name = "Ladysnake Libs"
+		url = "https://ladysnake.jfrog.io/artifactory/mods"
+	}
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -22,7 +26,7 @@ group = project.maven_group
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
@@ -37,22 +41,23 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:9.1.530"){
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:9.1.530") {
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
        exclude(group: "net.fabricmc.fabric-api")
        exclude(group: "me.shedaniel.cloth")
        exclude(group: "dev.architectury")
     }
-    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:9.1.530"){
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
         exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
     modImplementation("dev.architectury:architectury-fabric:6.2.43")
+    modImplementation "dev.emi:trinkets:3.4.1"
 }
 
 loom {

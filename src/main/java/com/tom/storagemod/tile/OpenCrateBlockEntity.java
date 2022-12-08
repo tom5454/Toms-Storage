@@ -10,15 +10,15 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
@@ -33,11 +33,11 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 
 	@Override
 	public void updateServer() {
-		if(world.getTime() % 5 == 0){
-			BlockState state = world.getBlockState(pos);
-			Direction f = state.get(Properties.FACING);
-			BlockPos p = pos.offset(f);
-			items = world.getNonSpectatingEntities(ItemEntity.class, new Box(p));
+		if(level.getGameTime() % 5 == 0){
+			BlockState state = level.getBlockState(worldPosition);
+			Direction f = state.getValue(BlockStateProperties.FACING);
+			BlockPos p = worldPosition.relative(f);
+			items = level.getEntitiesOfClass(ItemEntity.class, new AABB(p));
 		}
 	}
 
@@ -70,18 +70,18 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 			if(!state.isEmpty()) {
 				state.forEach(s -> {
 					if(s.spawn != null) {
-						BlockState state = world.getBlockState(pos);
+						BlockState state = level.getBlockState(worldPosition);
 						Direction f = Direction.UP;
-						if(state.getBlock() == StorageMod.openCrate)f = state.get(Properties.FACING);
-						BlockPos p = pos.offset(f);
-						ItemEntity entityitem = new ItemEntity(world, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, s.spawn);
-						entityitem.setToDefaultPickupDelay();
-						entityitem.setVelocity(Vec3d.ZERO);
-						world.spawnEntity(entityitem);
+						if(state.getBlock() == StorageMod.openCrate)f = state.getValue(BlockStateProperties.FACING);
+						BlockPos p = worldPosition.relative(f);
+						ItemEntity entityitem = new ItemEntity(level, p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5, s.spawn);
+						entityitem.setDefaultPickUpDelay();
+						entityitem.setDeltaMovement(Vec3.ZERO);
+						level.addFreshEntity(entityitem);
 						items.add(entityitem);
 					} else if(s.entity != null) {
-						s.entity.getStack().split(s.remove);
-						if(s.entity.getStack().isEmpty())s.entity.discard();
+						s.entity.getItem().split(s.remove);
+						if(s.entity.getItem().isEmpty())s.entity.discard();
 					}
 				});
 			}
@@ -103,7 +103,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 			if (maxAmount < 1)return 0;
 			long ext = 0;
 			for (ItemEntity e : new ArrayList<>(items)) {
-				if(resource.matches(e.getStack())) {
+				if(resource.matches(e.getItem())) {
 					ext += extract0(e, (int) (maxAmount - ext), transaction);
 					if(ext == maxAmount)break;
 				}
@@ -117,7 +117,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 			updateSnapshots(transaction);
 			State state = new State();
 			state.entity = ent;
-			state.remove = Math.min(maxAmount, ent.getStack().getCount());
+			state.remove = Math.min(maxAmount, ent.getItem().getCount());
 			this.state.add(state);
 			return state.remove;
 		}
@@ -133,17 +133,17 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 
 				@Override
 				public boolean isResourceBlank() {
-					return item.getStack().isEmpty();
+					return item.getItem().isEmpty();
 				}
 
 				@Override
 				public ItemVariant getResource() {
-					return ItemVariant.of(item.getStack());
+					return ItemVariant.of(item.getItem());
 				}
 
 				@Override
 				public long getAmount() {
-					return item.getStack().getCount();
+					return item.getItem().getCount();
 				}
 
 				@Override

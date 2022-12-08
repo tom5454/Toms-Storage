@@ -8,23 +8,23 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
@@ -33,9 +33,10 @@ import com.tom.storagemod.block.AbstractStorageTerminalBlock;
 import com.tom.storagemod.block.AbstractStorageTerminalBlock.TerminalPos;
 import com.tom.storagemod.gui.StorageTerminalMenu;
 import com.tom.storagemod.item.WirelessTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 import com.tom.storagemod.util.Util;
 
-public class StorageTerminalBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, TickableServer {
+public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvider, TickableServer {
 	private Storage<ItemVariant> itemHandler;
 	private Map<StoredItemStack, Long> items = new HashMap<>();
 	private int sort;
@@ -52,13 +53,13 @@ public class StorageTerminalBlockEntity extends BlockEntity implements NamedScre
 	}
 
 	@Override
-	public ScreenHandler createMenu(int id, PlayerInventory plInv, PlayerEntity arg2) {
+	public AbstractContainerMenu createMenu(int id, Inventory plInv, Player arg2) {
 		return new StorageTerminalMenu(id, plInv, this);
 	}
 
 	@Override
-	public Text getDisplayName() {
-		return Text.translatable("ts.storage_terminal");
+	public Component getDisplayName() {
+		return Component.translatable("ts.storage_terminal");
 	}
 
 	public Map<StoredItemStack, Long> getStacks() {
@@ -102,22 +103,22 @@ public class StorageTerminalBlockEntity extends BlockEntity implements NamedScre
 		if(st.isEmpty())return;
 		StoredItemStack st0 = pushStack(new StoredItemStack(st));
 		if(st0 != null) {
-			ItemScatterer.spawn(world, pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f, st0.getActualStack());
+			Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, st0.getActualStack());
 		}
 	}
 
 	@Override
 	public void updateServer() {
 		if(updateItems) {
-			BlockState st = world.getBlockState(pos);
-			Direction d = st.get(AbstractStorageTerminalBlock.FACING);
-			TerminalPos p = st.get(AbstractStorageTerminalBlock.TERMINAL_POS);
+			BlockState st = level.getBlockState(worldPosition);
+			Direction d = st.getValue(AbstractStorageTerminalBlock.FACING);
+			TerminalPos p = st.getValue(AbstractStorageTerminalBlock.TERMINAL_POS);
 			if(p == TerminalPos.UP)d = Direction.UP;
 			if(p == TerminalPos.DOWN)d = Direction.DOWN;
 			items.clear();
-			itemHandler = ItemStorage.SIDED.find(world, pos.offset(d), d.getOpposite());
+			itemHandler = ItemStorage.SIDED.find(level, worldPosition.relative(d), d.getOpposite());
 			if(itemHandler == null) {
-				Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(d));
+				Container inv = HopperBlockEntity.getContainerAt(level, worldPosition.relative(d));
 				if(inv != null)itemHandler = InventoryStorage.of(inv, d.getOpposite());
 			}
 			if(itemHandler != null) {
@@ -127,12 +128,12 @@ public class StorageTerminalBlockEntity extends BlockEntity implements NamedScre
 			}
 			updateItems = false;
 		}
-		if(world.getTime() % 40 == 5) {
-			beaconLevel = BlockPos.stream(new Box(pos).expand(8)).mapToInt(p -> {
-				if(world.canSetBlock(p)) {
-					BlockState st = world.getBlockState(p);
-					if(st.isOf(Blocks.BEACON)) {
-						return InventoryCableConnectorBlockEntity.calcBeaconLevel(world, p.getX(), p.getY(), p.getZ());
+		if(level.getGameTime() % 40 == 5) {
+			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(8)).mapToInt(p -> {
+				if(level.isLoaded(p)) {
+					BlockState st = level.getBlockState(p);
+					if(st.is(Blocks.BEACON)) {
+						return InventoryCableConnectorBlockEntity.calcBeaconLevel(level, p.getX(), p.getY(), p.getZ());
 					}
 				}
 				return 0;
@@ -140,18 +141,16 @@ public class StorageTerminalBlockEntity extends BlockEntity implements NamedScre
 		}
 	}
 
-	public boolean canInteractWith(PlayerEntity player) {
-		if(world.getBlockEntity(pos) != this)return false;
+	public boolean canInteractWith(Player player) {
+		if(level.getBlockEntity(worldPosition) != this)return false;
 		int d = 4;
-		int termReach = 0;
-		if(player.getMainHandStack().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getMainHandStack().getItem()).getRange(player, player.getMainHandStack()));
-		if(player.getOffHandStack().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getOffHandStack().getItem()).getRange(player, player.getOffHandStack()));
+		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
 		if(beaconLevel >= StorageMod.CONFIG.wirelessTermBeaconLvl && termReach > 0) {
 			if(beaconLevel >= StorageMod.CONFIG.wirelessTermBeaconLvlDim)return true;
-			else return player.getWorld() == world;
+			else return player.getLevel() == level;
 		}
 		d = Math.max(d, termReach);
-		return player.getWorld() == world && !(player.squaredDistanceTo(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > d*2*d*2);
+		return player.getLevel() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
 	}
 
 	public int getSorting() {
@@ -163,14 +162,14 @@ public class StorageTerminalBlockEntity extends BlockEntity implements NamedScre
 	}
 
 	@Override
-	public void writeNbt(NbtCompound compound) {
+	public void saveAdditional(CompoundTag compound) {
 		compound.putInt("sort", sort);
 	}
 
 	@Override
-	public void readNbt(NbtCompound compound) {
+	public void load(CompoundTag compound) {
 		sort = compound.getInt("sort");
-		super.readNbt(compound);
+		super.load(compound);
 	}
 
 	public String getLastSearch() {

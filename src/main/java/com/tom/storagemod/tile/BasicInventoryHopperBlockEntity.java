@@ -3,10 +3,10 @@ package com.tom.storagemod.tile;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.BasicInventoryHopperBlock;
@@ -25,7 +25,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 			cooldown--;
 			return;
 		}
-		if(!this.getCachedState().get(BasicInventoryHopperBlock.ENABLED))return;
+		if(!this.getBlockState().getValue(BasicInventoryHopperBlock.ENABLED))return;
 
 		try (Transaction tr = Transaction.openOuter()) {
 			ItemVariant iv = getFilter().isEmpty() ? null : ItemVariant.of(getFilter());
@@ -42,19 +42,19 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	}
 
 	@Override
-	public void writeNbt(NbtCompound compound) {
-		compound.put("Filter", getFilter().writeNbt(new NbtCompound()));
+	public void saveAdditional(CompoundTag compound) {
+		compound.put("Filter", getFilter().save(new CompoundTag()));
 	}
 
 	@Override
-	public void readNbt(NbtCompound nbtIn) {
-		super.readNbt(nbtIn);
-		setFilter(ItemStack.fromNbt(nbtIn.getCompound("Filter")));
+	public void load(CompoundTag nbtIn) {
+		super.load(nbtIn);
+		setFilter(ItemStack.of(nbtIn.getCompound("Filter")));
 	}
 
 	public void setFilter(ItemStack filter) {
 		this.filter = filter;
-		markDirty();
+		setChanged();
 	}
 
 	public ItemStack getFilter() {

@@ -12,19 +12,19 @@ import java.util.Map.Entry;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeMatcher;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.RecipeBookMenu;
+import net.minecraft.world.inventory.RecipeBookType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 
 import com.google.common.collect.Lists;
 
@@ -34,7 +34,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.tile.StorageTerminalBlockEntity;
 
-public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInventory> implements IDataReceiver {
+public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> implements IDataReceiver {
 	private static final int DIVISION_BASE = 1000;
 	private static final char[] ENCODED_POSTFIXES = "KMGTPE".toCharArray();
 	public static final Format format;
@@ -56,17 +56,17 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
 	private Map<StoredItemStack, Long> itemsCount = new HashMap<>();
 	private int lines;
-	protected PlayerInventory pinv;
+	protected Inventory pinv;
 	public Runnable onPacket;
 	public int terminalData;
 	public String search;
 
-	public StorageTerminalMenu(int id, PlayerInventory inv, StorageTerminalBlockEntity te) {
+	public StorageTerminalMenu(int id, Inventory inv, StorageTerminalBlockEntity te) {
 		this(StorageMod.storageTerminal, id, inv, te);
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
-	public StorageTerminalMenu(ScreenHandlerType<?> type, int id, PlayerInventory inv, StorageTerminalBlockEntity te) {
+	public StorageTerminalMenu(MenuType<?> type, int id, Inventory inv, StorageTerminalBlockEntity te) {
 		super(type, id);
 		this.te = te;
 		this.pinv = inv;
@@ -74,14 +74,14 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 	}
 
 	@Override
-	public boolean onButtonClick(PlayerEntity playerIn, int id) {
+	public boolean clickMenuButton(Player playerIn, int id) {
 		if(id == 0)return false;
 		int newC = id >> 1;
 		te.setSorting(newC);
 		return false;
 	}
 
-	public StorageTerminalMenu(ScreenHandlerType<?> type, int id, PlayerInventory inv) {
+	public StorageTerminalMenu(MenuType<?> type, int id, Inventory inv) {
 		this(type, id, inv, null);
 	}
 
@@ -89,12 +89,12 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 		addStorageSlots(5, 8, 18);
 	}
 
-	public StorageTerminalMenu(int id, PlayerInventory inv) {
+	public StorageTerminalMenu(int id, Inventory inv) {
 		this(StorageMod.storageTerminal, id, inv);
 		this.addPlayerSlots(inv, 8, 120);
 	}
 
-	protected void addPlayerSlots(PlayerInventory playerInventory, int x, int y) {
+	protected void addPlayerSlots(Inventory playerInventory, int x, int y) {
 		this.playerSlotsStart = slots.size() - 1;
 		for (int i = 0;i < 3;++i) {
 			for (int j = 0;j < 9;++j) {
@@ -229,22 +229,22 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 	}
 
 	@Override
-	public void sendContentUpdates() {
-		super.sendContentUpdates();
+	public void broadcastChanges() {
+		super.broadcastChanges();
 		if(te == null)return;
 		Map<StoredItemStack, Long> itemsCount = te.getStacks();
 		if(!this.itemsCount.equals(itemsCount)) {
-			NbtList list = new NbtList();
+			ListTag list = new ListTag();
 			this.itemList.clear();
 			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
 				StoredItemStack storedS = e.getKey();
-				NbtCompound tag = new NbtCompound();
+				CompoundTag tag = new CompoundTag();
 				storedS.writeToNBT(tag);
 				tag.putLong("c", e.getValue());
 				list.add(tag);
 				this.itemList.add(new StoredItemStack(e.getKey().getStack(), e.getValue()));
 			}
-			NbtCompound mainTag = new NbtCompound();
+			CompoundTag mainTag = new CompoundTag();
 			mainTag.put("l", list);
 			mainTag.putInt("p", te.getSorting());
 			mainTag.putString("s", te.getLastSearch());
@@ -253,12 +253,12 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 		}
 	}
 
-	public final void receiveClientTagPacket(NbtCompound message) {
+	public final void receiveClientTagPacket(CompoundTag message) {
 		//System.out.println(message);
-		NbtList list = message.getList("l", 10);
+		ListTag list = message.getList("l", 10);
 		itemList.clear();
 		for (int i = 0;i < list.size();i++) {
-			NbtCompound tag = list.getCompound(i);
+			CompoundTag tag = list.getCompound(i);
 			StoredItemStack stack = StoredItemStack.readFromNBT(tag);
 			if(stack != null)
 				itemList.add(stack);
@@ -266,24 +266,24 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 		}
 		//System.out.println(itemList);
 		itemListClient = new ArrayList<>(itemList);
-		pinv.markDirty();
+		pinv.setChanged();
 		terminalData = message.getInt("p");
 		search = message.getString("s");
 		if(onPacket != null)onPacket.run();
 	}
 
 	@Override
-	public final ItemStack transferSlot(PlayerEntity playerIn, int index) {
+	public final ItemStack quickMoveStack(Player playerIn, int index) {
 		if (slots.size() > index) {
 			if (index > playerSlotsStart && te != null) {
-				if (slots.get(index) != null && slots.get(index).hasStack()) {
+				if (slots.get(index) != null && slots.get(index).hasItem()) {
 					Slot slot = slots.get(index);
-					ItemStack slotStack = slot.getStack();
+					ItemStack slotStack = slot.getItem();
 					StoredItemStack c = te.pushStack(new StoredItemStack(slotStack, slotStack.getCount()));
 					ItemStack itemstack = c != null ? c.getActualStack() : ItemStack.EMPTY;
-					slot.setStack(itemstack);
-					if (!playerIn.world.isClient)
-						sendContentUpdates();
+					slot.set(itemstack);
+					if (!playerIn.level.isClientSide)
+						broadcastChanges();
 				}
 			} else {
 				return shiftClickItems(playerIn, index);
@@ -292,7 +292,7 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 		return ItemStack.EMPTY;
 	}
 
-	protected ItemStack shiftClickItems(PlayerEntity playerIn, int index) {
+	protected ItemStack shiftClickItems(Player playerIn, int index) {
 		return ItemStack.EMPTY;
 	}
 
@@ -303,7 +303,7 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 			if (stack.getItem() == matchTo.getItem()) {
 				boolean equals = true;
 				if (checkTag) {
-					equals = equals && ItemStack.areItemsEqual(stack, matchTo);
+					equals = equals && ItemStack.isSameIgnoreDurability(stack, matchTo);
 				}
 				return equals;
 			}
@@ -311,74 +311,74 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 		return false;
 	}
 
-	public void sendMessage(NbtCompound compound) {
+	public void sendMessage(CompoundTag compound) {
 		NetworkHandler.sendToServer(compound);
 	}
 
 	@Override
-	public void receive(NbtCompound message) {
+	public void receive(CompoundTag message) {
 		if(pinv.player.isSpectator())return;
 		if(message.contains("s")) {
 			te.setLastSearch(message.getString("s"));
 		}
 		if(message.contains("a")) {
-			ServerPlayerEntity player = (ServerPlayerEntity) pinv.player;
-			player.updateLastActionTime();
-			NbtCompound d = message.getCompound("a");
-			ItemStack clicked = ItemStack.fromNbt(d.getCompound("s"));
+			ServerPlayer player = (ServerPlayer) pinv.player;
+			player.resetLastActionTime();
+			CompoundTag d = message.getCompound("a");
+			ItemStack clicked = ItemStack.of(d.getCompound("s"));
 			SlotAction act = SlotAction.VALUES[Math.abs(d.getInt("a")) % SlotAction.VALUES.length];
 			if(act == SlotAction.SPACE_CLICK) {
 				for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
-					transferSlot(player, i);
+					quickMoveStack(player, i);
 				}
 			} else {
 				if (act == SlotAction.PULL_OR_PUSH_STACK) {
-					ItemStack stack = getCursorStack();
+					ItemStack stack = getCarried();
 					if (!stack.isEmpty()) {
 						StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
 						ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
-						setCursorStack(itemstack);
+						setCarried(itemstack);
 					} else {
 						if (clicked.isEmpty())return;
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
+						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxStackSize());
 						if(pulled != null) {
-							setCursorStack(pulled.getActualStack());
+							setCarried(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.PULL_ONE) {
-					ItemStack stack = getCursorStack();
+					ItemStack stack = getCarried();
 					if (clicked.isEmpty())return;
 					if (d.getBoolean("m")) {
 						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 						if(pulled != null) {
 							ItemStack itemstack = pulled.getActualStack();
-							this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
+							this.moveItemStackTo(itemstack, playerSlotsStart + 1, this.slots.size(), true);
 							if (itemstack.getCount() > 0)
 								te.pushOrDrop(itemstack);
-							player.getInventory().markDirty();
+							player.getInventory().setChanged();
 						}
 					} else {
 						if (!stack.isEmpty()) {
-							if (areItemStacksEqual(stack, clicked, true) && stack.getCount() + 1 <= stack.getMaxCount()) {
+							if (areItemStacksEqual(stack, clicked, true) && stack.getCount() + 1 <= stack.getMaxStackSize()) {
 								StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 								if (pulled != null) {
-									stack.increment(1);
+									stack.grow(1);
 								}
 							}
 						} else {
 							StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
 							if (pulled != null) {
-								setCursorStack(pulled.getActualStack());
+								setCarried(pulled.getActualStack());
 							}
 						}
 					}
 				} else if (act == SlotAction.GET_HALF) {
-					ItemStack stack = getCursorStack();
+					ItemStack stack = getCarried();
 					if (!stack.isEmpty()) {
-						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 2, 1));
+						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxStackSize()) / 2, 1));
 						ItemStack itemstack = te.pushStack(stack1);
-						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						setCursorStack(stack);
+						stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
+						setCarried(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -388,18 +388,18 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 							if(e.equals((Object)clickedSt))
 								maxCount = e.getQuantity();
 						}
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 2, 1));
+						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 2, 1));
 						if(pulled != null) {
-							setCursorStack(pulled.getActualStack());
+							setCarried(pulled.getActualStack());
 						}
 					}
 				} else if (act == SlotAction.GET_QUARTER) {
-					ItemStack stack = getCursorStack();
+					ItemStack stack = getCarried();
 					if (!stack.isEmpty()) {
-						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 4, 1));
+						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxStackSize()) / 4, 1));
 						ItemStack itemstack = te.pushStack(stack1);
-						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						setCursorStack(stack);
+						stack.grow(!itemstack.isEmpty() ? itemstack.getCount() : 0);
+						setCarried(stack);
 					} else {
 						if (clicked.isEmpty())return;
 						long maxCount = 64;
@@ -408,77 +408,77 @@ public class StorageTerminalMenu extends AbstractRecipeScreenHandler<CraftingInv
 							StoredItemStack e = itemList.get(i);
 							if(e.equals((Object)clickedSt))maxCount = e.getQuantity();
 						}
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 4, 1));
+						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 4, 1));
 						if(pulled != null) {
-							setCursorStack(pulled.getActualStack());
+							setCarried(pulled.getActualStack());
 						}
 					}
 				} else {
 					if (clicked.isEmpty())return;
-					StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
+					StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxStackSize());
 					if(pulled != null) {
 						ItemStack itemstack = pulled.getActualStack();
-						this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
+						this.moveItemStackTo(itemstack, playerSlotsStart + 1, this.slots.size(), true);
 						if (itemstack.getCount() > 0)
 							te.pushOrDrop(itemstack);
-						player.getInventory().markDirty();
+						player.getInventory().setChanged();
 					}
 				}
 			}
 			//player.updateCursorStack();
 		}
 		if(message.contains("c")) {
-			NbtCompound d = message.getCompound("c");
+			CompoundTag d = message.getCompound("c");
 			te.setSorting(d.getInt("d"));
 		}
 	}
 
 	@Override
-	public void populateRecipeFinder(RecipeMatcher paramRecipeFinder) {
+	public void fillCraftSlotsStackedContents(StackedContents paramRecipeFinder) {
 	}
 
 	@Override
-	public void clearCraftingSlots() {
+	public void clearCraftingContent() {
 	}
 
 	@Override
-	public boolean matches(Recipe<? super CraftingInventory> paramRecipe) {
+	public boolean recipeMatches(Recipe<? super CraftingContainer> paramRecipe) {
 		return false;
 	}
 
 	@Override
-	public int getCraftingResultSlotIndex() {
+	public int getResultSlotIndex() {
 		return 0;
 	}
 
 	@Override
-	public int getCraftingWidth() {
+	public int getGridWidth() {
 		return 0;
 	}
 
 	@Override
-	public int getCraftingHeight() {
+	public int getGridHeight() {
 		return 0;
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public int getCraftingSlotCount() {
+	public int getSize() {
 		return 0;
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity paramPlayerEntity) {
+	public boolean stillValid(Player paramPlayerEntity) {
 		return te == null || te.canInteractWith(paramPlayerEntity);
 	}
 
 	@Override
-	public RecipeBookCategory getCategory() {
-		return RecipeBookCategory.CRAFTING;
+	public RecipeBookType getRecipeBookType() {
+		return RecipeBookType.CRAFTING;
 	}
 
 	@Override
-	public boolean canInsertIntoSlot(int index) {
+	public boolean shouldMoveToInventory(int index) {
 		return false;
 	}
 }

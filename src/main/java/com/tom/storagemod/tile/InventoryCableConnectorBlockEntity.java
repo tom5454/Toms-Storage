@@ -4,21 +4,21 @@ import java.util.UUID;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BeaconBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BeaconBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
@@ -27,7 +27,7 @@ import com.tom.storagemod.util.IInventoryLink;
 import com.tom.storagemod.util.RemoteConnections;
 import com.tom.storagemod.util.RemoteConnections.Channel;
 
-public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableConnectorBlockEntity implements NamedScreenHandlerFactory, IInventoryLink {
+public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableConnectorBlockEntity implements MenuProvider, IInventoryLink {
 	private static final String CHANNEL_TAG = "channel";
 	private static final String REMOTE_TAG = "remote";
 	private UUID channel = null;
@@ -41,13 +41,13 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	@Override
 	public void updateServer() {
 		super.updateServer();
-		if(!world.isClient && world.getTime() % 20 == 18) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(InventoryCableConnectorBlock.FACING);
-			BlockPos pos = this.pos.offset(facing);
-			BlockState st = world.getBlockState(pos);
-			if(st.isOf(Blocks.BEACON)) {
-				beaconLevel = calcBeaconLevel(world, pos.getX(), pos.getY(), pos.getZ());
+		if(!level.isClientSide && level.getGameTime() % 20 == 18) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
+			BlockPos pos = this.worldPosition.relative(facing);
+			BlockState st = level.getBlockState(pos);
+			if(st.is(Blocks.BEACON)) {
+				beaconLevel = calcBeaconLevel(level, pos.getX(), pos.getY(), pos.getZ());
 			} else {
 				beaconLevel = -1;
 			}
@@ -58,12 +58,12 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	protected Storage<ItemVariant> getPointedAt(BlockPos pos, Direction facing) {
 		if(beaconLevel >= 0) {
 			if(channel != null && beaconLevel > 0) {
-				Channel chn = RemoteConnections.get(world).getChannel(channel);
+				Channel chn = RemoteConnections.get(level).getChannel(channel);
 				if(chn != null) {
 					if(!remote) {
-						return chn.findOthers((ServerWorld) world, this.pos, beaconLevel);
+						return chn.findOthers((ServerLevel) level, this.worldPosition, beaconLevel);
 					} else {
-						chn.register((ServerWorld) world, this.pos);
+						chn.register((ServerLevel) level, this.worldPosition);
 					}
 				}
 			}
@@ -72,16 +72,16 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 		return super.getPointedAt(pos, facing);
 	}
 
-	public static int calcBeaconLevel(World world, int x, int y, int z) {
+	public static int calcBeaconLevel(Level world, int x, int y, int z) {
 		int i = 0;
 
 		BlockEntity ent = world.getBlockEntity(new BlockPos(x, y, z));
 		if(ent instanceof BeaconBlockEntity b) {
-			if(b.getBeamSegments().isEmpty())return 0;
+			if(b.getBeamSections().isEmpty())return 0;
 
 			for(int j = 1; j <= 4; i = j++) {
 				int k = y - j;
-				if (k < world.getBottomY()) {
+				if (k < world.getMinBuildHeight()) {
 					break;
 				}
 
@@ -89,7 +89,7 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 
 				for(int l = x - j; l <= x + j && flag; ++l) {
 					for(int i1 = z - j; i1 <= z + j; ++i1) {
-						if (!world.getBlockState(new BlockPos(l, k, i1)).isIn(BlockTags.BEACON_BASE_BLOCKS)) {
+						if (!world.getBlockState(new BlockPos(l, k, i1)).is(BlockTags.BEACON_BASE_BLOCKS)) {
 							flag = false;
 							break;
 						}
@@ -105,20 +105,20 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	}
 
 	@Override
-	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+	public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
 		return new InventoryLinkMenu(syncId, inv, this);
 	}
 
 	@Override
-	public Text getDisplayName() {
-		return Text.translatable("ts.inventory_connector");
+	public Component getDisplayName() {
+		return Component.translatable("ts.inventory_connector");
 	}
 
 	@Override
-	public void readNbt(NbtCompound nbt) {
-		super.readNbt(nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		if(nbt.contains(CHANNEL_TAG)) {
-			channel = nbt.getUuid(CHANNEL_TAG);
+			channel = nbt.getUUID(CHANNEL_TAG);
 		} else {
 			channel = null;
 		}
@@ -126,32 +126,32 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	}
 
 	@Override
-	public void writeNbt(NbtCompound nbt) {
-		super.writeNbt(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if(channel != null) {
-			nbt.putUuid(CHANNEL_TAG, channel);
+			nbt.putUUID(CHANNEL_TAG, channel);
 		}
 		nbt.putBoolean(REMOTE_TAG, remote);
 	}
 
 	@Override
-	public Storage<ItemVariant> getInventoryFrom(ServerWorld fromWorld, int fromLevel) {
+	public Storage<ItemVariant> getInventoryFrom(ServerLevel fromWorld, int fromLevel) {
 		if(!remote || beaconLevel < StorageMod.CONFIG.invLinkBeaconLvl)return null;
 		if(beaconLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim || fromLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim)return this;
-		if(fromWorld.getRegistryKey().equals(world.getRegistryKey()))return this;
+		if(fromWorld.dimension().equals(level.dimension()))return this;
 		return null;
 	}
 
-	public boolean stillValid(PlayerEntity p_59619_) {
+	public boolean stillValid(Player p_59619_) {
 		if(channel != null) {
-			Channel chn = RemoteConnections.get(world).getChannel(channel);
-			if(chn != null && !chn.publicChannel && !chn.owner.equals(p_59619_.getUuid()))
+			Channel chn = RemoteConnections.get(level).getChannel(channel);
+			if(chn != null && !chn.publicChannel && !chn.owner.equals(p_59619_.getUUID()))
 				return false;
 		}
-		if (this.world.getBlockEntity(this.pos) != this || beaconLevel < 0) {
+		if (this.level.getBlockEntity(this.worldPosition) != this || beaconLevel < 0) {
 			return false;
 		} else {
-			return !(p_59619_.squaredDistanceTo(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) > 64.0D);
+			return !(p_59619_.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > 64.0D);
 		}
 	}
 
@@ -161,9 +161,9 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	}
 
 	public void setChannel(UUID channel) {
-		RemoteConnections.get(world).invalidateCache(this.channel);
+		RemoteConnections.get(level).invalidateCache(this.channel);
 		this.channel = channel;
-		markDirty();
+		setChanged();
 	}
 
 	public int getBeaconLevel() {
@@ -176,6 +176,6 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 
 	public void setRemote(boolean remote) {
 		this.remote = remote;
-		markDirty();
+		setChanged();
 	}
 }

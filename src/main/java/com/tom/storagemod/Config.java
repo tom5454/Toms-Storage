@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.Tooltip;
@@ -68,7 +68,7 @@ public class Config implements ConfigData {
 	}
 
 	private void reloadConfig() {
-		StorageMod.multiblockInvs = multiblockInv.stream().map(Identifier::new).map(Registry.BLOCK::get).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
+		StorageMod.multiblockInvs = multiblockInv.stream().map(ResourceLocation::new).map(Registry.BLOCK::get).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 	}
 
 	public static Set<Block> getMultiblockInvs() {

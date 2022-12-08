@@ -1,39 +1,39 @@
 package com.tom.storagemod.gui;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.NetworkHandler;
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.tile.LevelEmitterBlockEntity;
 
-public class LevelEmitterMenu extends ScreenHandler implements IDataReceiver {
-	private final Inventory inv;
+public class LevelEmitterMenu extends AbstractContainerMenu implements IDataReceiver {
+	private final Container inv;
 	private LevelEmitterBlockEntity te;
-	private PlayerInventory pinv;
+	private Inventory pinv;
 
-	public LevelEmitterMenu(int p_i50087_1_, PlayerInventory p_i50087_2_) {
+	public LevelEmitterMenu(int p_i50087_1_, Inventory p_i50087_2_) {
 		this(p_i50087_1_, p_i50087_2_, null);
 	}
 
-	public LevelEmitterMenu(int p_i50088_1_, PlayerInventory p_i50088_2_, LevelEmitterBlockEntity te) {
+	public LevelEmitterMenu(int p_i50088_1_, Inventory p_i50088_2_, LevelEmitterBlockEntity te) {
 		super(StorageMod.levelEmitterConatiner, p_i50088_1_);
-		this.inv = te == null ? new SimpleInventory(1) : new Inventory() {
+		this.inv = te == null ? new SimpleContainer(1) : new Container() {
 
 			@Override
-			public void clear() {
+			public void clearContent() {
 			}
 
 			@Override
-			public void markDirty() {
+			public void setChanged() {
 			}
 
 			@Override
@@ -42,36 +42,36 @@ public class LevelEmitterMenu extends ScreenHandler implements IDataReceiver {
 			}
 
 			@Override
-			public ItemStack getStack(int index) {
+			public ItemStack getItem(int index) {
 				return te.getFilter();
 			}
 
 			@Override
-			public int size() {
+			public int getContainerSize() {
 				return 1;
 			}
 
 			@Override
-			public ItemStack removeStack(int paramInt1, int paramInt2) {
+			public ItemStack removeItem(int paramInt1, int paramInt2) {
 				return ItemStack.EMPTY;
 			}
 
 			@Override
-			public ItemStack removeStack(int paramInt) {
+			public ItemStack removeItemNoUpdate(int paramInt) {
 				return ItemStack.EMPTY;
 			}
 
 			@Override
-			public void setStack(int paramInt, ItemStack paramItemStack) {
+			public void setItem(int paramInt, ItemStack paramItemStack) {
 				te.setFilter(paramItemStack);
 			}
 
 			@Override
-			public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
+			public boolean stillValid(Player paramPlayerEntity) {
 				return false;
 			}
 		};
-		inv.onOpen(p_i50088_2_.player);
+		inv.startOpen(p_i50088_2_.player);
 		this.te = te;
 		this.pinv = p_i50088_2_;
 
@@ -93,7 +93,7 @@ public class LevelEmitterMenu extends ScreenHandler implements IDataReceiver {
 	 * Determines whether supplied player can use this container
 	 */
 	@Override
-	public boolean canUse(PlayerEntity playerIn) {
+	public boolean stillValid(Player playerIn) {
 		return te != null ? te.stillValid(playerIn) : true;
 	}
 
@@ -102,17 +102,17 @@ public class LevelEmitterMenu extends ScreenHandler implements IDataReceiver {
 	 * inventory and the other inventory(s).
 	 */
 	@Override
-	public ItemStack transferSlot(PlayerEntity playerIn, int index) {
+	public ItemStack quickMoveStack(Player playerIn, int index) {
 		Slot slot = this.slots.get(index);
-		if (slot != null && slot.hasStack()) {
+		if (slot != null && slot.hasItem()) {
 			if (index < 9) {
 			} else {
-				ItemStack is = slot.getStack().copy();
+				ItemStack is = slot.getItem().copy();
 				is.setCount(1);
 				Slot sl = this.slots.get(0);
-				if(!ItemStack.areItemsEqual(sl.getStack(), is)) {
-					if(sl.getStack().isEmpty()) {
-						sl.setStack(is);
+				if(!ItemStack.isSameIgnoreDurability(sl.getItem(), is)) {
+					if(sl.getItem().isEmpty()) {
+						sl.set(is);
 					}
 				}
 			}
@@ -125,28 +125,28 @@ public class LevelEmitterMenu extends ScreenHandler implements IDataReceiver {
 	 * Called when the container is closed.
 	 */
 	@Override
-	public void close(PlayerEntity playerIn) {
-		super.close(playerIn);
-		this.inv.onClose(playerIn);
+	public void removed(Player playerIn) {
+		super.removed(playerIn);
+		this.inv.stopOpen(playerIn);
 	}
 
 	@Override
-	public void onSlotClick(int slotId, int dragType, SlotActionType click, PlayerEntity player) {
+	public void clicked(int slotId, int dragType, ClickType click, Player player) {
 		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof PhantomSlot) {
-			ItemStack s = getCursorStack().copy();
+			ItemStack s = getCarried().copy();
 			if(!s.isEmpty())s.setCount(1);
-			slot.setStack(s);
+			slot.set(s);
 			return;
 		}
-		super.onSlotClick(slotId, dragType, click, player);
+		super.clicked(slotId, dragType, click, player);
 	}
 
 	private int lastCount = 0;
 	private boolean lessThan = false;
 
 	@Override
-	public void receive(NbtCompound tag) {
+	public void receive(CompoundTag tag) {
 		if(pinv.player.isSpectator() || te == null)return;
 		int count = tag.getInt("count");
 		boolean lt = tag.getBoolean("lessThan");
@@ -155,16 +155,16 @@ public class LevelEmitterMenu extends ScreenHandler implements IDataReceiver {
 	}
 
 	@Override
-	public void sendContentUpdates() {
+	public void broadcastChanges() {
 		if(te == null)return;
 		if(lastCount != te.getCount() || lessThan != te.isLessThan()) {
-			NbtCompound mainTag = new NbtCompound();
+			CompoundTag mainTag = new CompoundTag();
 			mainTag.putInt("count", te.getCount());
 			mainTag.putBoolean("lessThan", te.isLessThan());
 			lastCount = te.getCount();
 			lessThan = te.isLessThan();
 			NetworkHandler.sendTo(pinv.player, mainTag);
 		}
-		super.sendContentUpdates();
+		super.broadcastChanges();
 	}
 }

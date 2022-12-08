@@ -8,7 +8,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.BlankVariantView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import com.google.common.collect.Iterators;
 

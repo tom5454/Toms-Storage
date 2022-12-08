@@ -4,57 +4,57 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.CraftingResultInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
 
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
-	private ScreenHandler craftingContainer = new ScreenHandler(ScreenHandlerType.CRAFTING, 0) {
+	private AbstractContainerMenu craftingContainer = new AbstractContainerMenu(MenuType.CRAFTING, 0) {
 
 		@Override
-		public void onContentChanged(Inventory inventory) {
-			if (world != null && !world.isClient) {
+		public void slotsChanged(Container inventory) {
+			if (level != null && !level.isClientSide) {
 				onCraftingMatrixChanged();
 			}
 		}
 
 		@Override
-		public boolean canUse(PlayerEntity paramPlayerEntity) {
+		public boolean stillValid(Player paramPlayerEntity) {
 			return false;
 		}
 
 		@Override
-		public ItemStack transferSlot(PlayerEntity player, int index) {
+		public ItemStack quickMoveStack(Player player, int index) {
 			return ItemStack.EMPTY;
 		}
 	};
 	private CraftingRecipe currentRecipe;
-	private final CraftingInventory craftMatrix = new CraftingInventory(craftingContainer, 3, 3) {
+	private final CraftingContainer craftMatrix = new CraftingContainer(craftingContainer, 3, 3) {
 
 		@Override
-		public void markDirty() {
-			CraftingTerminalBlockEntity.this.markDirty();
+		public void setChanged() {
+			CraftingTerminalBlockEntity.this.setChanged();
 		}
 	};
-	private CraftingResultInventory craftResult = new CraftingResultInventory();
+	private ResultContainer craftResult = new ResultContainer();
 	private HashSet<CraftingTerminalMenu> craftingListeners = new HashSet<>();
 
 	public CraftingTerminalBlockEntity(BlockPos pos, BlockState state) {
@@ -62,26 +62,26 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 
 	@Override
-	public ScreenHandler createMenu(int id, PlayerInventory plInv, PlayerEntity arg2) {
+	public AbstractContainerMenu createMenu(int id, Inventory plInv, Player arg2) {
 		return new CraftingTerminalMenu(id, plInv, this);
 	}
 
 	@Override
-	public Text getDisplayName() {
-		return Text.translatable("ts.crafting_terminal");
+	public Component getDisplayName() {
+		return Component.translatable("ts.crafting_terminal");
 	}
 
 	@Override
-	public void writeNbt(NbtCompound compound) {
-		super.writeNbt(compound);
-		NbtList listnbt = new NbtList();
+	public void saveAdditional(CompoundTag compound) {
+		super.saveAdditional(compound);
+		ListTag listnbt = new ListTag();
 
-		for(int i = 0; i < craftMatrix.size(); ++i) {
-			ItemStack itemstack = craftMatrix.getStack(i);
+		for(int i = 0; i < craftMatrix.getContainerSize(); ++i) {
+			ItemStack itemstack = craftMatrix.getItem(i);
 			if (!itemstack.isEmpty()) {
-				NbtCompound tag = new NbtCompound();
+				CompoundTag tag = new CompoundTag();
 				tag.putByte("Slot", (byte)i);
-				itemstack.writeNbt(tag);
+				itemstack.save(tag);
 				listnbt.add(tag);
 			}
 		}
@@ -90,70 +90,70 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 	private boolean reading;
 	@Override
-	public void readNbt(NbtCompound compound) {
-		super.readNbt(compound);
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		reading = true;
-		NbtList listnbt = compound.getList("CraftingTable", 10);
+		ListTag listnbt = compound.getList("CraftingTable", 10);
 
 		for(int i = 0; i < listnbt.size(); ++i) {
-			NbtCompound tag = listnbt.getCompound(i);
+			CompoundTag tag = listnbt.getCompound(i);
 			int j = tag.getByte("Slot") & 255;
-			if (j >= 0 && j < craftMatrix.size()) {
-				craftMatrix.setStack(j, ItemStack.fromNbt(tag));
+			if (j >= 0 && j < craftMatrix.getContainerSize()) {
+				craftMatrix.setItem(j, ItemStack.of(tag));
 			}
 		}
 		reading = false;
 	}
 
-	public CraftingInventory getCraftingInv() {
+	public CraftingContainer getCraftingInv() {
 		return craftMatrix;
 	}
 
-	public CraftingResultInventory getCraftResult() {
+	public ResultContainer getCraftResult() {
 		return craftResult;
 	}
 
-	public void craftShift(PlayerEntity player) {
+	public void craftShift(Player player) {
 		List<ItemStack> craftedItemsList = new ArrayList<>();
 		int amountCrafted = 0;
-		ItemStack crafted = craftResult.getStack(0);
+		ItemStack crafted = craftResult.getItem(0);
 		do {
 			craft(player);
 			craftedItemsList.add(crafted.copy());
 			amountCrafted += crafted.getCount();
-		} while(ItemStack.areItemsEqual(crafted, craftResult.getStack(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxCount());
+		} while(ItemStack.isSameIgnoreDurability(crafted, craftResult.getItem(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxStackSize());
 
 		for (ItemStack craftedItem : craftedItemsList) {
-			if (!player.getInventory().insertStack(craftedItem.copy())) {
+			if (!player.getInventory().add(craftedItem.copy())) {
 				ItemStack is = pushStack(craftedItem);
 				if(!is.isEmpty()) {
-					ItemScatterer.spawn(world, player.getX(), player.getY(), player.getZ(), is);
+					Containers.dropItemStack(level, player.getX(), player.getY(), player.getZ(), is);
 				}
 			}
 		}
 
-		crafted.onCraft(player.world, player, amountCrafted);
+		crafted.onCraftedBy(player.level, player, amountCrafted);
 	}
 
-	public void craft(PlayerEntity thePlayer) {
+	public void craft(Player thePlayer) {
 		if(currentRecipe != null) {
-			DefaultedList<ItemStack> remainder = currentRecipe.getRemainder(craftMatrix);
+			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
 			boolean playerInvUpdate = false;
 			for (int i = 0; i < remainder.size(); ++i) {
-				ItemStack slot = craftMatrix.getStack(i);
+				ItemStack slot = craftMatrix.getItem(i);
 				ItemStack oldItem = slot.copy();
 				ItemStack rem = remainder.get(i);
 				if (!slot.isEmpty()) {
-					craftMatrix.removeStack(i, 1);
-					slot = craftMatrix.getStack(i);
+					craftMatrix.removeItem(i, 1);
+					slot = craftMatrix.getItem(i);
 				}
 				if(slot.isEmpty() && !oldItem.isEmpty()) {
 					StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
 					if(is == null && (getSorting() & (1 << 8)) != 0) {
-						for(int j = 0;j<thePlayer.getInventory().size();j++) {
-							ItemStack st = thePlayer.getInventory().getStack(j);
-							if(ItemStack.areItemsEqual(oldItem, st) && ItemStack.areNbtEqual(oldItem, st)) {
-								st = thePlayer.getInventory().removeStack(j, 1);
+						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
+							ItemStack st = thePlayer.getInventory().getItem(j);
+							if(ItemStack.isSameIgnoreDurability(oldItem, st) && ItemStack.tagMatches(oldItem, st)) {
+								st = thePlayer.getInventory().removeItem(j, 1);
 								if(!st.isEmpty()) {
 									is = new StoredItemStack(st, 1);
 									playerInvUpdate = true;
@@ -163,28 +163,28 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 						}
 					}
 					if(is != null) {
-						craftMatrix.setStack(i, is.getActualStack());
-						slot = craftMatrix.getStack(i);
+						craftMatrix.setItem(i, is.getActualStack());
+						slot = craftMatrix.getItem(i);
 					}
 				}
 				if (rem.isEmpty()) {
 					continue;
 				}
 				if (slot.isEmpty()) {
-					craftMatrix.setStack(i, rem);
+					craftMatrix.setItem(i, rem);
 					continue;
 				}
-				if (ItemStack.areItemsEqualIgnoreDamage(slot, rem) && ItemStack.areNbtEqual(slot, rem)) {
-					rem.increment(slot.getCount());
-					craftMatrix.setStack(i, rem);
+				if (ItemStack.isSame(slot, rem) && ItemStack.tagMatches(slot, rem)) {
+					rem.grow(slot.getCount());
+					craftMatrix.setItem(i, rem);
 					continue;
 				}
 				rem = pushStack(rem);
 				if(rem.isEmpty())continue;
-				if (thePlayer.getInventory().insertStack(rem)) continue;
-				thePlayer.dropItem(rem, false);
+				if (thePlayer.getInventory().add(rem)) continue;
+				thePlayer.drop(rem, false);
 			}
-			if(playerInvUpdate)thePlayer.currentScreenHandler.sendContentUpdates();
+			if(playerInvUpdate)thePlayer.containerMenu.broadcastChanges();
 			onCraftingMatrixChanged();
 		}
 	}
@@ -198,26 +198,26 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 
 	protected void onCraftingMatrixChanged() {
-		if (currentRecipe == null || !currentRecipe.matches(craftMatrix, world)) {
-			currentRecipe = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftMatrix, world).orElse(null);
+		if (currentRecipe == null || !currentRecipe.matches(craftMatrix, level)) {
+			currentRecipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix, level).orElse(null);
 		}
 
 		if (currentRecipe == null) {
-			craftResult.setStack(0, ItemStack.EMPTY);
+			craftResult.setItem(0, ItemStack.EMPTY);
 		} else {
-			craftResult.setStack(0, currentRecipe.craft(craftMatrix));
+			craftResult.setItem(0, currentRecipe.assemble(craftMatrix));
 		}
 
 		craftingListeners.forEach(CraftingTerminalMenu::onCraftMatrixChanged);
 
 		if (!reading) {
-			markDirty();
+			setChanged();
 		}
 	}
 
 	public void clear() {
-		for (int i = 0; i < craftMatrix.size(); i++) {
-			ItemStack st = craftMatrix.removeStack(i);
+		for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
+			ItemStack st = craftMatrix.removeItemNoUpdate(i);
 			if(!st.isEmpty()) {
 				pushOrDrop(st);
 			}
@@ -225,7 +225,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		onCraftingMatrixChanged();
 	}
 
-	public void handlerItemTransfer(PlayerEntity player, ItemStack[][] items) {
+	public void handlerItemTransfer(Player player, ItemStack[][] items) {
 		clear();
 		for (int i = 0;i < 9;i++) {
 			if (items[i] != null) {
@@ -240,9 +240,9 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 				if (stack.isEmpty()) {
 					for (int j = 0;j < items[i].length;j++) {
 						boolean br = false;
-						for (int k = 0;k < player.getInventory().size();k++) {
-							if(ItemStack.areItemsEqual(player.getInventory().getStack(k), items[i][j])) {
-								stack = player.getInventory().removeStack(k, 1);
+						for (int k = 0;k < player.getInventory().getContainerSize();k++) {
+							if(ItemStack.isSameIgnoreDurability(player.getInventory().getItem(k), items[i][j])) {
+								stack = player.getInventory().removeItem(k, 1);
 								br = true;
 								break;
 							}
@@ -252,7 +252,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					}
 				}
 				if (!stack.isEmpty()) {
-					craftMatrix.setStack(i, stack);
+					craftMatrix.setItem(i, stack);
 				}
 			}
 		}

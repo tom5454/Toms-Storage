@@ -2,19 +2,19 @@ package com.tom.storagemod.util;
 
 import java.util.Set;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class InventoryWrapper {
-	private static final SimpleInventory DUMMY = new SimpleInventory(0);
-	private final Inventory inv;
+	private static final SimpleContainer DUMMY = new SimpleContainer(0);
+	private final Container inv;
 	private final Direction dir;
 
-	public InventoryWrapper(Inventory inv, Direction dir) {
+	public InventoryWrapper(Container inv, Direction dir) {
 		if(inv == null)throw new NullPointerException("inv is null");
 		this.inv = inv;
 		this.dir = dir;
@@ -26,7 +26,7 @@ public class InventoryWrapper {
 	}
 
 	public int size() {
-		return inv.size();
+		return inv.getContainerSize();
 	}
 
 	public boolean isEmpty() {
@@ -34,61 +34,61 @@ public class InventoryWrapper {
 	}
 
 	public ItemStack getStack(int paramInt) {
-		return inv.getStack(paramInt);
+		return inv.getItem(paramInt);
 	}
 
 	public ItemStack removeStack(int paramInt1, int paramInt2) {
-		return inv.removeStack(paramInt1, paramInt2);
+		return inv.removeItem(paramInt1, paramInt2);
 	}
 
 	public ItemStack removeStack(int paramInt) {
-		return inv.removeStack(paramInt);
+		return inv.removeItemNoUpdate(paramInt);
 	}
 
 	public void setStack(int paramInt, ItemStack paramItemStack) {
-		inv.setStack(paramInt, paramItemStack);
+		inv.setItem(paramInt, paramItemStack);
 	}
 
 	public int getMaxCountPerStack() {
-		return inv.getMaxCountPerStack();
+		return inv.getMaxStackSize();
 	}
 
 	public void markDirty() {
-		inv.markDirty();
+		inv.setChanged();
 	}
 
 	public boolean isValid(int slot, ItemStack stack, Boolean extract) {
-		if(inv.getMaxCountPerStack() < stack.getCount() + inv.getStack(slot).getCount())return false;//Fix issues with mods that limit stacksize
-		if(inv instanceof SidedInventory) {
+		if(inv.getMaxStackSize() < stack.getCount() + inv.getItem(slot).getCount())return false;//Fix issues with mods that limit stacksize
+		if(inv instanceof WorldlyContainer) {
 			if(!canAccess(slot))return false;
-			SidedInventory si = (SidedInventory) inv;
+			WorldlyContainer si = (WorldlyContainer) inv;
 			if(extract == null) {
-				return si.canExtract(slot, stack, dir) && si.canInsert(slot, stack, dir);
+				return si.canTakeItemThroughFace(slot, stack, dir) && si.canPlaceItemThroughFace(slot, stack, dir);
 			}
 			if(extract) {
-				return si.canExtract(slot, stack, dir);
+				return si.canTakeItemThroughFace(slot, stack, dir);
 			} else {
-				return si.canInsert(slot, stack, dir);
+				return si.canPlaceItemThroughFace(slot, stack, dir);
 			}
 		}
-		return inv.isValid(slot, stack);
+		return inv.canPlaceItem(slot, stack);
 	}
 
 	public int count(Item item) {
-		return inv.count(item);
+		return inv.countItem(item);
 	}
 
 	public boolean containsAny(Set<Item> items) {
-		return inv.containsAny(items);
+		return inv.hasAnyOf(items);
 	}
 
-	public Inventory getInventory() {
+	public Container getInventory() {
 		return inv;
 	}
 
 	public boolean canAccess(int slot) {
-		if(inv instanceof SidedInventory) {
-			int[] slots = ((SidedInventory)inv).getAvailableSlots(dir);
+		if(inv instanceof WorldlyContainer) {
+			int[] slots = ((WorldlyContainer)inv).getSlotsForFace(dir);
 			for (int i = 0; i < slots.length; i++) {
 				if(slot == slots[i])return true;
 			}

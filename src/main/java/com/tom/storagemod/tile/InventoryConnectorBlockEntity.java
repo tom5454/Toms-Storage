@@ -15,15 +15,15 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.enums.ChestType;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
@@ -43,12 +43,12 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 
 	@Override
 	public void updateServer() {
-		long time = world.getTime();
+		long time = level.getGameTime();
 		if(time % 20 == 0) {
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			toCheck.add(pos);
-			checkedBlocks.add(pos);
+			toCheck.add(worldPosition);
+			checkedBlocks.add(worldPosition);
 			handlers.clear();
 			Set<LinkedInv> toRM = new HashSet<>();
 			for (LinkedInv inv : linkedInvs) {
@@ -74,28 +74,28 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
 				for (Direction d : Direction.values()) {
-					BlockPos p = cp.offset(d);
-					if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < range) {
+					BlockPos p = cp.relative(d);
+					if(!checkedBlocks.contains(p) && p.distSqr(worldPosition) < range) {
 						checkedBlocks.add(p);
-						BlockState state = world.getBlockState(p);
+						BlockState state = level.getBlockState(p);
 						if(state.getBlock() instanceof ITrim) {
 							toCheck.add(p);
 						} else {
-							BlockEntity te = world.getBlockEntity(p);
+							BlockEntity te = level.getBlockEntity(p);
 							if (te instanceof InventoryConnectorBlockEntity || te instanceof InventoryProxyBlockEntity || te instanceof AbstractInventoryCableConnectorBlockEntity) {
 								continue;
 							} else if(te != null && !StorageMod.CONFIG.onlyTrims) {
-								Storage<ItemVariant> inv = ItemStorage.SIDED.find(world, p, state, te, d.getOpposite());
+								Storage<ItemVariant> inv = ItemStorage.SIDED.find(level, p, state, te, d.getOpposite());
 								if(te instanceof ChestBlockEntity) {//Check for double chests
 									Block block = state.getBlock();
 									if(block instanceof ChestBlock) {
-										ChestType type = state.get(ChestBlock.CHEST_TYPE);
+										ChestType type = state.getValue(ChestBlock.TYPE);
 										if (type != ChestType.SINGLE) {
-											BlockPos opos = p.offset(ChestBlock.getFacing(state));
-											BlockState ostate = this.getWorld().getBlockState(opos);
+											BlockPos opos = p.relative(ChestBlock.getConnectedDirection(state));
+											BlockState ostate = this.getLevel().getBlockState(opos);
 											if (state.getBlock() == ostate.getBlock()) {
-												ChestType otype = ostate.get(ChestBlock.CHEST_TYPE);
-												if (otype != ChestType.SINGLE && type != otype && state.get(ChestBlock.FACING) == ostate.get(ChestBlock.FACING)) {
+												ChestType otype = ostate.getValue(ChestBlock.TYPE);
+												if (otype != ChestType.SINGLE && type != otype && state.getValue(ChestBlock.FACING) == ostate.getValue(ChestBlock.FACING)) {
 													toCheck.add(opos);
 													checkedBlocks.add(opos);
 												}
@@ -133,9 +133,9 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 		while(!toCheck.isEmpty()) {
 			BlockPos cp = toCheck.pop();
 			for (Direction d : Direction.values()) {
-				BlockPos p = cp.offset(d);
-				if(!checkedBlocks.contains(p) && p.getSquaredDistance(pos) < StorageMod.CONFIG.invRange) {
-					BlockState state = world.getBlockState(p);
+				BlockPos p = cp.relative(d);
+				if(!checkedBlocks.contains(p) && p.distSqr(pos) < StorageMod.CONFIG.invRange) {
+					BlockState state = level.getBlockState(p);
 					if(state.getBlock() == block) {
 						checkedBlocks.add(p);
 						edges.add(p);
@@ -181,14 +181,14 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 		return handlers;
 	}
 
-	public Pair<Integer, Integer> getUsage() {
+	public Tuple<Integer, Integer> getUsage() {
 		int slots = 0;
 		int free = 0;
 		for (StorageView<ItemVariant> view : handlers) {
 			slots++;
 			if(view.isResourceBlank())free++;
 		}
-		return new Pair<>(slots, free);
+		return new Tuple<>(slots, free);
 	}
 
 	@Override

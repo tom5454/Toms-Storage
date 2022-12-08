@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
@@ -42,7 +42,7 @@ public class REIPlugin implements REIClientPlugin {
 			@Override
 			public Result handle(Context context) {
 				if(context.getMenu() instanceof IREIAutoFillTerminal) {
-					if (!context.getDisplay().getCategoryIdentifier().equals(CRAFTING) || context.getMinecraft().currentScreen == context.getContainerScreen())
+					if (!context.getDisplay().getCategoryIdentifier().equals(CRAFTING) || context.getMinecraft().screen == context.getContainerScreen())
 						return Result.createNotApplicable();
 					Display recipe = context.getDisplay();
 					ItemStack[][] stacks = recipe.getInputEntries().stream().map(l ->
@@ -59,7 +59,7 @@ public class REIPlugin implements REIClientPlugin {
 							if(list.length > 0) {
 								boolean found = false;
 								for (ItemStack stack : list) {
-									if (stack != null && context.getMinecraft().player.getInventory().getSlotWithStack(stack) != -1) {
+									if (stack != null && context.getMinecraft().player.getInventory().findSlotMatchingItem(stack) != -1) {
 										found = true;
 										break;
 									}
@@ -83,19 +83,19 @@ public class REIPlugin implements REIClientPlugin {
 						}
 					}
 					if (context.isActuallyCrafting()) {
-						NbtCompound compound = new NbtCompound();
-						NbtList list = new NbtList();
+						CompoundTag compound = new CompoundTag();
+						ListTag list = new ListTag();
 						for (int i = 0;i < stacks.length;++i) {
 							if (stacks[i] != null) {
-								NbtCompound CompoundTag = new NbtCompound();
+								CompoundTag CompoundTag = new CompoundTag();
 								CompoundTag.putByte("s", (byte) (width == 1 ? i * 3 : width == 2 ? ((i % 2) + i / 2 * 3) : i));
 								int k = 0;
 								for (int j = 0;j < stacks[i].length && k < 9;j++) {
 									if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 										StoredItemStack s = new StoredItemStack(stacks[i][j]);
-										if(stored.contains(s) || context.getMinecraft().player.getInventory().getSlotWithStack(stacks[i][j]) != -1) {
-											NbtCompound tag = new NbtCompound();
-											stacks[i][j].writeNbt(tag);
+										if(stored.contains(s) || context.getMinecraft().player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
+											CompoundTag tag = new CompoundTag();
+											stacks[i][j].save(tag);
 											CompoundTag.put("i" + (k++), tag);
 										}
 									}
@@ -114,11 +114,11 @@ public class REIPlugin implements REIClientPlugin {
 									for (Widget widget : widgets) {
 										if (widget instanceof Slot && ((Slot) widget).getNoticeMark() == Slot.INPUT) {
 											if (missing.contains(i++)) {
-												matrices.push();
+												matrices.pushPose();
 												matrices.translate(0, 0, 400);
 												Rectangle innerBounds = ((Slot) widget).getInnerBounds();
 												Screen.fill(matrices, innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), 0x40ff0000);
-												matrices.pop();
+												matrices.popPose();
 											}
 										}
 									}

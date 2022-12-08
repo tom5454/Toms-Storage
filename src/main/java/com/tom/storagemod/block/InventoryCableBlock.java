@@ -5,120 +5,120 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ConnectingBlock;
-import net.minecraft.block.Material;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
 
 import com.tom.storagemod.StorageModClient;
 
-public class InventoryCableBlock extends ConnectingBlock implements Waterloggable, IInventoryCable {
-	public static final BooleanProperty UP = Properties.UP;
-	public static final BooleanProperty DOWN = Properties.DOWN;
-	public static final BooleanProperty NORTH = Properties.NORTH;
-	public static final BooleanProperty SOUTH = Properties.SOUTH;
-	public static final BooleanProperty EAST = Properties.EAST;
-	public static final BooleanProperty WEST = Properties.WEST;
-	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
+public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable {
+	public static final BooleanProperty UP = BlockStateProperties.UP;
+	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
+	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+	public static final BooleanProperty EAST = BlockStateProperties.EAST;
+	public static final BooleanProperty WEST = BlockStateProperties.WEST;
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final BooleanProperty[] DIR_TO_PROPERTY = new BooleanProperty[] {DOWN, UP, NORTH, SOUTH, WEST, EAST};
 
 	public InventoryCableBlock() {
-		super(0.125f, Block.Settings.of(Material.WOOD).strength(2));
-		setDefaultState(getDefaultState()
-				.with(DOWN, false)
-				.with(UP, false)
-				.with(NORTH, false)
-				.with(EAST, false)
-				.with(SOUTH, false)
-				.with(WEST, false)
-				.with(WATERLOGGED, false));
+		super(0.125f, Block.Properties.of(Material.WOOD).strength(2));
+		registerDefaultState(defaultBlockState()
+				.setValue(DOWN, false)
+				.setValue(UP, false)
+				.setValue(NORTH, false)
+				.setValue(EAST, false)
+				.setValue(SOUTH, false)
+				.setValue(WEST, false)
+				.setValue(WATERLOGGED, false));
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
 		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, WATERLOGGED);
 	}
 
 	@Override
 	public FluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
-	public BlockState getStateForNeighborUpdate(BlockState stateIn, Direction facing, BlockState facingState, WorldAccess worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (stateIn.get(WATERLOGGED)) {
-			worldIn.createAndScheduleFluidTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 
-		return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing));
+		return stateIn.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext context) {
-		FluidState ifluidstate = context.getWorld().getFluidState(context.getBlockPos());
-		return withConnectionProperties(context.getWorld(), context.getBlockPos()).
-				with(WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER));
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
+		return withConnectionProperties(context.getLevel(), context.getClickedPos()).
+				setValue(WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER));
 	}
 
 	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+	public List<BlockPos> next(Level world, BlockState state, BlockPos pos) {
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			if(state.get(DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.offset(d));
+			if(state.getValue(DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.relative(d));
 		}
 		return next;
 	}
 
-	public BlockState withConnectionProperties(WorldAccess blockView_1, BlockPos blockPos_1) {
-		BlockState block_1 = blockView_1.getBlockState(blockPos_1.down());
-		BlockState block_2 = blockView_1.getBlockState(blockPos_1.up());
+	public BlockState withConnectionProperties(LevelAccessor blockView_1, BlockPos blockPos_1) {
+		BlockState block_1 = blockView_1.getBlockState(blockPos_1.below());
+		BlockState block_2 = blockView_1.getBlockState(blockPos_1.above());
 		BlockState block_3 = blockView_1.getBlockState(blockPos_1.north());
 		BlockState block_4 = blockView_1.getBlockState(blockPos_1.east());
 		BlockState block_5 = blockView_1.getBlockState(blockPos_1.south());
 		BlockState block_6 = blockView_1.getBlockState(blockPos_1.west());
 
-		return getDefaultState()
-				.with(DOWN, IInventoryCable.canConnect(block_1, Direction.DOWN))
-				.with(UP, IInventoryCable.canConnect(block_2, Direction.UP))
-				.with(NORTH, IInventoryCable.canConnect(block_3, Direction.NORTH))
-				.with(EAST, IInventoryCable.canConnect(block_4, Direction.EAST))
-				.with(SOUTH, IInventoryCable.canConnect(block_5, Direction.SOUTH))
-				.with(WEST, IInventoryCable.canConnect(block_6, Direction.WEST));
+		return defaultBlockState()
+				.setValue(DOWN, IInventoryCable.canConnect(block_1, Direction.DOWN))
+				.setValue(UP, IInventoryCable.canConnect(block_2, Direction.UP))
+				.setValue(NORTH, IInventoryCable.canConnect(block_3, Direction.NORTH))
+				.setValue(EAST, IInventoryCable.canConnect(block_4, Direction.EAST))
+				.setValue(SOUTH, IInventoryCable.canConnect(block_5, Direction.SOUTH))
+				.setValue(WEST, IInventoryCable.canConnect(block_6, Direction.WEST));
 	}
 
 	@Override
-	public BlockState rotate(BlockState blockState_1, BlockRotation blockRotation_1) {
+	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {
 		switch (blockRotation_1) {
 		case CLOCKWISE_180:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(EAST, blockState_1.get(WEST)).with(SOUTH, blockState_1.get(NORTH)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(EAST, blockState_1.getValue(WEST)).setValue(SOUTH, blockState_1.getValue(NORTH)).setValue(WEST, blockState_1.getValue(EAST));
 		case CLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(EAST)).with(EAST, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(WEST)).with(WEST, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(EAST)).setValue(EAST, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(NORTH));
 		case COUNTERCLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(WEST)).with(EAST, blockState_1.get(NORTH)).with(SOUTH, blockState_1.get(EAST)).with(WEST, blockState_1.get(SOUTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(WEST)).setValue(EAST, blockState_1.getValue(NORTH)).setValue(SOUTH, blockState_1.getValue(EAST)).setValue(WEST, blockState_1.getValue(SOUTH));
 		default:
 			break;
 		}
@@ -126,12 +126,12 @@ public class InventoryCableBlock extends ConnectingBlock implements Waterloggabl
 	}
 
 	@Override
-	public BlockState mirror(BlockState blockState_1, BlockMirror blockMirror_1) {
+	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {
 		case FRONT_BACK:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(NORTH));
 		case LEFT_RIGHT:
-			return blockState_1.with(EAST, blockState_1.get(WEST)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(EAST, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(EAST));
 		default:
 			break;
 		}

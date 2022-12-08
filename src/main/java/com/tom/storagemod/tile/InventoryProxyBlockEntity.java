@@ -14,23 +14,23 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.InventoryProvider;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.WorldlyContainerHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
@@ -39,7 +39,7 @@ import com.tom.storagemod.block.InventoryProxyBlock.DirectionWithNull;
 import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InventoryWrapper;
 
-public class InventoryProxyBlockEntity extends PaintedBlockEntity implements TickableServer, SidedStorageBlockEntity, Inventory, Storage<ItemVariant>, IProxy {
+public class InventoryProxyBlockEntity extends PaintedBlockEntity implements TickableServer, SidedStorageBlockEntity, Container, Storage<ItemVariant>, IProxy {
 	private Storage<ItemVariant> pointedAtSt;
 
 	public InventoryProxyBlockEntity(BlockPos pos, BlockState state) {
@@ -48,14 +48,14 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 
 	@Override
 	public void updateServer() {
-		if(world.getTime() % 20 == 18) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(InventoryProxyBlock.FACING);
-			DirectionWithNull filter = state.get(InventoryProxyBlock.FILTER_FACING);
-			BlockEntity te = world.getBlockEntity(pos.offset(facing));
+		if(level.getGameTime() % 20 == 18) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(InventoryProxyBlock.FACING);
+			DirectionWithNull filter = state.getValue(InventoryProxyBlock.FILTER_FACING);
+			BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
 			if(te != null && !(te instanceof InventoryProxyBlockEntity)) {
-				pointedAtSt = ItemStorage.SIDED.find(world, pos.offset(facing), facing.getOpposite());
-				Inventory inv = HopperBlockEntity.getInventoryAt(world, pos.offset(facing));
+				pointedAtSt = ItemStorage.SIDED.find(level, worldPosition.relative(facing), facing.getOpposite());
+				Container inv = HopperBlockEntity.getContainerAt(level, worldPosition.relative(facing));
 				if(inv != null) {
 					pointedAt = new InventoryWrapper(inv, facing.getOpposite());
 				} else {
@@ -69,13 +69,13 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 			ignoreCount = false;
 			globalCountLimit = 64;
 			if(filter != DirectionWithNull.NULL) {
-				te = world.getBlockEntity(pos.offset(filter.getDir()));
+				te = level.getBlockEntity(worldPosition.relative(filter.getDir()));
 				if(te != null && !(te instanceof InventoryProxyBlockEntity)) {
-					Inventory inv = getInventoryAt(world, pos.offset(filter.getDir()));
+					Container inv = getInventoryAt(level, worldPosition.relative(filter.getDir()));
 					if(inv != null) {
 						this.filter = new InventoryWrapper(inv, filter.getDir().getOpposite());
-						if(te instanceof NamedScreenHandlerFactory) {
-							String[] sp = ((NamedScreenHandlerFactory)te).getDisplayName().getString().split(",");
+						if(te instanceof MenuProvider) {
+							String[] sp = ((MenuProvider)te).getDisplayName().getString().split(",");
 							for (String string : sp) {
 								String[] sp2 = string.split("=");
 								String key = sp2[0];
@@ -101,7 +101,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 			if (this.filter != null) {
 				this.pointedAtSt = InventoryStorage.of(this, Direction.DOWN);
 			}
-			this.world.updateComparators(this.pos, getCachedState().getBlock());
+			this.level.updateNeighbourForOutputSignal(this.worldPosition, getBlockState().getBlock());
 		}
 	}
 
@@ -167,11 +167,11 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 	}
 
 	@Override
-	public int size() {
+	public int getContainerSize() {
 		return call(InventoryWrapper::size, i -> true, 0);
 	}
 
@@ -181,22 +181,22 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 
 	@Override
-	public ItemStack getStack(int paramInt) {
+	public ItemStack getItem(int paramInt) {
 		return call(i -> i.getStack(paramInt), i -> checkFilter(i, paramInt, null), ItemStack.EMPTY);
 	}
 
 	@Override
-	public ItemStack removeStack(int paramInt1, int paramInt2) {
+	public ItemStack removeItem(int paramInt1, int paramInt2) {
 		return call(i -> i.removeStack(paramInt1, paramInt2), i -> checkFilter(i, paramInt1, null), ItemStack.EMPTY);
 	}
 
 	@Override
-	public ItemStack removeStack(int paramInt) {
+	public ItemStack removeItemNoUpdate(int paramInt) {
 		return call(i -> i.removeStack(paramInt), i -> checkFilter(i, paramInt, null), ItemStack.EMPTY);
 	}
 
 	@Override
-	public void setStack(int paramInt, ItemStack paramItemStack) {
+	public void setItem(int paramInt, ItemStack paramItemStack) {
 		call(i -> {
 			i.setStack(paramInt, paramItemStack);
 			return Unit.INSTANCE;
@@ -204,7 +204,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 
 	@Override
-	public boolean isValid(int slot, ItemStack stack) {
+	public boolean canPlaceItem(int slot, ItemStack stack) {
 		return call(i -> i.isValid(slot, stack, null), i -> checkFilter(i, slot, stack), false);
 	}
 
@@ -215,12 +215,12 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 				if(fstack.isEmpty())return true;
 				if(stack == null) {
 					stack = w.getStack(slot);
-					if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areNbtEqual(stack, fstack)) {
+					if(ItemStack.isSameIgnoreDurability(stack, fstack) && ItemStack.tagMatches(stack, fstack)) {
 						return true;
 					}
 					return false;
 				}
-				if(ItemStack.areItemsEqual(stack, fstack) && ItemStack.areNbtEqual(stack, fstack)) {
+				if(ItemStack.isSameIgnoreDurability(stack, fstack) && ItemStack.tagMatches(stack, fstack)) {
 					if(ignoreCount)return true;
 					int count = w.getStack(slot).getCount();
 					if(count < fstack.getCount())
@@ -233,19 +233,19 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 
 	@Override
-	public boolean canPlayerUse(PlayerEntity paramPlayerEntity) {
+	public boolean stillValid(Player paramPlayerEntity) {
 		return false;
 	}
 
 	@Override
-	public int getMaxCountPerStack() {
+	public int getMaxStackSize() {
 		return filter == null ? call(InventoryWrapper::getMaxCountPerStack, i -> true, 0) : globalCountLimit;
 	}
 
 	public int getComparatorOutput() {
 		return call(inventory -> {
 			if(filter == null) {
-				return ScreenHandler.calculateComparatorOutput(inventory.getInventory());
+				return AbstractContainerMenu.getRedstoneSignalFromContainer(inventory.getInventory());
 			}
 			int i = 0;
 			float f = 0.0F;
@@ -257,30 +257,30 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 				ItemStack fstack = fsize > j ? filter.getStack(j) : ItemStack.EMPTY;
 
 				if (!itemStack.isEmpty()) {
-					if(fstack.isEmpty() || (ItemStack.areItemsEqual(itemStack, fstack) && ItemStack.areNbtEqual(itemStack, fstack))) {
-						f += itemStack.getCount() / Math.min((ignoreCount || fstack.isEmpty() ? globalCountLimit : fstack.getCount()), itemStack.getMaxCount());
+					if(fstack.isEmpty() || (ItemStack.isSameIgnoreDurability(itemStack, fstack) && ItemStack.tagMatches(itemStack, fstack))) {
+						f += itemStack.getCount() / Math.min((ignoreCount || fstack.isEmpty() ? globalCountLimit : fstack.getCount()), itemStack.getMaxStackSize());
 						i++;
 					}
 				}
 			}
 
 			f /= inventory.size();
-			return MathHelper.floor(f * 14.0F) + ((i > 0) ? 1 : 0);
+			return Mth.floor(f * 14.0F) + ((i > 0) ? 1 : 0);
 		}, i -> true, 0);
 	}
 
-	public static Inventory getInventoryAt(World world, BlockPos blockPos) {
-		Inventory inventory = null;
+	public static Container getInventoryAt(Level world, BlockPos blockPos) {
+		Container inventory = null;
 		BlockState blockState = world.getBlockState(blockPos);
 		Block block = blockState.getBlock();
-		if (block instanceof InventoryProvider) {
-			inventory = ((InventoryProvider) block).getInventory(blockState, world, blockPos);
+		if (block instanceof WorldlyContainerHolder) {
+			inventory = ((WorldlyContainerHolder) block).getContainer(blockState, world, blockPos);
 		} else if (blockState.hasBlockEntity()) {
 			BlockEntity blockEntity = world.getBlockEntity(blockPos);
-			if (blockEntity instanceof Inventory) {
-				inventory = (Inventory) blockEntity;
+			if (blockEntity instanceof Container) {
+				inventory = (Container) blockEntity;
 				if (inventory instanceof ChestBlockEntity && block instanceof ChestBlock) {
-					inventory = ChestBlock.getInventory((ChestBlock) block, blockState, world, blockPos, true);
+					inventory = ChestBlock.getContainer((ChestBlock) block, blockState, world, blockPos, true);
 				}
 			}
 		}

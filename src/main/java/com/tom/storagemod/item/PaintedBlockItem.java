@@ -1,32 +1,32 @@
 package com.tom.storagemod.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PaintedBlockItem extends BlockItem {
 
-	public PaintedBlockItem(Block block, Item.Settings p) {
+	public PaintedBlockItem(Block block, Item.Properties p) {
 		super(block, p);
 	}
 	public PaintedBlockItem(Block block) {
-		this(block, new Item.Settings());
+		this(block, new Item.Properties());
 	}
 
 	@Override
-	public Text getName(ItemStack is) {
-		Text tcS = super.getName(is);
-		MutableText tc = (MutableText) tcS;
-		if(is.hasNbt() && is.getNbt().getCompound("BlockEntityTag").contains("block")) {
-			BlockState st = NbtHelper.toBlockState(is.getNbt().getCompound("BlockEntityTag").getCompound("block"));
+	public Component getName(ItemStack is) {
+		Component tcS = super.getName(is);
+		MutableComponent tc = (MutableComponent) tcS;
+		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
+			BlockState st = NbtUtils.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
 			tc.append(" (");
-			tc.append(st.getBlock().getName().formatted(Formatting.GREEN));
+			tc.append(st.getBlock().getName().withStyle(ChatFormatting.GREEN));
 			tc.append(")");
 		}
 		return tc;

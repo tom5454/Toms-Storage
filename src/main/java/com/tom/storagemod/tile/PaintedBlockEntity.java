@@ -1,15 +1,15 @@
 package com.tom.storagemod.tile;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 
@@ -33,29 +33,29 @@ public class PaintedBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void readNbt(NbtCompound compound) {
-		super.readNbt(compound);
-		blockState = NbtHelper.toBlockState(compound.getCompound("block"));
+	public void load(CompoundTag compound) {
+		super.load(compound);
+		blockState = NbtUtils.readBlockState(compound.getCompound("block"));
 		markDirtyClient();
 	}
 
 	@Override
-	public void writeNbt(NbtCompound compound) {
+	public void saveAdditional(CompoundTag compound) {
 		if (blockState != null) {
-			compound.put("block", NbtHelper.fromBlockState(blockState));
+			compound.put("block", NbtUtils.writeBlockState(blockState));
 		}
 	}
 
 	private void markDirtyClient() {
-		markDirty();
-		if (getWorld() != null) {
-			BlockState state = getWorld().getBlockState(getPos());
-			getWorld().updateListeners(getPos(), state, state, 3);
+		setChanged();
+		if (getLevel() != null) {
+			BlockState state = getLevel().getBlockState(getBlockPos());
+			getLevel().sendBlockUpdated(getBlockPos(), state, state, 3);
 
-			if(!world.isClient) {
-				ServerWorld world = (ServerWorld) getWorld();
-				world.getChunkManager().threadedAnvilChunkStorage.getPlayersWatchingChunk(new ChunkPos(getPos()), false).forEach(player -> {
-					player.networkHandler.sendPacket(toUpdatePacket());
+			if(!level.isClientSide) {
+				ServerLevel world = (ServerLevel) getLevel();
+				world.getChunkSource().chunkMap.getPlayers(new ChunkPos(getBlockPos()), false).forEach(player -> {
+					player.connection.send(getUpdatePacket());
 				});
 			}
 			//sync();
@@ -63,16 +63,16 @@ public class PaintedBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public BlockEntityUpdateS2CPacket toUpdatePacket() {
-		return BlockEntityUpdateS2CPacket.create(this);
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
-	public NbtCompound toInitialChunkDataNbt() {
-		return createNbtWithIdentifyingData();
+	public CompoundTag getUpdateTag() {
+		return saveWithFullMetadata();
 	}
 
 	public BlockState getPaintedBlockState() {
-		return blockState == null ? Blocks.AIR.getDefaultState() : blockState;
+		return blockState == null ? Blocks.AIR.defaultBlockState() : blockState;
 	}
 }

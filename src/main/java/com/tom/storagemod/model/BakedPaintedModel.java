@@ -12,25 +12,25 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.ModelBakeSettings;
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.render.model.json.ModelOverrideList;
-import net.minecraft.client.render.model.json.ModelTransformation;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.mojang.datafixers.util.Pair;
 
@@ -38,9 +38,9 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedModel {
-	private static final SpriteIdentifier ID = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier(StorageMod.modid, "block/trim"));
-	private static final Identifier FALLBACK_ID = new Identifier("minecraft:block/stone");
-	private Sprite sprite;
+	private static final Material ID = new Material(TextureAtlas.LOCATION_BLOCKS, new ResourceLocation(StorageMod.modid, "block/trim"));
+	private static final ResourceLocation FALLBACK_ID = new ResourceLocation("minecraft:block/stone");
+	private TextureAtlasSprite sprite;
 	private BakedModel fallback;
 	public BakedPaintedModel() {
 	}
@@ -51,13 +51,13 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos,
-			Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos,
+			Supplier<RandomSource> randomSupplier, RenderContext context) {
 		BlockEntity tile = blockView.getBlockEntity(pos);
 		if(tile instanceof PaintedBlockEntity) {
 			try {
 				BlockState st = ((PaintedBlockEntity)tile).getPaintedBlockState();
-				BakedModel model = MinecraftClient.getInstance().getBlockRenderManager().getModel(st);
+				BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(st);
 				if(model instanceof FabricBakedModel)
 					((FabricBakedModel)model).emitBlockQuads(blockView, st, pos, randomSupplier, context);
 				else
@@ -83,42 +83,42 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
+	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
 
 	}
 
 	@Override
-	public ModelOverrideList getOverrides() {
+	public ItemOverrides getOverrides() {
 		return null;
 	}
 
 	@Override
-	public List<BakedQuad> getQuads(BlockState arg0, Direction arg1, Random arg2) {
+	public List<BakedQuad> getQuads(BlockState arg0, Direction arg1, RandomSource arg2) {
 		return fallback.getQuads(arg0, arg1, arg2);
 	}
 
 	@Override
-	public Sprite getParticleSprite() {
+	public TextureAtlasSprite getParticleIcon() {
 		return sprite;
 	}
 
 	@Override
-	public ModelTransformation getTransformation() {
+	public ItemTransforms getTransforms() {
 		return null;
 	}
 
 	@Override
-	public boolean hasDepth() {
+	public boolean isGui3d() {
 		return false;
 	}
 
 	@Override
-	public boolean isBuiltin() {
+	public boolean isCustomRenderer() {
 		return false;
 	}
 
 	@Override
-	public boolean isSideLit() {
+	public boolean usesBlockLight() {
 		return false;
 	}
 
@@ -128,19 +128,19 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
+	public BakedModel bake(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
 		sprite = textureGetter.apply(ID);
 		fallback = loader.bake(FALLBACK_ID, rotationContainer);
 		return this;
 	}
 
 	@Override
-	public Collection<Identifier> getModelDependencies() {
+	public Collection<ResourceLocation> getDependencies() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter,
+	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
 			Set<Pair<String, String>> unresolvedTextureReferences) {
 		return Arrays.asList(ID);
 	}

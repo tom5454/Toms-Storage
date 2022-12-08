@@ -5,75 +5,75 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Pair;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.InventoryConnectorBlockEntity;
 
-public class InventoryConnectorBlock extends BlockWithEntity implements IInventoryCable {
+public class InventoryConnectorBlock extends BaseEntityBlock implements IInventoryCable {
 
 	public InventoryConnectorBlock() {
-		super(Block.Settings.of(Material.WOOD).strength(3));//.harvestTool(ToolType.AXE)
+		super(Block.Properties.of(Material.WOOD).strength(3));
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new InventoryConnectorBlockEntity(pos, state);
 	}
 
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state,
 			BlockEntityType<T> type) {
 		return TickerUtil.createTicker(world, false, true);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
 		StorageModClient.tooltip("inventory_connector", tooltip);
 	}
 
 	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+	public List<BlockPos> next(Level world, BlockState state, BlockPos pos) {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
 			BlockHitResult hit) {
-		if(!world.isClient) {
+		if(!world.isClientSide) {
 			BlockEntity tile = world.getBlockEntity(pos);
 			if(tile instanceof InventoryConnectorBlockEntity) {
 				InventoryConnectorBlockEntity te = (InventoryConnectorBlockEntity) tile;
-				Pair<Integer, Integer> usage = te.getUsage();
-				player.sendMessage(Text.translatable("chat.toms_storage.inventory_connector.free_slots", usage.getRight(), usage.getLeft()), true);
+				Tuple<Integer, Integer> usage = te.getUsage();
+				player.displayClientMessage(Component.translatable("chat.toms_storage.inventory_connector.free_slots", usage.getB(), usage.getA()), true);
 			}
 		}
-		return ActionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

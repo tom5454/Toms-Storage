@@ -5,50 +5,50 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 
-public class PaintedFramedInventoryCableBlock extends BlockWithEntity implements IInventoryCable, IPaintable {
+public class PaintedFramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable {
 
 	public PaintedFramedInventoryCableBlock() {
-		super(Block.Settings.of(Material.WOOD).strength(2).nonOpaque());
+		super(Block.Properties.of(Material.WOOD).strength(2).noOcclusion());
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
-		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+	public List<BlockPos> next(Level world, BlockState state, BlockPos pos) {
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			next.add(pos.offset(d));
+			next.add(pos.relative(d));
 		}
 		return next;
 	}
 
 	@Override
-	public boolean paint(World world, BlockPos pos, BlockState to) {
-		world.setBlockState(pos, StorageMod.invCablePainted.getDefaultState(), 2);
+	public boolean paint(Level world, BlockPos pos, BlockState to) {
+		world.setBlock(pos, StorageMod.invCablePainted.defaultBlockState(), 2);
 		BlockEntity te = world.getBlockEntity(pos);
 		if(te != null && te instanceof PaintedBlockEntity)
 			return ((PaintedBlockEntity)te).setPaintedBlockState(to);
@@ -56,22 +56,22 @@ public class PaintedFramedInventoryCableBlock extends BlockWithEntity implements
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new PaintedBlockEntity(pos, state);
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
 	}
 
 	@Override
-	public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+	public boolean propagatesSkylightDown(BlockState state, BlockGetter world, BlockPos pos) {
 		return false;
 	}
 
 	@Override
-	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
 		return new ItemStack(StorageMod.invCableFramed);
 	}
 }

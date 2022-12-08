@@ -1,9 +1,9 @@
 package com.tom.storagemod.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface IPaintable {
-	boolean paint(World world, BlockPos pos, BlockState to);
+	boolean paint(Level world, BlockPos pos, BlockState to);
 }

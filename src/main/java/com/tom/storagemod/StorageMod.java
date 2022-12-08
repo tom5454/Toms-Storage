@@ -3,6 +3,7 @@ package com.tom.storagemod;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,58 +16,60 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import com.tom.storagemod.NetworkHandler.IDataReceiver;
+import com.tom.storagemod.block.BasicInventoryHopperBlock;
+import com.tom.storagemod.block.CraftingTerminalBlock;
+import com.tom.storagemod.block.FilteredInventoryCableConnectorBlock;
+import com.tom.storagemod.block.FramedInventoryCableBlock;
+import com.tom.storagemod.block.FramedInventoryCableConnectorBlock;
 import com.tom.storagemod.block.InventoryCableBlock;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
-import com.tom.storagemod.block.FilteredInventoryCableConnectorBlock;
-import com.tom.storagemod.block.FramedInventoryCableConnectorBlock;
-import com.tom.storagemod.block.FramedInventoryCableBlock;
-import com.tom.storagemod.block.PaintedFramedInventoryCableBlock;
-import com.tom.storagemod.block.BasicInventoryHopperBlock;
+import com.tom.storagemod.block.InventoryConnectorBlock;
 import com.tom.storagemod.block.InventoryProxyBlock;
 import com.tom.storagemod.block.LevelEmitterBlock;
 import com.tom.storagemod.block.OpenCrateBlock;
+import com.tom.storagemod.block.PaintedFramedInventoryCableBlock;
 import com.tom.storagemod.block.PaintedTrimBlock;
-import com.tom.storagemod.block.TrimBlock;
-import com.tom.storagemod.block.CraftingTerminalBlock;
-import com.tom.storagemod.block.InventoryConnectorBlock;
 import com.tom.storagemod.block.StorageTerminalBlock;
+import com.tom.storagemod.block.TrimBlock;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
 import com.tom.storagemod.gui.FilteredMenu;
 import com.tom.storagemod.gui.InventoryLinkMenu;
 import com.tom.storagemod.gui.LevelEmitterMenu;
 import com.tom.storagemod.gui.StorageTerminalMenu;
 import com.tom.storagemod.item.AdvWirelessTerminalItem;
-import com.tom.storagemod.item.PaintedBlockItem;
 import com.tom.storagemod.item.PaintKitItem;
+import com.tom.storagemod.item.PaintedBlockItem;
+import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.item.WirelessTerminalItem;
-import com.tom.storagemod.tile.CraftingTerminalBlockEntity;
-import com.tom.storagemod.tile.InventoryCableConnectorBlockEntity;
-import com.tom.storagemod.tile.FilteredInventoryCableConnectorBlockEntity;
-import com.tom.storagemod.tile.InventoryConnectorBlockEntity;
 import com.tom.storagemod.tile.BasicInventoryHopperBlockEntity;
+import com.tom.storagemod.tile.CraftingTerminalBlockEntity;
+import com.tom.storagemod.tile.FilteredInventoryCableConnectorBlockEntity;
+import com.tom.storagemod.tile.InventoryCableConnectorBlockEntity;
+import com.tom.storagemod.tile.InventoryConnectorBlockEntity;
 import com.tom.storagemod.tile.InventoryProxyBlockEntity;
 import com.tom.storagemod.tile.LevelEmitterBlockEntity;
 import com.tom.storagemod.tile.OpenCrateBlockEntity;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 import com.tom.storagemod.tile.StorageTerminalBlockEntity;
+import com.tom.storagemod.util.PlayerInvUtil;
 
 import io.netty.buffer.ByteBufOutputStream;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -109,11 +112,11 @@ public class StorageMod implements ModInitializer {
 	public static BlockEntityType<BasicInventoryHopperBlockEntity> invHopperBasicTile;
 	public static BlockEntityType<LevelEmitterBlockEntity> levelEmitterTile;
 
-	public static ScreenHandlerType<StorageTerminalMenu> storageTerminal;
-	public static ScreenHandlerType<CraftingTerminalMenu> craftingTerminalCont;
-	public static ScreenHandlerType<FilteredMenu> filteredConatiner;
-	public static ScreenHandlerType<LevelEmitterMenu> levelEmitterConatiner;
-	public static ScreenHandlerType<InventoryLinkMenu> inventoryLink;
+	public static MenuType<StorageTerminalMenu> storageTerminal;
+	public static MenuType<CraftingTerminalMenu> craftingTerminalCont;
+	public static MenuType<FilteredMenu> filteredConatiner;
+	public static MenuType<LevelEmitterMenu> levelEmitterConatiner;
+	public static MenuType<InventoryLinkMenu> inventoryLink;
 
 	public static final Gson gson = new GsonBuilder().create();
 	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
@@ -125,11 +128,11 @@ public class StorageMod implements ModInitializer {
 	public StorageMod() {
 	}
 
-	public static final ItemGroup STORAGE_MOD_TAB = FabricItemGroupBuilder.build(id("tab"), () -> new ItemStack(terminal));
+	public static final CreativeModeTab STORAGE_MOD_TAB = FabricItemGroupBuilder.build(id("tab"), () -> new ItemStack(terminal));
 
 
-	public static Identifier id(String id) {
-		return new Identifier(modid, id);
+	public static ResourceLocation id(String id) {
+		return new ResourceLocation(modid, id);
 	}
 
 	@Override
@@ -211,9 +214,9 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(terminal);
 		registerItemForBlock(openCrate);
 		registerItemForBlock(inventoryTrim);
-		Registry.register(Registry.ITEM, Registry.BLOCK.getId(paintedTrim), new PaintedBlockItem(paintedTrim));
+		Registry.register(Registry.ITEM, Registry.BLOCK.getKey(paintedTrim), new PaintedBlockItem(paintedTrim));
 		registerItemForBlock(invCable);
-		Registry.register(Registry.ITEM, Registry.BLOCK.getId(invCableFramed), new PaintedBlockItem(invCableFramed, new Item.Settings().group(STORAGE_MOD_TAB)));
+		Registry.register(Registry.ITEM, Registry.BLOCK.getKey(invCableFramed), new PaintedBlockItem(invCableFramed, new Item.Properties().tab(STORAGE_MOD_TAB)));
 		registerItemForBlock(invCableConnector);
 		registerItemForBlock(invCableConnectorFiltered);
 		registerItemForBlock(invProxy);
@@ -223,19 +226,24 @@ public class StorageMod implements ModInitializer {
 		registerItemForBlock(invCableConnectorFramed);
 
 		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_C2S, (s, p, h, buf, rp) -> {
-			NbtCompound tag = buf.readUnlimitedNbt();
+			CompoundTag tag = buf.readAnySizeNbt();
 			s.submit(() -> {
-				if(p.currentScreenHandler instanceof IDataReceiver) {
-					((IDataReceiver)p.currentScreenHandler).receive(tag);
+				if(p.containerMenu instanceof IDataReceiver) {
+					((IDataReceiver)p.containerMenu).receive(tag);
 				}
 			});
 		});
+		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.OPEN_TERMINAL_C2S, (s, p, h, buf, rp) -> s.submit(() -> {
+			ItemStack t = PlayerInvUtil.findItem(p, i -> i.getItem() instanceof WirelessTerminal e && e.canOpen(i), ItemStack.EMPTY, Function.identity());
+			if(!t.isEmpty())
+				((WirelessTerminal)t.getItem()).open(p, t);
+		}));
 
 		ServerLoginNetworking.registerGlobalReceiver(id("config"), (server, handler, understood, buf, sync, respSender) -> {
 		});
 
 		ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, sync) -> {
-			PacketByteBuf packet = PacketByteBufs.create();
+			FriendlyByteBuf packet = PacketByteBufs.create();
 			try (OutputStreamWriter writer = new OutputStreamWriter(new ByteBufOutputStream(packet))){
 				gson.toJson(LOADED_CONFIG, writer);
 			} catch (IOException e) {
@@ -252,16 +260,16 @@ public class StorageMod implements ModInitializer {
 
 		configHolder.registerSaveListener((a, b) -> {
 			multiblockInvs = null;
-			return ActionResult.PASS;
+			return InteractionResult.PASS;
 		});
 	}
 
-	private static <T extends ScreenHandler> ScreenHandlerType<T> registerSimple(Identifier id, ScreenHandlerType.Factory<T> factory) {
-		ScreenHandlerType<T> type = new ScreenHandlerType<>(factory);
-		return Registry.register(Registry.SCREEN_HANDLER, id, type);
+	private static <T extends AbstractContainerMenu> MenuType<T> registerSimple(ResourceLocation id, MenuType.MenuSupplier<T> factory) {
+		MenuType<T> type = new MenuType<>(factory);
+		return Registry.register(Registry.MENU, id, type);
 	}
 
 	private static void registerItemForBlock(Block block) {
-		Registry.register(Registry.ITEM, Registry.BLOCK.getId(block), new BlockItem(block, new Item.Settings().group(STORAGE_MOD_TAB)));
+		Registry.register(Registry.ITEM, Registry.BLOCK.getKey(block), new BlockItem(block, new Item.Properties().tab(STORAGE_MOD_TAB)));
 	}
 }

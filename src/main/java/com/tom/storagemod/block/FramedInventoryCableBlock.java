@@ -5,108 +5,108 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ConnectingBlock;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.Material;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class FramedInventoryCableBlock extends Block implements IInventoryCable, IPaintable {
-	public static final BooleanProperty UP = Properties.UP;
-	public static final BooleanProperty DOWN = Properties.DOWN;
-	public static final BooleanProperty NORTH = Properties.NORTH;
-	public static final BooleanProperty SOUTH = Properties.SOUTH;
-	public static final BooleanProperty EAST = Properties.EAST;
-	public static final BooleanProperty WEST = Properties.WEST;
+	public static final BooleanProperty UP = BlockStateProperties.UP;
+	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
+	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+	public static final BooleanProperty EAST = BlockStateProperties.EAST;
+	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 
 	public FramedInventoryCableBlock() {
-		super(Block.Settings.of(Material.WOOD).strength(2).nonOpaque());
-		setDefaultState(getDefaultState()
-				.with(DOWN, false)
-				.with(UP, false)
-				.with(NORTH, false)
-				.with(EAST, false)
-				.with(SOUTH, false)
-				.with(WEST, false));
+		super(Block.Properties.of(Material.WOOD).strength(2).noOcclusion());
+		registerDefaultState(defaultBlockState()
+				.setValue(DOWN, false)
+				.setValue(UP, false)
+				.setValue(NORTH, false)
+				.setValue(EAST, false)
+				.setValue(SOUTH, false)
+				.setValue(WEST, false));
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
-		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable", tooltip);
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST);
 	}
 
 	@Override
-	public List<BlockPos> next(World world, BlockState state, BlockPos pos) {
+	public List<BlockPos> next(Level world, BlockState state, BlockPos pos) {
 		List<BlockPos> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			if(state.get(InventoryCableBlock.DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.offset(d));
+			if(state.getValue(InventoryCableBlock.DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.relative(d));
 		}
 		return next;
 	}
 
 	@Override
-	public BlockState getStateForNeighborUpdate(BlockState stateIn, Direction facing, BlockState facingState, WorldAccess worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return stateIn.with(ConnectingBlock.FACING_PROPERTIES.get(facing), IInventoryCable.canConnect(facingState, facing));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+		return stateIn.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext context) {
-		return withConnectionProperties(context.getWorld(), context.getBlockPos());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return withConnectionProperties(context.getLevel(), context.getClickedPos());
 	}
 
-	public BlockState withConnectionProperties(WorldAccess blockView_1, BlockPos blockPos_1) {
-		BlockState block_1 = blockView_1.getBlockState(blockPos_1.down());
-		BlockState block_2 = blockView_1.getBlockState(blockPos_1.up());
+	public BlockState withConnectionProperties(LevelAccessor blockView_1, BlockPos blockPos_1) {
+		BlockState block_1 = blockView_1.getBlockState(blockPos_1.below());
+		BlockState block_2 = blockView_1.getBlockState(blockPos_1.above());
 		BlockState block_3 = blockView_1.getBlockState(blockPos_1.north());
 		BlockState block_4 = blockView_1.getBlockState(blockPos_1.east());
 		BlockState block_5 = blockView_1.getBlockState(blockPos_1.south());
 		BlockState block_6 = blockView_1.getBlockState(blockPos_1.west());
 
-		return getDefaultState()
-				.with(DOWN, IInventoryCable.canConnect(block_1, Direction.DOWN))
-				.with(UP, IInventoryCable.canConnect(block_2, Direction.UP))
-				.with(NORTH, IInventoryCable.canConnect(block_3, Direction.NORTH))
-				.with(EAST, IInventoryCable.canConnect(block_4, Direction.EAST))
-				.with(SOUTH, IInventoryCable.canConnect(block_5, Direction.SOUTH))
-				.with(WEST, IInventoryCable.canConnect(block_6, Direction.WEST));
+		return defaultBlockState()
+				.setValue(DOWN, IInventoryCable.canConnect(block_1, Direction.DOWN))
+				.setValue(UP, IInventoryCable.canConnect(block_2, Direction.UP))
+				.setValue(NORTH, IInventoryCable.canConnect(block_3, Direction.NORTH))
+				.setValue(EAST, IInventoryCable.canConnect(block_4, Direction.EAST))
+				.setValue(SOUTH, IInventoryCable.canConnect(block_5, Direction.SOUTH))
+				.setValue(WEST, IInventoryCable.canConnect(block_6, Direction.WEST));
 	}
 
 	@Override
-	public BlockState rotate(BlockState blockState_1, BlockRotation blockRotation_1) {
+	public BlockState rotate(BlockState blockState_1, Rotation blockRotation_1) {
 		switch (blockRotation_1) {
 		case CLOCKWISE_180:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(EAST, blockState_1.get(WEST)).with(SOUTH, blockState_1.get(NORTH)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(EAST, blockState_1.getValue(WEST)).setValue(SOUTH, blockState_1.getValue(NORTH)).setValue(WEST, blockState_1.getValue(EAST));
 		case CLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(EAST)).with(EAST, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(WEST)).with(WEST, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(EAST)).setValue(EAST, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(NORTH));
 		case COUNTERCLOCKWISE_90:
-			return blockState_1.with(NORTH, blockState_1.get(WEST)).with(EAST, blockState_1.get(NORTH)).with(SOUTH, blockState_1.get(EAST)).with(WEST, blockState_1.get(SOUTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(WEST)).setValue(EAST, blockState_1.getValue(NORTH)).setValue(SOUTH, blockState_1.getValue(EAST)).setValue(WEST, blockState_1.getValue(SOUTH));
 		default:
 			break;
 		}
@@ -114,12 +114,12 @@ public class FramedInventoryCableBlock extends Block implements IInventoryCable,
 	}
 
 	@Override
-	public BlockState mirror(BlockState blockState_1, BlockMirror blockMirror_1) {
+	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {
 		case FRONT_BACK:
-			return blockState_1.with(NORTH, blockState_1.get(SOUTH)).with(SOUTH, blockState_1.get(NORTH));
+			return blockState_1.setValue(NORTH, blockState_1.getValue(SOUTH)).setValue(SOUTH, blockState_1.getValue(NORTH));
 		case LEFT_RIGHT:
-			return blockState_1.with(EAST, blockState_1.get(WEST)).with(WEST, blockState_1.get(EAST));
+			return blockState_1.setValue(EAST, blockState_1.getValue(WEST)).setValue(WEST, blockState_1.getValue(EAST));
 		default:
 			break;
 		}
@@ -129,8 +129,8 @@ public class FramedInventoryCableBlock extends Block implements IInventoryCable,
 	}
 
 	@Override
-	public boolean paint(World world, BlockPos pos, BlockState to) {
-		world.setBlockState(pos, StorageMod.invCablePainted.getDefaultState(), 2);
+	public boolean paint(Level world, BlockPos pos, BlockState to) {
+		world.setBlock(pos, StorageMod.invCablePainted.defaultBlockState(), 2);
 		BlockEntity te = world.getBlockEntity(pos);
 		if(te != null && te instanceof PaintedBlockEntity)
 			return ((PaintedBlockEntity)te).setPaintedBlockState(to);
@@ -138,12 +138,12 @@ public class FramedInventoryCableBlock extends Block implements IInventoryCable,
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
 	}
 
 	@Override
-	public boolean isTranslucent(BlockState state, BlockView world, BlockPos pos) {
+	public boolean propagatesSkylightDown(BlockState state, BlockGetter world, BlockPos pos) {
 		return false;
 	}
 }

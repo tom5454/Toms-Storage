@@ -10,18 +10,18 @@ import java.util.UUID;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.saveddata.SavedData;
 
-public class RemoteConnections extends PersistentState {
+public class RemoteConnections extends SavedData {
 	private static final String CONNECTIONS_TAG = "connections";
 	public static final String CHANNEL_ID = "id";
 	public static final String OWNER_ID = "owner";
@@ -33,29 +33,29 @@ public class RemoteConnections extends PersistentState {
 	private RemoteConnections() {
 	}
 
-	private RemoteConnections(NbtCompound tag) {
-		load(tag.getList(CONNECTIONS_TAG, NbtElement.COMPOUND_TYPE), connections);
+	private RemoteConnections(CompoundTag tag) {
+		load(tag.getList(CONNECTIONS_TAG, Tag.TAG_COMPOUND), connections);
 	}
 
-	public static void load(NbtList list, Map<UUID, Channel> connections) {
+	public static void load(ListTag list, Map<UUID, Channel> connections) {
 		for (int i = 0; i < list.size(); i++) {
-			NbtCompound t = list.getCompound(i);
-			UUID channel = t.getUuid(CHANNEL_ID);
+			CompoundTag t = list.getCompound(i);
+			UUID channel = t.getUUID(CHANNEL_ID);
 			connections.put(channel, new Channel(t));
 		}
 	}
 
-	public static RemoteConnections get(World world) {
-		ServerWorld sw = (ServerWorld) world;
-		return sw.getServer().getOverworld().getPersistentStateManager().getOrCreate(RemoteConnections::new, RemoteConnections::new, ID);
+	public static RemoteConnections get(Level world) {
+		ServerLevel sw = (ServerLevel) world;
+		return sw.getServer().overworld().getDataStorage().computeIfAbsent(RemoteConnections::new, RemoteConnections::new, ID);
 	}
 
 	@Override
-	public NbtCompound writeNbt(NbtCompound tag) {
-		NbtList list = new NbtList();
+	public CompoundTag save(CompoundTag tag) {
+		ListTag list = new ListTag();
 		connections.forEach((k, v) -> {
-			NbtCompound t = new NbtCompound();
-			t.putUuid(CHANNEL_ID, k);
+			CompoundTag t = new CompoundTag();
+			t.putUUID(CHANNEL_ID, k);
 			v.save(t);
 			list.add(t);
 		});
@@ -75,20 +75,20 @@ public class RemoteConnections extends PersistentState {
 			this.displayName = displayName;
 		}
 
-		private Channel(NbtCompound t) {
-			this(t.getUuid(OWNER_ID), t.getBoolean(PUBLIC_TAG), t.getString(DISPLAY_NAME));
+		private Channel(CompoundTag t) {
+			this(t.getUUID(OWNER_ID), t.getBoolean(PUBLIC_TAG), t.getString(DISPLAY_NAME));
 		}
 
-		public static Channel fromTag(NbtCompound t) {
+		public static Channel fromTag(CompoundTag t) {
 			return new Channel(null, t.getBoolean(PUBLIC_TAG), t.getString(DISPLAY_NAME));
 		}
 
-		public void register(ServerWorld world, BlockPos blockPos) {
+		public void register(ServerLevel world, BlockPos blockPos) {
 			DimPos pos = new DimPos(world, blockPos);
 			connectors.add(pos);
 		}
 
-		public Storage<ItemVariant> findOthers(ServerWorld world, BlockPos blockPos, int lvl) {
+		public Storage<ItemVariant> findOthers(ServerLevel world, BlockPos blockPos, int lvl) {
 			DimPos pos = new DimPos(world, blockPos);
 			connectors.add(pos);
 			Iterator<DimPos> posItr = connectors.iterator();
@@ -110,13 +110,13 @@ public class RemoteConnections extends PersistentState {
 			return handler;
 		}
 
-		public void save(NbtCompound t) {
-			t.putUuid(OWNER_ID, owner);
+		public void save(CompoundTag t) {
+			t.putUUID(OWNER_ID, owner);
 			t.putBoolean(PUBLIC_TAG, publicChannel);
 			t.putString(DISPLAY_NAME, displayName);
 		}
 
-		public void saveNet(NbtCompound t) {
+		public void saveNet(CompoundTag t) {
 			t.putBoolean(PUBLIC_TAG, publicChannel);
 			t.putString(DISPLAY_NAME, displayName);
 		}
@@ -124,20 +124,20 @@ public class RemoteConnections extends PersistentState {
 
 	public static class DimPos {
 		public int x, y, z;
-		public RegistryKey<World> dim;
+		public ResourceKey<Level> dim;
 
-		public DimPos(World world, BlockPos pos) {
+		public DimPos(Level world, BlockPos pos) {
 			this.x = pos.getX();
 			this.y = pos.getY();
 			this.z = pos.getZ();
-			this.dim = world.getRegistryKey();
+			this.dim = world.dimension();
 		}
 
 		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
-			result = prime * result + ((dim == null) ? 0 : dim.getValue().hashCode());
+			result = prime * result + ((dim == null) ? 0 : dim.location().hashCode());
 			result = prime * result + x;
 			result = prime * result + y;
 			result = prime * result + z;
@@ -159,10 +159,10 @@ public class RemoteConnections extends PersistentState {
 			return true;
 		}
 
-		public BlockEntity getTileEntity(ServerWorld world) {
-			World dim = world.getServer().getWorld(this.dim);
+		public BlockEntity getTileEntity(ServerLevel world) {
+			Level dim = world.getServer().getLevel(this.dim);
 			BlockPos pos = new BlockPos(x, y, z);
-			if(!dim.canSetBlock(pos))return null;
+			if(!dim.isLoaded(pos))return null;
 			return dim.getBlockEntity(pos);
 		}
 	}
@@ -171,12 +171,12 @@ public class RemoteConnections extends PersistentState {
 		return connections.get(connection);
 	}
 
-	public UUID makeChannel(NbtCompound t, UUID owner) {
+	public UUID makeChannel(CompoundTag t, UUID owner) {
 		UUID id = UUID.randomUUID();
 		String name = t.getString(DISPLAY_NAME);
 		if(name.length() > 50)name = "Channel " + System.currentTimeMillis();
 		connections.put(id, new Channel(owner, t.getBoolean(PUBLIC_TAG), name));
-		markDirty();
+		setDirty();
 		return id;
 	}
 
@@ -184,16 +184,16 @@ public class RemoteConnections extends PersistentState {
 		Channel c = connections.get(id);
 		if(c != null && c.owner.equals(player)) {
 			connections.remove(id);
-			markDirty();
+			setDirty();
 		}
 	}
 
-	public NbtList listChannels(PlayerEntity pl) {
-		NbtList list = new NbtList();
+	public ListTag listChannels(Player pl) {
+		ListTag list = new ListTag();
 		for (Entry<UUID, Channel> e : connections.entrySet()) {
-			if(e.getValue().publicChannel || e.getValue().owner.equals(pl.getUuid())) {
-				NbtCompound t = new NbtCompound();
-				t.putUuid(CHANNEL_ID, e.getKey());
+			if(e.getValue().publicChannel || e.getValue().owner.equals(pl.getUUID())) {
+				CompoundTag t = new CompoundTag();
+				t.putUUID(CHANNEL_ID, e.getKey());
 				e.getValue().save(t);
 				list.add(t);
 			}
@@ -205,7 +205,7 @@ public class RemoteConnections extends PersistentState {
 		Channel c = connections.get(id);
 		if(c != null && c.owner.equals(player)) {
 			c.publicChannel = pub;
-			markDirty();
+			setDirty();
 		}
 	}
 

@@ -4,18 +4,18 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
@@ -25,39 +25,39 @@ public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorB
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
-		tooltip.add(Text.translatable("tooltip.toms_storage.paintable"));
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
+		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override
-	public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
-		return VoxelShapes.fullCube();
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		return Shapes.block();
 	}
 
 	@Override
-	public boolean paint(World world, BlockPos pos, BlockState to) {
+	public boolean paint(Level world, BlockPos pos, BlockState to) {
 		BlockState old = world.getBlockState(pos);
 		BlockEntity te = world.getBlockEntity(pos);
-		NbtCompound tag = te.createNbt();
-		world.setBlockState(pos, StorageMod.invCableConnectorPainted.getDefaultState().
-				with(FACING, old.get(FACING))
-				.with(DOWN, old.get(DOWN))
-				.with(UP, old.get(UP))
-				.with(NORTH, old.get(NORTH))
-				.with(EAST, old.get(EAST))
-				.with(SOUTH, old.get(SOUTH))
-				.with(WEST, old.get(WEST)), 2);
+		CompoundTag tag = te.saveWithoutMetadata();
+		world.setBlock(pos, StorageMod.invCableConnectorPainted.defaultBlockState().
+				setValue(FACING, old.getValue(FACING))
+				.setValue(DOWN, old.getValue(DOWN))
+				.setValue(UP, old.getValue(UP))
+				.setValue(NORTH, old.getValue(NORTH))
+				.setValue(EAST, old.getValue(EAST))
+				.setValue(SOUTH, old.getValue(SOUTH))
+				.setValue(WEST, old.getValue(WEST)), 2);
 		te = world.getBlockEntity(pos);
-		te.readNbt(tag);
+		te.load(tag);
 		if(te != null && te instanceof PaintedBlockEntity)
 			return ((PaintedBlockEntity)te).setPaintedBlockState(to);
 		return false;
 	}
 
 	@Override
-	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
 		return new ItemStack(StorageMod.invCableConnectorFramed);
 	}
 }

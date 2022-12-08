@@ -15,13 +15,13 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
@@ -41,13 +41,13 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 
 	@Override
 	public void updateServer() {
-		if(world.getTime() % 20 == 19) {
-			BlockState state = world.getBlockState(pos);
-			Direction facing = state.get(InventoryCableConnectorBlock.FACING);
+		if(level.getGameTime() % 20 == 19) {
+			BlockState state = level.getBlockState(worldPosition);
+			Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
 			Stack<BlockPos> toCheck = new Stack<>();
 			Set<BlockPos> checkedBlocks = new HashSet<>();
-			checkedBlocks.add(pos);
-			toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, pos));
+			checkedBlocks.add(worldPosition);
+			toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, worldPosition));
 			if(master != null)master.unLink(linv);
 			master = null;
 			linv = new LinkedInv();
@@ -56,13 +56,13 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 				BlockPos cp = toCheck.pop();
 				if(!checkedBlocks.contains(cp)) {
 					checkedBlocks.add(cp);
-					if(world.canSetBlock(cp)) {
-						state = world.getBlockState(cp);
+					if(level.isLoaded(cp)) {
+						state = level.getBlockState(cp);
 						if(state.getBlock() == StorageMod.connector) {
-							BlockEntity te = world.getBlockEntity(cp);
+							BlockEntity te = level.getBlockEntity(cp);
 							if(te instanceof InventoryConnectorBlockEntity) {
 								master = (InventoryConnectorBlockEntity) te;
-								linv.time = world.getTime();
+								linv.time = level.getGameTime();
 								linv.handler = this::applyFilter;
 								master.addLinked(linv);
 								masterW = master.getInventory();
@@ -70,20 +70,20 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 							break;
 						}
 						if(state.getBlock() instanceof IInventoryCable) {
-							toCheck.addAll(((IInventoryCable)state.getBlock()).next(world, state, cp));
+							toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
 						}
 					}
 					if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
 				}
 			}
-			pointedAt = getPointedAt(pos.offset(facing), facing);
+			pointedAt = getPointedAt(worldPosition.relative(facing), facing);
 		}
 	}
 
 	protected Storage<ItemVariant> getPointedAt(BlockPos pos, Direction facing) {
-		Storage<ItemVariant> itemHandler = ItemStorage.SIDED.find(world, pos, facing.getOpposite());
+		Storage<ItemVariant> itemHandler = ItemStorage.SIDED.find(level, pos, facing.getOpposite());
 		if(itemHandler == null) {
-			Inventory inv = HopperBlockEntity.getInventoryAt(world, pos);
+			Container inv = HopperBlockEntity.getContainerAt(level, pos);
 			if(inv != null)itemHandler = InventoryStorage.of(inv, facing.getOpposite());
 		}
 		return itemHandler;

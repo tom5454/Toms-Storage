@@ -1,128 +1,128 @@
 package com.tom.storagemod.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Material;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.tom.storagemod.TickerUtil;
 import com.tom.storagemod.tile.StorageTerminalBlockEntity;
 
-public abstract class AbstractStorageTerminalBlock extends BlockWithEntity implements Waterloggable {
-	public static final EnumProperty<TerminalPos> TERMINAL_POS = EnumProperty.of("pos", TerminalPos.class);
-	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
-	public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
-	private static final VoxelShape SHAPE_N = Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 6.0D);
-	private static final VoxelShape SHAPE_S = Block.createCuboidShape(0.0D, 0.0D, 10.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_E = Block.createCuboidShape(10.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_W = Block.createCuboidShape(0.0D, 0.0D, 0.0D, 6.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_U = Block.createCuboidShape(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape SHAPE_D = Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
+public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
+	public static final EnumProperty<TerminalPos> TERMINAL_POS = EnumProperty.create("pos", TerminalPos.class);
+	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+	private static final VoxelShape SHAPE_N = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 6.0D);
+	private static final VoxelShape SHAPE_S = Block.box(0.0D, 0.0D, 10.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_E = Block.box(10.0D, 0.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_W = Block.box(0.0D, 0.0D, 0.0D, 6.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_U = Block.box(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape SHAPE_D = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 6.0D, 16.0D);
 	public AbstractStorageTerminalBlock() {
-		super(Block.Settings.of(Material.WOOD).strength(3).luminance(s -> 6));
-		setDefaultState(getDefaultState().with(TERMINAL_POS, TerminalPos.CENTER));
+		super(Block.Properties.of(Material.WOOD).strength(3).lightLevel(s -> 6));
+		registerDefaultState(defaultBlockState().setValue(TERMINAL_POS, TerminalPos.CENTER));
 	}
 
 	@Override
-	public BlockRenderType getRenderType(BlockState p_149645_1_) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState p_149645_1_) {
+		return RenderShape.MODEL;
 	}
 
 	@Override
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, WATERLOGGED, TERMINAL_POS);
 	}
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos,
-			PlayerEntity player, Hand hand, BlockHitResult rtr) {
-		if (world.isClient) {
-			return ActionResult.SUCCESS;
+	public InteractionResult use(BlockState state, Level world, BlockPos pos,
+			Player player, InteractionHand hand, BlockHitResult rtr) {
+		if (world.isClientSide) {
+			return InteractionResult.SUCCESS;
 		}
 
 		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
 		if (blockEntity_1 instanceof StorageTerminalBlockEntity term) {
 			if(term.canInteractWith(player)) {
-				player.openHandledScreen(term);
+				player.openMenu(term);
 			} else {
-				player.sendMessage(Text.translatable("chat.toms_storage.terminal_out_of_range"), true);
+				player.displayClientMessage(Component.translatable("chat.toms_storage.terminal_out_of_range"), true);
 			}
 		}
-		return ActionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public BlockState rotate(BlockState state, BlockRotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+	public BlockState rotate(BlockState state, Rotation rot) {
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	public BlockState mirror(BlockState state, BlockMirror mirrorIn) {
-		return state.rotate(mirrorIn.getRotation(state.get(FACING)));
+	public BlockState mirror(BlockState state, Mirror mirrorIn) {
+		return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext context) {
-		Direction direction = context.getSide().getOpposite();
-		FluidState ifluidstate = context.getWorld().getFluidState(context.getBlockPos());
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		Direction direction = context.getClickedFace().getOpposite();
+		FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
 		TerminalPos pos = TerminalPos.CENTER;
 		if(direction.getAxis() == Direction.Axis.Y) {
 			if(direction == Direction.UP)pos = TerminalPos.UP;
 			if(direction == Direction.DOWN)pos = TerminalPos.DOWN;
-			direction = context.getPlayerFacing();
+			direction = context.getHorizontalDirection();
 		}
-		return this.getDefaultState().with(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.NORTH : direction).
-				with(TERMINAL_POS, pos).
-				with(WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER));
+		return this.defaultBlockState().setValue(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.NORTH : direction).
+				setValue(TERMINAL_POS, pos).
+				setValue(WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER));
 	}
 
 	@Override
 	public FluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
-	public BlockState getStateForNeighborUpdate(BlockState stateIn, Direction facing, BlockState facingState, WorldAccess worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (stateIn.get(WATERLOGGED)) {
-			worldIn.createAndScheduleFluidTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 
-		return super.getStateForNeighborUpdate(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
 
 	@Override
-	public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
-		switch (state.get(TERMINAL_POS)) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		switch (state.getValue(TERMINAL_POS)) {
 		case CENTER:
-			switch (state.get(FACING)) {
+			switch (state.getValue(FACING)) {
 			case NORTH:
 				return SHAPE_N;
 			case SOUTH:
@@ -149,7 +149,7 @@ public abstract class AbstractStorageTerminalBlock extends BlockWithEntity imple
 		return SHAPE_N;
 	}
 
-	public static enum TerminalPos implements StringIdentifiable {
+	public static enum TerminalPos implements StringRepresentable {
 		CENTER("center"),
 		UP("up"),
 		DOWN("down")
@@ -160,13 +160,13 @@ public abstract class AbstractStorageTerminalBlock extends BlockWithEntity imple
 		}
 
 		@Override
-		public String asString() {
+		public String getSerializedName() {
 			return name;
 		}
 	}
 
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state,
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state,
 			BlockEntityType<T> type) {
 		return TickerUtil.createTicker(world, false, true);
 	}

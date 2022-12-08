@@ -4,19 +4,19 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.tile.FilteredInventoryCableConnectorBlockEntity;
@@ -25,28 +25,28 @@ public class FilteredInventoryCableConnectorBlock extends InventoryCableConnecto
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public void appendTooltip(ItemStack stack, BlockView worldIn, List<Text> tooltip,
-			TooltipContext flagIn) {
-		tooltip.add(Text.translatable("tooltip.toms_storage.filtered"));
+	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
+			TooltipFlag flagIn) {
+		tooltip.add(Component.translatable("tooltip.toms_storage.filtered"));
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new FilteredInventoryCableConnectorBlockEntity(pos, state);
 	}
 
 	@Override
-	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand,
+	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
 			BlockHitResult hit) {
-		if (world.isClient) {
-			return ActionResult.SUCCESS;
+		if (world.isClientSide) {
+			return InteractionResult.SUCCESS;
 		}
 
 		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
-		if (blockEntity_1 instanceof NamedScreenHandlerFactory) {
-			player.openHandledScreen((NamedScreenHandlerFactory)blockEntity_1);
+		if (blockEntity_1 instanceof MenuProvider) {
+			player.openMenu((MenuProvider)blockEntity_1);
 		}
-		return ActionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }
