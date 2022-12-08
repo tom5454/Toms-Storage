@@ -34,6 +34,7 @@ import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.WirelessTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 
 public class TileEntityStorageTerminal extends BlockEntity implements MenuProvider, TickableServer {
 	private IItemHandler itemHandler;
@@ -147,9 +148,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 	public boolean canInteractWith(Player player) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
 		int d = 4;
-		int termReach = 0;
-		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
-		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
+		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
 		if(beaconLevel >= Config.wirelessTermBeaconLvl && termReach > 0) {
 			if(beaconLevel >= Config.wirelessTermBeaconLvlDim)return true;
 			else return player.getLevel() == level;

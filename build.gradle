@@ -18,7 +18,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.3.4'
+version = project.mod_version
 group = 'com.tom5454.toms_storage' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'toms_storage-1.18.2'
 
@@ -60,9 +60,12 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
+            
+            property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             mods {
-                examplemod {
+                toms_storage {
                     source sourceSets.main
                 }
             }
@@ -82,9 +85,12 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
+            
+            property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             mods {
-                examplemod {
+                toms_storage {
                     source sourceSets.main
                 }
             }
@@ -106,10 +112,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'toms_storage', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
-                examplemod {
+                toms_storage {
                     source sourceSets.main
                 }
             }
@@ -129,6 +135,9 @@ repositories {
     //     dir 'libs'
     // }
     maven { url "https://dvs1.progwml6.com/files/maven" }
+    maven {
+        url = "https://maven.theillusivec4.top/"
+    }
 }
 
 dependencies {
@@ -150,9 +159,12 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.196:api")
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.1.255:api")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.196")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.1.255")
+  	
+  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.7.1")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.7.1:api")
 }
 
 // Example for how to get properties into the manifest for reading at runtime.

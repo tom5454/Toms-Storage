@@ -3,6 +3,7 @@ package com.tom.storagemod;
 import java.util.List;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -25,11 +26,17 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -40,9 +47,11 @@ import com.tom.storagemod.gui.GuiLevelEmitter;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
+import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.TileEntityPainted;
 
 public class StorageModClient {
+	public static KeyMapping openTerm;
 
 	public static void clientSetup() {
 		MenuScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
@@ -68,7 +77,9 @@ public class StorageModClient {
 			}
 			return -1;
 		}, StorageMod.paintedTrim, StorageMod.invCableFramed, StorageMod.invProxy, StorageMod.invCableConnectorFramed);
-		MinecraftForge.EVENT_BUS.addListener(StorageModClient::renderWorldLastEvent);
+		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMapping.CATEGORY_GAMEPLAY);
+		ClientRegistry.registerKeyBinding(openTerm);
+		MinecraftForge.EVENT_BUS.register(StorageModClient.class);
 	}
 
 	private static void bakeModels(ModelBakeEvent event) {
@@ -86,7 +97,8 @@ public class StorageModClient {
 		});
 	}
 
-	private static void renderWorldLastEvent(RenderLevelLastEvent evt) {
+	@SubscribeEvent
+	public static void renderWorldLastEvent(RenderLevelLastEvent evt) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		if( player == null )
@@ -134,6 +146,16 @@ public class StorageModClient {
 			}
 		} else if(addShift) {
 			tooltip.add(new TranslatableComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+		}
+	}
+
+	@SubscribeEvent
+	public static void clientTick(ClientTickEvent evt) {
+		if (Minecraft.getInstance().player == null || evt.phase == Phase.START)
+			return;
+
+		if(openTerm.consumeClick()) {
+			NetworkHandler.openTerminal();
 		}
 	}
 }

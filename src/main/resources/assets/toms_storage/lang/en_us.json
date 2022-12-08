@@ -71,6 +71,8 @@
 	"tooltip.toms_storage.lvlEm_lt_1": "Emit when less than specified in storage",
 	"tooltip.toms_storage.adv_wireless_terminal": "Shift right click a terminal to bind it.\\Range: %d blocks\\Build a level %d beacon in an 8 block radius of the bound terminal to make it accessible from anywhere in the same dimension.\\Build a level %d beacon in an 8 block radius of the bound terminal to make it accessible from anywhere across dimensions.\\The teminal's chunk has to be loaded",
 	"tooltip.toms_storage.adv_wireless_terminal.bound": "Bound to (%s, %s, %s) in %s",
+	"tooltip.toms_storage.adv_wireless_terminal.keybind": "Press the %s key to open",
+	"tooltip.toms_storage.adv_wireless_terminal.keybind.outline": "[%s]",
 	"tooltip.toms_storage.link_public_0": "Private Channel",
 	"tooltip.toms_storage.link_public_1": "Public Channel",
 	"tooltip.toms_storage.link_remote_0": "Access remote Inventories",
@@ -97,5 +99,7 @@
 	"tomsstorage.config.adv_wireless_beacon_lvl_dim": "Adv Wireless terminal requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby",
 	"tomsstorage.config.inv_link_beacon_lvl": "Advanced wireless terminal requied beacon level for infinite range",
 	"tomsstorage.config.inv_link_beacon_lvl_dim": "Advanced wireless terminal requied beacon level for infinite range",
-	"tomsstorage.config.inv_dup_scan_size": "Inventory Connector duplicate finder max slot count"
+	"tomsstorage.config.inv_dup_scan_size": "Inventory Connector duplicate finder max slot count",
+	
+	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal"
 }
