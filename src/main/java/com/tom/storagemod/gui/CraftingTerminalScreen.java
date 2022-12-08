@@ -1,6 +1,7 @@
 package com.tom.storagemod.gui;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -116,16 +117,16 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				buttonSearchType.setX(leftPos - 36);
 				buttonCtrlMode.setX(leftPos - 36);
 				buttonPullFromInv.setX(leftPos - 54);
-				buttonSearchType.y = topPos + 5;
-				buttonCtrlMode.y = topPos + 5 + 18;
-				buttonPullFromInv.y = topPos + 5 + 18;
+				buttonSearchType.setY(topPos + 5);
+				buttonCtrlMode.setY(topPos + 5 + 18);
+				buttonPullFromInv.setY(topPos + 5 + 18);
 			} else {
 				buttonSearchType.setX(leftPos - 18);
 				buttonCtrlMode.setX(leftPos - 18);
 				buttonPullFromInv.setX(leftPos - 18);
-				buttonSearchType.y = topPos + 5 + 18*2;
-				buttonCtrlMode.y = topPos + 5 + 18*3;
-				buttonPullFromInv.y = topPos + 5 + 18*4;
+				buttonSearchType.setY(topPos + 5 + 18*2);
+				buttonCtrlMode.setY(topPos + 5 + 18*3);
+				buttonPullFromInv.setY(topPos + 5 + 18*4);
 			}
 		}));
 		if(recipeBookGui.isVisible()) {
@@ -134,9 +135,9 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			buttonSearchType.setX(leftPos - 36);
 			buttonCtrlMode.setX(leftPos - 36);
 			buttonPullFromInv.setX(leftPos - 54);
-			buttonSearchType.y = topPos + 5;
-			buttonCtrlMode.y = topPos + 5 + 18;
-			buttonPullFromInv.y = topPos + 5 + 18;
+			buttonSearchType.setY(topPos + 5);
+			buttonCtrlMode.setY(topPos + 5 + 18);
+			buttonPullFromInv.setY(topPos + 5 + 18);
 			super.searchField.setX(this.leftPos + 82);
 			try {
 				searchField = (EditBox) searchBarField.get(recipeBookGui);
@@ -224,12 +225,6 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	}
 
 	@Override
-	public void onClose() {
-		this.recipeBookGui.removed();
-		super.onClose();
-	}
-
-	@Override
 	public RecipeBookComponent getRecipeBookComponent() {
 		return this.recipeBookGui;
 	}
@@ -263,11 +258,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	public class GuiButtonClear extends Button {
 
 		public GuiButtonClear(int x, int y, OnPress pressable) {
-			super(x, y, 11, 11, null, pressable);
-		}
-
-		public void setX(int i) {
-			x = i;
+			super(x, y, 11, 11, null, pressable, Supplier::get);
 		}
 
 		/**
@@ -278,12 +269,12 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			if (this.visible) {
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				RenderSystem.setShaderTexture(0, getGui());
-				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 				int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				this.blit(st, this.x, this.y, 194 + i * 11, 10, this.width, this.height);
+				this.blit(st, this.getX(), this.getY(), 194 + i * 11, 10, this.width, this.height);
 			}
 		}
 	}

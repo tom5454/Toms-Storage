@@ -1,12 +1,15 @@
 package com.tom.storagemod;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MenuType.MenuSupplier;
@@ -20,11 +23,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -71,9 +72,6 @@ import com.tom.storagemod.tile.OpenCrateBlockEntity;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 import com.tom.storagemod.tile.StorageTerminalBlockEntity;
 
-import top.theillusivec4.curios.api.SlotTypeMessage;
-import top.theillusivec4.curios.api.SlotTypePreset;
-
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
 public class StorageMod {
@@ -119,6 +117,7 @@ public class StorageMod {
 	public static RegistryObject<MenuType<FilteredMenu>> filteredConatiner = menu("ts.filtered.container", FilteredMenu::new);
 	public static RegistryObject<MenuType<LevelEmitterMenu>> levelEmitterConatiner = menu("ts.level_emitter.container", LevelEmitterMenu::new);
 	public static RegistryObject<MenuType<InventoryLinkMenu>> inventoryLink = menu("ts.inventory_link.container", InventoryLinkMenu::new);
+	public static List<Item> tabItems = new ArrayList<>();
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -130,6 +129,7 @@ public class StorageMod {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> StorageModClient::preInit);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::sendIMC);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::makeTab);
 
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
@@ -144,9 +144,14 @@ public class StorageMod {
 		MENU_TYPE.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
+	public static <T extends Item> T tab(T in) {
+		tabItems.add(in);
+		return in;
+	}
+
 	private static <B extends Block> RegistryObject<B> blockWithItem(String name, Supplier<B> create) {
 		RegistryObject<B> re = BLOCKS.register(name, create);
-		ITEMS.register(name, () -> new BlockItem(re.get(), new Item.Properties().tab(STORAGE_MOD_TAB)));
+		ITEMS.register(name, () -> tab(new BlockItem(re.get(), new Item.Properties())));
 		return re;
 	}
 
@@ -177,16 +182,18 @@ public class StorageMod {
 	}
 
 	public void sendIMC(InterModEnqueueEvent e) {
-		if(ModList.get().isLoaded("curios"))
-			InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BELT.getMessageBuilder().build());
+		/*if(ModList.get().isLoaded("curios"))
+			InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BELT.getMessageBuilder().build());*/
 	}
 
-	public static final CreativeModeTab STORAGE_MOD_TAB = new CreativeModeTab("toms_storage.tab") {
+	private void makeTab(CreativeModeTabEvent.Register evt) {
+		STORAGE_MOD_TAB = evt.registerCreativeModeTab(new ResourceLocation(modid, "tab"), b -> {
+			b.icon(() -> new ItemStack(terminal.get()));
+			b.displayItems((flag, out, bool) -> {
+				tabItems.forEach(out::accept);
+			});
+		});
+	}
 
-		@Override
-		@OnlyIn(Dist.CLIENT)
-		public ItemStack makeIcon() {
-			return new ItemStack(terminal.get());
-		}
-	};
+	public static CreativeModeTab STORAGE_MOD_TAB;
 }

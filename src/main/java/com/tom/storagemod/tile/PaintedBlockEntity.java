@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
@@ -47,7 +48,7 @@ public class PaintedBlockEntity extends BlockEntity {
 	@Override
 	public void load(@Nonnull CompoundTag compound) {
 		super.load(compound);
-		blockState = NbtUtils.readBlockState(compound.getCompound("block"));
+		blockState = NbtUtils.readBlockState(this.level.holderLookup(Registries.BLOCK), compound.getCompound("block"));
 		markDirtyClient();
 	}
 

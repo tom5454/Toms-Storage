@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -31,7 +31,8 @@ import com.tom.storagemod.StorageTags;
 public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 
 	public AdvWirelessTerminalItem() {
-		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
+		super(new Properties().stacksTo(1));
+		StorageMod.tab(this);
 	}
 
 	@Override
@@ -59,7 +60,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 				int y = stack.getTag().getInt("BindY");
 				int z = stack.getTag().getInt("BindZ");
 				String dim = stack.getTag().getString("BindDim");
-				Level termWorld = worldIn.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dim)));
+				Level termWorld = worldIn.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dim)));
 				if(termWorld.isLoaded(new BlockPos(x, y, z))) {
 					BlockHitResult lookingAt = new BlockHitResult(new Vec3(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
 					BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
