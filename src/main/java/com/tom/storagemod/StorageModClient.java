@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
@@ -26,11 +27,18 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryObject;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -41,13 +49,16 @@ import com.tom.storagemod.gui.LevelEmitterScreen;
 import com.tom.storagemod.gui.StorageTerminalScreen;
 import com.tom.storagemod.item.WirelessTerminalItem;
 import com.tom.storagemod.model.BakedPaintedModel;
+import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 
 public class StorageModClient {
+	public static KeyMapping openTerm;
 
 	public static void preInit() {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::registerColors);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::bakeModels);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::initKeybinds);
 	}
 
 	public static void clientSetup() {
@@ -56,7 +67,12 @@ public class StorageModClient {
 		MenuScreens.register(StorageMod.filteredConatiner.get(), FilteredScreen::new);
 		MenuScreens.register(StorageMod.levelEmitterConatiner.get(), LevelEmitterScreen::new);
 		MenuScreens.register(StorageMod.inventoryLink.get(), InventoryLinkScreen::new);
-		MinecraftForge.EVENT_BUS.addListener(StorageModClient::renderWorldLastEvent);
+		MinecraftForge.EVENT_BUS.register(StorageModClient.class);
+	}
+
+	public static void initKeybinds(RegisterKeyMappingsEvent evt) {
+		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMapping.CATEGORY_GAMEPLAY);
+		evt.register(openTerm);
 	}
 
 	public static void registerColors(RegisterColorHandlersEvent.Block event) {
@@ -90,24 +106,27 @@ public class StorageModClient {
 		});
 	}
 
-	private static void renderWorldLastEvent(RenderLevelLastEvent evt) {
-		Minecraft mc = Minecraft.getInstance();
-		Player player = mc.player;
-		if( player == null )
-			return;
+	@SubscribeEvent
+	public static void renderWorldOutline(RenderLevelStageEvent evt) {
+		if(evt.getStage() == Stage.AFTER_PARTICLES) {
+			Minecraft mc = Minecraft.getInstance();
+			Player player = mc.player;
+			if( player == null )
+				return;
 
-		if(!WirelessTerminalItem.isPlayerHolding(player))
-			return;
+			if(!WirelessTerminalItem.isPlayerHolding(player))
+				return;
 
-		BlockHitResult lookingAt = (BlockHitResult) player.pick(Config.wirelessRange, 0f, true);
-		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
-		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
-			BlockPos pos = lookingAt.getBlockPos();
-			Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
-			PoseStack ms = evt.getPoseStack();
-			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
-			drawShape(ms, buf, state.getOcclusionShape(player.level, pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
-			mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
+			BlockHitResult lookingAt = (BlockHitResult) player.pick(Config.wirelessRange, 0f, true);
+			BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
+			if(state.is(StorageTags.REMOTE_ACTIVATE)) {
+				BlockPos pos = lookingAt.getBlockPos();
+				Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
+				PoseStack ms = evt.getPoseStack();
+				VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
+				drawShape(ms, buf, state.getOcclusionShape(player.level, pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
+				mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
+			}
 		}
 	}
 
@@ -138,6 +157,16 @@ public class StorageModClient {
 			}
 		} else if(addShift) {
 			tooltip.add(Component.translatable("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+		}
+	}
+
+	@SubscribeEvent
+	public static void clientTick(ClientTickEvent evt) {
+		if (Minecraft.getInstance().player == null || evt.phase == Phase.START)
+			return;
+
+		if(openTerm.consumeClick()) {
+			NetworkHandler.openTerminal();
 		}
 	}
 }

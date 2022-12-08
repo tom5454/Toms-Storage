@@ -2,6 +2,7 @@ package com.tom.storagemod.item;
 
 import java.util.List;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -43,11 +44,15 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 			String dim = stack.getTag().getString("BindDim");
 			tooltip.add(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
+		tooltip.add(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind", Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind.outline", Component.keybind("key.toms_storage.open_terminal")).withStyle(ChatFormatting.GREEN)));
 	}
 
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
-		ItemStack stack = playerIn.getItemInHand(handIn);
+		return new InteractionResultHolder<>(activateTerminal(worldIn, playerIn.getItemInHand(handIn), playerIn, handIn), playerIn.getItemInHand(handIn));
+	}
+
+	public static InteractionResult activateTerminal(Level worldIn, ItemStack stack, Player playerIn, InteractionHand handIn) {
 		if(stack.hasTag() && stack.getTag().contains("BindX")) {
 			if(!worldIn.isClientSide) {
 				int x = stack.getTag().getInt("BindX");
@@ -60,7 +65,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 					BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
 					if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 						InteractionResult r = state.use(termWorld, playerIn, handIn, lookingAt);
-						return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
+						return r;
 					} else {
 						playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_invalid_block"), true);
 					}
@@ -68,10 +73,10 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 					playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_out_of_range"), true);
 				}
 			} else {
-				return InteractionResultHolder.consume(playerIn.getItemInHand(handIn));
+				return InteractionResult.CONSUME;
 			}
 		}
-		return InteractionResultHolder.pass(playerIn.getItemInHand(handIn));
+		return InteractionResult.PASS;
 	}
 
 	@Override
@@ -100,5 +105,15 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 	@Override
 	public int getRange(Player pl, ItemStack stack) {
 		return Config.advWirelessRange;
+	}
+
+	@Override
+	public void open(Player sender, ItemStack t) {
+		activateTerminal(sender.level, t, sender, InteractionHand.MAIN_HAND);
+	}
+
+	@Override
+	public boolean canOpen(ItemStack t) {
+		return true;
 	}
 }

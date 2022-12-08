@@ -51,4 +51,13 @@ public class WirelessTerminalItem extends Item implements WirelessTerminal {
 	public int getRange(Player pl, ItemStack stack) {
 		return Config.wirelessRange;
 	}
+
+	@Override
+	public void open(Player sender, ItemStack t) {
+	}
+
+	@Override
+	public boolean canOpen(ItemStack t) {
+		return false;
+	}
 }

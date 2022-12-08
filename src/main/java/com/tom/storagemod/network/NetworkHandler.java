@@ -1,11 +1,13 @@
 package com.tom.storagemod.network;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -14,9 +16,11 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.item.WirelessTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 
 public class NetworkHandler {
-	private static final String PROTOCOL_VERSION = "1";
+	private static final String PROTOCOL_VERSION = "2";
 	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
 			new ResourceLocation(StorageMod.modid, "main"),
 			() -> PROTOCOL_VERSION,
@@ -25,6 +29,7 @@ public class NetworkHandler {
 			);
 	public static void init() {
 		INSTANCE.registerMessage(0, DataPacket.class, DataPacket::toBytes, DataPacket::new, NetworkHandler::handleData);
+		INSTANCE.registerMessage(1, OpenTerminalPacket.class, (a, b) -> {}, b -> new OpenTerminalPacket(), NetworkHandler::handleData);
 		StorageMod.LOGGER.info("Initilaized Network Handler");
 	}
 
@@ -46,11 +51,24 @@ public class NetworkHandler {
 		ctx.get().setPacketHandled(true);
 	}
 
+	public static void handleData(OpenTerminalPacket packet, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().enqueueWork(() -> {
+			ServerPlayer sender = ctx.get().getSender();
+			ItemStack t = PlayerInvUtil.findItem(sender, i -> i.getItem() instanceof WirelessTerminal e && e.canOpen(i), ItemStack.EMPTY, Function.identity());
+			if(!t.isEmpty())
+				((WirelessTerminal)t.getItem()).open(sender, t);
+		});
+	}
+
 	public static void sendDataToServer(CompoundTag tag) {
 		INSTANCE.sendToServer(new DataPacket(tag));
 	}
 
 	public static void sendTo(ServerPlayer pl, CompoundTag tag) {
 		INSTANCE.send(PacketDistributor.PLAYER.with(() -> pl), new DataPacket(tag));
+	}
+
+	public static void openTerminal() {
+		INSTANCE.sendToServer(new OpenTerminalPacket());
 	}
 }
