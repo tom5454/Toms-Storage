@@ -1,6 +1,7 @@
 package com.tom.storagemod.item;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -24,7 +25,7 @@ public class PaintedBlockItem extends BlockItem {
 		Component tcS = super.getName(is);
 		MutableComponent tc = (MutableComponent) tcS;
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
-			BlockState st = NbtUtils.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
+			BlockState st = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), is.getTag().getCompound("BlockEntityTag").getCompound("block"));
 			tc.append(" (");
 			tc.append(st.getBlock().getName().withStyle(ChatFormatting.GREEN));
 			tc.append(")");

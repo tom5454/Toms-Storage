@@ -2,6 +2,8 @@ package com.tom.storagemod;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -9,14 +11,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -117,6 +120,7 @@ public class StorageMod implements ModInitializer {
 	public static MenuType<FilteredMenu> filteredConatiner;
 	public static MenuType<LevelEmitterMenu> levelEmitterConatiner;
 	public static MenuType<InventoryLinkMenu> inventoryLink;
+	public static List<Item> tabItems = new ArrayList<>();
 
 	public static final Gson gson = new GsonBuilder().create();
 	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
@@ -128,8 +132,14 @@ public class StorageMod implements ModInitializer {
 	public StorageMod() {
 	}
 
-	public static final CreativeModeTab STORAGE_MOD_TAB = FabricItemGroupBuilder.build(id("tab"), () -> new ItemStack(terminal));
+	public static final CreativeModeTab STORAGE_MOD_TAB = FabricItemGroup.builder(id("tab")).icon(() -> new ItemStack(terminal)).displayItems((flag, out, bool) -> {
+		tabItems.forEach(out::accept);
+	}).build();
 
+	public static <T extends Item> T tab(T in) {
+		tabItems.add(in);
+		return in;
+	}
 
 	public static ResourceLocation id(String id) {
 		return new ResourceLocation(modid, id);
@@ -177,46 +187,46 @@ public class StorageMod implements ModInitializer {
 		levelEmitterConatiner = registerSimple(id("ts.level_emitter.container"), LevelEmitterMenu::new);
 		inventoryLink = registerSimple(id("ts.inventory_link.container"), InventoryLinkMenu::new);
 
-		Registry.register(Registry.BLOCK, id("ts.inventory_connector"), connector);
-		Registry.register(Registry.BLOCK, id("ts.storage_terminal"), terminal);
-		Registry.register(Registry.BLOCK, id("ts.open_crate"), openCrate);
-		Registry.register(Registry.BLOCK, id("ts.trim"), inventoryTrim);
-		Registry.register(Registry.BLOCK, id("ts.painted_trim"), paintedTrim);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable"), invCable);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable_framed"), invCableFramed);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable_painted"), invCablePainted);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable_connector"), invCableConnector);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable_connector_filtered"), invCableConnectorFiltered);
-		Registry.register(Registry.BLOCK, id("ts.inventory_proxy"), invProxy);
-		Registry.register(Registry.BLOCK, id("ts.crafting_terminal"), craftingTerminal);
-		Registry.register(Registry.BLOCK, id("ts.inventory_hopper_basic"), invHopperBasic);
-		Registry.register(Registry.BLOCK, id("ts.level_emitter"), levelEmitter);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable_connector_framed"), invCableConnectorFramed);
-		Registry.register(Registry.BLOCK, id("ts.inventory_cable_connector_painted"), invCableConnectorPainted);
-		Registry.register(Registry.BLOCK, id("ts.inventory_proxy_painted"), invProxyPainted);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_connector"), connector);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.storage_terminal"), terminal);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.open_crate"), openCrate);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.trim"), inventoryTrim);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.painted_trim"), paintedTrim);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable"), invCable);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable_framed"), invCableFramed);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable_painted"), invCablePainted);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable_connector"), invCableConnector);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable_connector_filtered"), invCableConnectorFiltered);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_proxy"), invProxy);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.crafting_terminal"), craftingTerminal);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_hopper_basic"), invHopperBasic);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.level_emitter"), levelEmitter);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable_connector_framed"), invCableConnectorFramed);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_cable_connector_painted"), invCableConnectorPainted);
+		Registry.register(BuiltInRegistries.BLOCK, id("ts.inventory_proxy_painted"), invProxyPainted);
 
-		Registry.register(Registry.ITEM, id("ts.paint_kit"), paintingKit);
-		Registry.register(Registry.ITEM, id("ts.wireless_terminal"), wirelessTerminal);
-		Registry.register(Registry.ITEM, id("ts.adv_wireless_terminal"), advWirelessTerminal);
+		Registry.register(BuiltInRegistries.ITEM, id("ts.paint_kit"), paintingKit);
+		Registry.register(BuiltInRegistries.ITEM, id("ts.wireless_terminal"), wirelessTerminal);
+		Registry.register(BuiltInRegistries.ITEM, id("ts.adv_wireless_terminal"), advWirelessTerminal);
 
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_connector.tile"), connectorTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.storage_terminal.tile"), terminalTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.open_crate.tile"), openCrateTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.painted.tile"), paintedTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_cable_connector.tile"), invCableConnectorTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_cable_connector_filtered.tile"), invCableConnectorFilteredTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventory_proxy.tile"), invProxyTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.crafting_terminal.tile"), craftingTerminalTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.inventoty_hopper_basic.tile"), invHopperBasicTile);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, id("ts.level_emitter.tile"), levelEmitterTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.inventory_connector.tile"), connectorTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.storage_terminal.tile"), terminalTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.open_crate.tile"), openCrateTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.painted.tile"), paintedTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.inventory_cable_connector.tile"), invCableConnectorTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.inventory_cable_connector_filtered.tile"), invCableConnectorFilteredTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.inventory_proxy.tile"), invProxyTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.crafting_terminal.tile"), craftingTerminalTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.inventoty_hopper_basic.tile"), invHopperBasicTile);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("ts.level_emitter.tile"), levelEmitterTile);
 
 		registerItemForBlock(connector);
 		registerItemForBlock(terminal);
 		registerItemForBlock(openCrate);
 		registerItemForBlock(inventoryTrim);
-		Registry.register(Registry.ITEM, Registry.BLOCK.getKey(paintedTrim), new PaintedBlockItem(paintedTrim));
+		Registry.register(BuiltInRegistries.ITEM, BuiltInRegistries.BLOCK.getKey(paintedTrim), new PaintedBlockItem(paintedTrim));
 		registerItemForBlock(invCable);
-		Registry.register(Registry.ITEM, Registry.BLOCK.getKey(invCableFramed), new PaintedBlockItem(invCableFramed, new Item.Properties().tab(STORAGE_MOD_TAB)));
+		Registry.register(BuiltInRegistries.ITEM, BuiltInRegistries.BLOCK.getKey(invCableFramed), tab(new PaintedBlockItem(invCableFramed, new Item.Properties())));
 		registerItemForBlock(invCableConnector);
 		registerItemForBlock(invCableConnectorFiltered);
 		registerItemForBlock(invProxy);
@@ -266,10 +276,10 @@ public class StorageMod implements ModInitializer {
 
 	private static <T extends AbstractContainerMenu> MenuType<T> registerSimple(ResourceLocation id, MenuType.MenuSupplier<T> factory) {
 		MenuType<T> type = new MenuType<>(factory);
-		return Registry.register(Registry.MENU, id, type);
+		return Registry.register(BuiltInRegistries.MENU, id, type);
 	}
 
 	private static void registerItemForBlock(Block block) {
-		Registry.register(Registry.ITEM, Registry.BLOCK.getKey(block), new BlockItem(block, new Item.Properties().tab(STORAGE_MOD_TAB)));
+		Registry.register(BuiltInRegistries.ITEM, BuiltInRegistries.BLOCK.getKey(block), tab(new BlockItem(block, new Item.Properties())));
 	}
 }

@@ -149,7 +149,7 @@ public class StoredItemStack {
 		//if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.isSameIgnoreDurability(stack, other.stack) || !ItemStack.tagMatches(stack, other.stack)) return false;
+		} else if (!ItemStack.isSame(stack, other.stack) || !ItemStack.tagMatches(stack, other.stack)) return false;
 		return true;
 	}
 
@@ -159,7 +159,7 @@ public class StoredItemStack {
 		if (count != other.count) return false;
 		if (stack == null) {
 			if (other.stack != null) return false;
-		} else if (!ItemStack.isSameIgnoreDurability(stack, other.stack) || !ItemStack.tagMatches(stack, other.stack)) return false;
+		} else if (!ItemStack.isSame(stack, other.stack) || !ItemStack.tagMatches(stack, other.stack)) return false;
 		return true;
 	}
 

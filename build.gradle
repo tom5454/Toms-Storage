@@ -37,7 +37,7 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:4.0.6") {
+	modImplementation("com.terraformersmc:modmenu:5.0.1") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
@@ -56,8 +56,8 @@ dependencies {
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
-    modImplementation("dev.architectury:architectury-fabric:6.2.43")
-    modImplementation "dev.emi:trinkets:3.4.1"
+    modImplementation("dev.architectury:architectury-fabric:7.0.63")
+    //modImplementation "dev.emi:trinkets:3.4.1"
 }
 
 loom {

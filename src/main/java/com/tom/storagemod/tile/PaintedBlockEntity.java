@@ -1,6 +1,7 @@
 package com.tom.storagemod.tile;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -35,7 +36,7 @@ public class PaintedBlockEntity extends BlockEntity {
 	@Override
 	public void load(CompoundTag compound) {
 		super.load(compound);
-		blockState = NbtUtils.readBlockState(compound.getCompound("block"));
+		blockState = NbtUtils.readBlockState(this.level.holderLookup(Registries.BLOCK), compound.getCompound("block"));
 		markDirtyClient();
 	}
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
@@ -93,13 +94,9 @@ public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMe
 		protected int texX = 176;
 		protected int texY = 0;
 		public GuiButton(int x, int y, int tile, Runnable pressable) {
-			super(x, y, 16, 16, null, b -> pressable.run());
+			super(x, y, 16, 16, null, b -> pressable.run(), Supplier::get);
 			this.tile = tile;
 			addRenderableWidget(this);
-		}
-
-		public void setX(int i) {
-			x = i;
 		}
 
 		/**
@@ -114,10 +111,10 @@ public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMe
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 				int i = this.getYImage(this.isHoveredOrFocused());
-				this.blit(st, this.x, this.y, texX + i * 16, 16, this.width, this.height);
-				this.blit(st, this.x, this.y, texX + tile * 16 + state * 16, texY, this.width, this.height);
+				this.blit(st, this.getX(), this.getY(), texX + i * 16, 16, this.width, this.height);
+				this.blit(st, this.getX(), this.getY(), texX + tile * 16 + state * 16, texY, this.width, this.height);
 			}
 		}
 	}
@@ -206,7 +203,7 @@ public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMe
 		private int id;
 
 		public ListEntry(int x, int y, int id) {
-			super(x, y, 106, 16, null, null);
+			super(x, y, 106, 16, null, null, Supplier::get);
 			this.id = id;
 			addRenderableWidget(this);
 		}
@@ -226,11 +223,13 @@ public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMe
 					RenderSystem.enableBlend();
 					RenderSystem.defaultBlendFunc();
 					RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-					this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+					int x = getX();
+					int y = getY();
+					this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
 					int i = this.getYImage(this.isHoveredOrFocused());
-					this.blit(st, this.x, this.y, id.equals(selected) ? 106 : 0, 166 + i * 16, this.width, this.height);
-					this.blit(st, this.x + this.width - 16, this.y, 208 + (chn.publicChannel ? 16 : 0), 0, 16, 16);
-					drawCenteredString(st, font, chn.displayName, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xffffffff | Mth.ceil(this.alpha * 255.0F) << 24);
+					this.blit(st, x, y, id.equals(selected) ? 106 : 0, 166 + i * 16, this.width, this.height);
+					this.blit(st, x + this.width - 16, y, 208 + (chn.publicChannel ? 16 : 0), 0, 16, 16);
+					drawCenteredString(st, font, chn.displayName, x + this.width / 2, y + (this.height - 8) / 2, 0xffffffff | Mth.ceil(this.alpha * 255.0F) << 24);
 				}
 			}
 		}

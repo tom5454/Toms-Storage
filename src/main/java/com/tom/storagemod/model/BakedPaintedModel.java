@@ -1,10 +1,8 @@
 package com.tom.storagemod.model;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -20,7 +18,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
@@ -31,8 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-
-import com.mojang.datafixers.util.Pair;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.tile.PaintedBlockEntity;
@@ -128,21 +124,19 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 	}
 
 	@Override
-	public BakedModel bake(ModelBakery loader, Function<Material, TextureAtlasSprite> textureGetter, ModelState rotationContainer, ResourceLocation modelId) {
-		sprite = textureGetter.apply(ID);
-		fallback = loader.bake(FALLBACK_ID, rotationContainer);
-		return this;
-	}
-
-	@Override
 	public Collection<ResourceLocation> getDependencies() {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
-			Set<Pair<String, String>> unresolvedTextureReferences) {
-		return Arrays.asList(ID);
+	public BakedModel bake(ModelBaker loader, Function<Material, TextureAtlasSprite> textureGetter,
+			ModelState modelState, ResourceLocation resourceLocation) {
+		sprite = textureGetter.apply(ID);
+		fallback = loader.bake(FALLBACK_ID, modelState);
+		return this;
 	}
 
+	@Override
+	public void resolveParents(Function<ResourceLocation, UnbakedModel> function) {
+	}
 }

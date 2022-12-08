@@ -303,7 +303,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> imple
 			if (stack.getItem() == matchTo.getItem()) {
 				boolean equals = true;
 				if (checkTag) {
-					equals = equals && ItemStack.isSameIgnoreDurability(stack, matchTo);
+					equals = equals && ItemStack.isSame(stack, matchTo);
 				}
 				return equals;
 			}

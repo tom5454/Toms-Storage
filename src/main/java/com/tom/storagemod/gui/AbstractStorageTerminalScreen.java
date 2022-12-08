@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -155,15 +156,17 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				if (this.visible) {
 					RenderSystem.setShader(GameRenderer::getPositionTexShader);
 					RenderSystem.setShaderTexture(0, getGui());
-					this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+					int x = getX();
+					int y = getY();
+					this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
 					//int i = this.getYImage(this.isHovered);
 					RenderSystem.enableBlend();
 					RenderSystem.defaultBlendFunc();
 					RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-					blit(st, this.x, this.y, texX, texY + tile * 16, this.width, this.height);
-					if((state & 1) > 0)blit(st, this.x+1, this.y+1, texX + 16, texY + tile * 16, this.width-2, this.height-2);
-					if((state & 2) > 0)blit(st, this.x+1, this.y+1, texX + 16+14, texY + tile * 16, this.width-2, this.height-2);
-					if((state & 4) > 0)blit(st, this.x+1, this.y+1, texX + 16+14*2, texY + tile * 16, this.width-2, this.height-2);
+					this.blit(st, x, y, texX, texY + tile * 16, this.width, this.height);
+					if((state & 1) > 0)this.blit(st, x+1, y+1, texX + 16, texY + tile * 16, this.width-2, this.height-2);
+					if((state & 2) > 0)this.blit(st, x+1, y+1, texX + 16+14, texY + tile * 16, this.width-2, this.height-2);
+					if((state & 4) > 0)this.blit(st, x+1, y+1, texX + 16+14*2, texY + tile * 16, this.width-2, this.height-2);
 				}
 			}
 		});
@@ -200,8 +203,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
 					StoredItemStack is = getMenu().itemListClient.get(i);
 					if (is != null && is.getStack() != null) {
-
-						String dspName = searchMod ? Registry.ITEM.getKey(is.getStack().getItem()).getNamespace() : is.getStack().getHoverName().getString();
+						String dspName = searchMod ? BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace() : is.getStack().getHoverName().getString();
 						notDone = true;
 						if (m.matcher(dspName.toLowerCase()).find()) {
 							addStackToClientList(is);
@@ -417,7 +419,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		} else if (GLFW.glfwGetKey(mc.getWindow().getWindow(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
 			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
 		} else {
-			if (mouseButton == 1 && isHovering(searchField.x - leftPos, searchField.y - topPos, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
+			if (mouseButton == 1 && isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, searchField.getWidth(), searchField.getHeight(), mouseX, mouseY))
 				searchField.setValue("");
 			else if(this.searchField.mouseClicked(mouseX, mouseY, mouseButton))return true;
 			else
@@ -575,28 +577,24 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		protected int texX = 194;
 		protected int texY = 30;
 		public GuiButton(int x, int y, int tile, OnPress pressable) {
-			super(x, y, 16, 16, Component.literal(""), pressable);
+			super(x, y, 16, 16, Component.literal(""), pressable, Supplier::get);
 			this.tile = tile;
-		}
-
-		public void setX(int i) {
-			x = i;
 		}
 
 		/**
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderButton(PoseStack matrices, int mouseX, int mouseY, float pt) {
+		public void renderButton(PoseStack st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				RenderSystem.setShaderTexture(0, getGui());
-				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 				//int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				blit(matrices, this.x, this.y, texX + state * 16, texY + tile * 16, this.width, this.height);
+				this.blit(st, this.getX(), this.getY(), texX + state * 16, texY + tile * 16, this.width, this.height);
 			}
 		}
 	}

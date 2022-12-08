@@ -110,7 +110,7 @@ public class LevelEmitterMenu extends AbstractContainerMenu implements IDataRece
 				ItemStack is = slot.getItem().copy();
 				is.setCount(1);
 				Slot sl = this.slots.get(0);
-				if(!ItemStack.isSameIgnoreDurability(sl.getItem(), is)) {
+				if(!ItemStack.isSame(sl.getItem(), is)) {
 					if(sl.getItem().isEmpty()) {
 						sl.set(is);
 					}

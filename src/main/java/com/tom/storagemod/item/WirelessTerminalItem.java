@@ -23,7 +23,8 @@ import com.tom.storagemod.StorageTags;
 public class WirelessTerminalItem extends Item implements WirelessTerminal {
 
 	public WirelessTerminalItem() {
-		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
+		super(new Properties().stacksTo(1));
+		StorageMod.tab(this);
 	}
 
 	@Override

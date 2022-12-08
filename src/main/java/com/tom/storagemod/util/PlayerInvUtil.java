@@ -8,8 +8,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import dev.emi.trinkets.api.TrinketsApi;
-
 public class PlayerInvUtil {
 	private static boolean trinkets = FabricLoader.getInstance().isModLoaded("trinkets");
 
@@ -24,13 +22,13 @@ public class PlayerInvUtil {
 				return map.apply(s);
 			}
 		}
-		if(trinkets) {
+		/*if(trinkets) {
 			var tc = TrinketsApi.getTrinketComponent(player).orElse(null);
 			if(tc != null) {
 				var s = tc.getEquipped(is);
 				if(!s.isEmpty())return map.apply(s.get(0).getB());
 			}
-		}
+		}*/
 		return def;
 	}
 }

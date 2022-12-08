@@ -121,7 +121,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 			craft(player);
 			craftedItemsList.add(crafted.copy());
 			amountCrafted += crafted.getCount();
-		} while(ItemStack.isSameIgnoreDurability(crafted, craftResult.getItem(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxStackSize());
+		} while(ItemStack.isSame(crafted, craftResult.getItem(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxStackSize());
 
 		for (ItemStack craftedItem : craftedItemsList) {
 			if (!player.getInventory().add(craftedItem.copy())) {
@@ -152,7 +152,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					if(is == null && (getSorting() & (1 << 8)) != 0) {
 						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
 							ItemStack st = thePlayer.getInventory().getItem(j);
-							if(ItemStack.isSameIgnoreDurability(oldItem, st) && ItemStack.tagMatches(oldItem, st)) {
+							if(ItemStack.isSame(oldItem, st) && ItemStack.tagMatches(oldItem, st)) {
 								st = thePlayer.getInventory().removeItem(j, 1);
 								if(!st.isEmpty()) {
 									is = new StoredItemStack(st, 1);
@@ -241,7 +241,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					for (int j = 0;j < items[i].length;j++) {
 						boolean br = false;
 						for (int k = 0;k < player.getInventory().getContainerSize();k++) {
-							if(ItemStack.isSameIgnoreDurability(player.getInventory().getItem(k), items[i][j])) {
+							if(ItemStack.isSame(player.getInventory().getItem(k), items[i][j])) {
 								stack = player.getInventory().removeItem(k, 1);
 								br = true;
 								break;

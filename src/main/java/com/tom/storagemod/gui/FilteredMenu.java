@@ -64,7 +64,7 @@ public class FilteredMenu extends AbstractContainerMenu {
 				is.setCount(1);
 				for(int i = 0;i<9;i++) {
 					Slot sl = this.slots.get(i);
-					if(ItemStack.isSameIgnoreDurability(sl.getItem(), is))break;
+					if(ItemStack.isSame(sl.getItem(), is))break;
 					if(sl.getItem().isEmpty()) {
 						sl.set(is);
 						break;
