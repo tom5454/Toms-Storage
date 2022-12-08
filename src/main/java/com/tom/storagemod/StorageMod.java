@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,6 +61,7 @@ import com.tom.storagemod.item.ItemAdvWirelessTerminal;
 import com.tom.storagemod.item.ItemBlockPainted;
 import com.tom.storagemod.item.ItemPaintKit;
 import com.tom.storagemod.item.ItemWirelessTerminal;
+import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.tile.SidedStorageBlockEntity;
 import com.tom.storagemod.tile.TileEntityCraftingTerminal;
 import com.tom.storagemod.tile.TileEntityInventoryCableConnector;
@@ -71,6 +73,7 @@ import com.tom.storagemod.tile.TileEntityLevelEmitter;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 
 import io.netty.buffer.ByteBufOutputStream;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -234,6 +237,11 @@ public class StorageMod implements ModInitializer {
 				}
 			});
 		});
+		ServerPlayNetworking.registerGlobalReceiver(NetworkHandler.OPEN_TERMINAL_C2S, (s, p, h, buf, rp) -> s.submit(() -> {
+			ItemStack t = PlayerInvUtil.findItem(p, i -> i.getItem() instanceof WirelessTerminal e && e.canOpen(i), ItemStack.EMPTY, Function.identity());
+			if(!t.isEmpty())
+				((WirelessTerminal)t.getItem()).open(p, t);
+		}));
 
 		ServerLoginNetworking.registerGlobalReceiver(id("config"), (server, handler, understood, buf, sync, respSender) -> {
 		});

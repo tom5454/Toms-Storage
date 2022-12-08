@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelProviderException;
@@ -15,16 +17,18 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -53,14 +57,15 @@ import io.netty.buffer.ByteBufInputStream;
 
 public class StorageModClient implements ClientModInitializer {
 	protected static final Identifier PAINT = new Identifier(StorageMod.modid, "paint");
+	public static KeyBinding openTerm;
 
 	@Override
 	public void onInitializeClient() {
-		ScreenRegistry.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
-		ScreenRegistry.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
-		ScreenRegistry.register(StorageMod.filteredConatiner, GuiFiltered::new);
-		ScreenRegistry.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
-		ScreenRegistry.register(StorageMod.inventoryLink, GuiInventoryLink::new);
+		HandledScreens.register(StorageMod.storageTerminal, GuiStorageTerminal::new);
+		HandledScreens.register(StorageMod.craftingTerminalCont, GuiCraftingTerminal::new);
+		HandledScreens.register(StorageMod.filteredConatiner, GuiFiltered::new);
+		HandledScreens.register(StorageMod.levelEmitterConatiner, GuiLevelEmitter::new);
+		HandledScreens.register(StorageMod.inventoryLink, GuiInventoryLink::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.paintedTrim, RenderLayer.getTranslucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCablePainted, RenderLayer.getTranslucent());
@@ -143,6 +148,18 @@ public class StorageModClient implements ClientModInitializer {
 			StorageMod.CONFIG = read;
 			StorageMod.LOGGER.info("Received server config");
 			return CompletableFuture.completedFuture(PacketByteBufs.empty());
+		});
+
+		openTerm = new KeyBinding("key.toms_storage.open_terminal", InputUtil.GLFW_KEY_B, KeyBinding.GAMEPLAY_CATEGORY);
+		KeyBindingHelper.registerKeyBinding(openTerm);
+
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (client.player == null)
+				return;
+
+			if(openTerm.wasPressed()) {
+				NetworkHandler.openTerminal();
+			}
 		});
 	}
 

@@ -34,6 +34,7 @@ import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.WirelessTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 import com.tom.storagemod.util.Util;
 
 public class TileEntityStorageTerminal extends BlockEntity implements NamedScreenHandlerFactory, TickableServer {
@@ -146,9 +147,7 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	public boolean canInteractWith(PlayerEntity player) {
 		if(world.getBlockEntity(pos) != this)return false;
 		int d = 4;
-		int termReach = 0;
-		if(player.getMainHandStack().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getMainHandStack().getItem()).getRange(player, player.getMainHandStack()));
-		if(player.getOffHandStack().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getOffHandStack().getItem()).getRange(player, player.getOffHandStack()));
+		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
 		if(beaconLevel >= StorageMod.CONFIG.wirelessTermBeaconLvl && termReach > 0) {
 			if(beaconLevel >= StorageMod.CONFIG.wirelessTermBeaconLvlDim)return true;
 			else return player.getWorld() == world;

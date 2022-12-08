@@ -9,6 +9,10 @@ jcenter()
 maven { url "https://maven.shedaniel.me/" }
 maven { url "https://maven.terraformersmc.com/releases/"}
 maven { url "https://dvs1.progwml6.com/files/maven" }
+maven {
+		name = "Ladysnake Libs"
+		url = "https://ladysnake.jfrog.io/artifactory/mods"
+	}
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -36,20 +40,21 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
 	
-	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:8.2.479"){
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
     }
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:8.2.479") {
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
        exclude(group: "net.fabricmc.fabric-api")
        exclude(group: "me.shedaniel.cloth")
     }
-    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:8.2.479"){
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
         exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
     }
     //modCompileOnly("mezz.jei:jei-1.18.2-fabric-api:10.1.0.198")
     //modRuntimeOnly("mezz.jei:jei-1.18.2-fabric:10.1.0.198")
+    modImplementation "dev.emi:trinkets:3.3.1"
 }
 
 minecraft {

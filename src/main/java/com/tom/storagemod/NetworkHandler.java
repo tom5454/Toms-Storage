@@ -13,6 +13,7 @@ import io.netty.buffer.Unpooled;
 public class NetworkHandler {
 	public static final Identifier DATA_S2C = new Identifier(StorageMod.modid, "data_packet_s2c");
 	public static final Identifier DATA_C2S = new Identifier(StorageMod.modid, "data_packet_c2s");
+	public static final Identifier OPEN_TERMINAL_C2S = new Identifier(StorageMod.modid, "open_term_c2s");
 
 	public static interface IDataReceiver {
 		void receive(NbtCompound tag);
@@ -28,5 +29,9 @@ public class NetworkHandler {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeNbt(tag);
 		ServerPlayNetworking.send((ServerPlayerEntity) player, DATA_S2C, buf);
+	}
+
+	public static void openTerminal() {
+		ClientPlayNetworking.send(OPEN_TERMINAL_C2S, new PacketByteBuf(Unpooled.buffer()));
 	}
 }
