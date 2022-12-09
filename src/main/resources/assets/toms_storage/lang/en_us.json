@@ -104,5 +104,7 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlDim": "Advanced wireless terminal requied beacon level for infinite range",
 	"text.autoconfig.toms_storage.option.invDupScanSize": "Inventory Connector duplicate finder max slot count",
 	
-	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal"
+	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal",
+	
+	"tag.toms_storage.trims": "Inventory Trims"
 }

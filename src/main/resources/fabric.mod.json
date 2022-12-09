@@ -30,6 +30,9 @@
     ],
 	"rei_client": [
     	"com.tom.storagemod.rei.REIPlugin"
+    ],
+    "emi": [
+    	"com.tom.storagemod.emi.EMIPlugin"
     ]
   },
   "mixins": [
