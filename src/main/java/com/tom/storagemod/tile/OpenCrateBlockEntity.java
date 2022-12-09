@@ -103,7 +103,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 			if (maxAmount < 1)return 0;
 			long ext = 0;
 			for (ItemEntity e : new ArrayList<>(items)) {
-				if(resource.matches(e.getItem())) {
+				if(resource.matches(e.getItem()) && e.isAlive()) {
 					ext += extract0(e, (int) (maxAmount - ext), transaction);
 					if(ext == maxAmount)break;
 				}
@@ -128,6 +128,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 
 				@Override
 				public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+					if(!item.isAlive())return 0L;
 					return extract0(item, (int) maxAmount, transaction);
 				}
 

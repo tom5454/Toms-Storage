@@ -58,6 +58,7 @@ dependencies {
     }
     modImplementation("dev.architectury:architectury-fabric:7.0.63")
     //modImplementation "dev.emi:trinkets:3.4.1"
+    modImplementation "dev.emi:emi:0.5.0+1.19.3"
 }
 
 loom {
