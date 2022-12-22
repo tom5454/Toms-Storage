@@ -172,7 +172,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					craftMatrix.setItem(i, rem);
 					continue;
 				}
-				if (ItemStack.isSameIgnoreDurability(slot, rem) && ItemStack.tagMatches(slot, rem)) {
+				if (ItemStack.isSame(slot, rem) && ItemStack.tagMatches(slot, rem)) {
 					rem.grow(slot.getCount());
 					craftMatrix.setItem(i, rem);
 					continue;

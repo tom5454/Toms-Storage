@@ -22,7 +22,8 @@ import com.tom.storagemod.StorageTags;
 public class WirelessTerminalItem extends Item implements WirelessTerminal {
 
 	public WirelessTerminalItem() {
-		super(new Properties().tab(StorageMod.STORAGE_MOD_TAB).stacksTo(1));
+		super(new Properties().stacksTo(1));
+		StorageMod.tab(this);
 	}
 
 	@Override
@@ -50,5 +51,14 @@ public class WirelessTerminalItem extends Item implements WirelessTerminal {
 	@Override
 	public int getRange(Player pl, ItemStack stack) {
 		return Config.wirelessRange;
+	}
+
+	@Override
+	public void open(Player sender, ItemStack t) {
+	}
+
+	@Override
+	public boolean canOpen(ItemStack t) {
+		return false;
 	}
 }

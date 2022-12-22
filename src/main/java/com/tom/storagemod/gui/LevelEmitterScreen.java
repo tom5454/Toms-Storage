@@ -3,6 +3,7 @@ package com.tom.storagemod.gui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import net.minecraft.client.gui.components.Button;
@@ -108,12 +109,8 @@ public class LevelEmitterScreen extends AbstractContainerScreen<LevelEmitterMenu
 		protected int texX = 176;
 		protected int texY = 0;
 		public GuiButton(int x, int y, int tile, OnPress pressable) {
-			super(x, y, 16, 16, null, pressable);
+			super(x, y, 16, 16, null, pressable, Supplier::get);
 			this.tile = tile;
-		}
-
-		public void setX(int i) {
-			x = i;
 		}
 
 		/**
@@ -124,12 +121,12 @@ public class LevelEmitterScreen extends AbstractContainerScreen<LevelEmitterMenu
 			if (this.visible) {
 				RenderSystem.setShader(GameRenderer::getPositionTexShader);
 				RenderSystem.setShaderTexture(0, gui);
-				this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+				this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 				//int i = this.getYImage(this.isHovered);
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				this.blit(st, this.x, this.y, texX + state * 16, texY + tile * 16, this.width, this.height);
+				this.blit(st, this.getX(), this.getY(), texX + state * 16, texY + tile * 16, this.width, this.height);
 			}
 		}
 	}
@@ -145,7 +142,7 @@ public class LevelEmitterScreen extends AbstractContainerScreen<LevelEmitterMenu
 		private Button btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new Button(leftPos + x, topPos + y + 16, len, 20, Component.literal((v > 0 ? "+" : "") + v), this::evt);
+			btn = Button.builder(Component.literal((v > 0 ? "+" : "") + v), this::evt).bounds(leftPos + x, topPos + y + 16, len, 20).build();
 			addRenderableWidget(btn);
 			this.v = v;
 			this.sv = sv;

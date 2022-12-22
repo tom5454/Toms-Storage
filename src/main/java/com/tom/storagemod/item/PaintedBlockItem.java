@@ -3,6 +3,7 @@ package com.tom.storagemod.item;
 import java.util.function.Function;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,7 +22,7 @@ public class PaintedBlockItem extends BlockItem {
 	}
 
 	public static Function<Block, Item> make() {
-		return b -> new PaintedBlockItem(b, new Item.Properties().tab(StorageMod.STORAGE_MOD_TAB));
+		return b -> StorageMod.tab(new PaintedBlockItem(b, new Item.Properties()));
 	}
 
 	private PaintedBlockItem(Block block, Item.Properties p) {
@@ -32,7 +33,7 @@ public class PaintedBlockItem extends BlockItem {
 	public Component getName(ItemStack is) {
 		MutableComponent tc = (MutableComponent) super.getName(is);
 		if(is.hasTag() && is.getTag().getCompound("BlockEntityTag").contains("block")) {
-			BlockState st = NbtUtils.readBlockState(is.getTag().getCompound("BlockEntityTag").getCompound("block"));
+			BlockState st = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), is.getTag().getCompound("BlockEntityTag").getCompound("block"));
 			tc.append(" (");
 			tc.append(st.getBlock().getName().withStyle(ChatFormatting.GREEN));
 			tc.append(")");
