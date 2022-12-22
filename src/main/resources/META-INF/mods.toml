@@ -41,7 +41,7 @@ Simple vanilla style storage mod.
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[41.0.94,)" #mandatory
+    versionRange="[44.0.17,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -50,6 +50,6 @@ Simple vanilla style storage mod.
 [[dependencies.toms_storage]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19,)"
+    versionRange="[1.19.3,)"
     ordering="NONE"
     side="BOTH"

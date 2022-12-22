@@ -1,5 +1,6 @@
 package com.tom.storagemod.util;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -8,6 +9,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.fml.ModList;
+
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotResult;
 
 public class PlayerInvUtil {
 	private static boolean curios = ModList.get().isLoaded("curios");
@@ -24,8 +28,8 @@ public class PlayerInvUtil {
 			}
 		}
 		if(curios) {
-			/*List<SlotResult> s = CuriosApi.getCuriosHelper().findCurios(player, is);
-			if(!s.isEmpty())return map.apply(s.get(0).stack());*/
+			List<SlotResult> s = CuriosApi.getCuriosHelper().findCurios(player, is);
+			if(!s.isEmpty())return map.apply(s.get(0).stack());
 		}
 		return def;
 	}

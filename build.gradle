@@ -142,7 +142,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.3-44.0.0'
+    minecraft 'net.minecraftforge:forge:1.19.3-44.0.37'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -160,10 +160,10 @@ dependencies {
     /*compileOnly fg.deobf("mezz.jei:jei-1.19.2-forge-api:11.2.0.256")
     compileOnly fg.deobf("mezz.jei:jei-1.19.2-common-api:11.2.0.256")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.256")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.2.0.256")*/
   	
-  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0:api")*/
+  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.3-5.1.1.2")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.3-5.1.1.2:api")
 }
 
 // Example for how to get properties into the manifest for reading at runtime.

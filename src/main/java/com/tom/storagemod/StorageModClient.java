@@ -91,14 +91,14 @@ public class StorageModClient {
 		return -1;
 	}
 
-	private static void bakeModels(ModelEvent.BakingCompleted event) {
+	private static void bakeModels(ModelEvent.ModifyBakingResult event) {
 		bindPaintedModel(event, StorageMod.paintedTrim);
 		bindPaintedModel(event, StorageMod.invCableFramed);
 		bindPaintedModel(event, StorageMod.invProxy);
 		bindPaintedModel(event, StorageMod.invCableConnectorFramed);
 	}
 
-	private static void bindPaintedModel(ModelEvent.BakingCompleted event, RegistryObject<? extends Block> block) {
+	private static void bindPaintedModel(ModelEvent.ModifyBakingResult event, RegistryObject<? extends Block> block) {
 		ResourceLocation baseLoc = block.getId();
 		block.get().getStateDefinition().getPossibleStates().forEach(st -> {
 			ModelResourceLocation resLoc = BlockModelShaper.stateToModelLocation(baseLoc, st);
