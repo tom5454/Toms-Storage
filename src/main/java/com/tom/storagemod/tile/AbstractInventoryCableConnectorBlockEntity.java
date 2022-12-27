@@ -86,7 +86,11 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 			Container inv = HopperBlockEntity.getContainerAt(level, pos);
 			if(inv != null)itemHandler = InventoryStorage.of(inv, facing.getOpposite());
 		}
-		return itemHandler;
+        if (!(itemHandler instanceof AbstractInventoryCableConnectorBlockEntity) && !(itemHandler instanceof InventoryProxyBlockEntity)) {
+            return itemHandler;
+        } else {
+            return null;
+        }
 	}
 
 	protected Storage<ItemVariant> applyFilter() {

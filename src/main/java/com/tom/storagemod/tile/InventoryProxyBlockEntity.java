@@ -53,7 +53,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 			Direction facing = state.getValue(InventoryProxyBlock.FACING);
 			DirectionWithNull filter = state.getValue(InventoryProxyBlock.FILTER_FACING);
 			BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
-			if(te != null && !(te instanceof InventoryProxyBlockEntity)) {
+			if(te != null && !(te instanceof InventoryProxyBlockEntity) && !(te instanceof AbstractInventoryCableConnectorBlockEntity)) {
 				pointedAtSt = ItemStorage.SIDED.find(level, worldPosition.relative(facing), facing.getOpposite());
 				Container inv = HopperBlockEntity.getContainerAt(level, worldPosition.relative(facing));
 				if(inv != null) {
