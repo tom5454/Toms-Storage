@@ -32,61 +32,61 @@ import com.tom.storagemod.tile.InventoryConnectorBlockEntity.LinkedInv;
 import com.tom.storagemod.util.IProxy;
 
 public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEntity implements TickableServer, SidedStorageBlockEntity, Storage<ItemVariant>, IProxy {
-	protected InventoryConnectorBlockEntity master;
-	protected Storage<ItemVariant> pointedAt, masterW;
-	protected LinkedInv linv;
+    protected InventoryConnectorBlockEntity master;
+    protected Storage<ItemVariant> pointedAt, masterW;
+    protected LinkedInv linv;
 
-	public AbstractInventoryCableConnectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		super(type, pos, state);
-	}
+    public AbstractInventoryCableConnectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+    }
 
-	@Override
-	public void updateServer() {
-		if(level.getGameTime() % 20 == 19) {
-			BlockState state = level.getBlockState(worldPosition);
-			Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
-			Stack<BlockPos> toCheck = new Stack<>();
-			Set<BlockPos> checkedBlocks = new HashSet<>();
-			checkedBlocks.add(worldPosition);
-			toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, worldPosition));
-			if(master != null)master.unLink(linv);
-			master = null;
-			linv = new LinkedInv();
-			masterW = null;
-			while(!toCheck.isEmpty()) {
-				BlockPos cp = toCheck.pop();
-				if(!checkedBlocks.contains(cp)) {
-					checkedBlocks.add(cp);
-					if(level.isLoaded(cp)) {
-						state = level.getBlockState(cp);
-						if(state.getBlock() == StorageMod.connector) {
-							BlockEntity te = level.getBlockEntity(cp);
-							if(te instanceof InventoryConnectorBlockEntity) {
-								master = (InventoryConnectorBlockEntity) te;
-								linv.time = level.getGameTime();
-								linv.handler = this::applyFilter;
-								master.addLinked(linv);
-								masterW = master.getInventory();
-							}
-							break;
-						}
-						if(state.getBlock() instanceof IInventoryCable) {
-							toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
-						}
-					}
-					if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
-				}
-			}
-			pointedAt = getPointedAt(worldPosition.relative(facing), facing);
-		}
-	}
+    @Override
+    public void updateServer() {
+        if(level.getGameTime() % 20 == 19) {
+            BlockState state = level.getBlockState(worldPosition);
+            Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
+            Stack<BlockPos> toCheck = new Stack<>();
+            Set<BlockPos> checkedBlocks = new HashSet<>();
+            checkedBlocks.add(worldPosition);
+            toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, worldPosition));
+            if(master != null)master.unLink(linv);
+            master = null;
+            linv = new LinkedInv();
+            masterW = null;
+            while(!toCheck.isEmpty()) {
+                BlockPos cp = toCheck.pop();
+                if(!checkedBlocks.contains(cp)) {
+                    checkedBlocks.add(cp);
+                    if(level.isLoaded(cp)) {
+                        state = level.getBlockState(cp);
+                        if(state.getBlock() == StorageMod.connector) {
+                            BlockEntity te = level.getBlockEntity(cp);
+                            if(te instanceof InventoryConnectorBlockEntity) {
+                                master = (InventoryConnectorBlockEntity) te;
+                                linv.time = level.getGameTime();
+                                linv.handler = this::applyFilter;
+                                master.addLinked(linv);
+                                masterW = master.getInventory();
+                            }
+                            break;
+                        }
+                        if(state.getBlock() instanceof IInventoryCable) {
+                            toCheck.addAll(((IInventoryCable)state.getBlock()).next(level, state, cp));
+                        }
+                    }
+                    if(checkedBlocks.size() > StorageMod.CONFIG.invConnectorMaxCables)break;
+                }
+            }
+            pointedAt = getPointedAt(worldPosition.relative(facing), facing);
+        }
+    }
 
-	protected Storage<ItemVariant> getPointedAt(BlockPos pos, Direction facing) {
-		Storage<ItemVariant> itemHandler = ItemStorage.SIDED.find(level, pos, facing.getOpposite());
-		if(itemHandler == null) {
-			Container inv = HopperBlockEntity.getContainerAt(level, pos);
-			if(inv != null)itemHandler = InventoryStorage.of(inv, facing.getOpposite());
-		}
+    protected Storage<ItemVariant> getPointedAt(BlockPos pos, Direction facing) {
+        Storage<ItemVariant> itemHandler = ItemStorage.SIDED.find(level, pos, facing.getOpposite());
+        if(itemHandler == null) {
+            Container inv = HopperBlockEntity.getContainerAt(level, pos);
+            if(inv != null)itemHandler = InventoryStorage.of(inv, facing.getOpposite());
+        }
 
         Boolean itemHandlerIsConflicting = false;
         if (itemHandler instanceof AbstractInventoryCableConnectorBlockEntity cableConnector) {
@@ -102,37 +102,37 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
         } else {
             return itemHandler;
         }
-	}
+    }
 
-	protected Storage<ItemVariant> applyFilter() {
-		return pointedAt;
-	}
+    protected Storage<ItemVariant> applyFilter() {
+        return pointedAt;
+    }
 
-	@Override
-	public Storage<ItemVariant> get() {
-		return masterW;
-	}
+    @Override
+    public Storage<ItemVariant> get() {
+        return masterW;
+    }
 
-	@Override
-	public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-		if(masterW == null)return 0L;
-		return masterW.insert(resource, maxAmount, transaction);
-	}
+    @Override
+    public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        if(masterW == null)return 0L;
+        return masterW.insert(resource, maxAmount, transaction);
+    }
 
-	@Override
-	public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-		if(masterW == null)return 0L;
-		return masterW.extract(resource, maxAmount, transaction);
-	}
+    @Override
+    public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+        if(masterW == null)return 0L;
+        return masterW.extract(resource, maxAmount, transaction);
+    }
 
-	@Override
-	public Iterator<StorageView<ItemVariant>> iterator() {
-		if(masterW == null)return Collections.emptyIterator();
-		return masterW.iterator();
-	}
+    @Override
+    public Iterator<StorageView<ItemVariant>> iterator() {
+        if(masterW == null)return Collections.emptyIterator();
+        return masterW.iterator();
+    }
 
-	@Override
-	public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
-		return this;
-	}
+    @Override
+    public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
+        return this;
+    }
 }
