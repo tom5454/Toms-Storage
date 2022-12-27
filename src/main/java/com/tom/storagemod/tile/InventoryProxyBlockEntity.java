@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
+import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.block.InventoryProxyBlock;
 import com.tom.storagemod.block.InventoryProxyBlock.DirectionWithNull;
 import com.tom.storagemod.util.IProxy;
@@ -53,7 +54,13 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 			Direction facing = state.getValue(InventoryProxyBlock.FACING);
 			DirectionWithNull filter = state.getValue(InventoryProxyBlock.FILTER_FACING);
 			BlockEntity te = level.getBlockEntity(worldPosition.relative(facing));
-			if(te != null && !(te instanceof InventoryProxyBlockEntity) && !(te instanceof AbstractInventoryCableConnectorBlockEntity)) {
+            Boolean teIsConflicting = false;
+
+            if (te instanceof AbstractInventoryCableConnectorBlockEntity cableConnector) {
+                teIsConflicting = te.getBlockState().getValue(InventoryCableConnectorBlock.FACING) == facing.getOpposite();
+            }
+
+			if(te != null && !(te instanceof InventoryProxyBlockEntity) && !teIsConflicting) {
 				pointedAtSt = ItemStorage.SIDED.find(level, worldPosition.relative(facing), facing.getOpposite());
 				Container inv = HopperBlockEntity.getContainerAt(level, worldPosition.relative(facing));
 				if(inv != null) {

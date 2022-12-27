@@ -27,6 +27,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.TickerUtil.TickableServer;
 import com.tom.storagemod.block.IInventoryCable;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
+import com.tom.storagemod.block.InventoryProxyBlock;
 import com.tom.storagemod.tile.InventoryConnectorBlockEntity.LinkedInv;
 import com.tom.storagemod.util.IProxy;
 
@@ -86,10 +87,20 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 			Container inv = HopperBlockEntity.getContainerAt(level, pos);
 			if(inv != null)itemHandler = InventoryStorage.of(inv, facing.getOpposite());
 		}
-        if (!(itemHandler instanceof AbstractInventoryCableConnectorBlockEntity) && !(itemHandler instanceof InventoryProxyBlockEntity)) {
-            return itemHandler;
-        } else {
+
+        Boolean itemHandlerIsConflicting = false;
+        if (itemHandler instanceof AbstractInventoryCableConnectorBlockEntity cableConnector) {
+            Direction cableConnectorFacing = ((BlockEntity)cableConnector).getBlockState().getValue(InventoryCableConnectorBlock.FACING);
+            itemHandlerIsConflicting = cableConnectorFacing == facing.getOpposite();
+        } else if (itemHandler instanceof InventoryProxyBlockEntity inventoryProxy) {
+            Direction inventoryProxyFacing = inventoryProxy.getBlockState().getValue(InventoryProxyBlock.FACING);
+            itemHandlerIsConflicting = inventoryProxyFacing == facing.getOpposite();
+        }
+
+        if (itemHandlerIsConflicting) {
             return null;
+        } else {
+            return itemHandler;
         }
 	}
 
