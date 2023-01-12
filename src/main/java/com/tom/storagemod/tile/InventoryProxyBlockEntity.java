@@ -136,7 +136,9 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 
 	@Override
 	public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
-		return this;
+		BlockState state = level.getBlockState(worldPosition);
+		Direction facing = state.getValue(InventoryProxyBlock.FACING);
+		return side == facing ? null : this;
 	}
 
 	//Old function
