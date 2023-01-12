@@ -135,7 +135,9 @@ public class TileEntityInventoryProxy extends TileEntityPainted implements Ticka
 
 	@Override
 	public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
-		return this;
+		BlockState state = world.getBlockState(pos);
+		Direction facing = state.get(BlockInventoryProxy.FACING);
+		return side == facing ? null : this;
 	}
 
 	//Old function
