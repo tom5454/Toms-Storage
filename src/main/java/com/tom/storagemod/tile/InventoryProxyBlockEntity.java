@@ -129,14 +129,16 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 
 	@Override
-	public @Nullable StorageView<ItemVariant> exactView(TransactionContext transaction, ItemVariant resource) {
+	public @Nullable StorageView<ItemVariant> exactView(ItemVariant resource) {
 		if(pointedAtSt == null)return null;
-		return pointedAtSt.exactView(transaction, resource);
+		return pointedAtSt.exactView(resource);
 	}
 
 	@Override
 	public @Nullable Storage<ItemVariant> getItemStorage(Direction side) {
-		return this;
+		BlockState state = level.getBlockState(worldPosition);
+		Direction facing = state.getValue(InventoryProxyBlock.FACING);
+		return side == facing ? null : this;
 	}
 
 	//Old function
