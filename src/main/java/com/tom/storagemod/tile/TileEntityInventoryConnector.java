@@ -147,7 +147,7 @@ public class TileEntityInventoryConnector extends BlockEntity implements Tickabl
 	}
 
 	private boolean checkHandlers(MergedStorage ih, int depth) {
-		if(depth > 3)return true;
+		if(depth > 3 || ih == handlers)return true;
 		for (Storage<ItemVariant> lo : ih.getStorages()) {
 			Storage<ItemVariant> ihr = IProxy.resolve(lo);
 			if(ihr == handlers)return true;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,7 +38,8 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 		BlockHitResult lookingAt = (BlockHitResult) playerIn.raycast(StorageMod.CONFIG.wirelessRange, 0f, true);
 		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
 		if(state.isIn(StorageTags.REMOTE_ACTIVATE)) {
-			ActionResult r = state.onUse(worldIn, playerIn, handIn, lookingAt);
+			ActionResult r = UseBlockCallback.EVENT.invoker().interact(playerIn, worldIn, handIn, lookingAt);
+			if(r == ActionResult.PASS)r = state.onUse(worldIn, playerIn, handIn, lookingAt);
 			return new TypedActionResult<>(r, playerIn.getStackInHand(handIn));
 		} else {
 			return super.use(worldIn, playerIn, handIn);

@@ -182,4 +182,8 @@ public class TileEntityStorageTerminal extends BlockEntity implements NamedScree
 	public void setLastSearch(String string) {
 		lastSearch = string;
 	}
+
+	public int getBeaconLevel() {
+		return beaconLevel;
+	}
 }

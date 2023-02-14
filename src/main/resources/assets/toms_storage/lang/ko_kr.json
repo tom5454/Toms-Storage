@@ -87,6 +87,19 @@
 	"chat.toms_storage.terminal_out_of_range": "터미널 범위 벗어남",
 	"chat.toms_storage.inv_link_access_denied": "접근 거부됨",
 	
+	"tomsstorage.config.inventory_connector_range": "인벤토리 커넥터 범위",
+	"tomsstorage.config.only_trims_connect": "인벤토리 연결에 트림만 허용",
+	"tomsstorage.config.inv_cable_connector_max_scan": "인벤토리 케이블 커넥터 최대 케이블 수",
+	"tomsstorage.config.wireless_reach": "무선 터미널 범위",
+	"tomsstorage.config.multiblock_inv": "멀티 블록 인벤토리",
+	"tomsstorage.config.adv_wireless_range": "고급 무선 터미널 범위",
+	"tomsstorage.config.adv_wireless_beacon_lvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
+	"tomsstorage.config.adv_wireless_beacon_lvl_dim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
+	"tomsstorage.config.inv_link_beacon_lvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨",
+	"tomsstorage.config.inv_link_beacon_lvl_dim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨",
+	"tomsstorage.config.inv_dup_scan_size": "인벤토리 커넥터 중복 찾기 최대 슬롯 수",
+	
+	"text.autoconfig.toms_storage.title": "Tom's Simple Storage Configuration",
 	"text.autoconfig.toms_storage.option.invRange": "인벤토리 커넥터 범위",
 	"text.autoconfig.toms_storage.option.onlyTrims": "인벤토리 연결에 트림만 허용",
 	"text.autoconfig.toms_storage.option.invConnectorMaxCables": "인벤토리 케이블 커넥터 최대 케이블 수",
@@ -95,6 +108,8 @@
 	"text.autoconfig.toms_storage.option.advWirelessRange": "고급 무선 터미널 범위",
 	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
 	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvlDim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
+	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvl.@Tooltip": "Value of 0 only requires a single beacon block nearby",
+	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvlDim.@Tooltip": "Value of 0 only requires a single beacon block nearby",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlDim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨",
 	"text.autoconfig.toms_storage.option.invDupScanSize": "인벤토리 커넥터 중복 찾기 최대 슬롯 수"

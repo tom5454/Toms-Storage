@@ -5,10 +5,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.Format;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -17,7 +15,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.book.RecipeBookCategory;
@@ -33,8 +30,11 @@ import com.tom.storagemod.NetworkHandler.IDataReceiver;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
+import com.tom.storagemod.util.DataSlots;
+import com.tom.storagemod.util.TerminalSyncManager;
+import com.tom.storagemod.util.TerminalSyncManager.InteractHandler;
 
-public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<CraftingInventory> implements IDataReceiver {
+public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<CraftingInventory> implements IDataReceiver, InteractHandler {
 	private static final int DIVISION_BASE = 1000;
 	private static final char[] ENCODED_POSTFIXES = "KMGTPE".toCharArray();
 	public static final Format format;
@@ -54,12 +54,13 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	public List<StoredItemStack> itemList = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClient = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
-	private Map<StoredItemStack, Long> itemsCount = new HashMap<>();
 	private int lines;
 	protected PlayerInventory pinv;
 	public Runnable onPacket;
-	public int terminalData;
+	public int terminalData, beaconLvl;
 	public String search;
+	public boolean noSort;
+	public TerminalSyncManager sync = new TerminalSyncManager();
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv, TileEntityStorageTerminal te) {
 		this(StorageMod.storageTerminal, id, inv, te);
@@ -71,6 +72,12 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		this.te = te;
 		this.pinv = inv;
 		addStorageSlots();
+		addProperty(DataSlots.create(v -> {
+			terminalData = v;
+			if(onPacket != null)
+				onPacket.run();
+		}, () -> te != null ? te.getSorting() : 0));
+		addProperty(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : 0));
 	}
 
 	@Override
@@ -230,43 +237,27 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 
 	@Override
 	public void sendContentUpdates() {
-		super.sendContentUpdates();
 		if(te == null)return;
 		Map<StoredItemStack, Long> itemsCount = te.getStacks();
-		if(!this.itemsCount.equals(itemsCount)) {
-			NbtList list = new NbtList();
-			this.itemList.clear();
-			for(Entry<StoredItemStack, Long> e : itemsCount.entrySet()) {
-				StoredItemStack storedS = e.getKey();
-				NbtCompound tag = new NbtCompound();
-				storedS.writeToNBT(tag);
-				tag.putLong("c", e.getValue());
-				list.add(tag);
-				this.itemList.add(new StoredItemStack(e.getKey().getStack(), e.getValue()));
-			}
-			NbtCompound mainTag = new NbtCompound();
-			mainTag.put("l", list);
-			mainTag.putInt("p", te.getSorting());
-			mainTag.putString("s", te.getLastSearch());
-			NetworkHandler.sendTo(pinv.player, mainTag);
-			this.itemsCount = new HashMap<>(itemsCount);
-		}
+		sync.update(itemsCount, (ServerPlayerEntity) pinv.player, !te.getLastSearch().equals(search) ? tag -> {
+			search = te.getLastSearch();
+			tag.putString("s", search);
+		} : null);
+		super.sendContentUpdates();
 	}
 
 	public final void receiveClientTagPacket(NbtCompound message) {
-		//System.out.println(message);
-		NbtList list = message.getList("l", 10);
-		itemList.clear();
-		for (int i = 0;i < list.size();i++) {
-			NbtCompound tag = list.getCompound(i);
-			itemList.add(StoredItemStack.readFromNBT(tag));
-			//System.out.println(tag);
+		if(sync.receiveUpdate(message)) {
+			itemList = sync.getAsList();
+			if(noSort) {
+				itemListClient.forEach(s -> s.setCount(sync.getAmount(s)));
+			} else {
+				itemListClient = new ArrayList<>(itemList);
+			}
+			pinv.markDirty();
 		}
-		//System.out.println(itemList);
-		itemListClient = new ArrayList<>(itemList);
-		pinv.markDirty();
-		terminalData = message.getInt("p");
-		search = message.getString("s");
+		if(message.contains("s"))
+			search = message.getString("s");
 		if(onPacket != null)onPacket.run();
 	}
 
@@ -294,21 +285,6 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		return ItemStack.EMPTY;
 	}
 
-	public static boolean areItemStacksEqual(ItemStack stack, ItemStack matchTo, boolean checkTag) {
-		if (stack.isEmpty() && matchTo.isEmpty())
-			return false;
-		if (!stack.isEmpty() && !matchTo.isEmpty()) {
-			if (stack.getItem() == matchTo.getItem()) {
-				boolean equals = true;
-				if (checkTag) {
-					equals = equals && ItemStack.areItemsEqual(stack, matchTo);
-				}
-				return equals;
-			}
-		}
-		return false;
-	}
-
 	public void sendMessage(NbtCompound compound) {
 		NetworkHandler.sendToServer(compound);
 	}
@@ -319,112 +295,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		if(message.contains("s")) {
 			te.setLastSearch(message.getString("s"));
 		}
-		if(message.contains("a")) {
-			ServerPlayerEntity player = (ServerPlayerEntity) pinv.player;
-			player.updateLastActionTime();
-			NbtCompound d = message.getCompound("a");
-			ItemStack clicked = ItemStack.fromNbt(d.getCompound("s"));
-			SlotAction act = SlotAction.VALUES[Math.abs(d.getInt("a")) % SlotAction.VALUES.length];
-			if(act == SlotAction.SPACE_CLICK) {
-				for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
-					transferSlot(player, i);
-				}
-			} else {
-				if (act == SlotAction.PULL_OR_PUSH_STACK) {
-					ItemStack stack = getCursorStack();
-					if (!stack.isEmpty()) {
-						StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
-						ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
-						setCursorStack(itemstack);
-					} else {
-						if (clicked.isEmpty())return;
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
-						if(pulled != null) {
-							setCursorStack(pulled.getActualStack());
-						}
-					}
-				} else if (act == SlotAction.PULL_ONE) {
-					ItemStack stack = getCursorStack();
-					if (clicked.isEmpty())return;
-					if (d.getBoolean("m")) {
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
-						if(pulled != null) {
-							ItemStack itemstack = pulled.getActualStack();
-							this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
-							if (itemstack.getCount() > 0)
-								te.pushOrDrop(itemstack);
-							player.getInventory().markDirty();
-						}
-					} else {
-						if (!stack.isEmpty()) {
-							if (areItemStacksEqual(stack, clicked, true) && stack.getCount() + 1 <= stack.getMaxCount()) {
-								StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
-								if (pulled != null) {
-									stack.increment(1);
-								}
-							}
-						} else {
-							StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), 1);
-							if (pulled != null) {
-								setCursorStack(pulled.getActualStack());
-							}
-						}
-					}
-				} else if (act == SlotAction.GET_HALF) {
-					ItemStack stack = getCursorStack();
-					if (!stack.isEmpty()) {
-						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 2, 1));
-						ItemStack itemstack = te.pushStack(stack1);
-						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						setCursorStack(stack);
-					} else {
-						if (clicked.isEmpty())return;
-						long maxCount = 64;
-						StoredItemStack clickedSt = new StoredItemStack(clicked);
-						for (int i = 0; i < itemList.size(); i++) {
-							StoredItemStack e = itemList.get(i);
-							if(e.equals((Object)clickedSt))
-								maxCount = e.getQuantity();
-						}
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 2, 1));
-						if(pulled != null) {
-							setCursorStack(pulled.getActualStack());
-						}
-					}
-				} else if (act == SlotAction.GET_QUARTER) {
-					ItemStack stack = getCursorStack();
-					if (!stack.isEmpty()) {
-						ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 4, 1));
-						ItemStack itemstack = te.pushStack(stack1);
-						stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
-						setCursorStack(stack);
-					} else {
-						if (clicked.isEmpty())return;
-						long maxCount = 64;
-						StoredItemStack clickedSt = new StoredItemStack(clicked);
-						for (int i = 0; i < itemList.size(); i++) {
-							StoredItemStack e = itemList.get(i);
-							if(e.equals((Object)clickedSt))maxCount = e.getQuantity();
-						}
-						StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), Math.max(Math.min(maxCount, clicked.getMaxCount()) / 4, 1));
-						if(pulled != null) {
-							setCursorStack(pulled.getActualStack());
-						}
-					}
-				} else {
-					if (clicked.isEmpty())return;
-					StoredItemStack pulled = te.pullStack(new StoredItemStack(clicked), clicked.getMaxCount());
-					if(pulled != null) {
-						ItemStack itemstack = pulled.getActualStack();
-						this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
-						if (itemstack.getCount() > 0)
-							te.pushOrDrop(itemstack);
-						player.getInventory().markDirty();
-					}
-				}
-			}
-			//player.updateCursorStack();
-		}
+		sync.receiveInteract(message, this);
 		if(message.contains("c")) {
 			NbtCompound d = message.getCompound("c");
 			te.setSorting(d.getInt("d"));
@@ -478,5 +349,108 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	@Override
 	public boolean canInsertIntoSlot(int index) {
 		return false;
+	}
+
+	@Override
+	public void onInteract(StoredItemStack clicked, SlotAction act, boolean mod) {
+		ServerPlayerEntity player = (ServerPlayerEntity) pinv.player;
+		player.updateLastActionTime();
+		if(act == SlotAction.SPACE_CLICK) {
+			for (int i = playerSlotsStart + 1;i < playerSlotsStart + 28;i++) {
+				transferSlot(player, i);
+			}
+		} else {
+			if (act == SlotAction.PULL_OR_PUSH_STACK) {
+				ItemStack stack = getCursorStack();
+				if (!stack.isEmpty()) {
+					StoredItemStack rem = te.pushStack(new StoredItemStack(stack));
+					ItemStack itemstack = rem == null ? ItemStack.EMPTY : rem.getActualStack();
+					setCursorStack(itemstack);
+				} else {
+					if (clicked == null)return;
+					StoredItemStack pulled = te.pullStack(clicked, clicked.getMaxStackSize());
+					if(pulled != null) {
+						setCursorStack(pulled.getActualStack());
+					}
+				}
+			} else if (act == SlotAction.PULL_ONE) {
+				ItemStack stack = getCursorStack();
+				if (clicked == null)return;
+				if (mod) {
+					StoredItemStack pulled = te.pullStack(clicked, 1);
+					if(pulled != null) {
+						ItemStack itemstack = pulled.getActualStack();
+						this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
+						if (itemstack.getCount() > 0)
+							te.pushOrDrop(itemstack);
+						player.getInventory().markDirty();
+					}
+				} else {
+					if (!stack.isEmpty()) {
+						if (ItemStack.areEqual(stack, clicked.getStack()) && stack.getCount() + 1 <= stack.getMaxCount()) {
+							StoredItemStack pulled = te.pullStack(clicked, 1);
+							if (pulled != null) {
+								stack.increment(1);
+							}
+						}
+					} else {
+						StoredItemStack pulled = te.pullStack(clicked, 1);
+						if (pulled != null) {
+							setCursorStack(pulled.getActualStack());
+						}
+					}
+				}
+			} else if (act == SlotAction.GET_HALF) {
+				ItemStack stack = getCursorStack();
+				if (!stack.isEmpty()) {
+					ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 2, 1));
+					ItemStack itemstack = te.pushStack(stack1);
+					stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
+					setCursorStack(stack);
+				} else {
+					if (clicked == null)return;
+					long maxCount = 64;
+					for (int i = 0; i < itemList.size(); i++) {
+						StoredItemStack e = itemList.get(i);
+						if(e.equals((Object)clicked))
+							maxCount = e.getQuantity();
+					}
+					StoredItemStack pulled = te.pullStack(clicked, Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 2, 1));
+					if(pulled != null) {
+						setCursorStack(pulled.getActualStack());
+					}
+				}
+			} else if (act == SlotAction.GET_QUARTER) {
+				ItemStack stack = getCursorStack();
+				if (!stack.isEmpty()) {
+					ItemStack stack1 = stack.split(Math.max(Math.min(stack.getCount(), stack.getMaxCount()) / 4, 1));
+					ItemStack itemstack = te.pushStack(stack1);
+					stack.increment(!itemstack.isEmpty() ? itemstack.getCount() : 0);
+					setCursorStack(stack);
+				} else {
+					if (clicked == null)return;
+					long maxCount = 64;
+					for (int i = 0; i < itemList.size(); i++) {
+						StoredItemStack e = itemList.get(i);
+						if(e.equals((Object)clicked))maxCount = e.getQuantity();
+					}
+					StoredItemStack pulled = te.pullStack(clicked, Math.max(Math.min(maxCount, clicked.getMaxStackSize()) / 4, 1));
+					if(pulled != null) {
+						setCursorStack(pulled.getActualStack());
+					}
+				}
+			} else {
+				if (clicked == null)return;
+				StoredItemStack pulled = te.pullStack(clicked, clicked.getMaxStackSize());
+				if(pulled != null) {
+					ItemStack itemstack = pulled.getActualStack();
+					this.insertItem(itemstack, playerSlotsStart + 1, this.slots.size(), true);
+					if (itemstack.getCount() > 0)
+						te.pushOrDrop(itemstack);
+					player.getInventory().markDirty();
+				}
+			}
+		}
+		//player.updateCursorStack();
 	}
 }

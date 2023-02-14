@@ -10,6 +10,8 @@ public class StoredItemStack {
 	private ItemStack stack;
 	private long count;
 	private static final String ITEM_COUNT_NAME = "c", ITEMSTACK_NAME = "s";
+	private int hash;
+
 	public StoredItemStack(ItemStack stack, long count) {
 		this.stack = stack;
 		this.count = count;
@@ -128,12 +130,15 @@ public class StoredItemStack {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((stack == null) ? 0 : stack.getItem().hashCode());
-		result = prime * result + ((stack == null || !stack.hasNbt()) ? 0 : stack.getNbt().hashCode());
-		//System.out.println(result + " " + stack);
-		return result;
+		if(hash == 0) {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((stack == null) ? 0 : stack.getItem().hashCode());
+			result = prime * result + ((stack == null || !stack.hasNbt()) ? 0 : stack.getNbt().hashCode());
+			hash = result;
+			return result;
+		}
+		return hash;
 	}
 
 	public String getDisplayName() {
@@ -165,5 +170,13 @@ public class StoredItemStack {
 
 	public void grow(long c) {
 		count += c;
+	}
+
+	public void setCount(long count) {
+		this.count = count;
+	}
+
+	public int getMaxStackSize() {
+		return stack.getMaxCount();
 	}
 }
