@@ -1,7 +1,9 @@
 package com.tom.storagemod.gui;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -30,6 +32,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 
 import net.minecraftforge.fml.ModList;
@@ -42,6 +45,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.StoredItemStack.ComparatorAmount;
 import com.tom.storagemod.StoredItemStack.IStoredItemStackComparator;
@@ -50,6 +54,9 @@ import com.tom.storagemod.gui.ContainerStorageTerminal.SlotAction;
 import com.tom.storagemod.gui.ContainerStorageTerminal.SlotStorage;
 import com.tom.storagemod.jei.JEIHandler;
 import com.tom.storagemod.network.IDataReceiver;
+
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal> extends AbstractContainerScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
@@ -79,6 +86,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode;
+	private Comparator<StoredItemStack> sortComp;
 
 	public GuiStorageTerminalBase(T screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn);
@@ -223,7 +231,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 				}
 			} catch (Exception e) {
 			}
-			Collections.sort(getMenu().itemListClientSorted, comparator);
+			Collections.sort(getMenu().itemListClientSorted, menu.noSort ? sortComp : comparator);
 			if(!searchLast.equals(searchString)) {
 				getMenu().scrollTo(0);
 				this.currentScroll = 0;
@@ -268,6 +276,24 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		int i1 = k + 14;
 		int j1 = l + rowCount * 18;
 
+		if(hasShiftDown()) {
+			if(!menu.noSort) {
+				List<StoredItemStack> list = getMenu().itemListClientSorted;
+				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();
+				map.defaultReturnValue(Integer.MAX_VALUE);
+				for (int m = 0; m < list.size(); m++) {
+					map.put(list.get(m), m);
+				}
+				sortComp = Comparator.comparing(map::getInt);
+				menu.noSort = true;
+			}
+		} else if(menu.noSort) {
+			sortComp = null;
+			menu.noSort = false;
+			refreshItemList = true;
+			menu.itemListClient = new ArrayList<>(menu.itemList);
+		}
+
 		if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
 			this.isScrolling = this.needsScrollBars();
 		}
@@ -292,6 +318,19 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		j = l;
 		k = j1;
 		this.blit(st, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
+
+		if(menu.beaconLvl > 0) {
+			this.itemRenderer.renderAndDecorateItem(this.minecraft.player, new ItemStack(Items.BEACON), leftPos - 18, topPos - 16, 0);
+
+			if(isHovering(-18, -16, 16, 16, mouseX, mouseY)) {
+				String info;
+				if(menu.beaconLvl >= Config.wirelessTermBeaconLvlDim)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.anywhere");
+				else if(menu.beaconLvl >= Config.wirelessTermBeaconLvl)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.sameDim");
+				else info = "";
+				renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.terminal_beacon", menu.beaconLvl, info).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+			}
+		}
+
 		st.pushPose();
 		//RenderHelper.turnBackOn();
 		slotIDUnderMouse = drawSlots(st, mouseX, mouseY);
@@ -380,45 +419,33 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		if (slotIDUnderMouse > -1) {
 			if (isPullOne(mouseButton)) {
 				if (getMenu().getSlotByID(slotIDUnderMouse).stack != null && getMenu().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
-					for (int i = 0;i < getMenu().itemList.size();i++) {
-						if (getMenu().getSlotByID(slotIDUnderMouse).stack.equals(getMenu().itemList.get(i))) {
-							storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack.getStack(), SlotAction.PULL_ONE, isTransferOne(mouseButton) ? 1 : 0);
-							return true;
-						}
-					}
+					storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, SlotAction.PULL_ONE, isTransferOne(mouseButton));
+					return true;
 				}
 				return true;
 			} else if (pullHalf(mouseButton)) {
 				if (!menu.getCarried().isEmpty()) {
-					storageSlotClick(ItemStack.EMPTY, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
+					storageSlotClick(null, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, false);
 				} else {
 					if (getMenu().getSlotByID(slotIDUnderMouse).stack != null && getMenu().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
-						for (int i = 0;i < getMenu().itemList.size();i++) {
-							if (getMenu().getSlotByID(slotIDUnderMouse).stack.equals(getMenu().itemList.get(i))) {
-								storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack.getStack(), hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, 0);
-								return true;
-							}
-						}
+						storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, false);
+						return true;
 					}
 				}
 			} else if (pullNormal(mouseButton)) {
 				if (!menu.getCarried().isEmpty()) {
-					storageSlotClick(ItemStack.EMPTY, SlotAction.PULL_OR_PUSH_STACK, 0);
+					storageSlotClick(null, SlotAction.PULL_OR_PUSH_STACK, false);
 				} else {
 					if (getMenu().getSlotByID(slotIDUnderMouse).stack != null) {
 						if (getMenu().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
-							for (int i = 0;i < getMenu().itemList.size();i++) {
-								if (getMenu().getSlotByID(slotIDUnderMouse).stack.equals(getMenu().itemList.get(i))) {
-									storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack.getStack(), hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK, 0);
-									return true;
-								}
-							}
+							storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK, false);
+							return true;
 						}
 					}
 				}
 			}
 		} else if (GLFW.glfwGetKey(mc.getWindow().getWindow(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
-			storageSlotClick(ItemStack.EMPTY, SlotAction.SPACE_CLICK, 0);
+			storageSlotClick(null, SlotAction.SPACE_CLICK, false);
 		} else {
 			if (mouseButton == 1 && isHovering(searchField.x - leftPos, searchField.y - topPos, 89, this.getFont().lineHeight, mouseX, mouseY))
 				searchField.setValue("");
@@ -429,14 +456,8 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		return true;
 	}
 
-	protected void storageSlotClick(ItemStack slotStack, SlotAction act, int mod) {
-		CompoundTag c = new CompoundTag();
-		c.put("s", slotStack.save(new CompoundTag()));
-		c.putInt("a", act.ordinal());
-		c.putByte("m", (byte) mod);
-		CompoundTag msg = new CompoundTag();
-		msg.put("a", c);
-		menu.sendMessage(msg);
+	protected void storageSlotClick(StoredItemStack slotStack, SlotAction act, boolean mod) {
+		menu.sync.sendInteract(slotStack, act, mod);
 	}
 
 	public boolean isPullOne(int mouseButton) {

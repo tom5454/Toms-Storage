@@ -14,6 +14,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
@@ -36,7 +39,9 @@ public class ItemWirelessTerminal extends Item implements WirelessTerminal {
 		BlockHitResult lookingAt = (BlockHitResult) playerIn.pick(Config.wirelessRange, 0f, true);
 		BlockState state = worldIn.getBlockState(lookingAt.getBlockPos());
 		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
-			InteractionResult r = state.use(worldIn, playerIn, handIn, lookingAt);
+			PlayerInteractEvent.RightClickBlock event = new PlayerInteractEvent.RightClickBlock(playerIn, handIn, lookingAt.getBlockPos(), lookingAt);
+			MinecraftForge.EVENT_BUS.post(event);
+			InteractionResult r = event.isCanceled() ? event.getCancellationResult() : state.use(worldIn, playerIn, handIn, lookingAt);
 			return new InteractionResultHolder<>(r, playerIn.getItemInHand(handIn));
 		} else {
 			return super.use(worldIn, playerIn, handIn);

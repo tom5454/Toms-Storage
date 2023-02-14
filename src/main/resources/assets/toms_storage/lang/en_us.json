@@ -17,6 +17,9 @@
 	"item.toms_storage.ts.paint_kit": "Paint Kit",
 	"item.toms_storage.ts.wireless_terminal": "Wireless Terminal",
 	"item.toms_storage.ts.adv_wireless_terminal": "Advanced Wireless Terminal",
+	"item.toms_storage.ts.item_filter": "Item Filter",
+	"item.toms_storage.ts.polymorphic_item_filter": "Polymorphic Item Filter",
+	"item.toms_storage.ts.tag_item_filter": "Tag Item Filter",
 	
 	"itemGroup.toms_storage.tab": "Tom's Simple Storage",
 	
@@ -78,6 +81,23 @@
 	"tooltip.toms_storage.link_remote_0": "Access remote Inventories",
 	"tooltip.toms_storage.link_remote_1": "Provide Inventories for Remote Access",
 	"tooltip.toms_storage.items_missing": "Some items may not be inserted into the crafting grid",
+	"tooltip.toms_storage.item_filter": "Allow filtering multiple items, damage and NBT",
+	"tooltip.toms_storage.poly_item_filter": "Only allow inserting items that already exists in this inventory",
+	"tooltip.toms_storage.tag_item_filter": "Filter using tags",
+	"tooltip.toms_storage.allowList_0": "Reject matching",
+	"tooltip.toms_storage.allowList_1": "Allow matching",
+	"tooltip.toms_storage.matchNBT_0": "Don't match NBT",
+	"tooltip.toms_storage.matchNBT_1": "Match NBT",
+	"tooltip.toms_storage.priority_0": "Priority: Lowest",
+	"tooltip.toms_storage.priority_1": "Priority: Low",
+	"tooltip.toms_storage.priority_2": "Priority: Normal",
+	"tooltip.toms_storage.priority_3": "Priority: High",
+	"tooltip.toms_storage.priority_4": "Priority: Highest",
+	"tooltip.toms_storage.keepLast_0": "Don't keep last item in slot",
+	"tooltip.toms_storage.keepLast_1": "Keep last item in slot",
+	"tooltip.toms_storage.terminal_beacon": "Beacon level: %d%s",
+	"tooltip.toms_storage.terminal_beacon.sameDim": "This terminal is accessible anywhere\\in this dimension\\with the Advanced Wireless Terminal",
+	"tooltip.toms_storage.terminal_beacon.anywhere": "This terminal is accessible anywhere\\with the Advanced Wireless Terminal",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
@@ -101,5 +121,22 @@
 	"tomsstorage.config.inv_link_beacon_lvl_dim": "Advanced wireless terminal requied beacon level for infinite range",
 	"tomsstorage.config.inv_dup_scan_size": "Inventory Connector duplicate finder max slot count",
 	
-	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal"
+	"text.autoconfig.toms_storage.title": "Tom's Simple Storage Configuration",
+	"text.autoconfig.toms_storage.option.invRange": "Inventory Connector Range",
+	"text.autoconfig.toms_storage.option.onlyTrims": "Only Allow Trims to Connect Inventories",
+	"text.autoconfig.toms_storage.option.invConnectorMaxCables": "Inventory Cable Connector Maximum number of cables",
+	"text.autoconfig.toms_storage.option.wirelessRange": "Wireless terminal reach",
+	"text.autoconfig.toms_storage.option.multiblockInv": "Multiblock inventories",
+	"text.autoconfig.toms_storage.option.advWirelessRange": "Advanced wireless terminal range",
+	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvl": "Advanced wireless terminal requied beacon level for infinite range",
+	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvlDim": "Adv Wireless terminal requied beacon level for cross dimensional access",
+	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvl.@Tooltip": "Value of 0 only requires a single beacon block nearby",
+	"text.autoconfig.toms_storage.option.wirelessTermBeaconLvlDim.@Tooltip": "Value of 0 only requires a single beacon block nearby",
+	"text.autoconfig.toms_storage.option.invLinkBeaconLvl": "Advanced wireless terminal requied beacon level for infinite range",
+	"text.autoconfig.toms_storage.option.invLinkBeaconLvlDim": "Advanced wireless terminal requied beacon level for infinite range",
+	"text.autoconfig.toms_storage.option.invDupScanSize": "Inventory Connector duplicate finder max slot count",
+	
+	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal",
+	
+	"tag.toms_storage.trims": "Inventory Trims"
 }

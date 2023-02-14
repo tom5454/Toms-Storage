@@ -183,4 +183,8 @@ public class TileEntityStorageTerminal extends BlockEntity implements MenuProvid
 	public void setLastSearch(String string) {
 		lastSearch = string;
 	}
+
+	public int getBeaconLevel() {
+		return beaconLevel;
+	}
 }
