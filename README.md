@@ -1,5 +1,12 @@
-# Toms-Storage
-Simple vanilla style storage mod for Minecraft
+# Tom's Storage
+**Downloads: [Forge](https://www.curseforge.com/minecraft/mc-mods/toms-storage) ꞏ [Fabric](https://www.curseforge.com/minecraft/mc-mods/toms-storage-fabric)**
+
 ![Banner](https://github.com/tom5454/Toms-Storage/blob/master/banner.png)
-Mod Spotlight Video:  
-[![My Spotlight Video](https://img.youtube.com/vi/RwRKNhZ7uec/0.jpg)](https://www.youtube.com/watch?v=RwRKNhZ7uec)
+
+**A simple, Vanilla-style storage mod for Minecraft.**
+
+## Spotlights
+
+If you have created a spotlight video, please [file an issue](https://github.com/tom5454/Toms-Storage/issues) and we will add it here.
+
+- [tom5454's spotlight video](https://www.youtube.com/watch?v=RwRKNhZ7uec)
