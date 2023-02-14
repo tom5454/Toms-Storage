@@ -1,0 +1,8 @@
+accessWidener	v1	named
+accessible field net/minecraft/recipebook/ServerPlaceRecipe stackedContents Lnet/minecraft/world/entity/player/StackedContents;
+mutable field net/minecraft/recipebook/ServerPlaceRecipe stackedContents Lnet/minecraft/world/entity/player/StackedContents;
+
+accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent stackedContents Lnet/minecraft/world/entity/player/StackedContents;
+mutable field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent stackedContents Lnet/minecraft/world/entity/player/StackedContents;
+accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent searchBox Lnet/minecraft/client/gui/components/EditBox;
+accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent ghostRecipe Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;
