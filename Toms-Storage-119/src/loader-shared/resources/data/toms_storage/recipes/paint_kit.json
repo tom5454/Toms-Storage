@@ -1,0 +1,38 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"RGB",
+    "iaW",
+    "bS "
+  ],
+  "key": {
+  	"b": {
+      "item": "minecraft:water_bucket"
+    },
+    "a": {
+      "item": "minecraft:bucket"
+    },
+    "R": {
+      "tag": "forge:dyes/red"
+    },
+    "G": {
+      "tag": "forge:dyes/green"
+    },
+    "B": {
+      "tag": "forge:dyes/blue"
+    },
+    "W": {
+    	"tag": "minecraft:wool"
+    },
+    "S": {
+    	"tag": "forge:rods/wooden"
+    },
+	"i": {
+    	"tag": "forge:dyes/black"
+    }
+  },
+  "result": {
+    "item": "toms_storage:ts.paint_kit",
+    "count": 1
+  }
+}
