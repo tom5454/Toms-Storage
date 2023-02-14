@@ -1,5 +1,6 @@
 # Toms-Storage
-This is the branch for the Fabric mod. And it depends on [Tom's Fabric Lib](https://www.curseforge.com/minecraft/mc-mods/toms-fabric-lib)  
+# This branch was moved to: https://github.com/tom5454/Toms-Storage/tree/master/TomsStorageFabric-1.19.3
+This is the branch for the Fabric mod.  
 Simple vanilla style storage mod for Minecraft
 ![Banner](https://github.com/tom5454/Toms-Storage/blob/master/banner.png)
 Mod Spotlight Video:  
