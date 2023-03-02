@@ -10,6 +10,7 @@ archivesBaseName = 'toms_storage-1.19.3'
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+def useLib = System.getProperty("useLib")
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
@@ -177,11 +178,13 @@ dependencies {
   	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.3-5.1.1.2")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.3-5.1.1.2:api")
     
-    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:10.0.586")
-	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:10.0.586")
-	implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:10.0.586")
-	implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:9.0.94")
-    implementation fg.deobf("dev.architectury:architectury-forge:7.0.66")
+    if(useLib) {
+    	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:10.0.586")
+		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:10.0.586")
+		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:10.0.586")
+		implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:9.0.94")
+    	implementation fg.deobf("dev.architectury:architectury-forge:7.0.66")
+    }
 }
 
 sourceSets {
@@ -190,7 +193,7 @@ sourceSets {
 			srcDir "../TomsStorage-119/src/shared/java"
 			srcDir "../TomsStorage-119/src/loader-shared/java"
 			srcDir "src/platform-shared/java"
-			//exclude "com/tom/storagemod/rei/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
 		}
 		resources {
 			srcDir "../TomsStorage-119/src/shared/resources"

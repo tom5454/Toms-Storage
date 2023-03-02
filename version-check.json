@@ -10,22 +10,25 @@
 		"1.17.1-latest": "1.2.21",
 		"1.18-latest": "1.4.0",
 		"1.18.2-latest": "1.4.0",
-		"1.19-latest": "1.4.0",
-		"1.19.2-latest": "1.4.0",
-		"1.19.3-latest": "1.4.0"
+		"1.19-latest": "1.5.1",
+		"1.19.2-latest": "1.5.1",
+		"1.19.3-latest": "1.5.1"
 	},
 	"1.19.3": {
-		"1.4.0": "Added item filters (simple, tag, polymorphic)\nAdded allow/deny settings, priority, keep last item in slot to filtered inventory cable connector\nRewritten terminal networking\nHolding shift in the terminal stops sorting\nAdded support for JEI on fabric, REI on forge\nAdded ghost item drag to JEI/REI/EMI\nUpdated pt_br\nFixed terminal rendering issues\nFixed crafting terminals not dropping their inventory when breaking\nFixed crash\nFixed wireless terminal bypassing FTB Chunks",
+		"1.5.1": "Fixed crash with Inventory Cable Connector gui\nFixed crash on 1.19.3 forge\nFixed items not showing in terminals on forge",
+		"1.5.0": "Added item filters (simple, tag, polymorphic)\nAdded allow/deny settings, priority, keep last item in slot to filtered inventory cable connector\nRewritten terminal networking\nHolding shift in the terminal stops sorting\nAdded support for JEI on fabric, REI on forge\nAdded ghost item drag to JEI/REI/EMI\nUpdated pt_br\nFixed terminal rendering issues\nFixed crafting terminals not dropping their inventory when breaking\nFixed crash\nFixed wireless terminal bypassing FTB Chunks",
 		"1.3.11": "Fixed crash on launch (#173)\nFixed painted blocks resetting on world load\nReadded curio support",
 		"1.3.10": "1.19.3 port"
 	},
 	"1.19.2": {
-		"1.4.0": "Added item filters (simple, tag, polymorphic)\nAdded allow/deny settings, priority, keep last item in slot to filtered inventory cable connector\nRewritten terminal networking\nHolding shift in the terminal stops sorting\nAdded support for JEI on fabric, REI on forge\nAdded ghost item drag to JEI/REI/EMI\nUpdated pt_br\nFixed terminal rendering issues\nFixed crafting terminals not dropping their inventory when breaking\nFixed crash\nFixed wireless terminal bypassing FTB Chunks",
+		"1.5.1": "Fixed crash with Inventory Cable Connector gui\nFixed items not showing in terminals on forge",
+		"1.5.0": "Added item filters (simple, tag, polymorphic)\nAdded allow/deny settings, priority, keep last item in slot to filtered inventory cable connector\nRewritten terminal networking\nHolding shift in the terminal stops sorting\nAdded support for JEI on fabric, REI on forge\nAdded ghost item drag to JEI/REI/EMI\nUpdated pt_br\nFixed terminal rendering issues\nFixed crafting terminals not dropping their inventory when breaking\nFixed crash\nFixed wireless terminal bypassing FTB Chunks",
 		"1.3.10": "Added curio/trinket support for the advanced wireless terminal\nUpdated to 1.19.3\nAdded pt_br translation (#159)",
 		"1.3.9": "Fixed JEI R/U not working\nFixed the @ character not included in JEI search\nFixed the terminal search couldn't unfocus\nFixed duplication bug with Crafting Terminal\nFixed Filtered Inventory Cable Connector infinite loop",
 		"1.3.8": "Fixed dedicated servers not working"
 	},
 	"1.19": {
+		"1.5.1": "Fixed crash with Inventory Cable Connector gui\nFixed items not showing in terminals on forge",
 		"1.4.0": "Added item filters (simple, tag, polymorphic)\nAdded allow/deny settings, priority, keep last item in slot to filtered inventory cable connector\nRewritten terminal networking\nHolding shift in the terminal stops sorting\nAdded support for JEI on fabric, REI on forge\nAdded ghost item drag to JEI/REI/EMI\nUpdated pt_br\nFixed terminal rendering issues\nFixed crafting terminals not dropping their inventory when breaking\nFixed crash\nFixed wireless terminal bypassing FTB Chunks",
 		"1.3.10": "Added curio/trinket support for the advanced wireless terminal\nUpdated to 1.19.3\nAdded pt_br translation (#159)",
 		"1.3.9": "Fixed JEI R/U not working\nFixed the @ character not included in JEI search\nFixed the terminal search couldn't unfocus\nFixed duplication bug with Crafting Terminal\nFixed Filtered Inventory Cable Connector infinite loop",

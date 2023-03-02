@@ -11,22 +11,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -51,18 +46,17 @@ import com.tom.storagemod.gui.LevelEmitterScreen;
 import com.tom.storagemod.gui.StorageTerminalScreen;
 import com.tom.storagemod.gui.TagItemFilterScreen;
 import com.tom.storagemod.item.WirelessTerminalItem;
-import com.tom.storagemod.model.BakedPaintedModel;
 import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.platform.PlatformModelLoader;
 import com.tom.storagemod.tile.PaintedBlockEntity;
-import com.tom.storagemod.util.GameObject;
 
 public class StorageModClient {
 	public static KeyMapping openTerm;
 
 	public static void preInit() {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::registerColors);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::bakeModels);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(StorageModClient::initKeybinds);
+		PlatformModelLoader.init();
 	}
 
 	public static void clientSetup() {
@@ -95,21 +89,6 @@ public class StorageModClient {
 			}
 		}
 		return -1;
-	}
-
-	private static void bakeModels(ModelEvent.BakingCompleted event) {
-		bindPaintedModel(event, Content.paintedTrim);
-		bindPaintedModel(event, Content.invCableFramed);
-		bindPaintedModel(event, Content.invProxy);
-		bindPaintedModel(event, Content.invCableConnectorFramed);
-	}
-
-	private static void bindPaintedModel(ModelEvent.BakingCompleted event, GameObject<? extends Block> block) {
-		ResourceLocation baseLoc = block.getId();
-		block.get().getStateDefinition().getPossibleStates().forEach(st -> {
-			ModelResourceLocation resLoc = BlockModelShaper.stateToModelLocation(baseLoc, st);
-			event.getModels().put(resLoc, new BakedPaintedModel(block.get(), event.getModels().get(resLoc)));
-		});
 	}
 
 	@SubscribeEvent

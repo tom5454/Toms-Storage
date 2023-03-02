@@ -13,7 +13,9 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import com.google.common.collect.Iterators;
 
-public class FilteredStorage extends FilteringStorage<ItemVariant> implements IProxy {
+import com.tom.storagemod.platform.PlatformStorage;
+
+public class FilteredStorage extends FilteringStorage<ItemVariant> implements IProxy, PlatformStorage {
 	private BlankVariantView<ItemVariant> nullSlot = new BlankVariantView<>(ItemVariant.blank(), 0);
 	private ItemPredicate filter;
 	private boolean keepLastInSlot;
@@ -77,15 +79,6 @@ public class FilteredStorage extends FilteringStorage<ItemVariant> implements IP
 			return v != null ? new FilteringStorageView(v) : v;
 		} else
 			return super.exactView(resource);
-	}
-
-	@Deprecated(forRemoval = true)
-	@Override
-	public @Nullable StorageView<ItemVariant> exactView(TransactionContext transaction, ItemVariant resource) {
-		if(keepLastInSlot)
-			return new FilteringStorageView(super.exactView(transaction, resource));
-		else
-			return super.exactView(transaction, resource);
 	}
 
 	private class FilteringStorageView implements StorageView<ItemVariant> {

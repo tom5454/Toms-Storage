@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
+import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.util.StoredItemStack;
 
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
@@ -205,7 +206,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		if (currentRecipe == null) {
 			craftResult.setItem(0, ItemStack.EMPTY);
 		} else {
-			craftResult.setItem(0, currentRecipe.assemble(craftMatrix));
+			craftResult.setItem(0, Platform.assembleRecipe(level, craftMatrix, currentRecipe));
 		}
 
 		craftingListeners.forEach(CraftingTerminalMenu::onCraftMatrixChanged);

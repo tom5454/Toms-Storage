@@ -94,7 +94,7 @@ public class AbstractInventoryCableConnectorBlockEntity extends PaintedBlockEnti
 	}
 
 	protected LazyOptional<IItemHandler> applyFilter(LazyOptional<IItemHandler> to) {
-		return pointedAt == null ? LazyOptional.empty() : pointedAt;
+		return to;
 	}
 
 	protected LazyOptional<IItemHandler> makeCapability() {

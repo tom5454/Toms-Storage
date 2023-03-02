@@ -35,11 +35,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.InventoryProxyBlock;
 import com.tom.storagemod.block.InventoryProxyBlock.DirectionWithNull;
+import com.tom.storagemod.platform.PlatformStorage;
 import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InventoryWrapper;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 
-public class InventoryProxyBlockEntity extends PaintedBlockEntity implements TickableServer, SidedStorageBlockEntity, Container, Storage<ItemVariant>, IProxy {
+public class InventoryProxyBlockEntity extends PaintedBlockEntity implements TickableServer, SidedStorageBlockEntity, Container, PlatformStorage, IProxy {
 	private Storage<ItemVariant> pointedAtSt;
 
 	public InventoryProxyBlockEntity(BlockPos pos, BlockState state) {
@@ -129,9 +130,9 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 	}
 
 	@Override
-	public @Nullable StorageView<ItemVariant> exactView(TransactionContext transaction, ItemVariant resource) {
+	public @Nullable StorageView<ItemVariant> exactView(ItemVariant resource) {
 		if(pointedAtSt == null)return null;
-		return pointedAtSt.exactView(transaction, resource);
+		return pointedAtSt.exactView(resource);
 	}
 
 	@Override
