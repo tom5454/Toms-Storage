@@ -1,10 +1,3 @@
 accessWidener	v1	named
-accessible field net/minecraft/recipe/InputSlotFiller matcher Lnet/minecraft/recipe/RecipeMatcher;
-mutable field net/minecraft/recipe/InputSlotFiller matcher Lnet/minecraft/recipe/RecipeMatcher;
-
-accessible method net/minecraft/tag/BlockTags register (Ljava/lang/String;)Lnet/minecraft/tag/TagKey;
-
-accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeMatcher;
-mutable field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget recipeFinder Lnet/minecraft/recipe/RecipeMatcher;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget searchField Lnet/minecraft/client/gui/widget/TextFieldWidget;
 accessible field net/minecraft/client/gui/screen/recipebook/RecipeBookWidget ghostSlots Lnet/minecraft/client/gui/screen/recipebook/RecipeBookGhostSlots;

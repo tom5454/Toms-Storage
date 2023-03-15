@@ -29,11 +29,11 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	private static final Identifier RECIPE_BUTTON_TEXTURE = new Identifier("textures/gui/recipe_button.png");
 	private GuiButton buttonPullFromInv;
 	private boolean pullFromInv;
+	private GuiButtonClear btnClr;
 
 	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, PlayerInventory inv, Text titleIn) {
 		super(screenContainer, inv, titleIn);
 		recipeBookGui = new RecipeBookWidget();
-		recipeBookGui.recipeFinder = handler.new TerminalRecipeItemHelper();
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.x = this.recipeBookGui.findLeftEdge(this.width, this.backgroundWidth);
 		addDrawableChild(this.recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
-		GuiButtonClear btnClr = new GuiButtonClear(x + 80, y + 110, b -> clearGrid());
+		btnClr = new GuiButtonClear(x + 80, y + 110, b -> clearGrid());
 		addDrawableChild(btnClr);
 		buttonPullFromInv = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
@@ -72,38 +72,36 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 			this.recipeBookGui.toggleOpen();
 			this.x = this.recipeBookGui.findLeftEdge(this.width, this.backgroundWidth);
 			((TexturedButtonWidget)buttonWidget).setPos(this.x + 4, this.height / 2);
-			super.searchField.setX(this.x + 82);
-			btnClr.setX(this.x + 80);
-			buttonSortingType.setX(x - 18);
-			buttonDirection.setX(x - 18);
-			if(recipeBookGui.isOpen()) {
-				buttonSearchType.setX(x - 36);
-				buttonCtrlMode.setX(x - 36);
-				buttonPullFromInv.setX(x - 54);
-				buttonSearchType.y = y + 5;
-				buttonCtrlMode.y = y + 5 + 18;
-				buttonPullFromInv.y = y + 5 + 18;
-			} else {
-				buttonSearchType.setX(x - 18);
-				buttonCtrlMode.setX(x - 18);
-				buttonPullFromInv.setX(x - 18);
-				buttonSearchType.y = y + 5 + 18*2;
-				buttonCtrlMode.y = y + 5 + 18*3;
-				buttonPullFromInv.y = y + 5 + 18*4;
-			}
+			setButtonsPos();
 		}));
+		setButtonsPos();
+		onPacket();
+	}
+
+	private void setButtonsPos() {
+		searchField.setX(this.x + 82);
+		btnClr.setX(this.x + 80);
+		buttonSortingType.setX(x - 18);
+		buttonDirection.setX(x - 18);
 		if(recipeBookGui.isOpen()) {
-			buttonSortingType.setX(x - 18);
-			buttonDirection.setX(x - 18);
 			buttonSearchType.setX(x - 36);
 			buttonCtrlMode.setX(x - 36);
 			buttonPullFromInv.setX(x - 54);
-			buttonSearchType.y = y + 5;
-			buttonCtrlMode.y = y + 5 + 18;
-			buttonPullFromInv.y = y + 5 + 18;
-			super.searchField.setX(this.x + 82);
+			buttonGhostMode.setX(x - 54);
+			buttonSearchType.setY(y + 5);
+			buttonCtrlMode.setY(y + 5 + 18);
+			buttonPullFromInv.setY(y + 5 + 18);
+			buttonGhostMode.setY(y + 5);
+		} else {
+			buttonSearchType.setX(x - 18);
+			buttonCtrlMode.setX(x - 18);
+			buttonPullFromInv.setX(x - 18);
+			buttonGhostMode.setX(x - 18);
+			buttonSearchType.setY(y + 5 + 18*2);
+			buttonCtrlMode.setY(y + 5 + 18*3);
+			buttonPullFromInv.setY(y + 5 + 18*5);
+			buttonGhostMode.setY(y + 5 + 18*4);
 		}
-		onPacket();
 	}
 
 	@Override
@@ -211,8 +209,8 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 				}
 			}
 			if(itemstack != null) {
-				super.searchField.setText(itemstack.getName().getString());
-				super.searchField.setTextFieldFocused(false);
+				searchField.setText(itemstack.getName().getString());
+				searchField.setTextFieldFocused(false);
 				return true;
 			}
 		}

@@ -159,6 +159,10 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	@Override
 	public void populateRecipeFinder(RecipeMatcher itemHelperIn) {
 		this.craftMatrix.provideRecipeInputs(itemHelperIn);
+		if(te != null)sync.fillStackedContents(itemHelperIn);
+		else itemList.forEach(e -> {
+			itemHelperIn.addUnenchantedInput(e.getActualStack());
+		});
 	}
 
 	@Override
@@ -193,23 +197,10 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 		return 10;
 	}
 
-	public class TerminalRecipeItemHelper extends RecipeMatcher {
-		@Override
-		public void clear() {
-			super.clear();
-			itemList.forEach(e -> {
-				addUnenchantedInput(e.getActualStack());
-			});
-		}
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void fillInputSlots(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayerEntity p_217056_3_) {
 		(new InputSlotFiller(this) {
-			{
-				matcher = new TerminalRecipeItemHelper();
-			}
 
 			@Override
 			protected void fillInputSlot(Slot slotToFill, ItemStack ingredientIn) {

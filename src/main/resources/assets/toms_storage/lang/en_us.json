@@ -98,6 +98,9 @@
 	"tooltip.toms_storage.terminal_beacon": "Beacon level: %d%s",
 	"tooltip.toms_storage.terminal_beacon.sameDim": "This terminal is accessible anywhere\\in this dimension\\with the Advanced Wireless Terminal",
 	"tooltip.toms_storage.terminal_beacon.anywhere": "This terminal is accessible anywhere\\with the Advanced Wireless Terminal",
+	"tooltip.toms_storage.nbt_overflow": "This item's tag is too big, the item may not show correctly in the terminal",
+	"tooltip.toms_storage.ghostMode_0": "Enable sorting while holding SHIFT",
+	"tooltip.toms_storage.ghostMode_1": "Disable sorting while holding SHIFT",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
