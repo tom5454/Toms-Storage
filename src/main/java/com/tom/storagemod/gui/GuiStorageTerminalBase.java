@@ -82,10 +82,10 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	protected EditBox searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	private String searchLast = "";
-	protected boolean loadedSearch = false;
+	protected boolean loadedSearch = false, ghostItems;
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode;
+	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode;
 	private Comparator<StoredItemStack> sortComp;
 
 	public GuiStorageTerminalBase(T screenContainer, Inventory inv, Component titleIn) {
@@ -100,6 +100,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		int type = (s & 0b000_11_0_00) >> 3;
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
 		searchType = (s & 0b111_00_0_00) >> 5;
+		ghostItems = (s & 0b1_0_000_00_0_00) == 0;
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
 			searchField.setFocus(true);
 		}
@@ -107,6 +108,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttonDirection.state = rev ? 1 : 0;
 		buttonSearchType.state = searchType;
 		buttonCtrlMode.state = controllMode;
+		buttonGhostMode.state = ghostItems ? 1 : 0;
 
 		if(!loadedSearch && menu.search != null) {
 			loadedSearch = true;
@@ -129,6 +131,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		d |= ((comparator.isReversed() ? 1 : 0) << 2);
 		d |= (comparator.type() << 3);
 		d |= ((searchType & 0b111) << 5);
+		d |= ((ghostItems ? 0 : 1) << 9);
 		return d;
 	}
 
@@ -182,6 +185,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttonCtrlMode = addRenderableWidget(new GuiButton(leftPos - 18, topPos + 5 + 18*3, 3, b -> {
 			controllMode = (controllMode + 1) % ControllMode.VALUES.length;
 			buttonCtrlMode.state = controllMode;
+			sendUpdate();
+		}));
+		buttonGhostMode = addRenderableWidget(new GuiButton(leftPos - 18, topPos + 5 + 18*4, 5, b -> {
+			ghostItems = !ghostItems;
+			buttonGhostMode.state = ghostItems ? 1 : 0;
 			sendUpdate();
 		}));
 		updateSearch();
@@ -276,7 +284,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		int i1 = k + 14;
 		int j1 = l + rowCount * 18;
 
-		if(hasShiftDown()) {
+		if(ghostItems && hasShiftDown()) {
 			if(!menu.noSort) {
 				List<StoredItemStack> list = getMenu().itemListClientSorted;
 				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();
@@ -345,6 +353,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 		if (buttonCtrlMode.isHoveredOrFocused()) {
 			renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(TextComponent::new).collect(Collectors.toList()), mouseX, mouseY);
+		}
+		if (buttonGhostMode.isHoveredOrFocused()) {
+			renderTooltip(st, new TranslatableComponent("tooltip.toms_storage.ghostMode_" + buttonGhostMode.state), mouseX, mouseY);
 		}
 	}
 
@@ -608,6 +619,10 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 
 		public void setX(int i) {
 			x = i;
+		}
+
+		public void setY(int i) {
+			y = i;
 		}
 
 		/**

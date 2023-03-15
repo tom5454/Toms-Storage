@@ -1,11 +1,8 @@
 package com.tom.storagemod.gui;
 
-import java.lang.reflect.Field;
-
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -15,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -28,43 +24,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftingTerminal> implements RecipeUpdateListener {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/crafting_terminal.png");
-	private static Field stackedContentsField, searchBarField, ghostRecipeField;
-	static {
-		try {
-			for (Field f : RecipeBookComponent.class.getDeclaredFields()) {
-				if(f.getType() == StackedContents.class) {
-					f.setAccessible(true);
-					stackedContentsField = f;
-				} else if(f.getType() == EditBox.class) {
-					f.setAccessible(true);
-					searchBarField = f;
-				} else if(f.getType() == GhostRecipe.class) {
-					f.setAccessible(true);
-					ghostRecipeField = f;
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 	private final RecipeBookComponent recipeBookGui;
 	private boolean widthTooNarrow;
 	private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
-	private EditBox searchField;
-	private GhostRecipe ghostRecipe;
 	private GuiButton buttonPullFromInv;
+	private GuiButtonClear btnClr;
 	private boolean pullFromInv;
 
 	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn);
-
 		recipeBookGui = new RecipeBookComponent();
-		try {
-			stackedContentsField.set(recipeBookGui, getMenu().new TerminalRecipeItemHelper());
-			ghostRecipe = (GhostRecipe) ghostRecipeField.get(recipeBookGui);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
@@ -75,7 +44,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	@Override
 	protected void onUpdateSearch(String text) {
 		if(ModList.get().isLoaded("jei") || (searchType & 4) > 0) {
-			if(searchField != null)searchField.setValue(text);
+			if(recipeBookGui.searchBox != null)recipeBookGui.searchBox.setValue(text);
 			recipeBookGui.recipesUpdated();
 		}
 	}
@@ -91,7 +60,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
 		addRenderableWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
-		GuiButtonClear btnClr = new GuiButtonClear(leftPos + 80, topPos + 110, b -> clearGrid());
+		btnClr = new GuiButtonClear(leftPos + 80, topPos + 110, b -> clearGrid());
 		addRenderableWidget(btnClr);
 		buttonPullFromInv = addRenderableWidget(new GuiButton(leftPos - 18, topPos + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
@@ -100,52 +69,39 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		}));
 		addRenderableWidget(new ImageButton(this.leftPos + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
 			this.recipeBookGui.initVisuals();
-			try {
-				searchField = (EditBox) searchBarField.get(recipeBookGui);
-			} catch (Exception e) {
-				searchField = null;
-			}
-
 			this.recipeBookGui.toggleVisibility();
 			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
 			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.height / 2);
-			super.searchField.setX(this.leftPos + 82);
-			btnClr.setX(this.leftPos + 80);
-			buttonSortingType.setX(leftPos - 18);
-			buttonDirection.setX(leftPos - 18);
-			if(recipeBookGui.isVisible()) {
-				buttonSearchType.setX(leftPos - 36);
-				buttonCtrlMode.setX(leftPos - 36);
-				buttonPullFromInv.setX(leftPos - 54);
-				buttonSearchType.y = topPos + 5;
-				buttonCtrlMode.y = topPos + 5 + 18;
-				buttonPullFromInv.y = topPos + 5 + 18;
-			} else {
-				buttonSearchType.setX(leftPos - 18);
-				buttonCtrlMode.setX(leftPos - 18);
-				buttonPullFromInv.setX(leftPos - 18);
-				buttonSearchType.y = topPos + 5 + 18*2;
-				buttonCtrlMode.y = topPos + 5 + 18*3;
-				buttonPullFromInv.y = topPos + 5 + 18*4;
-			}
+			setButtonsPos();
 		}));
+		setButtonsPos();
+		onPacket();
+	}
+
+	private void setButtonsPos() {
+		searchField.setX(this.leftPos + 82);
+		btnClr.setX(this.leftPos + 80);
+		buttonSortingType.setX(leftPos - 18);
+		buttonDirection.setX(leftPos - 18);
 		if(recipeBookGui.isVisible()) {
-			buttonSortingType.setX(leftPos - 18);
-			buttonDirection.setX(leftPos - 18);
 			buttonSearchType.setX(leftPos - 36);
 			buttonCtrlMode.setX(leftPos - 36);
 			buttonPullFromInv.setX(leftPos - 54);
-			buttonSearchType.y = topPos + 5;
-			buttonCtrlMode.y = topPos + 5 + 18;
-			buttonPullFromInv.y = topPos + 5 + 18;
-			super.searchField.setX(this.leftPos + 82);
-			try {
-				searchField = (EditBox) searchBarField.get(recipeBookGui);
-			} catch (Exception e) {
-				searchField = null;
-			}
+			buttonGhostMode.setX(leftPos - 54);
+			buttonSearchType.setY(topPos + 5);
+			buttonCtrlMode.setY(topPos + 5 + 18);
+			buttonPullFromInv.setY(topPos + 5 + 18);
+			buttonGhostMode.setY(topPos + 5);
+		} else {
+			buttonSearchType.setX(leftPos - 18);
+			buttonCtrlMode.setX(leftPos - 18);
+			buttonPullFromInv.setX(leftPos - 18);
+			buttonGhostMode.setX(leftPos - 18);
+			buttonSearchType.setY(topPos + 5 + 18*2);
+			buttonCtrlMode.setY(topPos + 5 + 18*3);
+			buttonPullFromInv.setY(topPos + 5 + 18*5);
+			buttonGhostMode.setY(topPos + 5 + 18*4);
 		}
-		onPacket();
 	}
 
 	@Override
@@ -244,8 +200,8 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 		if(code == GLFW.GLFW_KEY_S && hoveredSlot != null) {
 			ItemStack itemstack = null;
 
-			for (int i = 0; i < this.ghostRecipe.size(); ++i) {
-				GhostRecipe.GhostIngredient ghostrecipe$ghostingredient = this.ghostRecipe.get(i);
+			for (int i = 0; i < this.recipeBookGui.ghostRecipe.size(); ++i) {
+				GhostRecipe.GhostIngredient ghostrecipe$ghostingredient = this.recipeBookGui.ghostRecipe.get(i);
 				int j = ghostrecipe$ghostingredient.getX();
 				int k = ghostrecipe$ghostingredient.getY();
 				if (j == hoveredSlot.x && k == hoveredSlot.y) {
@@ -253,8 +209,8 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 				}
 			}
 			if(itemstack != null) {
-				super.searchField.setValue(itemstack.getHoverName().getString());
-				super.searchField.setFocus(false);
+				searchField.setValue(itemstack.getHoverName().getString());
+				searchField.setFocus(false);
 				return true;
 			}
 		}

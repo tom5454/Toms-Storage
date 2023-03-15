@@ -1,6 +1,5 @@
 package com.tom.storagemod.gui;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import net.minecraft.client.RecipeBookCategories;
@@ -33,19 +32,6 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	public static class SlotCrafting extends Slot {
 		public SlotCrafting(Container inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);
-		}
-	}
-	private static Field recipeItemHelperField;
-	static {
-		try {
-			for (Field f : ServerPlaceRecipe.class.getDeclaredFields()) {
-				if(f.getType() == StackedContents.class) {
-					f.setAccessible(true);
-					recipeItemHelperField = f;
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -172,6 +158,10 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	@Override
 	public void fillCraftSlotsStackedContents(StackedContents itemHelperIn) {
 		this.craftMatrix.fillStackedContents(itemHelperIn);
+		if(te != null)sync.fillStackedContents(itemHelperIn);
+		else itemList.forEach(e -> {
+			itemHelperIn.accountSimpleStack(e.getActualStack());
+		});
 	}
 
 	@Override
@@ -210,27 +200,10 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 		return Lists.newArrayList(RecipeBookCategories.CRAFTING_SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
 	}
 
-	public class TerminalRecipeItemHelper extends StackedContents {
-		@Override
-		public void clear() {
-			super.clear();
-			itemList.forEach(e -> {
-				accountSimpleStack(e.getActualStack());
-			});
-		}
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void handlePlacement(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayer p_217056_3_) {
 		(new ServerPlaceRecipe(this) {
-			{
-				try {
-					recipeItemHelperField.set(this, new TerminalRecipeItemHelper());
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
 
 			@Override
 			protected void moveItemToGrid(Slot slotToFill, ItemStack ingredientIn) {

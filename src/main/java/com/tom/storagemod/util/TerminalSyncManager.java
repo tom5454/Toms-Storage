@@ -9,8 +9,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,13 +30,13 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 public class TerminalSyncManager {
-	private static final int MAX_PACKET_SIZE = 32000;
+	private static final int MAX_PACKET_SIZE = 64000;
 	private Object2IntMap<StoredItemStack> idMap = new Object2IntOpenHashMap<>();
 	private Int2ObjectMap<StoredItemStack> idMap2 = new Int2ObjectArrayMap<>();
 	private Object2LongMap<StoredItemStack> items = new Object2LongOpenHashMap<>();
 	private Map<StoredItemStack, StoredItemStack> itemList = new HashMap<>();
 	private int lastId = 1;
-	private FriendlyByteBuf workBuf = new FriendlyByteBuf(Unpooled.buffer());
+	private FriendlyByteBuf workBuf = new FriendlyByteBuf(Unpooled.buffer(MAX_PACKET_SIZE, MAX_PACKET_SIZE * 2));
 
 	public static CompoundTag getSyncTag(ItemStack stack) {
 		Item item = stack.getItem();
@@ -64,6 +67,23 @@ public class TerminalSyncManager {
 		if(wr)buf.writeVarInt(Item.getId(item));
 		if(stack.getQuantity() != 0)buf.writeVarLong(stack.getQuantity());
 		if(wr && compoundtag != null)buf.writeNbt(compoundtag);
+	}
+
+	private void writeMiniStack(FriendlyByteBuf buf, StoredItemStack stack) {
+		int id = idMap.getInt(stack);
+		byte flags = (byte) ((stack.getQuantity() == 0 ? 1 : 0) | 2);
+		buf.writeByte(flags);
+		buf.writeVarInt(id);
+		buf.writeVarInt(Item.getId(stack.getStack().getItem()));
+		if(stack.getQuantity() != 0)buf.writeVarLong(stack.getQuantity());
+		CompoundTag tag = new CompoundTag();
+		CompoundTag d = new CompoundTag();
+		tag.put("display", d);
+		ListTag lore = new ListTag();
+		d.put("Lore", lore);
+		lore.add(StringTag.valueOf("{\"translate\":\"tooltip.toms_storage.nbt_overflow\",\"color\":\"red\"}"));
+		tag.putInt("uid", id);
+		buf.writeNbt(tag);
 	}
 
 	private StoredItemStack read(FriendlyByteBuf buf) {
@@ -108,7 +128,12 @@ public class TerminalSyncManager {
 			for (int i = 0; i < toWrite.size(); i++, j++) {
 				StoredItemStack stack = toWrite.get(i);
 				int li = workBuf.writerIndex();
-				write(workBuf, stack);
+				try {
+					write(workBuf, stack);
+				} catch (IndexOutOfBoundsException e) {
+					workBuf.writerIndex(li);
+					writeMiniStack(workBuf, stack);
+				}
 				int s = workBuf.writerIndex();
 				if((s > MAX_PACKET_SIZE || j > 32000) && j > 1) {
 					CompoundTag t = writeBuf("d", workBuf, li);
@@ -116,7 +141,11 @@ public class TerminalSyncManager {
 					NetworkHandler.sendTo(player, t);
 					j = 0;
 					workBuf.writerIndex(0);
-					workBuf.writeBytes(workBuf, li, s - li);
+					if(s - li > MAX_PACKET_SIZE) {
+						writeMiniStack(workBuf, stack);
+					} else {
+						workBuf.writeBytes(workBuf, li, s - li);
+					}
 				}
 			}
 			if(j > 0 || extraSync != null) {
@@ -195,6 +224,14 @@ public class TerminalSyncManager {
 
 	public List<StoredItemStack> getAsList() {
 		return new ArrayList<>(this.itemList.values());
+	}
+
+	public void fillStackedContents(StackedContents stc) {
+		items.forEach((s, c) -> {
+			ItemStack st = s.getActualStack();
+			st.setCount(c.intValue());
+			stc.accountSimpleStack(st);
+		});
 	}
 
 	public long getAmount(StoredItemStack stack) {
