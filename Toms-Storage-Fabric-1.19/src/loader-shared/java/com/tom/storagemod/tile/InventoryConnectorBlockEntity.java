@@ -53,6 +53,7 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 			checkedBlocks.add(worldPosition);
 			handlers.clear();
 			Set<LinkedInv> toRM = new HashSet<>();
+			Collections.sort(linkedInvs);
 			for (LinkedInv inv : linkedInvs) {
 				if(inv.time + 40 < time) {
 					toRM.add(inv);
@@ -71,7 +72,6 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 				}
 			}
 			linkedInvs.removeAll(toRM);
-			Collections.sort(linkedInvs);
 			int range = StorageMod.CONFIG.invRange * StorageMod.CONFIG.invRange;
 			while(!toCheck.isEmpty()) {
 				BlockPos cp = toCheck.pop();
@@ -171,7 +171,7 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 
 		@Override
 		public int compareTo(LinkedInv o) {
-			return priority.compareTo(o.priority);
+			return -priority.compareTo(o.priority);
 		}
 	}
 

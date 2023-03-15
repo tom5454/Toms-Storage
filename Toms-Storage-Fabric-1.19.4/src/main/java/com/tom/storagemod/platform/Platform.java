@@ -2,9 +2,12 @@ package com.tom.storagemod.platform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -113,5 +116,17 @@ public class Platform {
 
 	public static <M extends AbstractContainerMenu> MenuType<M> createMenuType(MenuSupplier<M> create) {
 		return new MenuType<>(create, FeatureFlags.VANILLA_SET);
+	}
+
+	private static boolean trinkets = FabricLoader.getInstance().isModLoaded("trinkets");
+	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
+		if(trinkets) {
+			/*var tc = TrinketsApi.getTrinketComponent(player).orElse(null);
+			if(tc != null) {
+				var s = tc.getEquipped(is);
+				if(!s.isEmpty())return map.apply(s.get(0).getB());
+			}*/
+		}
+		return def;
 	}
 }

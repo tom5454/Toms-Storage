@@ -6,7 +6,6 @@ import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -158,6 +157,10 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public void fillCraftSlotsStackedContents(StackedContents itemHelperIn) {
 		this.craftMatrix.fillStackedContents(itemHelperIn);
+		if(te != null)sync.fillStackedContents(itemHelperIn);
+		else itemList.forEach(e -> {
+			itemHelperIn.accountSimpleStack(e.getActualStack());
+		});
 	}
 
 	@Override
@@ -196,23 +199,10 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		return Lists.newArrayList(RecipeBookCategories.CRAFTING_SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
 	}
 
-	public class TerminalRecipeItemHelper extends StackedContents {
-		@Override
-		public void clear() {
-			super.clear();
-			itemList.forEach(e -> {
-				accountSimpleStack(e.getActualStack());
-			});
-		}
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void handlePlacement(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayer p_217056_3_) {
-		(new ServerPlaceRecipe(this) {
-			{
-				stackedContents = new TerminalRecipeItemHelper();
-			}
+		(new PlatformServerPlaceRecipe(this) {
 
 			@Override
 			protected void moveItemToGrid(Slot slotToFill, ItemStack ingredientIn) {

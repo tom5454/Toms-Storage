@@ -1,4 +1,4 @@
-package com.tom.storagemod.platform;
+package com.tom.storagemod.gui;
 
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;

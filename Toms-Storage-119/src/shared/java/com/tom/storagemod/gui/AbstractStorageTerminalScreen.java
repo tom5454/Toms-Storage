@@ -42,7 +42,6 @@ import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.gui.StorageTerminalMenu.SlotAction;
 import com.tom.storagemod.gui.StorageTerminalMenu.SlotStorage;
 import com.tom.storagemod.platform.Platform;
-import com.tom.storagemod.platform.PlatformContainerScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
 import com.tom.storagemod.util.NumberFormatUtil;
@@ -78,10 +77,10 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected PlatformEditBox searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	private String searchLast = "";
-	protected boolean loadedSearch = false;
+	protected boolean loadedSearch = false, ghostItems;
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode;
+	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode;
 	private Comparator<StoredItemStack> sortComp;
 
 	public AbstractStorageTerminalScreen(T screenContainer, Inventory inv, Component titleIn) {
@@ -96,6 +95,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		int type = (s & 0b000_11_0_00) >> 3;
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
 		searchType = (s & 0b111_00_0_00) >> 5;
+		ghostItems = (s & 0b1_0_000_00_0_00) == 0;
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
 			searchField.setFocus(true);
 		}
@@ -103,6 +103,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		buttonDirection.state = rev ? 1 : 0;
 		buttonSearchType.state = searchType;
 		buttonCtrlMode.state = controllMode;
+		buttonGhostMode.state = ghostItems ? 1 : 0;
 
 		if(!loadedSearch && menu.search != null) {
 			loadedSearch = true;
@@ -125,6 +126,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		d |= ((comparator.isReversed() ? 1 : 0) << 2);
 		d |= (comparator.type() << 3);
 		d |= ((searchType & 0b111) << 5);
+		d |= ((ghostItems ? 0 : 1) << 9);
 		return d;
 	}
 
@@ -186,6 +188,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		buttonCtrlMode = addRenderableWidget(makeButton(leftPos - 18, topPos + 5 + 18*3, 3, b -> {
 			controllMode = (controllMode + 1) % ControllMode.VALUES.length;
 			buttonCtrlMode.state = controllMode;
+			sendUpdate();
+		}));
+		buttonGhostMode = addRenderableWidget(makeButton(leftPos - 18, topPos + 5 + 18*4, 5, b -> {
+			ghostItems = !ghostItems;
+			buttonGhostMode.state = ghostItems ? 1 : 0;
 			sendUpdate();
 		}));
 		updateSearch();
@@ -279,7 +286,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		int i1 = k + 14;
 		int j1 = l + rowCount * 18;
 
-		if(hasShiftDown()) {
+		if(ghostItems && hasShiftDown()) {
 			if(!menu.noSort) {
 				List<StoredItemStack> list = getMenu().itemListClientSorted;
 				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();
@@ -319,10 +326,10 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		i = k;
 		j = l;
 		k = j1;
-		this.blit(st, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
+		blit(st, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
 
 		if(menu.beaconLvl > 0) {
-			this.itemRenderer.renderAndDecorateItem(this.minecraft.player, new ItemStack(Items.BEACON), leftPos - 18, topPos - 16, 0);
+			renderItem(st, new ItemStack(Items.BEACON), leftPos - 18, topPos - 16);
 
 			if(isHovering(-18, -16, 16, 16, mouseX, mouseY)) {
 				String info;
@@ -354,6 +361,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		if (buttonCtrlMode.isHoveredOrFocused()) {
 			renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + buttonCtrlMode.state).split("\\\\")).map(Component::literal).collect(Collectors.toList()), mouseX, mouseY);
 		}
+		if (buttonGhostMode.isHoveredOrFocused()) {
+			renderTooltip(st, Component.translatable("tooltip.toms_storage.ghostMode_" + buttonGhostMode.state), mouseX, mouseY);
+		}
 	}
 
 	@Override
@@ -376,17 +386,15 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected boolean drawSlot(PoseStack st, SlotStorage slot, int mouseX, int mouseY) {
 		if (slot.stack != null) {
 			this.setBlitOffset(100);
-			this.itemRenderer.blitOffset = 100.0F;
 
 			ItemStack stack = slot.stack.getStack().copy().split(1);
 			int i = slot.xDisplayPosition, j = slot.yDisplayPosition;
 
-			this.itemRenderer.renderAndDecorateItem(this.minecraft.player, stack, i, j, 0);
-			this.itemRenderer.renderGuiItemDecorations(this.font, stack, i, j, null);
+			renderItem(st, stack, i, j);
+			renderItemDecorations(st, stack, i, j);
 
 			drawStackSize(st, getFont(), slot.stack.getQuantity(), i, j);
 
-			this.itemRenderer.blitOffset = 0.0F;
 			this.setBlitOffset(0);
 		}
 

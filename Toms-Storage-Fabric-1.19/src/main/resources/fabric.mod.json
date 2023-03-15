@@ -33,13 +33,17 @@
     ],
     "emi": [
     	"com.tom.storagemod.emi.EMIPlugin"
-    ]
+    ],
+    "jei_mod_plugin": [
+		"com.tom.storagemod.jei.JEIHandler"
+	]
   },
   "mixins": [
   ],
 	"accessWidener" : "tomsstorage.accesswidener",
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric": "*"
+    "fabric": "*",
+    "minecraft": ">=1.19 <=1.19.2"
   }
 }

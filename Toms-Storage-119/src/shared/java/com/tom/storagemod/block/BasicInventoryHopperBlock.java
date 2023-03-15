@@ -158,6 +158,13 @@ public class BasicInventoryHopperBlock extends BaseEntityBlock implements IInven
 	}
 
 	@Override
+	public void onPlace(BlockState p_54110_, Level p_54111_, BlockPos p_54112_, BlockState p_54113_, boolean p_54114_) {
+		if (!p_54113_.is(p_54110_.getBlock())) {
+			this.updateState(p_54111_, p_54112_, p_54110_);
+		}
+	}
+
+	@Override
 	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		this.updateState(worldIn, pos, state);
 	}

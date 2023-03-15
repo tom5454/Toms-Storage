@@ -16,7 +16,7 @@ import com.tom.storagemod.util.Priority;
 public class InventoryConnectorFilterMenu extends AbstractFilteredMenu {
 	private final Container dispenserInventory;
 	public boolean allowList, keepLastInSlot;
-	public Priority priority;
+	public Priority priority = Priority.NORMAL;
 	private FilteredInventoryCableConnectorBlockEntity te;
 
 	public InventoryConnectorFilterMenu(int wid, Inventory pinv) {

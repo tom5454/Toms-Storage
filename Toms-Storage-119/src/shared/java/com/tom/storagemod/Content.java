@@ -117,7 +117,7 @@ public class Content {
 	}
 
 	private static <M extends AbstractContainerMenu> GameObject<MenuType<M>> menu(String name, MenuSupplier<M> create) {
-		return Platform.MENU_TYPE.register(name, () -> new MenuType<>(create));
+		return Platform.MENU_TYPE.register(name, () -> Platform.createMenuType(create));
 	}
 
 	public static void init() {

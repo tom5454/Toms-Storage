@@ -1,5 +1,9 @@
 package com.tom.storagemod.platform;
 
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -25,11 +29,15 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.util.GameObject.GameRegistry;
 import com.tom.storagemod.util.GameObject.GameRegistryBE;
+
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotResult;
 
 public class Platform {
 
@@ -105,5 +113,14 @@ public class Platform {
 
 	public static <M extends AbstractContainerMenu> MenuType<M> createMenuType(MenuSupplier<M> create) {
 		return new MenuType<>(create);
+	}
+
+	private static boolean curios = ModList.get().isLoaded("curios");
+	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
+		if(curios) {
+			List<SlotResult> s = CuriosApi.getCuriosHelper().findCurios(player, is);
+			if(!s.isEmpty())return map.apply(s.get(0).stack());
+		}
+		return def;
 	}
 }

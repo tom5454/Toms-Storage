@@ -10,7 +10,7 @@
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage-fabric",
-    "sources": "https://github.com/tom5454/Toms-Storage/tree/fabric",
+    "sources": "https://github.com/tom5454/Toms-Storage/",
 	"issues": "https://github.com/tom5454/Toms-Storage/issues"
   },
 
@@ -43,6 +43,7 @@
 	"accessWidener" : "tomsstorage.accesswidener",
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric": "*"
+    "fabric": "*",
+    "minecraft": "1.19.3"
   }
 }

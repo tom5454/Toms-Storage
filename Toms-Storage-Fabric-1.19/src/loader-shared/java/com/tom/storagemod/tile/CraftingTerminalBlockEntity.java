@@ -57,6 +57,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	};
 	private ResultContainer craftResult = new ResultContainer();
 	private HashSet<CraftingTerminalMenu> craftingListeners = new HashSet<>();
+	private boolean refillingGrid;
 
 	public CraftingTerminalBlockEntity(BlockPos pos, BlockState state) {
 		super(Content.craftingTerminalTile.get(), pos, state);
@@ -140,6 +141,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		if(currentRecipe != null) {
 			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
 			boolean playerInvUpdate = false;
+			refillingGrid = true;
 			for (int i = 0; i < remainder.size(); ++i) {
 				ItemStack slot = craftMatrix.getItem(i);
 				ItemStack oldItem = slot.copy();
@@ -185,8 +187,9 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 				if (thePlayer.getInventory().add(rem)) continue;
 				thePlayer.drop(rem, false);
 			}
-			if(playerInvUpdate)thePlayer.containerMenu.broadcastChanges();
+			refillingGrid = false;
 			onCraftingMatrixChanged();
+			if(playerInvUpdate)thePlayer.containerMenu.broadcastChanges();
 		}
 	}
 
@@ -199,6 +202,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 
 	protected void onCraftingMatrixChanged() {
+		if(refillingGrid)return;
 		if (currentRecipe == null || !currentRecipe.matches(craftMatrix, level)) {
 			currentRecipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix, level).orElse(null);
 		}

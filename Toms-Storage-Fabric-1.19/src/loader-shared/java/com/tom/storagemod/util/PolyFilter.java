@@ -22,7 +22,7 @@ public class PolyFilter implements ItemPredicate {
 
 	private void updateFilter() {
 		long time = face.level().getGameTime();
-		if(lastCheck != time && time % 10 == 1) {
+		if(time - lastCheck >= 10) {
 			lastCheck = time;
 			filter.clear();
 			Storage<ItemVariant> st = ItemStorage.SIDED.find(face.level(), face.pos(), face.from());
