@@ -42,13 +42,13 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:6.1.0-rc.1") {
+	modImplementation("com.terraformersmc:modmenu:6.1.0-rc.4") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
-    //modImplementation "dev.emi:trinkets:3.5.0"
+    modImplementation "dev.emi:trinkets:3.6.0"
 	
-	/*modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
@@ -64,9 +64,9 @@ dependencies {
         exclude(group: "dev.architectury")
     }
     modImplementation("dev.architectury:architectury-fabric:7.0.63")
-    modImplementation "dev.emi:emi:0.6.3+1.19.3"
+    modImplementation "dev.emi:emi:0.7.1+1.19.4"
     
-	// compile against the JEI API but do not include it at runtime
+	/*// compile against the JEI API but do not include it at runtime
 	modCompileOnlyApi("mezz.jei:jei-1.19.3-common-api:12.1.1.13")
 	modCompileOnlyApi("mezz.jei:jei-1.19.3-fabric-api:12.1.1.13")
 	// at runtime, use the full JEI jar for Fabric
@@ -80,8 +80,6 @@ sourceSets {
 			srcDir "../TomsStorageFabric-1.19/src/loader-shared/java"
 			srcDir "../TomsStorage-1194/src/platform-shared/java"
 			exclude "com/tom/storagemod/jei/**"
-			exclude "com/tom/storagemod/rei/**"
-			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
 			srcDir "../TomsStorage-119/src/shared/resources"

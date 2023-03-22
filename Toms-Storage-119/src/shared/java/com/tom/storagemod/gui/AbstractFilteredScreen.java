@@ -4,6 +4,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
+import com.tom.storagemod.platform.PlatformContainerScreen;
+
 public abstract class AbstractFilteredScreen<T extends AbstractFilteredMenu> extends PlatformContainerScreen<T> {
 
 	public AbstractFilteredScreen(T p_97741_, Inventory p_97742_, Component p_97743_) {
