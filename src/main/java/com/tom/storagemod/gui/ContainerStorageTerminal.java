@@ -58,6 +58,7 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 	public int terminalData, beaconLvl;
 	public String search;
 	public TerminalSyncManager sync = new TerminalSyncManager();
+	public List<SlotData> slotData = new ArrayList<>();
 	public boolean noSort;
 
 	public ContainerStorageTerminal(int id, Inventory inv, TileEntityStorageTerminal te) {
@@ -89,6 +90,16 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 	public ContainerStorageTerminal(int id, Inventory inv) {
 		this(StorageMod.storageTerminal, id, inv);
 		this.addPlayerSlots(inv, 8, 120);
+	}
+
+	@Override
+	protected Slot addSlot(Slot slotIn) {
+		slotData.add(new SlotData(slotIn));
+		return super.addSlot(slotIn);
+	}
+
+	public void setOffset(int x, int y) {
+		slotData.forEach(d -> d.setOffset(x, y));
 	}
 
 	protected void addPlayerSlots(Inventory playerInventory, int x, int y) {
@@ -439,6 +450,18 @@ public class ContainerStorageTerminal extends RecipeBookMenu<CraftingContainer> 
 					player.getInventory().setChanged();
 				}
 			}
+		}
+	}
+
+	public static record SlotData(Slot slot, int x, int y) {
+
+		public SlotData(Slot s) {
+			this(s, s.x, s.y);
+		}
+
+		public void setOffset(int x, int y) {
+			slot.x = this.x + x;
+			slot.y = this.y + y;
 		}
 	}
 }
