@@ -101,6 +101,8 @@
 	"tooltip.toms_storage.nbt_overflow": "This item's tag is too big, the item may not show correctly in the terminal",
 	"tooltip.toms_storage.ghostMode_0": "Enable sorting while holding SHIFT",
 	"tooltip.toms_storage.ghostMode_1": "Disable sorting while holding SHIFT",
+	"tooltip.toms_storage.tallMode_0": "Terminal Size: Default",
+	"tooltip.toms_storage.tallMode_1": "Terminal Size: Auto",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",

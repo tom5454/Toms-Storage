@@ -61,6 +61,7 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 	public String search;
 	public boolean noSort;
 	public TerminalSyncManager sync = new TerminalSyncManager();
+	public List<SlotData> slotData = new ArrayList<>();
 
 	public ContainerStorageTerminal(int id, PlayerInventory inv, TileEntityStorageTerminal te) {
 		this(StorageMod.storageTerminal, id, inv, te);
@@ -112,6 +113,16 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 		for (int i = 0;i < 9;++i) {
 			addSlot(new Slot(playerInventory, i, x + i * 18, y + 58));
 		}
+	}
+
+	@Override
+	protected Slot addSlot(Slot slotIn) {
+		slotData.add(new SlotData(slotIn));
+		return super.addSlot(slotIn);
+	}
+
+	public void setOffset(int x, int y) {
+		slotData.forEach(d -> d.setOffset(x, y));
 	}
 
 	public final void addStorageSlots(int lines, int x, int y) {
@@ -452,5 +463,17 @@ public class ContainerStorageTerminal extends AbstractRecipeScreenHandler<Crafti
 			}
 		}
 		//player.updateCursorStack();
+	}
+
+	public static record SlotData(Slot slot, int x, int y) {
+
+		public SlotData(Slot s) {
+			this(s, s.x, s.y);
+		}
+
+		public void setOffset(int x, int y) {
+			slot.x = this.x + x;
+			slot.y = this.y + y;
+		}
 	}
 }

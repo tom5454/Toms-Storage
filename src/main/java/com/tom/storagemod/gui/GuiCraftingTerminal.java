@@ -1,5 +1,8 @@
 package com.tom.storagemod.gui;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -32,7 +35,7 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	private GuiButtonClear btnClr;
 
 	public GuiCraftingTerminal(ContainerCraftingTerminal screenContainer, PlayerInventory inv, Text titleIn) {
-		super(screenContainer, inv, titleIn);
+		super(screenContainer, inv, titleIn, 5, 256, 7, 17);
 		recipeBookGui = new RecipeBookWidget();
 	}
 
@@ -53,25 +56,24 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	protected void init() {
 		backgroundWidth = 194;
 		backgroundHeight = 256;
-		rowCount = 5;
 		super.init();
 		this.widthTooNarrow = this.width < 379;
 		this.recipeBookGui.initialize(this.width, this.height, this.mc, this.widthTooNarrow, this.handler);
 		this.x = this.recipeBookGui.findLeftEdge(this.width, this.backgroundWidth);
-		addDrawableChild(this.recipeBookGui);
+		addSelectableChild(this.recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
-		btnClr = new GuiButtonClear(x + 80, y + 110, b -> clearGrid());
+		btnClr = new GuiButtonClear(x + 80, y + 20 + rowCount * 18, b -> clearGrid());
 		addDrawableChild(btnClr);
 		buttonPullFromInv = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*4, 4, b -> {
 			pullFromInv = !pullFromInv;
 			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();
 		}));
-		this.addDrawableChild(new TexturedButtonWidget(this.x + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (buttonWidget) -> {
+		this.addDrawableChild(new TexturedButtonWidget(this.x + 4, this.y + 38 + rowCount * 18, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (buttonWidget) -> {
 			this.recipeBookGui.reset();
 			this.recipeBookGui.toggleOpen();
 			this.x = this.recipeBookGui.findLeftEdge(this.width, this.backgroundWidth);
-			((TexturedButtonWidget)buttonWidget).setPos(this.x + 4, this.height / 2);
+			((TexturedButtonWidget)buttonWidget).setPos(this.x + 4, this.y + 38 + rowCount * 18);
 			setButtonsPos();
 		}));
 		setButtonsPos();
@@ -81,26 +83,19 @@ public class GuiCraftingTerminal extends GuiStorageTerminalBase<ContainerCraftin
 	private void setButtonsPos() {
 		searchField.setX(this.x + 82);
 		btnClr.setX(this.x + 80);
-		buttonSortingType.setX(x - 18);
-		buttonDirection.setX(x - 18);
-		if(recipeBookGui.isOpen()) {
-			buttonSearchType.setX(x - 36);
-			buttonCtrlMode.setX(x - 36);
-			buttonPullFromInv.setX(x - 54);
-			buttonGhostMode.setX(x - 54);
-			buttonSearchType.setY(y + 5);
-			buttonCtrlMode.setY(y + 5 + 18);
-			buttonPullFromInv.setY(y + 5 + 18);
-			buttonGhostMode.setY(y + 5);
-		} else {
-			buttonSearchType.setX(x - 18);
-			buttonCtrlMode.setX(x - 18);
-			buttonPullFromInv.setX(x - 18);
-			buttonGhostMode.setX(x - 18);
-			buttonSearchType.setY(y + 5 + 18*2);
-			buttonCtrlMode.setY(y + 5 + 18*3);
-			buttonPullFromInv.setY(y + 5 + 18*5);
-			buttonGhostMode.setY(y + 5 + 18*4);
+		int space = recipeBookGui.isOpen() ? recipeBookGui.searchField.y - 16 : backgroundHeight;
+		List<ButtonWidget> buttons = Arrays.asList(buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonPullFromInv, buttonTallMode);
+		int y = this.y + 5;
+		int x = this.x - 18;
+		for (int i = 0; i < buttons.size(); i++) {
+			ButtonWidget b = buttons.get(i);
+			if(y + 18 > space) {
+				y = this.y + 5;
+				x -= 18;
+			}
+			b.x = x;
+			b.y = y;
+			y += 18;
 		}
 	}
 

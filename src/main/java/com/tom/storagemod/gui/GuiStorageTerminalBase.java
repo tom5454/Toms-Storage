@@ -79,15 +79,20 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 	protected TextFieldWidget searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	protected String searchLast = "";
-	protected boolean loadedSearch = false, ghostItems;
+	protected boolean loadedSearch = false, ghostItems, tallMode;
+	public final int textureSlotCount, guiHeight, slotStartX, slotStartY;
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final Identifier creativeInventoryTabs = new Identifier("textures/gui/container/creative_inventory/tabs.png");
-	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode;
+	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonTallMode;
 	private Comparator<StoredItemStack> sortComp;
 
-	public GuiStorageTerminalBase(T screenContainer, PlayerInventory inv, Text titleIn) {
+	public GuiStorageTerminalBase(T screenContainer, PlayerInventory inv, Text titleIn, int textureSlotCount, int guiHeight, int slotStartX, int slotStartY) {
 		super(screenContainer, inv, titleIn);
 		screenContainer.onPacket = this::onPacket;
+		this.textureSlotCount = textureSlotCount;
+		this.guiHeight = guiHeight;
+		this.slotStartX = slotStartX;
+		this.slotStartY = slotStartY;
 	}
 
 	protected void onPacket() {
@@ -98,6 +103,11 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
 		searchType = (s & 0b111_00_0_00) >> 5;
 		ghostItems = (s & 0b1_0_000_00_0_00) == 0;
+		boolean tallMode  =  (s & 0b1_0_0_000_00_0_00) != 0;
+		if (tallMode != this.tallMode) {
+			this.tallMode = tallMode;
+			init();
+		}
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
 			searchField.setTextFieldFocused(true);
 		}
@@ -106,6 +116,7 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		buttonSearchType.state = searchType;
 		buttonCtrlMode.state = controllMode;
 		buttonGhostMode.state = ghostItems ? 1 : 0;
+		buttonTallMode.state = tallMode ? 1 : 0;
 
 		if(!loadedSearch && handler.search != null) {
 			loadedSearch = true;
@@ -129,12 +140,24 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		d |= (comparator.type() << 3);
 		d |= ((searchType & 0b111) << 5);
 		d |= ((ghostItems ? 0 : 1) << 9);
+		d |= ((tallMode ? 1 : 0) << 10);
 		return d;
 	}
 
 	@Override
 	protected void init() {
 		clearChildren();
+		if (tallMode) {
+			int guiSize = guiHeight - textureSlotCount * 18;
+			rowCount = (height - 20 - guiSize) / 18;
+			backgroundHeight = guiSize + rowCount * 18;
+			handler.setOffset(0, (rowCount - textureSlotCount) * 18);
+			handler.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
+		} else {
+			rowCount = textureSlotCount;
+			handler.setOffset(0, 0);
+			handler.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
+		}
 		playerInventoryTitleY = backgroundHeight - 92;
 		super.init();
 		this.searchField = new TextFieldWidget(textRenderer, this.x + 82, this.y + 6, 89, this.textRenderer.fontHeight, new TranslatableText("narrator.toms_storage.terminal_search"));
@@ -189,6 +212,12 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 			ghostItems = !ghostItems;
 			buttonGhostMode.state = ghostItems ? 1 : 0;
 			sendUpdate();
+		}));
+		buttonTallMode = addDrawableChild(new GuiButton(x - 18, y + 5 + 18*5, 6, b -> {
+			tallMode = !tallMode;
+			buttonTallMode.state = tallMode ? 1 : 0;
+			sendUpdate();
+			init();
 		}));
 		updateSearch();
 	}
@@ -355,6 +384,9 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		}
 		if (buttonGhostMode.isHovered()) {
 			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.ghostMode_" + buttonGhostMode.state), mouseX, mouseY);
+		}
+		if (buttonTallMode.isHovered()) {
+			renderTooltip(matrices, new TranslatableText("tooltip.toms_storage.tallMode_" + buttonTallMode.state), mouseX, mouseY);
 		}
 	}
 
@@ -600,7 +632,20 @@ public abstract class GuiStorageTerminalBase<T extends ContainerStorageTerminal>
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, getGui());
-		drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+		if(tallMode) {
+			this.drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, slotStartY);
+			int guiStart = textureSlotCount * 18 + slotStartY;
+			int guiRStart = rowCount * 18 + slotStartY;
+			int guiSize = guiHeight - textureSlotCount * 18 - slotStartY;
+			this.drawTexture(st, this.x, this.y + guiRStart, 0, guiStart, this.backgroundWidth, guiSize);
+			int scrollbarW = 25;
+			this.drawTexture(st, this.x, this.y + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18);
+			for (int i = 1;i < rowCount - 1;i++) {
+				this.drawTexture(st, this.x, this.y + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18);
+			}
+			this.drawTexture(st, this.x, this.y + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18);
+		} else
+			this.drawTexture(st, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 
 	public class GuiButton extends ButtonWidget {
