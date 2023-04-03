@@ -8,18 +8,20 @@
 		"1.16.4-latest": "1.2.19",
 		"1.16.5-latest": "1.2.19",
 		"1.17.1-latest": "1.2.21",
-		"1.18-latest": "1.4.1",
-		"1.18.2-latest": "1.4.1",
-		"1.19-latest": "1.5.3",
-		"1.19.2-latest": "1.5.3",
-		"1.19.3-latest": "1.5.3",
-		"1.19.4-latest": "1.5.3"
+		"1.18-latest": "1.2.22",
+		"1.18.2-latest": "1.4.2",
+		"1.19-latest": "1.5.4",
+		"1.19.2-latest": "1.5.4",
+		"1.19.3-latest": "1.5.4",
+		"1.19.4-latest": "1.5.4"
 	},
 	"1.19.4": {
+		"1.5.4": "Added Tall Mode for Terminals\nJEI support for 1.19.4",
 		"1.5.3": "Added REI, EMI compatibility on 1.19.4\nAdded curio, trinkets compatibility on 1.19.4\nFixed R/U keybind not working in the terminal",
 		"1.5.2": "1.19.4 port"
 	},
 	"1.19.3": {
+		"1.5.4": "Added Tall Mode for Terminals",
 		"1.5.3": "Added REI, EMI compatibility on 1.19.4\nAdded curio, trinkets compatibility on 1.19.4\nFixed R/U keybind not working in the terminal",
 		"1.5.2": "Added toggle ghost mode button\n\nFixed crafting terminal recipe book not working\nFixed priority not working\nFixed right click not pulling half of the stack\nImproved Crafting Terminal Refill Speed\nFixed Polymorphic Item Filter not working in some cases",
 		"1.5.1": "Fixed crash with Inventory Cable Connector gui\nFixed crash on 1.19.3 forge\nFixed items not showing in terminals on forge",
@@ -28,6 +30,7 @@
 		"1.3.10": "1.19.3 port"
 	},
 	"1.19.2": {
+		"1.5.4": "Added Tall Mode for Terminals",
 		"1.5.3": "Added REI, EMI compatibility on 1.19.4\nAdded curio, trinkets compatibility on 1.19.4\nFixed R/U keybind not working in the terminal",
 		"1.5.2": "Added toggle ghost mode button\n\nFixed crafting terminal recipe book not working\nFixed priority not working\nFixed right click not pulling half of the stack\nImproved Crafting Terminal Refill Speed\nFixed Polymorphic Item Filter not working in some cases",
 		"1.5.1": "Fixed crash with Inventory Cable Connector gui\nFixed items not showing in terminals on forge",
@@ -37,6 +40,7 @@
 		"1.3.8": "Fixed dedicated servers not working"
 	},
 	"1.19": {
+		"1.5.4": "Added Tall Mode for Terminals",
 		"1.5.3": "Added REI, EMI compatibility on 1.19.4\nAdded curio, trinkets compatibility on 1.19.4\nFixed R/U keybind not working in the terminal",
 		"1.5.2": "Added toggle ghost mode button\n\nFixed crafting terminal recipe book not working\nFixed priority not working\nFixed right click not pulling half of the stack\nImproved Crafting Terminal Refill Speed\nFixed Polymorphic Item Filter not working in some cases",
 		"1.5.1": "Fixed crash with Inventory Cable Connector gui\nFixed items not showing in terminals on forge",
@@ -51,6 +55,7 @@
 		"1.3.3": "1.19 port"
 	},
 	"1.18.2": {
+		"1.4.2": "Added Tall Mode for Terminals",
 		"1.4.1": "Added toggle ghost mode button\n\nFixed crafting terminal recipe book not working\nFixed right click not pulling half of the stack\nImproved Crafting Terminal Refill Speed",
 		"1.4.0": "Rewritten terminal networking\nHolding shift in the terminal stops sorting\nUpdated pt_br\nFixed crafting terminals not dropping their inventory when breaking\nFixed crash\nFixed wireless terminal bypassing FTB Chunks",
 		"1.3.6": "Added curio/trinket support for the advanced wireless terminal\nUpdated to 1.19.3\nAdded pt_br translation (#159)",

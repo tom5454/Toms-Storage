@@ -78,15 +78,20 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected PlatformEditBox searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	private String searchLast = "";
-	protected boolean loadedSearch = false, ghostItems;
+	protected boolean loadedSearch = false, ghostItems, tallMode;
+	public final int textureSlotCount, guiHeight, slotStartX, slotStartY;
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode;
+	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonTallMode;
 	private Comparator<StoredItemStack> sortComp;
 
-	public AbstractStorageTerminalScreen(T screenContainer, Inventory inv, Component titleIn) {
+	public AbstractStorageTerminalScreen(T screenContainer, Inventory inv, Component titleIn, int textureSlotCount, int guiHeight, int slotStartX, int slotStartY) {
 		super(screenContainer, inv, titleIn);
 		screenContainer.onPacket = this::onPacket;
+		this.textureSlotCount = textureSlotCount;
+		this.guiHeight = guiHeight;
+		this.slotStartX = slotStartX;
+		this.slotStartY = slotStartY;
 	}
 
 	protected void onPacket() {
@@ -97,6 +102,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
 		searchType = (s & 0b111_00_0_00) >> 5;
 		ghostItems = (s & 0b1_0_000_00_0_00) == 0;
+		boolean tallMode  =  (s & 0b1_0_0_000_00_0_00) != 0;
+		if (tallMode != this.tallMode) {
+			this.tallMode = tallMode;
+			init();
+		}
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
 			searchField.setFocus(true);
 		}
@@ -105,6 +115,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		buttonSearchType.state = searchType;
 		buttonCtrlMode.state = controllMode;
 		buttonGhostMode.state = ghostItems ? 1 : 0;
+		buttonTallMode.state = tallMode ? 1 : 0;
 
 		if(!loadedSearch && menu.search != null) {
 			loadedSearch = true;
@@ -128,12 +139,24 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		d |= (comparator.type() << 3);
 		d |= ((searchType & 0b111) << 5);
 		d |= ((ghostItems ? 0 : 1) << 9);
+		d |= ((tallMode ? 1 : 0) << 10);
 		return d;
 	}
 
 	@Override
 	protected void init() {
 		clearWidgets();
+		if (tallMode) {
+			int guiSize = guiHeight - textureSlotCount * 18;
+			rowCount = (height - 20 - guiSize) / 18;
+			imageHeight = guiSize + rowCount * 18;
+			menu.setOffset(0, (rowCount - textureSlotCount) * 18);
+			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
+		} else {
+			rowCount = textureSlotCount;
+			menu.setOffset(0, 0);
+			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
+		}
 		inventoryLabelY = imageHeight - 92;
 		super.init();
 		this.searchField = new PlatformEditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, Component.translatable("narrator.toms_storage.terminal_search"));
@@ -195,6 +218,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			ghostItems = !ghostItems;
 			buttonGhostMode.state = ghostItems ? 1 : 0;
 			sendUpdate();
+		}));
+		buttonTallMode = addRenderableWidget(makeButton(leftPos - 18, topPos + 5 + 18*5, 6, b -> {
+			tallMode = !tallMode;
+			buttonTallMode.state = tallMode ? 1 : 0;
+			sendUpdate();
+			init();
 		}));
 		updateSearch();
 	}
@@ -330,9 +359,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		blit(st, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
 
 		if(menu.beaconLvl > 0) {
-			renderItem(st, new ItemStack(Items.BEACON), leftPos - 18, topPos - 16);
+			int x = 176;
+			int y = 24 + rowCount * 18;
+			renderItem(st, new ItemStack(Items.BEACON), leftPos + x, topPos + y);
 
-			if(isHovering(-18, -16, 16, 16, mouseX, mouseY)) {
+			if(isHovering(x, y, 16, 16, mouseX, mouseY)) {
 				String info;
 				if(menu.beaconLvl >= Config.get().wirelessTermBeaconLvlDim)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.anywhere");
 				else if(menu.beaconLvl >= Config.get().wirelessTermBeaconLvl)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.sameDim");
@@ -364,6 +395,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 		if (buttonGhostMode.isHoveredOrFocused()) {
 			renderTooltip(st, Component.translatable("tooltip.toms_storage.ghostMode_" + buttonGhostMode.state), mouseX, mouseY);
+		}
+		if (buttonTallMode.isHoveredOrFocused()) {
+			renderTooltip(st, Component.translatable("tooltip.toms_storage.tallMode_" + buttonTallMode.state), mouseX, mouseY);
 		}
 	}
 
@@ -566,7 +600,20 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected void renderBg(PoseStack st, float partialTicks, int mouseX, int mouseY) {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderTexture(0, getGui());
-		this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+		if(tallMode) {
+			this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY);
+			int guiStart = textureSlotCount * 18 + slotStartY;
+			int guiRStart = rowCount * 18 + slotStartY;
+			int guiSize = guiHeight - textureSlotCount * 18 - slotStartY;
+			this.blit(st, this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize);
+			int scrollbarW = 25;
+			this.blit(st, this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18);
+			for (int i = 1;i < rowCount - 1;i++) {
+				this.blit(st, this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18);
+			}
+			this.blit(st, this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18);
+		} else
+			this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	public GuiButton makeButton(int x, int y, int tile, OnPress pressable) {

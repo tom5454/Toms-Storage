@@ -14,4 +14,7 @@ public class PlatformEditBox extends EditBox {
 		setFocused(b);
 	}
 
+	public static int getY(EditBox b) {
+		return b.getY();
+	}
 }

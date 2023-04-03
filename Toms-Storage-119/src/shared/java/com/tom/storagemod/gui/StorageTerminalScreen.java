@@ -1,33 +1,23 @@
 package com.tom.storagemod.gui;
 
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class StorageTerminalScreen extends AbstractStorageTerminalScreen<StorageTerminalMenu> {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/storage_terminal.png");
 
 	public StorageTerminalScreen(StorageTerminalMenu screenContainer, Inventory inv, Component titleIn) {
-		super(screenContainer, inv, titleIn);
+		super(screenContainer, inv, titleIn, 5, 202, 7, 17);
 	}
 
 	@Override
 	protected void init() {
 		imageWidth = 194;
 		imageHeight = 202;
-		rowCount = 5;
 		super.init();
-	}
-
-	@Override
-	protected void renderBg(PoseStack st, float partialTicks, int mouseX, int mouseY) {
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderTexture(0, getGui());
-		this.blit(st, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 	}
 
 	@Override

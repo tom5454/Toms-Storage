@@ -35,6 +35,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> imple
 	public List<StoredItemStack> itemList = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClient = Lists.<StoredItemStack>newArrayList();
 	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
+	public List<SlotData> slotData = new ArrayList<>();
 	public TerminalSyncManager sync = new TerminalSyncManager();
 	private int lines;
 	protected Inventory pinv;
@@ -85,6 +86,16 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> imple
 		for (int i = 0;i < 9;++i) {
 			addSlot(new Slot(playerInventory, i, x + i * 18, y + 58));
 		}
+	}
+
+	@Override
+	protected Slot addSlot(Slot slotIn) {
+		slotData.add(new SlotData(slotIn));
+		return super.addSlot(slotIn);
+	}
+
+	public void setOffset(int x, int y) {
+		slotData.forEach(d -> d.setOffset(x, y));
 	}
 
 	public final void addStorageSlots(int lines, int x, int y) {
@@ -381,6 +392,18 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> imple
 					player.getInventory().setChanged();
 				}
 			}
+		}
+	}
+
+	public static record SlotData(Slot slot, int x, int y) {
+
+		public SlotData(Slot s) {
+			this(s, s.x, s.y);
+		}
+
+		public void setOffset(int x, int y) {
+			slot.x = this.x + x;
+			slot.y = this.y + y;
 		}
 	}
 }

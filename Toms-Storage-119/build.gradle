@@ -167,10 +167,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.19.2-forge-api:11.5.2.1007")
-    compileOnly fg.deobf("mezz.jei:jei-1.19.2-common-api:11.5.2.1007")
+    compileOnly fg.deobf("mezz.jei:jei-1.19.2-forge-api:11.6.0.1013")
+    compileOnly fg.deobf("mezz.jei:jei-1.19.2-common-api:11.6.0.1013")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.5.2.1007")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.6.0.1013")
   	
   	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0:api")

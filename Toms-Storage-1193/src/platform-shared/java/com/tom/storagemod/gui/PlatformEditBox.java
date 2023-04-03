@@ -10,4 +10,7 @@ public class PlatformEditBox extends EditBox {
 		super(p_94114_, p_94115_, p_94116_, p_94117_, p_94118_, p_94119_);
 	}
 
+	public static int getY(EditBox b) {
+		return b.getY();
+	}
 }

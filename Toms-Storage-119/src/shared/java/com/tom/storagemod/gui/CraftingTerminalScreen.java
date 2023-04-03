@@ -1,5 +1,8 @@
 package com.tom.storagemod.gui;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.components.ImageButton;
@@ -30,7 +33,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	private boolean pullFromInv;
 
 	public CraftingTerminalScreen(CraftingTerminalMenu screenContainer, Inventory inv, Component titleIn) {
-		super(screenContainer, inv, titleIn);
+		super(screenContainer, inv, titleIn, 5, 256, 7, 17);
 		recipeBookGui = new RecipeBookComponent();
 	}
 
@@ -51,25 +54,24 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	protected void init() {
 		imageWidth = 194;
 		imageHeight = 256;
-		rowCount = 5;
 		super.init();
 		this.widthTooNarrow = this.width < 379;
 		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
 		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
-		addRenderableWidget(recipeBookGui);
+		addWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
-		btnClr = new GuiButtonClear(leftPos + 80, topPos + 110, b -> clearGrid());
+		btnClr = new GuiButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, b -> clearGrid());
 		addRenderableWidget(btnClr);
-		buttonPullFromInv = addRenderableWidget(makeButton(leftPos - 18, topPos + 5 + 18*5, 4, b -> {
+		buttonPullFromInv = addRenderableWidget(makeButton(leftPos - 18, topPos + 5 + 18*6, 4, b -> {
 			pullFromInv = !pullFromInv;
 			buttonPullFromInv.state = pullFromInv ? 1 : 0;
 			sendUpdate();
 		}));
-		addRenderableWidget(new ImageButton(this.leftPos + 4, this.height / 2, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
+		addRenderableWidget(new ImageButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
 			this.recipeBookGui.initVisuals();
 			this.recipeBookGui.toggleVisibility();
 			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
-			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.height / 2);
+			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.topPos + 38 + rowCount * 18);
 			setButtonsPos();
 		}));
 		setButtonsPos();
@@ -79,26 +81,19 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	private void setButtonsPos() {
 		searchField.setX(this.leftPos + 82);
 		btnClr.setX(this.leftPos + 80);
-		buttonSortingType.setX(leftPos - 18);
-		buttonDirection.setX(leftPos - 18);
-		if(recipeBookGui.isVisible()) {
-			buttonSearchType.setX(leftPos - 36);
-			buttonCtrlMode.setX(leftPos - 36);
-			buttonPullFromInv.setX(leftPos - 54);
-			buttonGhostMode.setX(leftPos - 54);
-			buttonSearchType.setY(topPos + 5);
-			buttonCtrlMode.setY(topPos + 5 + 18);
-			buttonPullFromInv.setY(topPos + 5 + 18);
-			buttonGhostMode.setY(topPos + 5);
-		} else {
-			buttonSearchType.setX(leftPos - 18);
-			buttonCtrlMode.setX(leftPos - 18);
-			buttonPullFromInv.setX(leftPos - 18);
-			buttonGhostMode.setX(leftPos - 18);
-			buttonSearchType.setY(topPos + 5 + 18*2);
-			buttonCtrlMode.setY(topPos + 5 + 18*3);
-			buttonPullFromInv.setY(topPos + 5 + 18*5);
-			buttonGhostMode.setY(topPos + 5 + 18*4);
+		int space = recipeBookGui.isVisible() ? PlatformEditBox.getY(recipeBookGui.searchBox) - 16 : imageHeight;
+		List<PlatformButton> buttons = Arrays.asList(buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonPullFromInv, buttonTallMode);
+		int y = topPos + 5;
+		int x = leftPos - 18;
+		for (int i = 0; i < buttons.size(); i++) {
+			PlatformButton b = buttons.get(i);
+			if(y + 18 > space) {
+				y = topPos + 5;
+				x -= 18;
+			}
+			b.setX(x);
+			b.setY(y);
+			y += 18;
 		}
 	}
 

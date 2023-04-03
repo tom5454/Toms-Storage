@@ -21,4 +21,8 @@ public class PlatformEditBox extends EditBox {
 	public int getY() {
 		return y;
 	}
+
+	public static int getY(EditBox b) {
+		return b.y;
+	}
 }
