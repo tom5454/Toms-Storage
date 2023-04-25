@@ -63,7 +63,7 @@ dependencies {
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
-    modImplementation("dev.architectury:architectury-fabric:7.0.63")
+    modImplementation("dev.architectury:architectury-fabric:8.1.79")
     modImplementation "dev.emi:emi:0.7.1+1.19.4"
     
 	// compile against the JEI API but do not include it at runtime

@@ -13,9 +13,10 @@
 		"1.19-latest": "1.5.4",
 		"1.19.2-latest": "1.5.4",
 		"1.19.3-latest": "1.5.4",
-		"1.19.4-latest": "1.5.4"
+		"1.19.4-latest": "1.5.5"
 	},
 	"1.19.4": {
+		"1.5.5": "Fixed tooltips getting stuck",
 		"1.5.4": "Added Tall Mode for Terminals\nJEI support for 1.19.4",
 		"1.5.3": "Added REI, EMI compatibility on 1.19.4\nAdded curio, trinkets compatibility on 1.19.4\nFixed R/U keybind not working in the terminal",
 		"1.5.2": "1.19.4 port"

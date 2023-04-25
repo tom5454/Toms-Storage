@@ -31,4 +31,9 @@ public class PlatformButton extends Button {
 		}
 		return i;
 	}
+
+	@Override
+	public boolean isHoveredOrFocused() {
+		return isHovered;
+	}
 }
