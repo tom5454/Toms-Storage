@@ -80,21 +80,26 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 	private void init() {
 		int x = -4;
 		int y = 94;
-		this.addSlot(craftingResultSlot = new CraftingResultSlot(pinv.player, craftMatrix, craftResult, 0, x + 124, y + 35) {
-			@Override
-			public void onTakeItem(PlayerEntity thePlayer, ItemStack stack) {
-				if (thePlayer.world.isClient)
-					return;
-				this.onCrafted(stack);
-				if (!pinv.player.getEntityWorld().isClient) {
-					((TileEntityCraftingTerminal) te).craft(thePlayer);
-				}
-			}
-		});
+		this.addSlot(craftingResultSlot = new Result(x + 124, y + 35));
 
 		for(int i = 0; i < 3; ++i) {
 			for(int j = 0; j < 3; ++j) {
 				this.addSlot(new SlotCrafting(craftMatrix, j + i * 3, x + 30 + j * 18, y + 17 + i * 18));
+			}
+		}
+	}
+
+	private class Result extends CraftingResultSlot {
+
+		public Result(int x, int y) {
+			super(pinv.player, craftMatrix, craftResult, 0, x, y);
+		}
+
+		@Override
+		public void onTakeItem(PlayerEntity thePlayer, ItemStack stack) {
+			this.onCrafted(stack);
+			if (!pinv.player.getEntityWorld().isClient) {
+				((TileEntityCraftingTerminal) te).craft(thePlayer);
 			}
 		}
 	}
@@ -118,10 +123,28 @@ public class ContainerCraftingTerminal extends ContainerStorageTerminal implemen
 			itemstack = itemstack1.copy();
 			if (index == 0) {
 				if(te == null)return ItemStack.EMPTY;
-				((TileEntityCraftingTerminal) te).craftShift(playerIn);
-				if (!playerIn.world.isClient)
-					sendContentUpdates();
-				return ItemStack.EMPTY;
+				if (!((TileEntityCraftingTerminal)te).canCraft() || !this.insertItem(itemstack1, 10, 46, true)) {
+					return ItemStack.EMPTY;
+				}
+
+				slot.onQuickTransfer(itemstack1, itemstack);
+
+				if (itemstack1.isEmpty()) {
+					slot.setStack(ItemStack.EMPTY);
+				} else {
+					slot.markDirty();
+				}
+
+				if (itemstack1.getCount() == itemstack.getCount()) {
+					return ItemStack.EMPTY;
+				}
+
+				slot.onTakeItem(playerIn, itemstack1);
+				if (index == 0) {
+					playerIn.dropItem(itemstack1, false);
+				}
+
+				return itemstack;
 			} else if (index > 0 && index < 10) {
 				if(te == null)return ItemStack.EMPTY;
 				ItemStack stack = ((TileEntityCraftingTerminal) te).pushStack(itemstack);

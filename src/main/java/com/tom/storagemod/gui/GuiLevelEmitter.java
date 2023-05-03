@@ -29,7 +29,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 	private GuiButton lessThanBtn;
 	private TextFieldWidget textF;
 	private boolean lt;
-	private int count;
+	private int count = 1;
 	private List<AmountBtn> amountBtns = new ArrayList<>();
 
 	public GuiLevelEmitter(ContainerLevelEmitter screenContainer, PlayerInventory inv, Text titleIn) {
@@ -66,7 +66,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 		textF.setDrawsBackground(false);
 		textF.setVisible(true);
 		textF.setEditableColor(16777215);
-		textF.setText("1");
+		textF.setText(Integer.toString(count));
 		textF.setChangedListener(t -> {
 			try {
 				int c = Integer.parseInt(t);
@@ -83,6 +83,7 @@ public class GuiLevelEmitter extends HandledScreen<ContainerLevelEmitter> implem
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
 		});
+		lessThanBtn.state = lt ? 1 : 0;
 		addDrawableChild(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));

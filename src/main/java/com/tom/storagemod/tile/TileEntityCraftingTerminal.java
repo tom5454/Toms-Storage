@@ -1,8 +1,6 @@
 package com.tom.storagemod.tile;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,7 +17,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
@@ -46,6 +43,9 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	private final CraftingInventory craftMatrix = new CraftingInventory(craftingContainer, 3, 3);
 	private CraftingResultInventory craftResult = new CraftingResultInventory();
 	private HashSet<ContainerCraftingTerminal> craftingListeners = new HashSet<>();
+	private boolean refillingGrid;
+	private int craftingCooldown;
+
 	public TileEntityCraftingTerminal(BlockPos pos, BlockState state) {
 		super(StorageMod.craftingTerminalTile, pos, state);
 	}
@@ -102,32 +102,12 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		return craftResult;
 	}
 
-	public void craftShift(PlayerEntity player) {
-		List<ItemStack> craftedItemsList = new ArrayList<>();
-		int amountCrafted = 0;
-		ItemStack crafted = craftResult.getStack(0);
-		do {
-			craft(player);
-			craftedItemsList.add(crafted.copy());
-			amountCrafted += crafted.getCount();
-		} while(ItemStack.areItemsEqual(crafted, craftResult.getStack(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxCount());
-
-		for (ItemStack craftedItem : craftedItemsList) {
-			if (!player.getInventory().insertStack(craftedItem.copy())) {
-				ItemStack is = pushStack(craftedItem);
-				if(!is.isEmpty()) {
-					ItemScatterer.spawn(world, player.getX(), player.getY(), player.getZ(), is);
-				}
-			}
-		}
-
-		crafted.onCraft(player.world, player, amountCrafted);
-	}
-
 	public void craft(PlayerEntity thePlayer) {
 		if(currentRecipe != null) {
 			DefaultedList<ItemStack> remainder = currentRecipe.getRemainder(craftMatrix);
 			boolean playerInvUpdate = false;
+			refillingGrid = true;
+
 			for (int i = 0; i < remainder.size(); ++i) {
 				ItemStack slot = craftMatrix.getStack(i);
 				ItemStack oldItem = slot.copy();
@@ -173,8 +153,10 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 				if (thePlayer.getInventory().insertStack(rem)) continue;
 				thePlayer.dropItem(rem, false);
 			}
-			if(playerInvUpdate)thePlayer.currentScreenHandler.sendContentUpdates();
+			refillingGrid = false;
 			onCraftingMatrixChanged();
+			craftingCooldown += craftResult.getStack(0).getCount();
+			if(playerInvUpdate)thePlayer.currentScreenHandler.sendContentUpdates();
 		}
 	}
 
@@ -187,6 +169,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 	}
 
 	protected void onCraftingMatrixChanged() {
+		if(refillingGrid)return;
 		if (currentRecipe == null || !currentRecipe.matches(craftMatrix, world)) {
 			currentRecipe = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftMatrix, world).orElse(null);
 		}
@@ -198,6 +181,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		}
 
 		craftingListeners.forEach(ContainerCraftingTerminal::onCraftMatrixChanged);
+		craftResult.setLastRecipe(currentRecipe);
 
 		if (!reading) {
 			markDirty();
@@ -252,5 +236,15 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 		StoredItemStack is = pullStack(new StoredItemStack(itemStack), 1);
 		if(is == null)return ItemStack.EMPTY;
 		else return is.getActualStack();
+	}
+
+	@Override
+	public void updateServer() {
+		super.updateServer();
+		craftingCooldown = 0;
+	}
+
+	public boolean canCraft() {
+		return craftingCooldown + craftResult.getStack(0).getCount() <= craftResult.getStack(0).getMaxCount();
 	}
 }
