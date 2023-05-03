@@ -25,7 +25,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 	private GuiButton lessThanBtn;
 	private EditBox textF;
 	private boolean lt;
-	private int count;
+	private int count = 1;
 	private List<AmountBtn> amountBtns = new ArrayList<>();
 
 	public LevelEmitterScreen(LevelEmitterMenu screenContainer, Inventory inv, Component titleIn) {
@@ -62,7 +62,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		textF.setBordered(false);
 		textF.setVisible(true);
 		textF.setTextColor(16777215);
-		textF.setValue("1");
+		textF.setValue(Integer.toString(count));
 		textF.setResponder(t -> {
 			try {
 				int c = Integer.parseInt(t);
@@ -82,6 +82,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		lessThanBtn.texX = 176;
 		lessThanBtn.texY = 0;
 		lessThanBtn.texture = gui;
+		lessThanBtn.state = lt ? 1 : 0;
 		addRenderableWidget(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));

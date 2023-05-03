@@ -1,6 +1,6 @@
 {
     "pack": {
         "description": "Tom's Simple Storage resources",
-        "pack_format": 8
+        "pack_format": 12
     }
 }

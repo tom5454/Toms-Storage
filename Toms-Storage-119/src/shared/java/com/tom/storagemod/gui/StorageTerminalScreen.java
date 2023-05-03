@@ -18,6 +18,7 @@ public class StorageTerminalScreen extends AbstractStorageTerminalScreen<Storage
 		imageWidth = 194;
 		imageHeight = 202;
 		super.init();
+		onPacket();
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 package com.tom.storagemod.tile;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -10,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -21,9 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
-
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
@@ -60,6 +54,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	private ResultContainer craftResult = new ResultContainer();
 	private HashSet<CraftingTerminalMenu> craftingListeners = new HashSet<>();
 	private boolean refillingGrid;
+	private int craftingCooldown;
 
 	public CraftingTerminalBlockEntity(BlockPos pos, BlockState state) {
 		super(Content.craftingTerminalTile.get(), pos, state);
@@ -119,29 +114,6 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		return craftResult;
 	}
 
-	public void craftShift(Player player) {
-		List<ItemStack> craftedItemsList = new ArrayList<>();
-		int amountCrafted = 0;
-		ItemStack crafted = craftResult.getItem(0);
-		do {
-			craft(player);
-			craftedItemsList.add(crafted.copy());
-			amountCrafted += crafted.getCount();
-		} while(ItemStack.isSame(crafted, craftResult.getItem(0)) && (amountCrafted+crafted.getCount()) <= crafted.getMaxStackSize());
-
-		for (ItemStack craftedItem : craftedItemsList) {
-			if (!player.getInventory().add(craftedItem.copy())) {
-				ItemStack is = pushStack(craftedItem);
-				if(!is.isEmpty()) {
-					Containers.dropItemStack(level, player.getX(), player.getY(), player.getZ(), is);
-				}
-			}
-		}
-
-		crafted.onCraftedBy(player.level, player, amountCrafted);
-		ForgeEventFactory.firePlayerCraftingEvent(player, ItemHandlerHelper.copyStackWithSize(crafted, amountCrafted), craftMatrix);
-	}
-
 	public void craft(Player thePlayer) {
 		if(currentRecipe != null) {
 			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
@@ -194,6 +166,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 			}
 			refillingGrid = false;
 			onCraftingMatrixChanged();
+			craftingCooldown += craftResult.getItem(0).getCount();
 			if(playerInvUpdate)thePlayer.containerMenu.broadcastChanges();
 		}
 	}
@@ -219,6 +192,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		}
 
 		craftingListeners.forEach(CraftingTerminalMenu::onCraftMatrixChanged);
+		craftResult.setRecipeUsed(currentRecipe);
 
 		if (!reading) {
 			setChanged();
@@ -273,5 +247,15 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		StoredItemStack is = pullStack(new StoredItemStack(itemStack), 1);
 		if(is == null)return ItemStack.EMPTY;
 		else return is.getActualStack();
+	}
+
+	@Override
+	public void updateServer() {
+		super.updateServer();
+		craftingCooldown = 0;
+	}
+
+	public boolean canCraft() {
+		return craftingCooldown + craftResult.getItem(0).getCount() <= craftResult.getItem(0).getMaxStackSize();
 	}
 }

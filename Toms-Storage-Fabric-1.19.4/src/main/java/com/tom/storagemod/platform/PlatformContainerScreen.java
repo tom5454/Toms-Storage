@@ -24,6 +24,10 @@ public abstract class PlatformContainerScreen<T extends AbstractContainerMenu> e
 		return topPos;
 	}
 
+	public int getYSize() {
+		return imageHeight;
+	}
+
 	public Slot getSlotUnderMouse() {
 		return null;
 	}
