@@ -18,6 +18,7 @@ public class GuiStorageTerminal extends GuiStorageTerminalBase<ContainerStorageT
 		imageWidth = 194;
 		imageHeight = 202;
 		super.init();
+		onPacket();
 	}
 
 	@Override

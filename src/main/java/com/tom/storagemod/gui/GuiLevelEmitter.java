@@ -29,7 +29,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 	private GuiButton lessThanBtn;
 	private EditBox textF;
 	private boolean lt;
-	private int count;
+	private int count = 1;
 	private List<AmountBtn> amountBtns = new ArrayList<>();
 
 	public GuiLevelEmitter(ContainerLevelEmitter screenContainer, Inventory inv, Component titleIn) {
@@ -66,7 +66,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 		textF.setBordered(false);
 		textF.setVisible(true);
 		textF.setTextColor(16777215);
-		textF.setValue("1");
+		textF.setValue(Integer.toString(count));
 		textF.setResponder(t -> {
 			try {
 				int c = Integer.parseInt(t);
@@ -83,6 +83,7 @@ public class GuiLevelEmitter extends AbstractContainerScreen<ContainerLevelEmitt
 			lessThanBtn.state = lt ? 1 : 0;
 			send();
 		});
+		lessThanBtn.state = lt ? 1 : 0;
 		addRenderableWidget(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));
