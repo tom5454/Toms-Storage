@@ -1,0 +1,15 @@
+{
+    "textures": {
+        "down": "toms_storage:block/inventory_proxy_filter",
+        "particle": "toms_storage:block/inventory_proxy_side"
+    },
+    "parent": "block/block",
+    "elements": [
+        {   "from": [ -0.01, -0.01, -0.01 ],
+            "to": [ 16.01, 16.01, 16.01 ],
+            "faces": {
+                "down":    { "texture": "#down", "cullface": "down" }
+            }
+        }
+    ]
+}

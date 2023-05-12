@@ -218,12 +218,12 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 				if(fstack.isEmpty())return true;
 				if(stack == null) {
 					stack = w.getStack(slot);
-					if(ItemStack.isSame(stack, fstack) && ItemStack.tagMatches(stack, fstack)) {
+					if(ItemStack.isSameItemSameTags(stack, fstack)) {
 						return true;
 					}
 					return false;
 				}
-				if(ItemStack.isSame(stack, fstack) && ItemStack.tagMatches(stack, fstack)) {
+				if(ItemStack.isSameItemSameTags(stack, fstack)) {
 					if(ignoreCount)return true;
 					int count = w.getStack(slot).getCount();
 					if(count < fstack.getCount())
@@ -260,7 +260,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements Tic
 				ItemStack fstack = fsize > j ? filter.getStack(j) : ItemStack.EMPTY;
 
 				if (!itemStack.isEmpty()) {
-					if(fstack.isEmpty() || (ItemStack.isSame(itemStack, fstack) && ItemStack.tagMatches(itemStack, fstack))) {
+					if(fstack.isEmpty() || (ItemStack.isSameItemSameTags(itemStack, fstack))) {
 						f += itemStack.getCount() / Math.min((ignoreCount || fstack.isEmpty() ? globalCountLimit : fstack.getCount()), itemStack.getMaxStackSize());
 						i++;
 					}

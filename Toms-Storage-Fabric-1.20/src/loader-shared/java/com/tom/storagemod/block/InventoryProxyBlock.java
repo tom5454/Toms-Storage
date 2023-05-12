@@ -34,7 +34,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams.Builder;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.tom.storagemod.StorageMod;
@@ -109,8 +109,9 @@ public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getDrops(BlockState state, Builder builder) {
 		List<ItemStack> stacks = super.getDrops(state, builder);
 		if(state.getValue(FILTER_FACING) != DirectionWithNull.NULL)
 			stacks.add(new ItemStack(Items.DIAMOND));

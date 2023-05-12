@@ -1,0 +1,24 @@
+{
+   "criteria":{
+      "inv_changed-netherite":{
+         "trigger":"minecraft:inventory_changed",
+         "conditions":{
+            "items":[
+               {
+                  "item":"netherite"
+               }
+            ]
+         }
+      }
+   },
+   "rewards":{
+      "recipes":[
+         "toms_storage:adv_wireless_terminal"
+      ]
+   },
+   "requirements":[
+      [
+         "inv_changed-netherite"
+      ]
+   ]
+}

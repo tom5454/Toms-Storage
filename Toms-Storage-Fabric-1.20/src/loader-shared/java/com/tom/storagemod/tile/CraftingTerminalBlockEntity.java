@@ -7,12 +7,10 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -21,36 +19,17 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
+import com.tom.storagemod.util.CraftingMatrix;
 import com.tom.storagemod.util.StoredItemStack;
 
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
-	private AbstractContainerMenu craftingContainer = new AbstractContainerMenu(MenuType.CRAFTING, 0) {
-
-		@Override
-		public void slotsChanged(Container inventory) {
-			if (level != null && !level.isClientSide) {
-				onCraftingMatrixChanged();
-			}
-		}
-
-		@Override
-		public boolean stillValid(Player paramPlayerEntity) {
-			return false;
-		}
-
-		@Override
-		public ItemStack quickMoveStack(Player player, int index) {
-			return ItemStack.EMPTY;
-		}
-	};
 	private CraftingRecipe currentRecipe;
-	private final CraftingContainer craftMatrix = new CraftingContainer(craftingContainer, 3, 3) {
-
-		@Override
-		public void setChanged() {
-			CraftingTerminalBlockEntity.this.setChanged();
+	private final CraftingContainer craftMatrix = new CraftingMatrix(3, 3, () -> {
+		if (level != null && !level.isClientSide) {
+			onCraftingMatrixChanged();
 		}
-	};
+		setChanged();
+	});
 	private ResultContainer craftResult = new ResultContainer();
 	private HashSet<CraftingTerminalMenu> craftingListeners = new HashSet<>();
 	private boolean refillingGrid;
@@ -130,7 +109,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					if(is == null && (getSorting() & (1 << 8)) != 0) {
 						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
 							ItemStack st = thePlayer.getInventory().getItem(j);
-							if(ItemStack.isSame(oldItem, st) && ItemStack.tagMatches(oldItem, st)) {
+							if(ItemStack.isSameItemSameTags(oldItem, st)) {
 								st = thePlayer.getInventory().removeItem(j, 1);
 								if(!st.isEmpty()) {
 									is = new StoredItemStack(st, 1);
@@ -152,7 +131,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					craftMatrix.setItem(i, rem);
 					continue;
 				}
-				if (ItemStack.isSame(slot, rem) && ItemStack.tagMatches(slot, rem)) {
+				if (ItemStack.isSameItemSameTags(slot, rem)) {
 					rem.grow(slot.getCount());
 					craftMatrix.setItem(i, rem);
 					continue;
@@ -223,7 +202,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					for (int j = 0;j < items[i].length;j++) {
 						boolean br = false;
 						for (int k = 0;k < player.getInventory().getContainerSize();k++) {
-							if(ItemStack.isSame(player.getInventory().getItem(k), items[i][j])) {
+							if(ItemStack.isSameItemSameTags(player.getInventory().getItem(k), items[i][j])) {
 								stack = player.getInventory().removeItem(k, 1);
 								br = true;
 								break;

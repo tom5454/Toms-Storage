@@ -146,18 +146,13 @@ repositories {
 	}
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
-    maven {
-    	// location of the maven that hosts JEI files since January 2023
-    	name = "Jared's maven"
-    	url = "https://maven.blamejared.com/"
-	}
 }
 
 dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.22'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.58'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency

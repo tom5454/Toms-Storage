@@ -147,6 +147,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	@Override
 	public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
 		if (this.recipeBookGui.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_)) {
+			this.setFocused(this.recipeBookGui);
 			return true;
 		} else {
 			return this.widthTooNarrow && this.recipeBookGui.isVisible() ? true : super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);

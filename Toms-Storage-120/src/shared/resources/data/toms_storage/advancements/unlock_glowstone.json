@@ -1,0 +1,25 @@
+{
+   "criteria":{
+      "inv_changed-glowstone":{
+         "trigger":"minecraft:inventory_changed",
+         "conditions":{
+            "items":[
+               {
+                  "item":"glowstone"
+               }
+            ]
+         }
+      }
+   },
+   "rewards":{
+      "recipes":[
+         "toms_storage:storage_terminal",
+         "toms_storage:crafting_terminal"
+      ]
+   },
+   "requirements":[
+      [
+         "inv_changed-glowstone"
+      ]
+   ]
+}

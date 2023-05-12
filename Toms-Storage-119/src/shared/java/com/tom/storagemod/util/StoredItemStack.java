@@ -6,6 +6,8 @@ import java.util.function.Function;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
+import com.tom.storagemod.platform.Platform;
+
 public class StoredItemStack {
 	private ItemStack stack;
 	private long count;
@@ -114,6 +116,39 @@ public class StoredItemStack {
 		}
 	}
 
+	public static class ComparatorModName implements IStoredItemStackComparator {
+		public boolean reversed;
+
+		public ComparatorModName(boolean reversed) {
+			this.reversed = reversed;
+		}
+
+		@Override
+		public int compare(StoredItemStack in1, StoredItemStack in2) {
+			String m1 = Platform.getItemId(in1.getStack().getItem()).getNamespace();
+			String m2 = Platform.getItemId(in2.getStack().getItem()).getNamespace();
+			int c1 = m1.compareTo(m2);
+			int c2 = in1.getDisplayName().compareTo(in2.getDisplayName());
+			int c = c1 == 0 ? c2 : c1;
+			return this.reversed ? -c : c;
+		}
+
+		@Override
+		public boolean isReversed() {
+			return reversed;
+		}
+
+		@Override
+		public void setReversed(boolean rev) {
+			reversed = rev;
+		}
+
+		@Override
+		public int type() {
+			return 2;
+		}
+	}
+
 	public static interface IStoredItemStackComparator extends Comparator<StoredItemStack> {
 		boolean isReversed();
 		void setReversed(boolean rev);
@@ -122,7 +157,8 @@ public class StoredItemStack {
 
 	public static enum SortingTypes {
 		AMOUNT(ComparatorAmount::new),
-		NAME(ComparatorName::new)
+		NAME(ComparatorName::new),
+		BY_MOD(ComparatorModName::new),
 		;
 		public static final SortingTypes[] VALUES = values();
 		private final Function<Boolean, IStoredItemStackComparator> factory;

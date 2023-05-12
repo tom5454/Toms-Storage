@@ -1,0 +1,10 @@
+{
+	"variants": {
+	    "facing=down": {"model": "toms_storage:block/inventory_hopper_basic"},
+		"facing=up": {"model": "toms_storage:block/inventory_hopper_basic", "x": 180},
+		"facing=north": {"model": "toms_storage:block/inventory_hopper_basic", "x": 90, "y": 180},
+		"facing=south": {"model": "toms_storage:block/inventory_hopper_basic", "x": 90},
+		"facing=east": {"model": "toms_storage:block/inventory_hopper_basic", "y": 270, "x": 90},
+		"facing=west": {"model": "toms_storage:block/inventory_hopper_basic", "y": 90, "x": 90}
+	}
+}
