@@ -1,6 +1,0 @@
-accessWidener	v1	named
-accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent searchBox Lnet/minecraft/client/gui/components/EditBox;
-accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent ghostRecipe Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;
-
-mutable field net/minecraft/world/inventory/Slot x I
-mutable field net/minecraft/world/inventory/Slot y I

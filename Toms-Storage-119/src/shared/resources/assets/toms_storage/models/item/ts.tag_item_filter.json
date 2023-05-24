@@ -1,6 +1,0 @@
-{
-	"parent": "item/generated",
-	"textures": {
-		"layer0": "toms_storage:item/tag_item_filter"
-	}
-}
