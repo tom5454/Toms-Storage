@@ -10,12 +10,13 @@
 		"1.17.1-latest": "1.2.21",
 		"1.18-latest": "1.2.22",
 		"1.18.2-latest": "1.4.3",
-		"1.19-latest": "1.5.6",
-		"1.19.2-latest": "1.5.6",
-		"1.19.3-latest": "1.5.6",
-		"1.19.4-latest": "1.5.7"
+		"1.19-latest": "1.5.7",
+		"1.19.2-latest": "1.5.7",
+		"1.19.3-latest": "1.5.7",
+		"1.19.4-latest": "1.5.8"
 	},
 	"1.19.4": {
+		"1.5.8": "EMI Compat\nFixed painted trim item showing in creative",
 		"1.5.7": "Added Mod Name sorting\nFixed recipe book not working on 1.19.4",
 		"1.5.6": "Fixed some buttons not showing the correct state after window resize\nFixed crafting terminal not crafting some items properly or triggering advancements in some cases\nFixed show recipes in JEI not working correctly with tall terminal mode",
 		"1.5.5": "Fixed tooltips getting stuck",
@@ -24,6 +25,7 @@
 		"1.5.2": "1.19.4 port"
 	},
 	"1.19.3": {
+		"1.5.7": "EMI Compat\nFixed painted trim item showing in creative",
 		"1.5.6": "Added Mod Name sorting\nFixed recipe book not working on 1.19.4",
 		"1.5.5": "Fixed some buttons not showing the correct state after window resize\nFixed crafting terminal not crafting some items properly or triggering advancements in some cases\nFixed show recipes in JEI not working correctly with tall terminal mode",
 		"1.5.4": "Added Tall Mode for Terminals",
@@ -35,6 +37,7 @@
 		"1.3.10": "1.19.3 port"
 	},
 	"1.19.2": {
+		"1.5.7": "EMI Compat",
 		"1.5.6": "Added Mod Name sorting\nFixed recipe book not working on 1.19.4",
 		"1.5.5": "Fixed some buttons not showing the correct state after window resize\nFixed crafting terminal not crafting some items properly or triggering advancements in some cases\nFixed show recipes in JEI not working correctly with tall terminal mode",
 		"1.5.4": "Added Tall Mode for Terminals",
