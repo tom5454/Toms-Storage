@@ -8,7 +8,6 @@ maven { url 'https://jitpack.io' }
 jcenter()
 maven { url "https://maven.shedaniel.me/" }
 maven { url "https://maven.terraformersmc.com/releases/"}
-maven { url "https://dvs1.progwml6.com/files/maven" }
 maven { url "https://maven.architectury.dev/" }
 maven {
 		name = "Ladysnake Libs"
@@ -64,7 +63,8 @@ dependencies {
         exclude(group: "dev.architectury")
     }
     modImplementation("dev.architectury:architectury-fabric:8.1.79")
-    modImplementation "dev.emi:emi:0.7.1+1.19.4"
+    modCompileOnly "dev.emi:emi-fabric:1.0.1+1.19.4:api"
+	modLocalRuntime "dev.emi:emi-fabric:1.0.1+1.19.4"
     
 	// compile against the JEI API but do not include it at runtime
 	modCompileOnlyApi("mezz.jei:jei-1.19.4-common-api:13.0.0.1")

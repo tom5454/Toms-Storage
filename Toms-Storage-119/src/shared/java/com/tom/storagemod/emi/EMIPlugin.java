@@ -6,12 +6,14 @@ import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IAutoFillTerminal.ISearchHandler;
 
 import dev.emi.emi.api.EmiApi;
+import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
 
+@EmiEntrypoint
 public class EMIPlugin implements EmiPlugin {
 
 	@Override

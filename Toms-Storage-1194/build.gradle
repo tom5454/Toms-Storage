@@ -135,7 +135,6 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
-    maven { url "https://dvs1.progwml6.com/files/maven" }
     maven {
         url = "https://maven.theillusivec4.top/"
     }
@@ -144,6 +143,7 @@ repositories {
     	name = "Jared's maven"
     	url = "https://maven.blamejared.com/"
 	}
+	maven { url "https://maven.terraformersmc.com/releases/"}
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
 }
@@ -174,6 +174,9 @@ dependencies {
   	
   	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2:api")
+    
+    compileOnly fg.deobf("dev.emi:emi-forge:1.0.1+1.19.4:api")
+	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.1+1.19.4")
     
     if(useLib) {
     	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:11.0.597")
