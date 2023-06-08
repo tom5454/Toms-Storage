@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
@@ -94,16 +93,16 @@ public class ReiTransferHandler implements TransferHandler {
 			}
 			if(!missing.isEmpty()) {
 				return Result.createSuccessful().color(0x67aaaa00).blocksFurtherHandling(false).
-						renderer((matrices, mouseX, mouseY, delta, widgets, bounds, d) -> {
+						renderer((gr, mouseX, mouseY, delta, widgets, bounds, d) -> {
 							int i = 0;
 							for (Widget widget : widgets) {
 								if (widget instanceof Slot && ((Slot) widget).getNoticeMark() == Slot.INPUT) {
 									if (missing.contains(i++)) {
-										matrices.pushPose();
-										matrices.translate(0, 0, 400);
+										gr.pose().pushPose();
+										gr.pose().translate(0, 0, 400);
 										Rectangle innerBounds = ((Slot) widget).getInnerBounds();
-										Screen.fill(matrices, innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), 0x40ff0000);
-										matrices.popPose();
+										gr.fill(innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), 0x40ff0000);
+										gr.pose().popPose();
 									}
 								}
 							}

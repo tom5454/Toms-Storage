@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
+	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -8,7 +8,6 @@ maven { url 'https://jitpack.io' }
 jcenter()
 maven { url "https://maven.shedaniel.me/" }
 maven { url "https://maven.terraformersmc.com/releases/"}
-maven { url "https://dvs1.progwml6.com/files/maven" }
 maven { url "https://maven.architectury.dev/" }
 maven {
 		name = "Ladysnake Libs"
@@ -42,11 +41,11 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:7.0.0-beta.1") {
+	modImplementation("com.terraformersmc:modmenu:7.0.0-beta.2") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
-    /*modImplementation "dev.emi:trinkets:3.6.0"
+    //modImplementation "dev.emi:trinkets:3.6.0"
 	
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
@@ -63,8 +62,8 @@ dependencies {
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
-    modImplementation("dev.architectury:architectury-fabric:7.0.63")
-    modImplementation "dev.emi:emi:0.7.1+1.19.4"*/
+    modImplementation("dev.architectury:architectury-fabric:9.0.7")
+    //modImplementation "dev.emi:emi:0.7.1+1.19.4"
     
 	/*// compile against the JEI API but do not include it at runtime
 	modCompileOnlyApi("mezz.jei:jei-1.19.4-common-api:13.0.0.1")
@@ -80,7 +79,6 @@ sourceSets {
 			srcDir "src/loader-shared/java"
 			srcDir "../TomsStorage-120/src/platform-shared/java"
 			exclude "com/tom/storagemod/jei/**"
-			exclude "com/tom/storagemod/rei/**"
 			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
@@ -108,12 +106,11 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
 }
 
 jar {

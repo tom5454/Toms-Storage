@@ -28,7 +28,7 @@
     "modmenu": [
       "com.tom.storagemod.ModMenu"
     ],
-	"rei_client_": [
+	"rei_client": [
     	"com.tom.storagemod.rei.REIPlugin"
     ],
     "emi_": [

@@ -61,7 +61,7 @@ public class Content {
 	public static GameObject<StorageTerminalBlock> terminal = blockWithItem("ts.storage_terminal", StorageTerminalBlock::new);
 	public static GameObject<TrimBlock> inventoryTrim = blockWithItem("ts.trim", TrimBlock::new);
 	public static GameObject<OpenCrateBlock> openCrate = blockWithItem("ts.open_crate", OpenCrateBlock::new);
-	public static GameObject<PaintedTrimBlock> paintedTrim = blockWithItem("ts.painted_trim", PaintedTrimBlock::new, PaintedBlockItem.makeHidden());
+	public static GameObject<PaintedTrimBlock> paintedTrim = blockWithItemNoTab("ts.painted_trim", PaintedTrimBlock::new, PaintedBlockItem.makeHidden());
 	public static GameObject<InventoryCableBlock> invCable = blockWithItem("ts.inventory_cable", InventoryCableBlock::new);
 	public static GameObject<FramedInventoryCableBlock> invCableFramed = blockWithItem("ts.inventory_cable_framed", FramedInventoryCableBlock::new, PaintedBlockItem.make());
 	public static GameObject<InventoryCableConnectorBlock> invCableConnector = blockWithItem("ts.inventory_cable_connector", InventoryCableConnectorBlock::new);
@@ -108,8 +108,18 @@ public class Content {
 		return re;
 	}
 
+	private static <B extends Block, I extends Item> GameObject<B> blockWithItemNoTab(String name, Supplier<B> create, Function<Block, I> createItem) {
+		GameObject<B> re = Platform.BLOCKS.register(name, create);
+		itemNoTab(name, () -> createItem.apply(re.get()));
+		return re;
+	}
+
 	private static <I extends Item> GameObject<I> item(String name, Supplier<I> fact) {
-		return Platform.ITEMS.register(name, () -> Platform.registerItem(fact.get()));
+		return Platform.ITEMS.register(name, () -> Platform.addItemToTab(fact.get()));
+	}
+
+	private static <I extends Item> GameObject<I> itemNoTab(String name, Supplier<I> fact) {
+		return Platform.ITEMS.register(name, fact);
 	}
 
 	@SuppressWarnings("unchecked")

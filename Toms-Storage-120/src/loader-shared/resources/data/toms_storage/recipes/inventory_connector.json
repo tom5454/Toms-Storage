@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"PCP",
+    "cDc",
+    "PEP"
+  ],
+  "key": {
+  	"P": {
+      "tag": "minecraft:planks"
+    },
+    "c": {
+      "tag": "forge:chests/wooden"
+    },
+    "D": {
+      "tag": "forge:gems/diamond"
+    },
+    "C": {
+      "item": "minecraft:comparator"
+    },
+    "E": {
+      "tag": "forge:ender_pearls"
+    }
+  },
+  "result": {
+    "item": "toms_storage:ts.inventory_connector"
+  }
+}

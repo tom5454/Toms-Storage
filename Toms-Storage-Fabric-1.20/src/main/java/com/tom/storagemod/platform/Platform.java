@@ -40,7 +40,7 @@ public class Platform {
 
 	private static List<Item> tabItems = new ArrayList<>();
 
-	public static <I extends Item> I registerItem(I item) {
+	public static <I extends Item> I addItemToTab(I item) {
 		tabItems.add(item);
 		return item;
 	}

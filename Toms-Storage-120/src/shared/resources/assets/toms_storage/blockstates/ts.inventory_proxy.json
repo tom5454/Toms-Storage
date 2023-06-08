@@ -52,60 +52,6 @@
           "when": {
             "facing": "west"
           }
-        },
-        
-        {
-          "apply": {
-            "model": "toms_storage:block/inventory_proxy_filter"
-          },
-          "when": {
-            "filter_facing": "down"
-          }
-        },
-        {
-          "apply": {
-            "model": "toms_storage:block/inventory_proxy_filter",
-            "x": 180
-          },
-          "when": {
-            "filter_facing": "up"
-          }
-        },
-        {
-          "apply": {
-            "model": "toms_storage:block/inventory_proxy_filter",
-            "x": 90, "y": 180
-          },
-          "when": {
-            "filter_facing": "north"
-          }
-        },
-        {
-          "apply": {
-            "model": "toms_storage:block/inventory_proxy_filter",
-            "x": 90
-          },
-          "when": {
-            "filter_facing": "south"
-          }
-        },
-        {
-          "apply": {
-            "model": "toms_storage:block/inventory_proxy_filter",
-            "y": 270, "x": 90
-          },
-          "when": {
-            "filter_facing": "east"
-          }
-        },
-        {
-          "apply": {
-            "model": "toms_storage:block/inventory_proxy_filter",
-            "y": 90, "x": 90
-          },
-          "when": {
-            "filter_facing": "west"
-          }
         }
 	]
 }

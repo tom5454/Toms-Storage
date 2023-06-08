@@ -13,9 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import com.google.common.collect.Iterators;
 
-import com.tom.storagemod.platform.PlatformStorage;
-
-public class FilteredStorage extends FilteringStorage<ItemVariant> implements IProxy, PlatformStorage {
+public class FilteredStorage extends FilteringStorage<ItemVariant> implements IProxy, Storage<ItemVariant> {
 	private BlankVariantView<ItemVariant> nullSlot = new BlankVariantView<>(ItemVariant.blank(), 0);
 	private ItemPredicate filter;
 	private boolean keepLastInSlot;
