@@ -6,6 +6,7 @@ import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -227,7 +228,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void handlePlacement(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayer p_217056_3_) {
-		(new PlatformServerPlaceRecipe(this) {
+		(new ServerPlaceRecipe(this) {
 
 			@Override
 			protected void moveItemToGrid(Slot slotToFill, ItemStack ingredientIn) {
@@ -262,7 +263,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 			}
 
 			@Override
-			protected void clearGrid(boolean bool) {
+			protected void clearGrid() {
 				((CraftingTerminalBlockEntity) te).clear();
 				this.menu.clearCraftingContent();
 			}

@@ -109,7 +109,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		private Button btn;
 		private int v, sv;
 		public AmountBtn(int x, int y, int v, int sv, int len) {
-			btn = new PlatformButton(leftPos + x, topPos + y + 16, len, 20, Component.literal((v > 0 ? "+" : "") + v), this::evt);
+			btn = new ButtonExt(leftPos + x, topPos + y + 16, len, 20, Component.literal((v > 0 ? "+" : "") + v), this::evt);
 			addRenderableWidget(btn);
 			this.v = v;
 			this.sv = sv;

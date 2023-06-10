@@ -45,7 +45,9 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
-    //modImplementation "dev.emi:trinkets:3.6.0"
+    modImplementation "dev.emi:trinkets:3.7.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0"
+	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0"
 	
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
@@ -65,11 +67,11 @@ dependencies {
     modImplementation("dev.architectury:architectury-fabric:9.0.7")
     //modImplementation "dev.emi:emi:0.7.1+1.19.4"
     
-	/*// compile against the JEI API but do not include it at runtime
-	modCompileOnlyApi("mezz.jei:jei-1.19.4-common-api:13.0.0.1")
-	modCompileOnlyApi("mezz.jei:jei-1.19.4-fabric-api:13.0.0.1")
+	// compile against the JEI API but do not include it at runtime
+	modCompileOnlyApi("mezz.jei:jei-1.20-common-api:14.0.0.4")
+	modCompileOnlyApi("mezz.jei:jei-1.20-fabric-api:14.0.0.4")
 	// at runtime, use the full JEI jar for Fabric
-	modRuntimeOnly("mezz.jei:jei-1.19.4-fabric:13.0.0.1")*/
+	modRuntimeOnly("mezz.jei:jei-1.20-fabric:14.0.0.4")
 }
 
 sourceSets {
@@ -78,7 +80,6 @@ sourceSets {
 			srcDir "../TomsStorage-120/src/shared/java"
 			srcDir "src/loader-shared/java"
 			srcDir "../TomsStorage-120/src/platform-shared/java"
-			exclude "com/tom/storagemod/jei/**"
 			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {

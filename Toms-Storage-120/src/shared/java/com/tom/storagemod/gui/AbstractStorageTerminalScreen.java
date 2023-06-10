@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button.OnPress;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -76,7 +77,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	 */
 	private boolean refreshItemList;
 	protected boolean wasClicking;
-	protected PlatformEditBox searchField;
+	protected EditBox searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	private String searchLast = "";
 	protected boolean loadedSearch = false, ghostItems, tallMode;
@@ -109,7 +110,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			init();
 		}
 		if(!searchField.isFocused() && (searchType & 1) > 0) {
-			searchField.setFocus(true);
+			searchField.setFocused(true);
 		}
 		buttonSortingType.setState(type);
 		buttonDirection.setState(rev ? 1 : 0);
@@ -160,7 +161,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 		inventoryLabelY = imageHeight - 92;
 		super.init();
-		this.searchField = new PlatformEditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, Component.translatable("narrator.toms_storage.terminal_search"));
+		this.searchField = new EditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, Component.translatable("narrator.toms_storage.terminal_search"));
 		this.searchField.setMaxLength(100);
 		this.searchField.setBordered(false);
 		this.searchField.setVisible(true);
@@ -479,10 +480,15 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		} else if (GLFW.glfwGetKey(mc.getWindow().getWindow(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
 			storageSlotClick(null, SlotAction.SPACE_CLICK, false);
 		} else {
-			if (mouseButton == 1 && isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseX, mouseY))
-				searchField.setValue("");
-			else
+			if (isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseX, mouseY)) {
+				if(mouseButton == 1)
+					searchField.setValue("");
+				else
+					return super.mouseClicked(mouseX, mouseY, mouseButton);
+			} else {
+				searchField.setFocused(false);
 				return super.mouseClicked(mouseX, mouseY, mouseButton);
+			}
 		}
 		return true;
 	}

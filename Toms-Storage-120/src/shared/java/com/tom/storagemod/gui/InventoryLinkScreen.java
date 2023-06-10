@@ -178,7 +178,7 @@ public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMe
 		}
 	}
 
-	public class ListEntry extends PlatformButton {
+	public class ListEntry extends ButtonExt {
 		private int id;
 
 		public ListEntry(int x, int y, int id) {

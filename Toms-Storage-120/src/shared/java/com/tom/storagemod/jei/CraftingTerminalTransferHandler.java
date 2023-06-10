@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -16,8 +17,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
@@ -150,9 +149,9 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 		}
 
 		@Override
-		public void showError(PoseStack matrixStack, int mouseX, int mouseY, IRecipeSlotsView recipeLayout, int recipeX,
-				int recipeY) {
-			this.parent.showError(matrixStack, mouseX, mouseY, recipeLayout, recipeX, recipeY);
+		public void showError(GuiGraphics guiGraphics, int mouseX, int mouseY, IRecipeSlotsView recipeSlotsView,
+				int recipeX, int recipeY) {
+			this.parent.showError(guiGraphics, mouseX, mouseY, recipeSlotsView, recipeX, recipeY);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.tom.storagemod.jei;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.renderer.Rect2i;
@@ -13,25 +14,33 @@ import com.tom.storagemod.gui.FilterSlot;
 import com.tom.storagemod.gui.PhantomSlot;
 import com.tom.storagemod.item.IItemFilter;
 
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
+import mezz.jei.api.ingredients.ITypedIngredient;
+
 @SuppressWarnings("rawtypes")
-public class JeiGhostIngredientHandler implements JeiGhostIngredientHandlerPlatform {
+public class JeiGhostIngredientHandler implements IGhostIngredientHandler<AbstractFilteredScreen> {
 
 	@Override
-	public List<Target<ItemStack>> getTargets(AbstractFilteredScreen gui, ItemStack stack, boolean doStart) {
-		List<Target<ItemStack>> targets = new ArrayList<>();
-		boolean filter = stack.getItem() instanceof IItemFilter;
-		for (Slot slot : gui.getMenu().slots) {
-			if (slot instanceof PhantomSlot) {
-				targets.add(new SlotTarget(gui, slot));
-			} else if (!filter && slot instanceof FilterSlot) {
-				ItemStack s = slot.getItem();
-				boolean sf = !s.isEmpty() && s.getItem() instanceof IItemFilter;
-				if(!sf)targets.add(new SlotTarget(gui, slot));
+	@SuppressWarnings("unchecked")
+	public <I> List<Target<I>> getTargetsTyped(AbstractFilteredScreen gui, ITypedIngredient<I> ingredient, boolean doStart) {
+		if (ingredient.getType() == VanillaTypes.ITEM_STACK) {
+			ItemStack stack = (ItemStack) ingredient.getIngredient();
+			List<Target<ItemStack>> targets = new ArrayList<>();
+			boolean filter = stack.getItem() instanceof IItemFilter;
+			for (Slot slot : gui.getMenu().slots) {
+				if (slot instanceof PhantomSlot) {
+					targets.add(new SlotTarget(gui, slot));
+				} else if (!filter && slot instanceof FilterSlot) {
+					ItemStack s = slot.getItem();
+					boolean sf = !s.isEmpty() && s.getItem() instanceof IItemFilter;
+					if(!sf)targets.add(new SlotTarget(gui, slot));
+				}
 			}
+			return (List) targets;
 		}
-		return targets;
+		return Collections.emptyList();
 	}
-
 
 	@Override
 	public void onComplete() {

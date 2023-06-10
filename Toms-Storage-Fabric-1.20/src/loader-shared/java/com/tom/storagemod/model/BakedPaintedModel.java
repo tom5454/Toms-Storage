@@ -57,7 +57,7 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 				if(model instanceof FabricBakedModel)
 					((FabricBakedModel)model).emitBlockQuads(blockView, st, pos, randomSupplier, context);
 				else
-					context.fallbackConsumer().accept(model);
+					context.bakedModelConsumer().accept(model);
 				return;
 			} catch (Exception e) {
 			}
@@ -70,9 +70,9 @@ public class BakedPaintedModel implements UnbakedModel, BakedModel, FabricBakedM
 			emitter.square(direction, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 			// Set the sprite of the face, must be called after .square()
 			// We haven't specified any UV coordinates, so we want to use the whole texture. BAKE_LOCK_UV does exactly that.
-			emitter.spriteBake(0, sprite, MutableQuadView.BAKE_LOCK_UV);
+			emitter.spriteBake(sprite, MutableQuadView.BAKE_LOCK_UV);
 			// Enable texture usage
-			emitter.spriteColor(0, -1, -1, -1, -1);
+			emitter.color(-1, -1, -1, -1);
 			// Add the quad to the mesh
 			emitter.emit();
 		}

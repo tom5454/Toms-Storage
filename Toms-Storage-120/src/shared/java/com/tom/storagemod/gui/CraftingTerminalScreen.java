@@ -82,12 +82,12 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	private void setButtonsPos() {
 		searchField.setX(this.leftPos + 82);
 		btnClr.setX(this.leftPos + 80);
-		int space = recipeBookGui.isVisible() ? PlatformEditBox.getY(recipeBookGui.searchBox) - 16 : imageHeight;
-		List<PlatformButton> buttons = Arrays.asList(buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonPullFromInv, buttonTallMode);
+		int space = recipeBookGui.isVisible() ? recipeBookGui.searchBox.getY() - 16 : imageHeight;
+		List<ButtonExt> buttons = Arrays.asList(buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonPullFromInv, buttonTallMode);
 		int y = topPos + 5;
 		int x = leftPos - 18;
 		for (int i = 0; i < buttons.size(); i++) {
-			PlatformButton b = buttons.get(i);
+			ButtonExt b = buttons.get(i);
 			if(y + 18 > space) {
 				y = topPos + 5;
 				x -= 18;
@@ -197,14 +197,14 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			}
 			if(itemstack != null) {
 				searchField.setValue(itemstack.getHoverName().getString());
-				searchField.setFocus(false);
+				searchField.setFocused(false);
 				return true;
 			}
 		}
 		return super.keyPressed(code, p_231046_2_, p_231046_3_);
 	}
 
-	public class GuiButtonClear extends PlatformButton {
+	public class GuiButtonClear extends ButtonExt {
 
 		public GuiButtonClear(int x, int y, OnPress pressable) {
 			super(x, y, 11, 11, null, pressable);

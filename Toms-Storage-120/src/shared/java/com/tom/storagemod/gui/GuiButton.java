@@ -9,7 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 
-public class GuiButton extends PlatformButton {
+public class GuiButton extends ButtonExt {
 	public static final ResourceLocation BUTTON_TEXTURES = new ResourceLocation("toms_storage", "textures/gui/filter_buttons.png");
 
 	public ResourceLocation texture;

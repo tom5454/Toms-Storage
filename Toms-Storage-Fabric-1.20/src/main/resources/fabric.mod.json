@@ -34,7 +34,7 @@
     "emi_": [
     	"com.tom.storagemod.emi.EMIPlugin"
     ],
-    "jei_mod_plugin_": [
+    "jei_mod_plugin": [
 		"com.tom.storagemod.jei.JEIHandler"
 	]
   },
@@ -44,6 +44,6 @@
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
-    "minecraft": ">=1.19.4"
+    "minecraft": ">=1.20"
   }
 }

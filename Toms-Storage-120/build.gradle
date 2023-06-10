@@ -156,7 +156,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.20-46.0.1'
+    minecraft 'net.minecraftforge:forge:1.20-46.0.12'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -170,16 +170,16 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    /*// compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.19.4-forge-api:13.0.0.1")
-    compileOnly fg.deobf("mezz.jei:jei-1.19.4-common-api:13.0.0.1")
+    // compile against the JEI API but do not include it at runtime
+    compileOnly fg.deobf("mezz.jei:jei-1.20-forge-api:14.0.0.4")
+    compileOnly fg.deobf("mezz.jei:jei-1.20-common-api:14.0.0.4")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.19.4-forge:13.0.0.1")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.20-forge:14.0.0.4")
   	
-  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2:api")
+  	//runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2")
+    //compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2:api")
     
-    if(useLib) {
+    /*if(useLib) {
     	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:11.0.597")
 		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:11.0.597")
 		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:11.0.597")
@@ -195,7 +195,6 @@ sourceSets {
 			srcDir "src/loader-shared/java"
 			srcDir "src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			exclude "com/tom/storagemod/jei/**"
 			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
