@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.tom.storagemod.network.NetworkHandler;
@@ -31,7 +30,6 @@ public class StorageMod {
 		// Register the doClientStuff method for modloading
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> StorageModClient::preInit);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::sendIMC);
 
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
@@ -52,10 +50,5 @@ public class StorageMod {
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
 		StorageModClient.clientSetup();
-	}
-
-	public void sendIMC(InterModEnqueueEvent e) {
-		/*if(ModList.get().isLoaded("curios"))
-			InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BELT.getMessageBuilder().build());*/
 	}
 }

@@ -65,7 +65,8 @@ dependencies {
         exclude(group: "dev.architectury")
     }
     modImplementation("dev.architectury:architectury-fabric:9.0.7")
-    //modImplementation "dev.emi:emi:0.7.1+1.19.4"
+    modCompileOnly "dev.emi:emi-fabric:1.0.2+1.20:api"
+	modLocalRuntime "dev.emi:emi-fabric:1.0.2+1.20"
     
 	// compile against the JEI API but do not include it at runtime
 	modCompileOnlyApi("mezz.jei:jei-1.20-common-api:14.0.0.4")
@@ -80,7 +81,6 @@ sourceSets {
 			srcDir "../TomsStorage-120/src/shared/java"
 			srcDir "src/loader-shared/java"
 			srcDir "../TomsStorage-120/src/platform-shared/java"
-			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
 			srcDir "../TomsStorage-120/src/shared/resources"

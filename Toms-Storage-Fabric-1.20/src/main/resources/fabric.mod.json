@@ -31,7 +31,7 @@
 	"rei_client": [
     	"com.tom.storagemod.rei.REIPlugin"
     ],
-    "emi_": [
+    "emi": [
     	"com.tom.storagemod.emi.EMIPlugin"
     ],
     "jei_mod_plugin": [

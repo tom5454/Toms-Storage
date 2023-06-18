@@ -14,9 +14,14 @@
 		"1.19.2-latest": "1.5.7",
 		"1.19.3-latest": "1.5.7",
 		"1.19.4-latest": "1.5.8",
-		"1.20-latest": "1.6.1"
+		"1.20-latest": "1.6.2",
+		"1.20.1-latest": "1.6.2"
+	},
+	"1.20.1": {
+		"1.6.2": "Curio and EMI integration"
 	},
 	"1.20": {
+		"1.6.2": "Curio and EMI integration",
 		"1.6.1": "Added JEI support\nFixed terminal search not losing focus when clicked out",
 		"1.6.0": "1.20 port"
 	},

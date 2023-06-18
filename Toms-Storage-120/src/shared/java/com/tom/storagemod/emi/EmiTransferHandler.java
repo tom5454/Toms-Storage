@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -15,7 +15,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.gui.CraftingTerminalMenu;
 import com.tom.storagemod.util.IAutoFillTerminal;
@@ -58,7 +57,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 
 	@Override
 	public void render(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context, List<Widget> widgets,
-			PoseStack matrices) {
+			GuiGraphics matrices) {
 		RenderSystem.enableDepthTest();
 		List<Integer> missing = handleRecipe(recipe, context.getScreen(), true);
 		int i = 0;
@@ -69,7 +68,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 				Bounds bounds = sw.getBounds();
 				if (sw.getRecipe() == null && !stack.isEmpty()) {
 					if (missing.contains(j)) {
-						GuiComponent.fill(matrices, bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
+						matrices.fill(bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
 					}
 				}
 			}

@@ -3,12 +3,10 @@ package com.tom.storagemod.emi;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.gui.AbstractFilteredMenu;
 import com.tom.storagemod.gui.AbstractFilteredScreen;
@@ -44,14 +42,14 @@ public class EmiGhostIngredientHandler implements EmiDragDropHandler<Screen> {
 	}
 
 	@Override
-	public void render(Screen screen, EmiIngredient dragged, PoseStack matrices, int mouseX, int mouseY, float delta) {
+	public void render(Screen screen, EmiIngredient dragged, GuiGraphics matrices, int mouseX, int mouseY, float delta) {
 		if(!(screen instanceof AbstractFilteredScreen scr))return;
 		ItemStack stack = getStack(dragged);
 		if(stack.isEmpty())return;
 		var targets = getTargets(scr, stack);
 		for (DropTarget t : targets) {
 			Bounds b = t.getArea();
-			GuiComponent.fill(matrices, b.x(), b.y(), b.x() + b.width(), b.y() + b.height(), 0x8822BB33);
+			matrices.fill(b.x(), b.y(), b.x() + b.width(), b.y() + b.height(), 0x8822BB33);
 		}
 	}
 
