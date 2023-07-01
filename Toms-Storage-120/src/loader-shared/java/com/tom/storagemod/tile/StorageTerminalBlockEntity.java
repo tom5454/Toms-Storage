@@ -148,8 +148,8 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 		if(level.getBlockEntity(worldPosition) != this)return false;
 		int d = 4;
 		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
-		if(beaconLevel >= Config.get().wirelessTermBeaconLvl && termReach > 0) {
-			if(beaconLevel >= Config.get().wirelessTermBeaconLvlDim)return true;
+		if(Config.get().wirelessTermBeaconLvl != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvl && termReach > 0) {
+			if(Config.get().wirelessTermBeaconLvlDim != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvlDim)return true;
 			else return player.level() == level;
 		}
 		d = Math.max(d, termReach);

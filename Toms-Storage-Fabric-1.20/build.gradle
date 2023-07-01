@@ -65,14 +65,14 @@ dependencies {
         exclude(group: "dev.architectury")
     }
     modImplementation("dev.architectury:architectury-fabric:9.0.7")
-    modCompileOnly "dev.emi:emi-fabric:1.0.2+1.20:api"
-	modLocalRuntime "dev.emi:emi-fabric:1.0.2+1.20"
+    modCompileOnly "dev.emi:emi-fabric:1.0.5+1.20.1:api"
+	modLocalRuntime "dev.emi:emi-fabric:1.0.5+1.20.1"
     
 	// compile against the JEI API but do not include it at runtime
-	modCompileOnlyApi("mezz.jei:jei-1.20-common-api:14.0.0.4")
-	modCompileOnlyApi("mezz.jei:jei-1.20-fabric-api:14.0.0.4")
+	modCompileOnlyApi("mezz.jei:jei-1.20.1-common-api:15.2.0.22")
+	modCompileOnlyApi("mezz.jei:jei-1.20.1-fabric-api:15.2.0.22")
 	// at runtime, use the full JEI jar for Fabric
-	modRuntimeOnly("mezz.jei:jei-1.20-fabric:14.0.0.4")
+	modRuntimeOnly("mezz.jei:jei-1.20.1-fabric:15.2.0.22")
 }
 
 sourceSets {

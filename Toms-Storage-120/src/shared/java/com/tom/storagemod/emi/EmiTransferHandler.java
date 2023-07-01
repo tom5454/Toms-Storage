@@ -20,6 +20,7 @@ import com.tom.storagemod.gui.CraftingTerminalMenu;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.StoredItemStack;
 
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
@@ -43,8 +44,16 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	}
 
 	@Override
+	public EmiPlayerInventory getInventory(AbstractContainerScreen<CraftingTerminalMenu> screen) {
+		List<EmiStack> stacks = new ArrayList<>();
+		screen.getMenu().slots.subList(1, screen.getMenu().slots.size()).stream().map(Slot::getItem).map(EmiStack::of).forEach(stacks::add);
+		screen.getMenu().getStoredItems().forEach(s -> stacks.add(EmiStack.of(s.getStack(), s.getQuantity())));
+		return new EmiPlayerInventory(stacks);
+	}
+
+	@Override
 	public boolean supportsRecipe(EmiRecipe recipe) {
-		return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING;
+		return recipe.getCategory() == VanillaEmiRecipeCategories.CRAFTING && recipe.supportsRecipeTree();
 	}
 
 	@Override
@@ -73,11 +82,6 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 				}
 			}
 		}
-	}
-
-	@Override
-	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context) {
-		return true;
 	}
 
 	private static List<Integer> handleRecipe(EmiRecipe recipe, AbstractContainerScreen<CraftingTerminalMenu> screen, boolean simulate) {

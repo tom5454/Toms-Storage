@@ -20,8 +20,8 @@ import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
-import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.gui.InventoryLinkMenu;
 import com.tom.storagemod.util.IInventoryLink;
@@ -137,8 +137,8 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 
 	@Override
 	public Storage<ItemVariant> getInventoryFrom(ServerLevel fromWorld, int fromLevel) {
-		if(!remote || beaconLevel < StorageMod.CONFIG.invLinkBeaconLvl)return null;
-		if(beaconLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim || fromLevel >= StorageMod.CONFIG.invLinkBeaconLvlDim)return this;
+		if(!remote || Config.get().invLinkBeaconLvl == -1 || beaconLevel < Config.get().invLinkBeaconLvl)return null;
+		if(Config.get().invLinkBeaconLvlDim != -1 && (beaconLevel >= Config.get().invLinkBeaconLvlDim || fromLevel >= Config.get().invLinkBeaconLvlDim))return this;
 		if(fromWorld.dimension().equals(level.dimension()))return this;
 		return null;
 	}
