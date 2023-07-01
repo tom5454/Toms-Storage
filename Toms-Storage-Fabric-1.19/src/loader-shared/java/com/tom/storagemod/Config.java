@@ -25,7 +25,6 @@ public class Config implements ConfigData {
 	@Tooltip
 	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlDim = 4;
 	public int invLinkBeaconLvl = 1, invLinkBeaconLvlDim = 2;
-	/*public int invDupScanSize = 100;*/
 
 	@Override
 	public void validatePostLoad() throws ValidationException {
@@ -45,26 +44,22 @@ public class Config implements ConfigData {
 			advWirelessRange = 64;
 			StorageMod.LOGGER.warn("Adv Wireless Range out of bounds, resetting to default");
 		}
-		if(wirelessTermBeaconLvl < 0 || wirelessTermBeaconLvl > 4) {
+		if(wirelessTermBeaconLvl < -1 || wirelessTermBeaconLvl > 4) {
 			wirelessTermBeaconLvl = 1;
 			StorageMod.LOGGER.warn("wirelessTermBeaconLvl out of bounds, resetting to default");
 		}
-		if(wirelessTermBeaconLvlDim < 0 || wirelessTermBeaconLvlDim > 4) {
+		if(wirelessTermBeaconLvlDim < -1 || wirelessTermBeaconLvlDim > 4) {
 			wirelessTermBeaconLvlDim = 4;
 			StorageMod.LOGGER.warn("wirelessTermBeaconLvlDim out of bounds, resetting to default");
 		}
-		if(invLinkBeaconLvl < 0 || invLinkBeaconLvl > 4) {
+		if(invLinkBeaconLvl < -1 || invLinkBeaconLvl > 4) {
 			invLinkBeaconLvl = 1;
 			StorageMod.LOGGER.warn("invLinkBeaconLvl out of bounds, resetting to default");
 		}
-		if(invLinkBeaconLvlDim < 0 || invLinkBeaconLvlDim > 4) {
+		if(invLinkBeaconLvlDim < -1 || invLinkBeaconLvlDim > 4) {
 			invLinkBeaconLvlDim = 2;
 			StorageMod.LOGGER.warn("invLinkBeaconLvlDim out of bounds, resetting to default");
 		}
-		/*if(invDupScanSize < 0) {
-			invDupScanSize = 100;
-			StorageMod.LOGGER.warn("invDupScanSize out of bounds, resetting to default");
-		}*/
 		StorageMod.LOGGER.info("Config loaded");
 	}
 

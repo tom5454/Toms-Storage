@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
+	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -46,6 +46,8 @@ dependencies {
     }
     
     modImplementation "dev.emi:trinkets:3.6.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.1.0"
+	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.1.0"
 	
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
@@ -105,12 +107,11 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.release = 17
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
 }
 
 jar {

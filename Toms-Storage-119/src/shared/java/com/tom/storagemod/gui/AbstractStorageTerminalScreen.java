@@ -365,8 +365,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 			if(isHovering(x, y, 16, 16, mouseX, mouseY)) {
 				String info;
-				if(menu.beaconLvl >= Config.get().wirelessTermBeaconLvlDim)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.anywhere");
-				else if(menu.beaconLvl >= Config.get().wirelessTermBeaconLvl)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.sameDim");
+				if(Config.get().wirelessTermBeaconLvlDim != -1 && menu.beaconLvl >= Config.get().wirelessTermBeaconLvlDim)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.anywhere");
+				else if(Config.get().wirelessTermBeaconLvl != -1 && menu.beaconLvl >= Config.get().wirelessTermBeaconLvl)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.sameDim");
 				else info = "";
 				renderComponentTooltip(st, Arrays.stream(I18n.get("tooltip.toms_storage.terminal_beacon", menu.beaconLvl, info).split("\\\\")).map(Component::literal).collect(Collectors.toList()), mouseX, mouseY);
 			}

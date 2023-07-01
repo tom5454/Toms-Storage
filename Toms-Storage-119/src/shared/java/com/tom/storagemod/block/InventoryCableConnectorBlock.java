@@ -73,7 +73,13 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
 			TooltipFlag flagIn) {
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
-		StorageModClient.tooltip("inventory_cable_connector_link", false, tooltip, Config.get().invLinkBeaconLvl, Config.get().invLinkBeaconLvlDim);
+		if (Config.get().invLinkBeaconLvl != -1) {
+			StorageModClient.tooltip("inventory_cable_connector_link.beacon1", false, tooltip, Config.get().invLinkBeaconLvl);
+			if (Config.get().invLinkBeaconLvlDim != -1) {
+				StorageModClient.tooltip("inventory_cable_connector_link.beacon2", false, tooltip, Config.get().invLinkBeaconLvlDim);
+			}
+			StorageModClient.tooltip("inventory_cable_connector_link", false, tooltip);
+		}
 	}
 
 	@Override

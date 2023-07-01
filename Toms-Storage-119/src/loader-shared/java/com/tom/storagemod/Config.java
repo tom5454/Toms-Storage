@@ -72,24 +72,28 @@ public class Config {
 					defineInRange("advWirelessRange", 64, 16, 512);
 
 			wirelessTermBeaconLvl = builder.comment("Adv Wireless terminal requied beacon level for infinite range",
-					"Value of 0 only requires a single beacon block nearby").
+					"Value of 0 only requires a single beacon block nearby",
+					"Value of -1 disables this feature entirely").
 					translation("tomsstorage.config.adv_wireless_beacon_lvl").
-					defineInRange("wirelessTermBeaconLvl", 1, 0, 4);
+					defineInRange("wirelessTermBeaconLvl", 1, -1, 4);
 
 			wirelessTermBeaconLvlDim = builder.comment("Adv Wireless terminal requied beacon level for cross dimensional access",
-					"Value of 0 only requires a single beacon block nearby").
+					"Value of 0 only requires a single beacon block nearby",
+					"Value of -1 disables this feature entirely").
 					translation("tomsstorage.config.adv_wireless_beacon_lvl_dim").
-					defineInRange("wirelessTermBeaconLvlDim", 4, 0, 4);
+					defineInRange("wirelessTermBeaconLvlDim", 4, -1, 4);
 
 			invLinkBeaconLvl = builder.comment("Inventory Cable Connector requied beacon level for inventory linking",
-					"Value of 0 only requires a single beacon block").
+					"Value of 0 only requires a single beacon block",
+					"Value of -1 disables this feature entirely").
 					translation("tomsstorage.config.inv_link_beacon_lvl").
-					defineInRange("invLinkBeaconLvl", 1, 0, 4);
+					defineInRange("invLinkBeaconLvl", 1, -1, 4);
 
 			invLinkBeaconLvlDim = builder.comment("Inventory Cable Connector requied beacon level for cross dimensional access",
-					"Value of 0 only requires a single beacon block").
+					"Value of 0 only requires a single beacon block",
+					"Value of -1 disables this feature entirely").
 					translation("tomsstorage.config.inv_link_beacon_lvl_dim").
-					defineInRange("invLinkBeaconLvlDim", 2, 0, 4);
+					defineInRange("invLinkBeaconLvlDim", 2, -1, 4);
 
 			invDupScanSize = builder.comment("Inventory Connector duplicate finder max slot count",
 					"Value of 0 only disables").

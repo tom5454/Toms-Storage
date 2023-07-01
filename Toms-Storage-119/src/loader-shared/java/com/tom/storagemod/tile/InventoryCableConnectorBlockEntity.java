@@ -139,8 +139,8 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 
 	@Override
 	public LazyOptional<IItemHandler> getInventoryFrom(Level fromWorld, int fromLevel) {
-		if(!remote || beaconLevel < Config.get().invLinkBeaconLvl)return null;
-		if(beaconLevel >= Config.get().invLinkBeaconLvlDim || fromLevel >= Config.get().invLinkBeaconLvlDim)return getCapability();
+		if(!remote || Config.get().invLinkBeaconLvl == -1 || beaconLevel < Config.get().invLinkBeaconLvl)return null;
+		if(Config.get().invLinkBeaconLvlDim != -1 && (beaconLevel >= Config.get().invLinkBeaconLvlDim || fromLevel >= Config.get().invLinkBeaconLvlDim))return getCapability();
 		if(fromWorld.dimension().equals(level.dimension()))return getCapability();
 		return null;
 	}
