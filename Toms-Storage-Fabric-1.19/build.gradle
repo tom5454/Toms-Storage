@@ -11,7 +11,7 @@ maven { url "https://maven.terraformersmc.com/releases/"}
 maven { url "https://maven.architectury.dev/" }
 maven {
 		name = "Ladysnake Libs"
-		url = "https://ladysnake.jfrog.io/artifactory/mods"
+		url = 'https://maven.ladysnake.org/releases'
 	}
 maven {
     // location of the maven that hosts JEI files since January 2023
