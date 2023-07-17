@@ -136,10 +136,14 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
-    maven { url "https://dvs1.progwml6.com/files/maven" }
     maven {
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+    	// location of the maven that hosts JEI files since January 2023
+    	name = "Jared's maven"
+    	url = "https://maven.blamejared.com/"
+  	}
 }
 
 dependencies {
@@ -161,9 +165,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.1.255:api")
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2-forge-api:10.2.1.1004")
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2-common-api:10.2.1.1004")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.1.255")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.18.2-forge:10.2.1.1004")
   	
   	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.7.1")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.7.1:api")
