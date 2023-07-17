@@ -112,6 +112,7 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 				ItemStack slot = craftMatrix.getStack(i);
 				ItemStack oldItem = slot.copy();
 				ItemStack rem = remainder.get(i);
+				if (ItemStack.areEqual(slot, rem))continue;
 				if (!slot.isEmpty()) {
 					craftMatrix.removeStack(i, 1);
 					slot = craftMatrix.getStack(i);
@@ -140,11 +141,6 @@ public class TileEntityCraftingTerminal extends TileEntityStorageTerminal {
 					continue;
 				}
 				if (slot.isEmpty()) {
-					craftMatrix.setStack(i, rem);
-					continue;
-				}
-				if (ItemStack.areItemsEqualIgnoreDamage(slot, rem) && ItemStack.areNbtEqual(slot, rem)) {
-					rem.increment(slot.getCount());
 					craftMatrix.setStack(i, rem);
 					continue;
 				}
