@@ -30,6 +30,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -80,7 +81,7 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invProxyPainted.get(), RenderType.translucent());
 
 		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
-			CompoundTag tag = buf.readAnySizeNbt();
+			CompoundTag tag = (CompoundTag) buf.readNbt(NbtAccounter.UNLIMITED);
 			mc.submit(() -> {
 				if(mc.screen instanceof IDataReceiver) {
 					((IDataReceiver)mc.screen).receive(tag);

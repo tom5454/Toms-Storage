@@ -15,7 +15,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button.OnPress;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -44,6 +43,7 @@ import com.tom.storagemod.StorageModClient;
 import com.tom.storagemod.gui.StorageTerminalMenu.SlotAction;
 import com.tom.storagemod.gui.StorageTerminalMenu.SlotStorage;
 import com.tom.storagemod.platform.PlatformContainerScreen;
+import com.tom.storagemod.platform.PlatformEditBox;
 import com.tom.storagemod.util.ComponentJoiner;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
@@ -77,13 +77,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	 */
 	private boolean refreshItemList;
 	protected boolean wasClicking;
-	protected EditBox searchField;
+	protected PlatformEditBox searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount, searchType;
 	private String searchLast = "";
 	protected boolean loadedSearch = false, ghostItems, tallMode;
 	public final int textureSlotCount, guiHeight, slotStartX, slotStartY;
 	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
-	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 	protected GuiButton buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonTallMode;
 	private Comparator<StoredItemStack> sortComp;
 
@@ -161,7 +160,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 		inventoryLabelY = imageHeight - 92;
 		super.init();
-		this.searchField = new EditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, Component.translatable("narrator.toms_storage.terminal_search"));
+		this.searchField = new PlatformEditBox(getFont(), this.leftPos + 82, this.topPos + 6, 89, this.getFont().lineHeight, Component.translatable("narrator.toms_storage.terminal_search"));
 		this.searchField.setMaxLength(100);
 		this.searchField.setBordered(false);
 		this.searchField.setVisible(true);
@@ -359,7 +358,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		i = k;
 		j = l;
 		k = j1;
-		st.blit(creativeInventoryTabs, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
+		drawScroll(st, i, j + (int) ((k - j - 17) * this.currentScroll), this.needsScrollBars());
 
 		searchField.render(st, mouseX, mouseY, partialTicks);
 

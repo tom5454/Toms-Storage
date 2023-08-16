@@ -43,7 +43,7 @@ public class InventoryConnectorFilterScreen extends AbstractFilteredScreen<Inven
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(st);
+		this.renderBackground(st, mouseX, mouseY, partialTicks);
 		buttonAllowList.setState(menu.allowList ? 1 : 0);
 		buttonPriority.setState(menu.priority.ordinal());
 		buttonKeepLast.setState(menu.keepLastInSlot ? 1 : 0);

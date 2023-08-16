@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "toms_storage",
+  "version": "${version}",
+
+  "name": "Tom's Simple Storage Mod",
+  "description": "Simple storage mod for Minecraft",
+  "authors": [
+    "tom5454"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage-fabric",
+    "sources": "https://github.com/tom5454/Toms-Storage/",
+	"issues": "https://github.com/tom5454/Toms-Storage/issues"
+  },
+
+  "license": "MIT",
+  "icon": "icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+  	"client": [
+      "com.tom.storagemod.StorageModClient"
+    ],
+    "main": [
+      "com.tom.storagemod.StorageMod"
+    ],
+    "_modmenu": [
+      "com.tom.storagemod.ModMenu"
+    ],
+	"_rei_client": [
+    	"com.tom.storagemod.rei.REIPlugin"
+    ],
+    "_emi": [
+    	"com.tom.storagemod.emi.EMIPlugin"
+    ],
+    "_jei_mod_plugin": [
+		"com.tom.storagemod.jei.JEIHandler"
+	]
+  },
+  "mixins": [
+  ],
+	"accessWidener" : "tomsstorage.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": ">=1.20"
+  }
+}

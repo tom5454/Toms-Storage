@@ -32,7 +32,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 
 	@Override
 	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(matrixStack);
+		this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
 		amountBtns.forEach(AmountBtn::update);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.renderTooltip(matrixStack, mouseX, mouseY);

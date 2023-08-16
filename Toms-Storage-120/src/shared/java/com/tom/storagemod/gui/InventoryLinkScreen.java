@@ -16,7 +16,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
@@ -32,11 +31,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.gui.GuiButton.CompositeButton;
 import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.platform.PlatformContainerScreen;
 import com.tom.storagemod.util.IDataReceiver;
 import com.tom.storagemod.util.RemoteConnections;
 import com.tom.storagemod.util.RemoteConnections.Channel;
 
-public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMenu> implements IDataReceiver {
+public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMenu> implements IDataReceiver {
 	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/inventory_link.png");
 	private static final int LINES = 7;
@@ -241,7 +241,7 @@ public class InventoryLinkScreen extends AbstractContainerScreen<InventoryLinkMe
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(st);
+		this.renderBackground(st, mouseX, mouseY, partialTicks);
 		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 		int i = this.leftPos;
 		int j = this.topPos;

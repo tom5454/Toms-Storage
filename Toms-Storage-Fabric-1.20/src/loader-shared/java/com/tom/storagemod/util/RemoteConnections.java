@@ -21,6 +21,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.saveddata.SavedData;
 
+import com.tom.storagemod.platform.SavedDataFactory;
+
 public class RemoteConnections extends SavedData {
 	private static final String CONNECTIONS_TAG = "connections";
 	public static final String CHANNEL_ID = "id";
@@ -28,6 +30,7 @@ public class RemoteConnections extends SavedData {
 	public static final String PUBLIC_TAG = "public";
 	public static final String DISPLAY_NAME = "name";
 	private static final String ID = "toms_storage_rc";
+	private static final SavedDataFactory<RemoteConnections> FACTORY = new SavedDataFactory<>(RemoteConnections::new, RemoteConnections::new, ID);
 	private Map<UUID, Channel> connections = new HashMap<>();
 
 	private RemoteConnections() {
@@ -47,7 +50,7 @@ public class RemoteConnections extends SavedData {
 
 	public static RemoteConnections get(Level world) {
 		ServerLevel sw = (ServerLevel) world;
-		return sw.getServer().overworld().getDataStorage().computeIfAbsent(RemoteConnections::new, RemoteConnections::new, ID);
+		return FACTORY.get(sw.getServer().overworld().getDataStorage());
 	}
 
 	@Override

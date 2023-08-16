@@ -21,13 +21,13 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import com.tom.storagemod.platform.RecipeBookButton;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
 public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<CraftingTerminalMenu> implements RecipeUpdateListener {
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/crafting_terminal.png");
 	private final RecipeBookComponent recipeBookGui;
 	private boolean widthTooNarrow;
-	private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
 	private GuiButton buttonPullFromInv;
 	private GuiButtonClear btnClr;
 	private boolean pullFromInv;
@@ -68,7 +68,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			sendUpdate();
 		}));
 		buttonPullFromInv.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.pull_" + s));
-		addRenderableWidget(new ImageButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214076_1_) -> {
+		addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
 			this.recipeBookGui.initVisuals();
 			this.recipeBookGui.toggleVisibility();
 			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
@@ -121,7 +121,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(st);
+		this.renderBackground(st, mouseX, mouseY, partialTicks);
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
 			this.renderBg(st, partialTicks, mouseX, mouseY);
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
