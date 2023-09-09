@@ -41,11 +41,11 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	/*modImplementation("com.terraformersmc:modmenu:7.0.0-beta.2") {
+	modImplementation("com.terraformersmc:modmenu:8.0.0-beta.2") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
-    modImplementation "dev.emi:trinkets:3.7.0"
+    /*modImplementation "dev.emi:trinkets:3.7.0"
     modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0"
 	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0"
 	
@@ -84,7 +84,6 @@ sourceSets {
 			exclude "com/tom/storagemod/jei/**"
 			exclude "com/tom/storagemod/rei/**"
 			exclude "com/tom/storagemod/emi/**"
-			exclude "com/tom/storagemod/ModMenu.java"
 		}
 		resources {
 			srcDir "../TomsStorage-120/src/shared/resources"

@@ -225,10 +225,9 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		return Lists.newArrayList(RecipeBookCategories.CRAFTING_SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void handlePlacement(boolean p_217056_1_, Recipe<?> p_217056_2_, ServerPlayer p_217056_3_) {
-		(new ServerPlaceRecipe(this) {
+	public ServerPlaceRecipe<CraftingContainer> getRecipePlacer() {
+		return new ServerPlaceRecipe<>(this) {
 
 			@Override
 			protected void moveItemToGrid(Slot slotToFill, ItemStack ingredientIn) {
@@ -267,7 +266,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 				((CraftingTerminalBlockEntity) te).clear();
 				this.menu.clearCraftingContent();
 			}
-		}).recipeClicked(p_217056_3_, p_217056_2_, p_217056_1_);
+		};
 	}
 
 	@Override

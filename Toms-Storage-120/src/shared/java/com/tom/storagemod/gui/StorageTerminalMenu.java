@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +20,7 @@ import com.google.common.collect.Lists;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.platform.PlatformRecipeMenu;
 import com.tom.storagemod.tile.StorageTerminalBlockEntity;
 import com.tom.storagemod.util.DataSlots;
 import com.tom.storagemod.util.IDataReceiver;
@@ -28,7 +28,7 @@ import com.tom.storagemod.util.StoredItemStack;
 import com.tom.storagemod.util.TerminalSyncManager;
 import com.tom.storagemod.util.TerminalSyncManager.InteractHandler;
 
-public class StorageTerminalMenu extends RecipeBookMenu<CraftingContainer> implements IDataReceiver, InteractHandler {
+public class StorageTerminalMenu extends PlatformRecipeMenu implements IDataReceiver, InteractHandler {
 	protected StorageTerminalBlockEntity te;
 	protected int playerSlotsStart;
 	protected List<SlotStorage> storageSlotList = new ArrayList<>();
