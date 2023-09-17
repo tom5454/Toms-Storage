@@ -165,7 +165,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		}
 
 		craftingListeners.forEach(CraftingTerminalMenu::onCraftMatrixChanged);
-		craftResult.setRecipeUsed(currentRecipe.recipe());
+		craftResult.setRecipeUsed(currentRecipe == null ? null : currentRecipe.recipe());
 
 		if (!reading) {
 			setChanged();

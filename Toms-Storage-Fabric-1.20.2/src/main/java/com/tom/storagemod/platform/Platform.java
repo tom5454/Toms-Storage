@@ -12,6 +12,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -80,5 +82,9 @@ public class Platform {
 			}*/
 		}
 		return def;
+	}
+
+	public static CompoundTag readNbtTag(FriendlyByteBuf buf) {
+		return (CompoundTag) buf.readNbt(NbtAccounter.unlimitedHeap());
 	}
 }

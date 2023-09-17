@@ -30,7 +30,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -55,6 +54,7 @@ import com.tom.storagemod.gui.TagItemFilterScreen;
 import com.tom.storagemod.item.WirelessTerminalItem;
 import com.tom.storagemod.model.BakedPaintedModel;
 import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.tile.PaintedBlockEntity;
 import com.tom.storagemod.util.IDataReceiver;
 
@@ -81,7 +81,7 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invProxyPainted.get(), RenderType.translucent());
 
 		ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.DATA_S2C, (mc, h, buf, rp) -> {
-			CompoundTag tag = (CompoundTag) buf.readNbt(NbtAccounter.UNLIMITED);
+			CompoundTag tag = Platform.readNbtTag(buf);
 			mc.submit(() -> {
 				if(mc.screen instanceof IDataReceiver) {
 					((IDataReceiver)mc.screen).receive(tag);
