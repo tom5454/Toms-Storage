@@ -37,7 +37,6 @@ import com.tom.storagemod.util.RemoteConnections;
 import com.tom.storagemod.util.RemoteConnections.Channel;
 
 public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMenu> implements IDataReceiver {
-	protected static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 	private static final ResourceLocation gui = new ResourceLocation("toms_storage", "textures/gui/inventory_link.png");
 	private static final int LINES = 7;
 	private EditBox textF;
@@ -268,7 +267,7 @@ public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMe
 		i = k;
 		j = l;
 		k = j1;
-		st.blit(creativeInventoryTabs, i, j + (int) ((k - j - 17) * this.currentScroll), 232 + (this.needsScrollBars() ? 0 : 12), 0, 12, 15);
+		drawScroll(st, i, j + (int) ((k - j - 17) * this.currentScroll), this.needsScrollBars());
 
 		this.renderTooltip(st, mouseX, mouseY);
 	}

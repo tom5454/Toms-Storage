@@ -6,7 +6,7 @@ plugins {
 
 version = project.mod_version
 group = 'com.tom5454.toms_storage' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'toms_storage-1.20'
+archivesBaseName = 'toms_storage-1.20.2'
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -27,7 +27,7 @@ minecraft {
     //
     // Use non-default mappings at your own risk. They may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.20.1'
+    mappings channel: 'official', version: '1.20.2'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -157,7 +157,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.20.1-47.1.0'
+    minecraft 'net.minecraftforge:forge:1.20.2-48.0.0'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -171,7 +171,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    // compile against the JEI API but do not include it at runtime
+    /*// compile against the JEI API but do not include it at runtime
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.2.0.22")
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:15.2.0.22")
   	// at runtime, use the full JEI jar
@@ -189,20 +189,22 @@ dependencies {
 		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.0.624")
 		implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.0.99")
     	implementation fg.deobf("dev.architectury:architectury-forge:9.0.8")
-    }
+    }*/
 }
 
 sourceSets {
 	main {
 		java {
-			srcDir "src/shared/java"
-			srcDir "src/loader-shared/java"
+			srcDir "../TomsStorage-120/src/shared/java"
+			srcDir "../TomsStorage-120/src/loader-shared/java"
 			srcDir "src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			exclude "com/tom/storagemod/jei/**"
+			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
-			srcDir "src/shared/resources"
-			srcDir "src/loader-shared/resources"
+			srcDir "../TomsStorage-120/src/shared/resources"
+			srcDir "../TomsStorage-120/src/loader-shared/resources"
 			srcDir "src/platform-shared/resources"
 		}
 	}
