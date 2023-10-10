@@ -14,19 +14,22 @@
 		"1.19.2-latest": "1.5.9",
 		"1.19.3-latest": "1.5.9",
 		"1.19.4-latest": "1.5.10",
-		"1.20-latest": "1.6.4",
-		"1.20.1-latest": "1.6.4",
-		"1.20.2-latest": "1.6.5"
+		"1.20-latest": "1.6.5",
+		"1.20.1-latest": "1.6.5",
+		"1.20.2-latest": "1.6.6"
 	},
 	"1.20.2": {
+		"1.6.6": "Added JEI, REI, EMI support on 1.20.2\nFixed crash with VisualOverhaul",
 		"1.6.5": "1.20.2 port"
 	},
 	"1.20.1": {
+		"1.6.5": "Fixed EMI not working on 1.20\nFixed crash with VisualOverhaul",
 		"1.6.4": "Fixed duplication bug with Crafting Terminal",
 		"1.6.3": "Added the ability to disable beacon range extending\nImproved EMI compatibility",
 		"1.6.2": "Curio and EMI integration"
 	},
 	"1.20": {
+		"1.6.5": "Fixed EMI not working on 1.20\nFixed crash with VisualOverhaul",
 		"1.6.4": "Fixed duplication bug with Crafting Terminal",
 		"1.6.3": "Added the ability to disable beacon range extending\nImproved EMI compatibility",
 		"1.6.2": "Curio and EMI integration",

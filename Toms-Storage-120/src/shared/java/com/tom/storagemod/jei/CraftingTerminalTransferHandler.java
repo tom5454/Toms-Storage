@@ -20,6 +20,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
+import com.tom.storagemod.platform.PlatformRecipeTransferHandler;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.StoredItemStack;
 
@@ -28,13 +29,11 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
-import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 
-public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & IAutoFillTerminal> implements IRecipeTransferHandler<C, CraftingRecipe> {
+public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & IAutoFillTerminal> implements PlatformRecipeTransferHandler<C> {
 	private final Class<C> containerClass;
 	private final IRecipeTransferHandlerHelper helper;
 	private static final List<Class<? extends AbstractContainerMenu>> containerClasses = new ArrayList<>();
@@ -56,10 +55,10 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 	}
 
 	@Override
-	public @Nullable IRecipeTransferError transferRecipe(AbstractContainerMenu container, CraftingRecipe recipe,
+	public @Nullable IRecipeTransferError transferRecipe(C container, CraftingRecipe recipe,
 			IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer) {
 		if (container instanceof IAutoFillTerminal) {
-			IAutoFillTerminal term = (IAutoFillTerminal) container;
+			IAutoFillTerminal term = container;
 			List<IRecipeSlotView> missing = new ArrayList<>();
 			List<IRecipeSlotView> views = recipeSlots.getSlotViews();
 			List<ItemStack[]> inputs = new ArrayList<>();
@@ -159,10 +158,5 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 	@Override
 	public Optional<MenuType<C>> getMenuType() {
 		return Optional.<MenuType<C>>ofNullable((MenuType<C>) Content.craftingTerminalCont.get());
-	}
-
-	@Override
-	public RecipeType<CraftingRecipe> getRecipeType() {
-		return RecipeTypes.CRAFTING;
 	}
 }

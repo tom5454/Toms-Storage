@@ -60,6 +60,8 @@ minecraft {
                     source sourceSets.main
                 }
             }
+            
+            //jvmArgs '-Xdebug', '-Xrunjdwp:server=n,transport=dt_socket,address=1024,suspend=y'
         }
 
         server {
@@ -145,11 +147,6 @@ repositories {
 	}
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
-    maven {
-    	// location of the maven that hosts JEI files since January 2023
-    	name = "Jared's maven"
-    	url = "https://maven.blamejared.com/"
-	}
     maven { url "https://maven.terraformersmc.com/releases/"}
 }
 
@@ -175,13 +172,13 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.2.0.22")
     compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:15.2.0.22")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:15.2.0.22")
+  	//runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:15.2.0.22")
   	
-  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.2.0-beta.2+1.20")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.2.0-beta.2+1.20:api")
+  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.3.5+1.20.1:api")
     
-    compileOnly fg.deobf("dev.emi:emi-forge:1.0.2+1.20:api")
-	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.2+1.20")
+    compileOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1:api")
+	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1")
     
     if(useLib) {
     	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:12.0.624")
@@ -257,4 +254,12 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+//Small hack to run with gradle inside eclipse instead of it's own way
+if (!useLib) {
+	tasks.named('test', Test) {
+		dependsOn 'TomsStorage-120Client'
+		ignoreFailures true
+	}
 }

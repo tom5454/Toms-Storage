@@ -145,11 +145,6 @@ repositories {
 	}
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
-    maven {
-    	// location of the maven that hosts JEI files since January 2023
-    	name = "Jared's maven"
-    	url = "https://maven.blamejared.com/"
-	}
     maven { url "https://maven.terraformersmc.com/releases/"}
 }
 
@@ -157,7 +152,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.20.2-48.0.0'
+    minecraft 'net.minecraftforge:forge:1.20.2-48.0.4'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -171,19 +166,19 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    /*// compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:15.2.0.22")
-    compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:15.2.0.22")
+    // compile against the JEI API but do not include it at runtime
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:16.0.0.28")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:16.0.0.28")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:15.2.0.22")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:16.0.0.28")
   	
-  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.2.0-beta.2+1.20")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.2.0-beta.2+1.20:api")
+  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:6.0.1+1.20.2")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:6.0.1+1.20.2:api")
     
-    compileOnly fg.deobf("dev.emi:emi-forge:1.0.2+1.20:api")
-	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.2+1.20")
+    compileOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.2:api")
+	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.2")
     
-    if(useLib) {
+    /*if(useLib) {
     	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:12.0.624")
 		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:12.0.624")
 		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.0.624")
@@ -199,8 +194,6 @@ sourceSets {
 			srcDir "../TomsStorage-120/src/loader-shared/java"
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			exclude "com/tom/storagemod/jei/**"
-			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
 			srcDir "../TomsStorage-120/src/shared/resources"

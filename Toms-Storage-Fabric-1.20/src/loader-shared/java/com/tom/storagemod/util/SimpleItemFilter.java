@@ -25,7 +25,8 @@ public class SimpleItemFilter implements ItemPredicate {
 	}
 
 	private boolean test0(ItemVariant stack) {
-		for (ItemStack f : filter.items) {
+		for(int i = 0;i<filter.getContainerSize();i++) {
+			ItemStack f = filter.getItem(i);
 			if(f.isEmpty())continue;
 			if(stack.isOf(f.getItem()) && (!matchNBT || stack.nbtMatches(f.getTag())))return true;
 		}

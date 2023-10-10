@@ -2,6 +2,7 @@ package com.tom.storagemod.gui;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -20,7 +21,7 @@ public class GuiButton extends ButtonExt {
 	public Int2ObjectFunction<Tooltip> tooltipFactory;
 
 	public GuiButton(int x, int y, int tile, OnPress pressable) {
-		super(x, y, 16, 16, null, pressable);
+		super(x, y, 16, 16, Component.empty(), pressable);
 		this.tile = tile;
 		this.texture = BUTTON_TEXTURES;
 	}
