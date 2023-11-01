@@ -18,22 +18,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
-
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.registries.RegistryObject;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.GameObject.GameRegistry;
 import com.tom.storagemod.util.GameObject.GameRegistryBE;
-
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.SlotResult;
 
 public class Platform {
 
@@ -78,7 +74,7 @@ public class Platform {
 
 	public static InteractionResult checkUse(Level worldIn, BlockHitResult lookingAt, Player playerIn, InteractionHand handIn) {
 		PlayerInteractEvent.RightClickBlock event = new PlayerInteractEvent.RightClickBlock(playerIn, handIn, lookingAt.getBlockPos(), lookingAt);
-		MinecraftForge.EVENT_BUS.post(event);
+		NeoForge.EVENT_BUS.post(event);
 		if (event.isCanceled()) {
 			return event.getCancellationResult();
 		}
@@ -88,10 +84,10 @@ public class Platform {
 	private static boolean curios = ModList.get().isLoaded("curios");
 	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
 		if(curios) {
-			var handler = player.getCapability(CuriosCapability.INVENTORY).orElse(null);
+			/*var handler = player.getCapability(CuriosCapability.INVENTORY).orElse(null);
 			if (handler == null)return def;
 			List<SlotResult> s = handler.findCurios(is);
-			if(!s.isEmpty())return map.apply(s.get(0).stack());
+			if(!s.isEmpty())return map.apply(s.get(0).stack());*/
 		}
 		return def;
 	}

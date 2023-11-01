@@ -2,8 +2,6 @@ package com.tom.storagemod.util;
 
 import java.util.Iterator;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -71,7 +69,7 @@ public class FilteredStorage extends FilteringStorage<ItemVariant> implements IP
 	}
 
 	@Override
-	public @Nullable StorageView<ItemVariant> exactView(ItemVariant resource) {
+	public StorageView<ItemVariant> exactView(ItemVariant resource) {
 		if(keepLastInSlot) {
 			StorageView<ItemVariant> v = super.exactView(resource);
 			return v != null ? new FilteringStorageView(v) : v;

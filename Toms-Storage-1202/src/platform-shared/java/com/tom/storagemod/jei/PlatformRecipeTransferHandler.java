@@ -1,4 +1,4 @@
-package com.tom.storagemod.platform;
+package com.tom.storagemod.jei;
 
 import org.jetbrains.annotations.Nullable;
 

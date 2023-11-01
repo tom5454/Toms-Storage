@@ -1,4 +1,4 @@
-package com.tom.storagemod.platform;
+package com.tom.storagemod.jei;
 
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.crafting.CraftingRecipe;
