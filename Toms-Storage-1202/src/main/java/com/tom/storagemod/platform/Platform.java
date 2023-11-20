@@ -22,9 +22,8 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.ForgeRegistries;
-import net.neoforged.neoforge.registries.RegistryObject;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
@@ -33,14 +32,14 @@ import com.tom.storagemod.util.GameObject.GameRegistryBE;
 
 public class Platform {
 
-	public static final GameRegistry<Item> ITEMS = new GameRegistry<>(ForgeRegistries.ITEMS);
-	public static final GameRegistry<Block> BLOCKS = new GameRegistry<>(ForgeRegistries.BLOCKS);
+	public static final GameRegistry<Item> ITEMS = new GameRegistry<>(Registries.ITEM);
+	public static final GameRegistry<Block> BLOCKS = new GameRegistry<>(Registries.BLOCK);
 	public static final GameRegistryBE BLOCK_ENTITY = new GameRegistryBE();
-	public static final GameRegistry<MenuType<?>> MENU_TYPE = new GameRegistry<>(ForgeRegistries.MENU_TYPES);
+	public static final GameRegistry<MenuType<?>> MENU_TYPE = new GameRegistry<>(Registries.MENU);
 	public static final DeferredRegister<CreativeModeTab> TAB = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, StorageMod.modid);
 
 	private static List<Item> tabItems = new ArrayList<>();
-	public static final RegistryObject<CreativeModeTab> STORAGE_MOD_TAB = TAB.register("tab", () ->
+	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> STORAGE_MOD_TAB = TAB.register("tab", () ->
 	CreativeModeTab.builder()
 	.title(Component.translatable("itemGroup.toms_storage.tab"))
 	.icon(() -> new ItemStack(Content.terminal.get()))

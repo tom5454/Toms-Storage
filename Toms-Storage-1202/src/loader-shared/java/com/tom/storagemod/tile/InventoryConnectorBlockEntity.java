@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
@@ -21,7 +22,6 @@ import net.neoforged.neoforge.common.capabilities.Capabilities;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
@@ -108,7 +108,7 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 								if(inv.isPresent()) {
 									IItemHandler blockHandler = inv.orElse(null);
 									if(blockHandler == null) {
-										StorageMod.LOGGER.warn("Broken modded block at " + p + " in " + level.dimension().location().toString() + " block id: " + ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString());
+										StorageMod.LOGGER.warn("Broken modded block at " + p + " in " + level.dimension().location().toString() + " block id: " + BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString());
 									}
 									IItemHandler ihr = IProxy.resolve(blockHandler);
 									if(ihr instanceof MultiItemHandler) {

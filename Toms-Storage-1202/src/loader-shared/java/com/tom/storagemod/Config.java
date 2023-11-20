@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,7 +20,6 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 public class Config {
 	public static final List<String> defaultMultiblocks = Arrays.asList("");
@@ -148,7 +148,7 @@ public class Config {
 			invLinkBeaconLvlDim = SERVER.invLinkBeaconLvlDim.get();
 			invDupScanSize = SERVER.invDupScanSize.get();
 		} else if(modConfig.getType() == Type.COMMON) {
-			multiblockInvs = COMMON.multiblockInvs.get().stream().map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).
+			multiblockInvs = COMMON.multiblockInvs.get().stream().map(ResourceLocation::new).map(BuiltInRegistries.BLOCK::get).
 					filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 		}
 	}

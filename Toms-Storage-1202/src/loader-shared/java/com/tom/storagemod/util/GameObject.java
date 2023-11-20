@@ -3,23 +3,24 @@ package com.tom.storagemod.util;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.ForgeRegistries;
-import net.neoforged.neoforge.registries.IForgeRegistry;
-import net.neoforged.neoforge.registries.RegistryObject;
 
 import com.tom.storagemod.StorageMod;
 
 public class GameObject<T> {
-	private final RegistryObject<T> value;
+	private final DeferredHolder<? super T, T> value;
 
-	protected GameObject(RegistryObject<T> value) {
+	protected GameObject(DeferredHolder<? super T, T> value) {
 		this.value = value;
 	}
 
@@ -30,7 +31,7 @@ public class GameObject<T> {
 	public static class GameRegistry<T> {
 		protected final DeferredRegister<T> handle;
 
-		public GameRegistry(IForgeRegistry<T> reg) {
+		public GameRegistry(ResourceKey<? extends Registry<T>> reg) {
 			handle = DeferredRegister.create(reg, StorageMod.modid);
 		}
 
@@ -50,7 +51,7 @@ public class GameObject<T> {
 	public static class GameRegistryBE extends GameRegistry<BlockEntityType<?>> {
 
 		public GameRegistryBE() {
-			super(ForgeRegistries.BLOCK_ENTITY_TYPES);
+			super(Registries.BLOCK_ENTITY_TYPE);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -63,7 +64,7 @@ public class GameObject<T> {
 
 	public static class GameObjectBlockEntity<T extends BlockEntity> extends GameObject<BlockEntityType<T>> {
 
-		protected GameObjectBlockEntity(RegistryObject<BlockEntityType<T>> value) {
+		protected GameObjectBlockEntity(DeferredHolder<BlockEntityType<?>, BlockEntityType<T>> value) {
 			super(value);
 		}
 
