@@ -152,7 +152,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.20.2-48.0.4'
+    minecraft 'net.minecraftforge:forge:1.20.2-48.1.0'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
@@ -178,13 +178,13 @@ dependencies {
     compileOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.2:api")
 	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.2")
     
-    /*if(useLib) {
-    	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:12.0.624")
-		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:12.0.624")
-		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.0.624")
-		implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.0.99")
-    	implementation fg.deobf("dev.architectury:architectury-forge:9.0.8")
-    }*/
+    if(useLib) {
+    	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:13.0.685")
+		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:13.0.685")
+		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:13.0.685")
+		implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:12.0.119")
+    	implementation fg.deobf("dev.architectury:architectury-forge:10.0.17")
+    }
 }
 
 sourceSets {
@@ -193,7 +193,7 @@ sourceSets {
 			srcDir "../TomsStorage-120/src/shared/java"
 			srcDir "../TomsStorage-120/src/loader-shared/java"
 			srcDir "../TomsStorage-1202/src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
 		}
 		resources {
 			srcDir "../TomsStorage-120/src/shared/resources"

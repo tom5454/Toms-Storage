@@ -30,6 +30,9 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.GameObject.GameRegistry;
 import com.tom.storagemod.util.GameObject.GameRegistryBE;
 
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotResult;
+
 public class Platform {
 
 	public static final GameRegistry<Item> ITEMS = new GameRegistry<>(Registries.ITEM);
@@ -83,10 +86,10 @@ public class Platform {
 	private static boolean curios = ModList.get().isLoaded("curios");
 	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
 		if(curios) {
-			/*var handler = player.getCapability(CuriosCapability.INVENTORY).orElse(null);
+			var handler = player.getCapability(CuriosCapability.INVENTORY).orElse(null);
 			if (handler == null)return def;
 			List<SlotResult> s = handler.findCurios(is);
-			if(!s.isEmpty())return map.apply(s.get(0).stack());*/
+			if(!s.isEmpty())return map.apply(s.get(0).stack());
 		}
 		return def;
 	}

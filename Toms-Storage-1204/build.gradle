@@ -30,6 +30,7 @@ base {
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+def useLib = System.getProperty("useLib")
 
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
@@ -88,9 +89,8 @@ sourceSets {
 			srcDir "src/shared/java"
 			srcDir "src/loader-shared/java"
 			srcDir "src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			exclude "com/tom/storagemod/jei/**"
-			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
 			srcDir "src/shared/resources"
@@ -129,8 +129,19 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    //runtimeOnly "top.theillusivec4.curios:curios-neoforge:6.1.0+1.20.2"
-    //compileOnly "top.theillusivec4.curios:curios-neoforge:6.1.0+1.20.2:api"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4:api"
+    
+    compileOnly "dev.emi:emi-neoforge:1.0.29+1.20.4:api"
+	runtimeOnly "dev.emi:emi-neoforge:1.0.29+1.20.4"
+	
+	if(useLib) {
+    	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"
+		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:14.0.688"
+		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:14.0.688"
+		implementation "me.shedaniel.cloth:cloth-config-neoforge:13.0.121"
+    	implementation "dev.architectury:architectury-neoforge:11.0.9"
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -151,6 +162,10 @@ tasks.withType(ProcessResources).configureEach {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
+}
+
+java {
+    withSourcesJar()
 }
 
 // Example configuration to allow publishing using the maven-publish plugin

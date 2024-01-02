@@ -21,7 +21,7 @@ version="${file.jarVersion}" #mandatory
  # A display name for the mod
 displayName="Tom's Simple Storage Mod" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
-updateJSONURL="https://raw.githubusercontent.com/tom5454/Toms-Storage/master/version-check.json" #optional
+updateJSONURL="https://raw.githubusercontent.com/tom5454/Toms-Storage/master/version-check-nf.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://www.curseforge.com/minecraft/mc-mods/toms-storage" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
@@ -39,9 +39,9 @@ Simple vanilla style storage mod.
     # the modid of the dependency
     modId="neoforge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
-    mandatory=true #mandatory
+    type="required"
     # The version range of the dependency
-    versionRange="[20.2.59-beta,)" #mandatory
+    versionRange="[20.4.70-beta,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -49,7 +49,7 @@ Simple vanilla style storage mod.
 # Here's another dependency
 [[dependencies.toms_storage]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.20.2,)"
+    type="required"
+    versionRange="[1.20.4,1.20.5)"
     ordering="NONE"
     side="BOTH"

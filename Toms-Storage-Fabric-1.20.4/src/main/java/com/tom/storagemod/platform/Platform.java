@@ -33,6 +33,8 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.GameObject.GameRegistry;
 import com.tom.storagemod.util.GameObject.GameRegistryBE;
 
+import dev.emi.trinkets.api.TrinketsApi;
+
 public class Platform {
 
 	public static final GameRegistry<Item> ITEMS = new GameRegistry<>(BuiltInRegistries.ITEM);
@@ -74,13 +76,13 @@ public class Platform {
 
 	private static boolean trinkets = FabricLoader.getInstance().isModLoaded("trinkets");
 	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
-		/*if(trinkets) {
+		if(trinkets) {
 			var tc = TrinketsApi.getTrinketComponent(player).orElse(null);
 			if(tc != null) {
 				var s = tc.getEquipped(is);
 				if(!s.isEmpty())return map.apply(s.get(0).getB());
 			}
-		}*/
+		}
 		return def;
 	}
 

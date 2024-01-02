@@ -11,6 +11,17 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
+    maven {
+        url = "https://maven.theillusivec4.top/"
+    }
+    maven {
+    	// location of the maven that hosts JEI files since January 2023
+    	name = "Jared's maven"
+    	url = "https://maven.blamejared.com/"
+	}
+	maven { url "https://maven.shedaniel.me/" }
+    maven { url "https://maven.architectury.dev/" }
+    maven { url "https://maven.terraformersmc.com/releases/"}
 }
 
 base {
@@ -19,6 +30,7 @@ base {
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+def useLib = System.getProperty("useLib")
 
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
@@ -77,7 +89,7 @@ sourceSets {
 			srcDir "../TomsStorage-120/src/shared/java"
 			srcDir "src/loader-shared/java"
 			srcDir "src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			exclude "com/tom/storagemod/jei/**"
 			exclude "com/tom/storagemod/emi/**"
 		}
@@ -118,6 +130,16 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:6.1.0+1.20.2"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:6.1.0+1.20.2:api"
+    
+    if(useLib) {
+    	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:13.0.685"
+		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:13.0.685"
+		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:13.0.685"
+		implementation "me.shedaniel.cloth:cloth-config-neoforge:12.0.119"
+    	implementation "dev.architectury:architectury-neoforge:10.0.17"
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -138,6 +160,10 @@ tasks.withType(ProcessResources).configureEach {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
+}
+
+java {
+    withSourcesJar()
 }
 
 // Example configuration to allow publishing using the maven-publish plugin

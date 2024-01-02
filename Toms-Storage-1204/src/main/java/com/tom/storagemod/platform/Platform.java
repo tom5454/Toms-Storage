@@ -18,8 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -29,6 +29,9 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.GameObject.GameRegistry;
 import com.tom.storagemod.util.GameObject.GameRegistryBE;
+
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotResult;
 
 public class Platform {
 
@@ -54,12 +57,12 @@ public class Platform {
 		return item;
 	}
 
-	public static void register() {
+	public static void register(IEventBus bus) {
 		ITEMS.register();
 		BLOCKS.register();
 		BLOCK_ENTITY.register();
 		MENU_TYPE.register();
-		TAB.register(FMLJavaModLoadingContext.get().getModEventBus());
+		TAB.register(bus);
 	}
 
 	public static CompoundTag getSyncTag(ItemStack stack) {
@@ -83,10 +86,10 @@ public class Platform {
 	private static boolean curios = ModList.get().isLoaded("curios");
 	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
 		if(curios) {
-			/*var handler = player.getCapability(CuriosCapability.INVENTORY).orElse(null);
+			var handler = player.getCapability(CuriosCapability.INVENTORY);
 			if (handler == null)return def;
 			List<SlotResult> s = handler.findCurios(is);
-			if(!s.isEmpty())return map.apply(s.get(0).stack());*/
+			if(!s.isEmpty())return map.apply(s.get(0).stack());
 		}
 		return def;
 	}

@@ -41,11 +41,11 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:9.0.0-pre.1") {
+	modImplementation("com.terraformersmc:modmenu:9.0.0") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
-    /*modImplementation "dev.emi:trinkets:3.8.0"
+    modImplementation "dev.emi:trinkets:3.8.0"
     modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.3.0"
 	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.3.0"
 	
@@ -64,12 +64,12 @@ dependencies {
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
-    modImplementation("dev.architectury:architectury-fabric:10.0.8")
+    modImplementation("dev.architectury:architectury-fabric:11.0.9")
     
-    modCompileOnly "dev.emi:emi-fabric:1.0.21+1.20.2:api"
-	modLocalRuntime "dev.emi:emi-fabric:1.0.21+1.20.2"
+    modCompileOnly  "dev.emi:emi-fabric:1.0.29+1.20.4:api"
+	modLocalRuntime "dev.emi:emi-fabric:1.0.29+1.20.4"
     
-	// compile against the JEI API but do not include it at runtime
+	/*// compile against the JEI API but do not include it at runtime
 	modCompileOnlyApi("mezz.jei:jei-1.20.2-common-api:16.0.0.28")
 	modCompileOnlyApi("mezz.jei:jei-1.20.2-fabric-api:16.0.0.28")
 	// at runtime, use the full JEI jar for Fabric
@@ -83,8 +83,6 @@ sourceSets {
 			srcDir "src/loader-shared/java"
 			srcDir "../TomsStorage-1204/src/platform-shared/java"
 			exclude "com/tom/storagemod/jei/**"
-			exclude "com/tom/storagemod/rei/**"
-			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
 			srcDir "../TomsStorage-1204/src/shared/resources"
