@@ -66,7 +66,7 @@ dependencies {
     }
     modImplementation("dev.architectury:architectury-fabric:9.0.7")
     modCompileOnly "dev.emi:emi-fabric:1.0.5+1.20.1:api"
-	modLocalRuntime "dev.emi:emi-fabric:1.0.5+1.20.1"
+	//modLocalRuntime "dev.emi:emi-fabric:1.0.5+1.20.1"
     
 	// compile against the JEI API but do not include it at runtime
 	modCompileOnlyApi("mezz.jei:jei-1.20.1-common-api:15.2.0.22")

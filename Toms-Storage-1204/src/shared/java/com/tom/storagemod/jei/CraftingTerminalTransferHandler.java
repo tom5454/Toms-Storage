@@ -20,7 +20,6 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
-import com.tom.storagemod.platform.PlatformRecipeTransferHandler;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.StoredItemStack;
 

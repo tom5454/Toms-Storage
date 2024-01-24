@@ -90,7 +90,6 @@ sourceSets {
 			srcDir "src/loader-shared/java"
 			srcDir "src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			exclude "com/tom/storagemod/jei/**"
 		}
 		resources {
 			srcDir "src/shared/resources"
@@ -129,11 +128,16 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
+    compileOnly "mezz.jei:jei-1.20.4-neoforge-api:17.0.0.30"
+    compileOnly "mezz.jei:jei-1.20.4-common-api:17.0.0.30"
+    // at runtime, use the full JEI jar
+  	runtimeOnly "mezz.jei:jei-1.20.4-neoforge:17.0.0.30"
+  	
+    //runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
     compileOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4:api"
     
-    compileOnly "dev.emi:emi-neoforge:1.0.29+1.20.4:api"
-	runtimeOnly "dev.emi:emi-neoforge:1.0.29+1.20.4"
+    compileOnly "dev.emi:emi-neoforge:1.1.0+1.20.4:api"
+	//runtimeOnly "dev.emi:emi-neoforge:1.1.0+1.20.4"
 	
 	if(useLib) {
     	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"

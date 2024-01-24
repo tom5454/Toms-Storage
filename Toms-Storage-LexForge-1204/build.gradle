@@ -167,10 +167,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
     // compile against the JEI API but do not include it at runtime
-    //compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:16.0.0.28")
-    //compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:16.0.0.28")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.4-forge-api:17.0.0.30")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.4-common-api:17.0.0.30")
   	// at runtime, use the full JEI jar
-  	//runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:16.0.0.28")
+  	runtimeOnly fg.deobf("mezz.jei:jei-1.20.4-forge:17.0.0.30")
   	
   	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:7.0.0-beta.3+1.20.4")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:7.0.0-beta.3+1.20.4:api")
@@ -194,7 +194,6 @@ sourceSets {
 			srcDir "src/loader-shared/java"
 			srcDir "../TomsStorage-1204/src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			exclude "com/tom/storagemod/jei/**"
 			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
