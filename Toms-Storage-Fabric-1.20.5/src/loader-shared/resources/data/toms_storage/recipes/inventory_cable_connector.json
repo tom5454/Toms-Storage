@@ -26,6 +26,6 @@
     }
   },
   "result": {
-    "item": "toms_storage:ts.inventory_cable_connector"
+    "id": "toms_storage:ts.inventory_cable_connector"
   }
 }

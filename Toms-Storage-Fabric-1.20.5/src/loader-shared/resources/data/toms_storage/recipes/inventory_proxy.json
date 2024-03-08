@@ -17,6 +17,6 @@
     }
   },
   "result": {
-    "item": "toms_storage:ts.inventory_proxy"
+    "id": "toms_storage:ts.inventory_proxy"
   }
 }

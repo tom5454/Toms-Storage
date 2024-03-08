@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+  	{
+  		"item": "toms_storage:ts.painted_trim"
+  	},
+  	{
+  		"item": "minecraft:water_bucket"
+  	}
+  ],
+  "result": {
+    "id": "toms_storage:ts.trim",
+    "count": 1
+  }
+}

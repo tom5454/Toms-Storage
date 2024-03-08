@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -105,16 +106,16 @@ public class LevelEmitterBlockEntity extends BlockEntity implements TickableServ
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
-		compound.put("Filter", getFilter().save(new CompoundTag()));
+	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		compound.put("Filter", getFilter().save(provider, new CompoundTag()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
 	}
 
 	@Override
-	public void load(CompoundTag nbtIn) {
-		super.load(nbtIn);
-		filter = ItemStack.of(nbtIn.getCompound("Filter"));
+	public void load(CompoundTag nbtIn, HolderLookup.Provider provider) {
+		super.load(nbtIn, provider);
+		filter = ItemStack.parseOptional(provider, nbtIn.getCompound("Filter"));
 		count = nbtIn.getInt("Count");
 		lessThan = nbtIn.getBoolean("lessThan");
 	}

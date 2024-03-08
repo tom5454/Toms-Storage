@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "toms_storage:ts.inventory_cable_connector_framed",
+    "id": "toms_storage:ts.inventory_cable_connector_framed",
     "count": 1
   }
 }

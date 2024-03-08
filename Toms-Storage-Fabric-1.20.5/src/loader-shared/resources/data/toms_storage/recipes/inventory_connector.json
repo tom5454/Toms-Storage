@@ -23,6 +23,6 @@
     }
   },
   "result": {
-    "item": "toms_storage:ts.inventory_connector"
+    "id": "toms_storage:ts.inventory_connector"
   }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -54,7 +55,7 @@ public class FramedInventoryCableBlock extends Block implements IInventoryCable,
 
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
-			TooltipFlag flagIn) {
+			TooltipFlag flagIn, RegistryAccess registryAccess) {
 		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable", tooltip);
 	}

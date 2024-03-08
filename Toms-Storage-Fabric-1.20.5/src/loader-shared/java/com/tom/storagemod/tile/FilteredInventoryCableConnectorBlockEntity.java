@@ -3,6 +3,7 @@ package com.tom.storagemod.tile;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -44,18 +45,18 @@ public class FilteredInventoryCableConnectorBlockEntity extends AbstractInventor
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
-		tag.put("filter", filter.createTag());
+	public void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+		super.saveAdditional(tag, provider);
+		tag.put("filter", filter.createTag(provider));
 		tag.putBoolean("allowList", allowList);
 		tag.putInt("priority", priority.ordinal());
 		tag.putBoolean("keepLast", keepLastInSlot);
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
-		filter.fromTag(tag.getList("filter", 10));
+	public void load(CompoundTag tag, HolderLookup.Provider provider) {
+		super.load(tag, provider);
+		filter.fromTag(tag.getList("filter", 10), provider);
 		if(tag.contains("allowList"))allowList = tag.getBoolean("allowList");
 		else allowList = true;
 		if(tag.contains("priority"))priority = Priority.VALUES[Math.abs(tag.getInt("priority")) % Priority.VALUES.length];

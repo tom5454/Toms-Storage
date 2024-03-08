@@ -113,11 +113,14 @@ public class StorageModClient implements ClientModInitializer {
 			BlockHitResult lookingAt = (BlockHitResult) player.pick(StorageMod.CONFIG.wirelessRange, 0f, true);
 			BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
 			if(state.is(StorageTags.REMOTE_ACTIVATE)) {
+				PoseStack ps = new PoseStack();
+				ps.pushPose();
 				BlockPos pos = lookingAt.getBlockPos();
 				Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
 				VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
-				drawShapeOutline(ctx.matrixStack(), buf, state.getCollisionShape(player.level(), pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
+				drawShapeOutline(ps, buf, state.getCollisionShape(player.level(), pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
 				mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
+				ps.popPose();
 				return false;
 			}
 
@@ -172,8 +175,8 @@ public class StorageModClient implements ClientModInitializer {
 			q /= t;
 			r /= t;
 			s /= t;
-			vertexConsumer.vertex(entry.pose(), (float)(k + d), (float)(l + e), (float)(m + f)).color(g, h, i, j).normal(entry.normal(), q, r, s).endVertex();
-			vertexConsumer.vertex(entry.pose(), (float)(n + d), (float)(o + e), (float)(p + f)).color(g, h, i, j).normal(entry.normal(), q, r, s).endVertex();
+			vertexConsumer.vertex(entry, (float)(k + d), (float)(l + e), (float)(m + f)).color(g, h, i, j).normal(entry, q, r, s).endVertex();
+			vertexConsumer.vertex(entry, (float)(n + d), (float)(o + e), (float)(p + f)).color(g, h, i, j).normal(entry, q, r, s).endVertex();
 		});
 	}
 

@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -163,14 +164,14 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		compound.putInt("sort", sort);
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
+	public void load(CompoundTag compound, HolderLookup.Provider provider) {
 		sort = compound.getInt("sort");
-		super.load(compound);
+		super.load(compound, provider);
 	}
 
 	public String getLastSearch() {

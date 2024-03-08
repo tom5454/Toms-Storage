@@ -1,9 +1,14 @@
 package com.tom.storagemod.util;
 
+import java.util.ArrayList;
+
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
+
+import com.tom.storagemod.Content;
+import com.tom.storagemod.components.SimpleItemFilterComponent;
 
 public class SimpleItemFilter implements ItemPredicate {
 	private SimpleContainer filter;
@@ -12,11 +17,13 @@ public class SimpleItemFilter implements ItemPredicate {
 
 	public SimpleItemFilter(ItemStack stack) {
 		this.stack = stack;
-		filter = new SimpleContainer(9);
-		CompoundTag tag = stack.getOrCreateTag();
-		filter.fromTag(tag.getList("Filter", 10));
-		matchNBT = tag.getBoolean("matchNBT");
-		allowList = tag.getBoolean("allowlist");
+		SimpleItemFilterComponent c = stack.get(Content.simpleItemFilterComponent.get());
+		if (c != null) {
+			filter = new SimpleContainer(c.stacks().toArray(ItemStack[]::new));
+			matchNBT = c.matchComp();
+			allowList = c.allowList();
+		} else
+			filter = new SimpleContainer(9);
 	}
 
 	@Override
@@ -28,7 +35,7 @@ public class SimpleItemFilter implements ItemPredicate {
 		for(int i = 0;i<filter.getContainerSize();i++) {
 			ItemStack f = filter.getItem(i);
 			if(f.isEmpty())continue;
-			if(stack.isOf(f.getItem()) && (!matchNBT || stack.nbtMatches(f.getTag())))return true;
+			if(stack.isOf(f.getItem()) && (!matchNBT || stack.componentsMatches(f.getComponentsPatch())))return true;
 		}
 		return false;
 	}
@@ -39,10 +46,8 @@ public class SimpleItemFilter implements ItemPredicate {
 	}
 
 	public void flush() {
-		CompoundTag tag = stack.getOrCreateTag();
-		tag.put("Filter", filter.createTag());
-		tag.putBoolean("matchNBT", matchNBT);
-		tag.putBoolean("allowlist", allowList);
+		SimpleItemFilterComponent c = new SimpleItemFilterComponent(new ArrayList<>(filter.items), matchNBT, allowList);
+		stack.applyComponents(DataComponentPatch.builder().set(Content.simpleItemFilterComponent.get(), c).build());
 	}
 
 	public SimpleContainer getContainer() {

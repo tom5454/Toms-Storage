@@ -3,6 +3,7 @@ package com.tom.storagemod.block;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +33,7 @@ public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorB
 
 	@Override
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
-			TooltipFlag flagIn) {
+			TooltipFlag flagIn, RegistryAccess registryAccess) {
 		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 	}
@@ -41,7 +42,7 @@ public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorB
 	public boolean paint(Level world, BlockPos pos, BlockState to) {
 		BlockState old = world.getBlockState(pos);
 		BlockEntity te = world.getBlockEntity(pos);
-		CompoundTag tag = te.saveWithoutMetadata();
+		CompoundTag tag = te.saveWithoutMetadata(world.registryAccess());
 		world.setBlock(pos, StorageMod.invCableConnectorPainted.get().defaultBlockState().
 				setValue(FACING, old.getValue(FACING))
 				.setValue(DOWN, old.getValue(DOWN))
@@ -51,7 +52,7 @@ public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorB
 				.setValue(SOUTH, old.getValue(SOUTH))
 				.setValue(WEST, old.getValue(WEST)), 2);
 		te = world.getBlockEntity(pos);
-		te.load(tag);
+		te.load(tag, world.registryAccess());
 		if(te != null && te instanceof PaintedBlockEntity)
 			return ((PaintedBlockEntity)te).setPaintedBlockState(to);
 		return false;

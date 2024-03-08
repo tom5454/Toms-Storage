@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "toms_storage:ts.inventory_cable",
+    "id": "toms_storage:ts.inventory_cable",
     "count": 6
   }
 }

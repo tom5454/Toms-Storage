@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -116,8 +117,8 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	}
 
 	@Override
-	public void load(CompoundTag nbt) {
-		super.load(nbt);
+	public void load(CompoundTag nbt, HolderLookup.Provider provider) {
+		super.load(nbt, provider);
 		if(nbt.contains(CHANNEL_TAG)) {
 			channel = nbt.getUUID(CHANNEL_TAG);
 		} else {
@@ -127,8 +128,8 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt) {
-		super.saveAdditional(nbt);
+	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+		super.saveAdditional(nbt, provider);
 		if(channel != null) {
 			nbt.putUUID(CHANNEL_TAG, channel);
 		}

@@ -3,6 +3,7 @@ package com.tom.storagemod.tile;
 import java.util.HashSet;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -50,8 +51,8 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
-		super.saveAdditional(compound);
+	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.saveAdditional(compound, provider);
 		ListTag listnbt = new ListTag();
 
 		for(int i = 0; i < craftMatrix.getContainerSize(); ++i) {
@@ -59,7 +60,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 			if (!itemstack.isEmpty()) {
 				CompoundTag tag = new CompoundTag();
 				tag.putByte("Slot", (byte)i);
-				itemstack.save(tag);
+				itemstack.save(provider, tag);
 				listnbt.add(tag);
 			}
 		}
@@ -68,8 +69,8 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 	private boolean reading;
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
+	public void load(CompoundTag compound, HolderLookup.Provider provider) {
+		super.load(compound, provider);
 		reading = true;
 		ListTag listnbt = compound.getList("CraftingTable", 10);
 
@@ -77,7 +78,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 			CompoundTag tag = listnbt.getCompound(i);
 			int j = tag.getByte("Slot") & 255;
 			if (j >= 0 && j < craftMatrix.getContainerSize()) {
-				craftMatrix.setItem(j, ItemStack.of(tag));
+				craftMatrix.setItem(j, ItemStack.parseOptional(provider, tag));
 			}
 		}
 		reading = false;
@@ -110,7 +111,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					if(is == null && (getSorting() & (1 << 8)) != 0) {
 						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
 							ItemStack st = thePlayer.getInventory().getItem(j);
-							if(ItemStack.isSameItemSameTags(oldItem, st)) {
+							if(ItemStack.isSameItemSameComponents(oldItem, st)) {
 								st = thePlayer.getInventory().removeItem(j, 1);
 								if(!st.isEmpty()) {
 									is = new StoredItemStack(st, 1);
@@ -198,7 +199,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					for (int j = 0;j < items[i].length;j++) {
 						boolean br = false;
 						for (int k = 0;k < player.getInventory().getContainerSize();k++) {
-							if(ItemStack.isSameItemSameTags(player.getInventory().getItem(k), items[i][j])) {
+							if(ItemStack.isSameItemSameComponents(player.getInventory().getItem(k), items[i][j])) {
 								stack = player.getInventory().removeItem(k, 1);
 								br = true;
 								break;

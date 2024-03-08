@@ -1,6 +1,9 @@
 package com.tom.storagemod.tile;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -12,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.Content;
-import com.tom.storagemod.block.IPaintable;
 
 public class PaintedBlockEntity extends BlockEntity {
 	private BlockState blockState;
@@ -34,14 +36,14 @@ public class PaintedBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void load(CompoundTag compound) {
-		super.load(compound);
-		blockState = IPaintable.readBlockState(this.level, compound.getCompound("block"));
+	public void load(CompoundTag compound, HolderLookup.Provider provider) {
+		super.load(compound, provider);
+		blockState = NbtUtils.readBlockState(provider.lookupOrThrow(Registries.BLOCK), compound.getCompound("block"));
 		markDirtyClient();
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound) {
+	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		if (blockState != null) {
 			compound.put("block", NbtUtils.writeBlockState(blockState));
 		}
@@ -69,11 +71,31 @@ public class PaintedBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
-		return saveWithFullMetadata();
+	public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+		return saveWithFullMetadata(provider);
 	}
 
 	public BlockState getPaintedBlockState() {
 		return blockState == null ? Blocks.AIR.defaultBlockState() : blockState;
+	}
+
+	@Override
+	public void applyComponents(DataComponentMap dataComponentMap) {
+		super.applyComponents(dataComponentMap);
+		blockState = dataComponentMap.get(Content.paintComponent.get());
+	}
+
+	@Override
+	public void collectComponents(DataComponentMap.Builder builder) {
+		super.collectComponents(builder);
+		if (this.blockState != null) {
+			builder.set(Content.paintComponent.get(), blockState);
+		}
+	}
+
+	@Override
+	public void removeComponentsFromTag(CompoundTag compoundTag) {
+		super.removeComponentsFromTag(compoundTag);
+		compoundTag.remove("block");
 	}
 }

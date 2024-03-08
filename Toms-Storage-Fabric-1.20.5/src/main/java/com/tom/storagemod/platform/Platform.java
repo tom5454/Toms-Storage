@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -39,6 +40,7 @@ public class Platform {
 	public static final GameRegistry<Block> BLOCKS = new GameRegistry<>(BuiltInRegistries.BLOCK);
 	public static final GameRegistryBE BLOCK_ENTITY = new GameRegistryBE(BuiltInRegistries.BLOCK_ENTITY_TYPE);
 	public static final GameRegistry<MenuType<?>> MENU_TYPE = new GameRegistry<>(BuiltInRegistries.MENU);
+	public static final GameRegistry<DataComponentType<?>> DATA_COMPONENT_TYPES = new GameRegistry<>(BuiltInRegistries.DATA_COMPONENT_TYPE);
 
 	private static List<Item> tabItems = new ArrayList<>();
 
@@ -55,15 +57,6 @@ public class Platform {
 
 	static {
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP, STORAGE_MOD_TAB);
-	}
-
-	public static CompoundTag getSyncTag(ItemStack stack) {
-		Item item = stack.getItem();
-		CompoundTag compoundtag = null;
-		if (item.canBeDepleted() || item.shouldOverrideMultiplayerNbt()) {
-			compoundtag = stack.getTag();
-		}
-		return compoundtag;
 	}
 
 	public static InteractionResult checkUse(Level worldIn, BlockHitResult lookingAt, Player playerIn, InteractionHand handIn) {

@@ -17,7 +17,7 @@
     }
   },
   "result": {
-    "item": "toms_storage:ts.trim",
+    "id": "toms_storage:ts.trim",
     "count": 2
   }
 }

@@ -11,17 +11,17 @@ import java.util.UUID;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.saveddata.SavedData;
-
-import com.tom.storagemod.platform.SavedDataFactory;
 
 public class RemoteConnections extends SavedData {
 	private static final String CONNECTIONS_TAG = "connections";
@@ -30,13 +30,13 @@ public class RemoteConnections extends SavedData {
 	public static final String PUBLIC_TAG = "public";
 	public static final String DISPLAY_NAME = "name";
 	private static final String ID = "toms_storage_rc";
-	private static final SavedDataFactory<RemoteConnections> FACTORY = new SavedDataFactory<>(RemoteConnections::new, RemoteConnections::new, ID);
+	private static final SavedData.Factory<RemoteConnections> FACTORY = new SavedData.Factory<>(RemoteConnections::new, RemoteConnections::new, DataFixTypes.LEVEL);
 	private Map<UUID, Channel> connections = new HashMap<>();
 
 	private RemoteConnections() {
 	}
 
-	private RemoteConnections(CompoundTag tag) {
+	private RemoteConnections(CompoundTag tag, HolderLookup.Provider provider) {
 		load(tag.getList(CONNECTIONS_TAG, Tag.TAG_COMPOUND), connections);
 	}
 
@@ -50,11 +50,11 @@ public class RemoteConnections extends SavedData {
 
 	public static RemoteConnections get(Level world) {
 		ServerLevel sw = (ServerLevel) world;
-		return FACTORY.get(sw.getServer().overworld().getDataStorage());
+		return sw.getServer().overworld().getDataStorage().computeIfAbsent(FACTORY, ID);
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag tag) {
+	public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
 		ListTag list = new ListTag();
 		connections.forEach((k, v) -> {
 			CompoundTag t = new CompoundTag();
