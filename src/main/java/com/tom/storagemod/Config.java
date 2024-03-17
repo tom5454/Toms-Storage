@@ -25,12 +25,14 @@ public class Config {
 	public static int invRange;
 	public static int invConnectorMax = 0;
 	public static int wirelessRange, advWirelessRange;
+	public static int wirelessTermBeaconLvl, wirelessTermBeaconLvlDim;
 	public static Set<Block> multiblockInvs = new HashSet<>();
 
 	public static class Server {
 		public IntValue inventoryConnectorRange;
 		public IntValue inventoryCableConnectorMaxCables;
 		public IntValue wirelessRange, advWirelessRange;
+		public IntValue wirelessTermBeaconLvl, wirelessTermBeaconLvlDim;
 		public BooleanValue onlyTrimsConnect;
 		public ConfigValue<List<? extends String>> multiblockInvs;
 
@@ -58,6 +60,18 @@ public class Config {
 			advWirelessRange = builder.comment("Wireless terminal reach").
 					translation("tomsstorage.config.adv_wireless_range").
 					defineInRange("advWirelessRange", 64, 16, 512);
+
+			wirelessTermBeaconLvl = builder.comment("Adv Wireless terminal requied beacon level for infinite range",
+					"Value of 0 only requires a single beacon block nearby",
+					"Value of -1 disables this feature entirely").
+					translation("tomsstorage.config.adv_wireless_beacon_lvl").
+					defineInRange("wirelessTermBeaconLvl", 1, -1, 4);
+
+			wirelessTermBeaconLvlDim = builder.comment("Adv Wireless terminal requied beacon level for cross dimensional access",
+					"Value of 0 only requires a single beacon block nearby",
+					"Value of -1 disables this feature entirely").
+					translation("tomsstorage.config.adv_wireless_beacon_lvl_dim").
+					defineInRange("wirelessTermBeaconLvlDim", 4, -1, 4);
 		}
 	}
 
@@ -77,6 +91,8 @@ public class Config {
 		multiblockInvs = SERVER.multiblockInvs.get().stream().map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).
 				filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 		advWirelessRange = SERVER.advWirelessRange.get();
+		wirelessTermBeaconLvl = SERVER.wirelessTermBeaconLvl.get();
+		wirelessTermBeaconLvlDim = SERVER.wirelessTermBeaconLvlDim.get();
 	}
 
 	@SubscribeEvent

@@ -128,13 +128,17 @@ public class ClientProxy implements IProxy {
 		});
 	}
 
-	public static void tooltip(String key, List<ITextComponent> tooltip) {
+	public static void tooltip(String key, List<ITextComponent> tooltip, Object... args) {
+		tooltip(key, true, tooltip, args);
+	}
+
+	public static void tooltip(String key, boolean addShift, List<ITextComponent> tooltip, Object... args) {
 		if(Screen.hasShiftDown()) {
-			String[] sp = I18n.get("tooltip.toms_storage." + key).split("\\\\");
+			String[] sp = I18n.get("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
 				tooltip.add(new StringTextComponent(sp[i]));
 			}
-		} else {
+		} else if(addShift) {
 			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(TextFormatting.ITALIC, TextFormatting.GRAY));
 		}
 	}

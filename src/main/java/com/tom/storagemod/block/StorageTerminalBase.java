@@ -26,6 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -68,7 +69,12 @@ public abstract class StorageTerminalBase extends ContainerBlock implements IWat
 
 		TileEntity blockEntity_1 = world.getBlockEntity(pos);
 		if (blockEntity_1 instanceof TileEntityStorageTerminal) {
-			player.openMenu((TileEntityStorageTerminal)blockEntity_1);
+			TileEntityStorageTerminal term = (TileEntityStorageTerminal)blockEntity_1;
+			if (term.canInteractWith(player)) {
+				player.openMenu(term);
+			} else {
+				player.displayClientMessage(new TranslationTextComponent("chat.toms_storage.terminal_out_of_range"), true);
+			}
 		}
 		return ActionResultType.SUCCESS;
 	}

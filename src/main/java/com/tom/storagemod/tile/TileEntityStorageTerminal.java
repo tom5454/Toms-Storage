@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.InventoryHelper;
@@ -12,10 +13,14 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.BeaconTileEntity;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -24,6 +29,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StoredItemStack;
 import com.tom.storagemod.block.StorageTerminalBase;
@@ -37,6 +43,8 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 	private int sort;
 	private String lastSearch = "";
 	private boolean updateItems;
+	private int beaconLevel;
+
 	public TileEntityStorageTerminal() {
 		super(StorageMod.terminalTile);
 	}
@@ -107,32 +115,50 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	@Override
 	public void tick() {
-		if(!level.isClientSide && updateItems) {
-			BlockState st = level.getBlockState(worldPosition);
-			Direction d = st.getValue(StorageTerminalBase.FACING);
-			TerminalPos p = st.getValue(StorageTerminalBase.TERMINAL_POS);
-			if(p == TerminalPos.UP)d = Direction.UP;
-			if(p == TerminalPos.DOWN)d = Direction.DOWN;
-			TileEntity invTile = level.getBlockEntity(worldPosition.relative(d));
-			items.clear();
-			if(invTile != null) {
-				LazyOptional<IItemHandler> lih = invTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
-				itemHandler = lih.orElse(null);
-				if(itemHandler != null) {
-					IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
-					map(StoredItemStack::new).forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
+		if(!level.isClientSide) {
+			if (updateItems) {
+				BlockState st = level.getBlockState(worldPosition);
+				Direction d = st.getValue(StorageTerminalBase.FACING);
+				TerminalPos p = st.getValue(StorageTerminalBase.TERMINAL_POS);
+				if(p == TerminalPos.UP)d = Direction.UP;
+				if(p == TerminalPos.DOWN)d = Direction.DOWN;
+				TileEntity invTile = level.getBlockEntity(worldPosition.relative(d));
+				items.clear();
+				if(invTile != null) {
+					LazyOptional<IItemHandler> lih = invTile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d.getOpposite());
+					itemHandler = lih.orElse(null);
+					if(itemHandler != null) {
+						IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
+						map(StoredItemStack::new).forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
+					}
 				}
+				updateItems = false;
 			}
-			updateItems = false;
+			if(level.getGameTime() % 40 == 5) {
+				beaconLevel = BlockPos.betweenClosedStream(new AxisAlignedBB(worldPosition).inflate(8)).mapToInt(p -> {
+					if(level.isLoaded(p)) {
+						BlockState st = level.getBlockState(p);
+						if(st.is(Blocks.BEACON)) {
+							return calcBeaconLevel(p.getX(), p.getY(), p.getZ());
+						}
+					}
+					return 0;
+				}).max().orElse(0);
+			}
 		}
 	}
 
 	public boolean canInteractWith(PlayerEntity player) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
-		int d = 4;
-		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
-		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)d = Math.max(d, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
-		return !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
+		int termReach = 0;
+		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
+		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
+		if(Config.wirelessTermBeaconLvl != -1 && beaconLevel >= Config.wirelessTermBeaconLvl && termReach > 0) {
+			if(Config.wirelessTermBeaconLvlDim != -1 && beaconLevel >= Config.wirelessTermBeaconLvlDim)return true;
+			else return player.level == level;
+		}
+		int d = Math.max(termReach, 4);
+		return player.level == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
 	}
 
 	public int getSorting() {
@@ -161,5 +187,38 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	public void setLastSearch(String string) {
 		lastSearch = string;
+	}
+
+	private int calcBeaconLevel(int x, int y, int z) {
+		int i = 0;
+
+		TileEntity ent = level.getBlockEntity(new BlockPos(x, y, z));
+		if(ent instanceof BeaconTileEntity) {
+			BeaconTileEntity b = (BeaconTileEntity) ent;
+			if(b.getBeamSections().isEmpty())return 0;
+
+			for(int j = 1; j <= 4; i = j++) {
+				int k = y - j;
+				if (k < 0) {
+					break;
+				}
+
+				boolean flag = true;
+
+				for(int l = x - j; l <= x + j && flag; ++l) {
+					for(int i1 = z - j; i1 <= z + j; ++i1) {
+						if (!level.getBlockState(new BlockPos(l, k, i1)).is(BlockTags.BEACON_BASE_BLOCKS)) {
+							flag = false;
+							break;
+						}
+					}
+				}
+
+				if (!flag) {
+					break;
+				}
+			}
+		}
+		return i;
 	}
 }
