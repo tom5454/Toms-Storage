@@ -35,7 +35,7 @@ public class SimpleItemFilter implements ItemPredicate {
 		for(int i = 0;i<filter.getContainerSize();i++) {
 			ItemStack f = filter.getItem(i);
 			if(f.isEmpty())continue;
-			if(stack.isOf(f.getItem()) && (!matchNBT || stack.componentsMatches(f.getComponentsPatch())))return true;
+			if(stack.isOf(f.getItem()) && (!matchNBT || stack.componentsMatch(f.getComponentsPatch())))return true;
 		}
 		return false;
 	}

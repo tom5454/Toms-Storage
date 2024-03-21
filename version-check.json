@@ -5,8 +5,8 @@
 		"1.16.1-latest": "1.2.4",
 		"1.16.2-latest": "1.2.8",
 		"1.16.3-latest": "1.2.9",
-		"1.16.4-latest": "1.2.20",
-		"1.16.5-latest": "1.2.20",
+		"1.16.4-latest": "1.2.21",
+		"1.16.5-latest": "1.2.21",
 		"1.17.1-latest": "1.2.21",
 		"1.18-latest": "1.2.22",
 		"1.18.2-latest": "1.4.4",
@@ -127,6 +127,7 @@
 		"1.2.17": "1.17 port"
 	},
 	"1.16.5": {
+		"1.2.21": "Fixed crash on Dedicated Server",
 		"1.2.20": "Backported Advanced Wireless Terminal range extending feature",
 		"1.2.19": "Fixed inventory hopper not pulling items when unfiltered (Closes #67, Closes #37)",
 		"1.2.18": "Added advanced wireless terminal\nFixed terminal couldn't be closed if the search field is focused (Closes #59)",
@@ -138,6 +139,7 @@
 		"1.2.12": "Fixed button overlapping in terminal gui.\nFixed terminals being accessible in spectator mode."
 	},
 	"1.16.4": {
+		"1.2.21": "Fixed crash on Dedicated Server",
 		"1.2.20": "Backported Advanced Wireless Terminal range extending feature",
 		"1.2.19": "Fixed inventory hopper not pulling items when unfiltered (Closes #67, Closes #37)",
 		"1.2.18": "Added advanced wireless terminal\nFixed terminal couldn't be closed if the search field is focused (Closes #59)",
