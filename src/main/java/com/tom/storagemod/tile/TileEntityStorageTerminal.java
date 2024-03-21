@@ -195,7 +195,7 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 		TileEntity ent = level.getBlockEntity(new BlockPos(x, y, z));
 		if(ent instanceof BeaconTileEntity) {
 			BeaconTileEntity b = (BeaconTileEntity) ent;
-			if(b.getBeamSections().isEmpty())return 0;
+			if(b.getLevels() == 0)return 0;
 
 			for(int j = 1; j <= 4; i = j++) {
 				int k = y - j;
