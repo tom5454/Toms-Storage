@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class MergedStorage implements Storage<ItemVariant> {
@@ -58,9 +59,16 @@ public class MergedStorage implements Storage<ItemVariant> {
 		StoragePreconditions.notNegative(maxAmount);
 		long amount = 0;
 
-		for (Storage<ItemVariant> part : parts) {
-			amount += part.insert(resource, maxAmount - amount, transaction);
-			if (amount == maxAmount) break;
+		try (Transaction iterationTransaction = Transaction.openNested(transaction)) {
+			for (Storage<ItemVariant> part : parts) {
+				try (Transaction transferTransaction = iterationTransaction.openNested()) {
+					amount += part.insert(resource, maxAmount - amount, transferTransaction);
+					transferTransaction.commit();
+				}
+				if (amount == maxAmount) break;
+			}
+
+			iterationTransaction.commit();
 		}
 
 		return amount;
@@ -82,9 +90,15 @@ public class MergedStorage implements Storage<ItemVariant> {
 		StoragePreconditions.notNegative(maxAmount);
 		long amount = 0;
 
-		for (Storage<ItemVariant> part : parts) {
-			amount += part.extract(resource, maxAmount - amount, transaction);
-			if (amount == maxAmount) break;
+		try (Transaction iterationTransaction = Transaction.openNested(transaction)) {
+			for (Storage<ItemVariant> part : parts) {
+				try (Transaction transferTransaction = iterationTransaction.openNested()) {
+					amount += part.extract(resource, maxAmount - amount, transferTransaction);
+					transferTransaction.commit();
+				}
+				if (amount == maxAmount) break;
+			}
+			iterationTransaction.commit();
 		}
 
 		return amount;

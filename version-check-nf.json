@@ -1,15 +1,17 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage",
 	"promos": {
-		"1.20.2-latest": "1.6.9",
-		"1.20.4-latest": "1.6.10"
+		"1.20.2-latest": "1.6.10",
+		"1.20.4-latest": "1.6.11"
 	},
 	"1.20.4": {
+		"1.6.11": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.10": "Added JEI support",
 		"1.6.9": "20.4.70-beta port\nAdded curios, EMI, REI support",
 		"1.6.8": "1.20.4 port"
 	},
 	"1.20.2": {
+		"1.6.10": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.9": "Added curios support",
 		"1.6.8": "NeoForge 20.2.59-beta port",
 		"1.6.7": "NeoForge port"
