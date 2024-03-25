@@ -43,7 +43,7 @@ public class TileEntityInventoryHopperBasic extends TileEntityInventoryHopperBas
 					lastItemSlot = -1;
 				}
 			}
-		}
+		} else lastItemSlot = -1;
 		if(lastItemSlot == -1) {
 			for (int i = 0; i < top.getSlots(); i++) {
 				if(hasFilter) {
