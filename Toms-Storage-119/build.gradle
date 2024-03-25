@@ -60,6 +60,8 @@ minecraft {
                     source sourceSets.main
                 }
             }
+            
+            jvmArgs '-Xdebug', '-Xrunjdwp:server=n,transport=dt_socket,address=1024,suspend=y'
         }
 
         server {
@@ -170,7 +172,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.19.2-forge-api:11.6.0.1013")
     compileOnly fg.deobf("mezz.jei:jei-1.19.2-common-api:11.6.0.1013")
   	// at runtime, use the full JEI jar
-  	runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.6.0.1013")
+  	//runtimeOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.6.0.1013")
   	
   	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0:api")
@@ -252,4 +254,12 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+//Small hack to run with gradle inside eclipse instead of it's own way
+if (!useLib) {
+	tasks.named('test', Test) {
+		dependsOn 'TomsStorage-119Client'
+		ignoreFailures true
+	}
 }

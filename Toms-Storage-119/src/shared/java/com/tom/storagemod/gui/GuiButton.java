@@ -1,6 +1,7 @@
 package com.tom.storagemod.gui;
 
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -16,7 +17,7 @@ public class GuiButton extends PlatformButton {
 	public int texX = 0;
 	public int texY = 0;
 	public GuiButton(int x, int y, int tile, OnPress pressable) {
-		super(x, y, 16, 16, null, pressable);
+		super(x, y, 16, 16, Component.empty(), pressable);
 		this.tile = tile;
 		this.texture = BUTTON_TEXTURES;
 	}
