@@ -59,9 +59,16 @@ public class MergedStorage implements Storage<ItemVariant> {
 		StoragePreconditions.notNegative(maxAmount);
 		long amount = 0;
 
-		for (Storage<ItemVariant> part : parts) {
-			amount += part.insert(resource, maxAmount - amount, transaction);
-			if (amount == maxAmount) break;
+		try (Transaction iterationTransaction = Transaction.openNested(transaction)) {
+			for (Storage<ItemVariant> part : parts) {
+				try (Transaction transferTransaction = iterationTransaction.openNested()) {
+					amount += part.insert(resource, maxAmount - amount, transferTransaction);
+					transferTransaction.commit();
+				}
+				if (amount == maxAmount) break;
+			}
+
+			iterationTransaction.commit();
 		}
 
 		return amount;
@@ -83,9 +90,15 @@ public class MergedStorage implements Storage<ItemVariant> {
 		StoragePreconditions.notNegative(maxAmount);
 		long amount = 0;
 
-		for (Storage<ItemVariant> part : parts) {
-			amount += part.extract(resource, maxAmount - amount, transaction);
-			if (amount == maxAmount) break;
+		try (Transaction iterationTransaction = Transaction.openNested(transaction)) {
+			for (Storage<ItemVariant> part : parts) {
+				try (Transaction transferTransaction = iterationTransaction.openNested()) {
+					amount += part.extract(resource, maxAmount - amount, transferTransaction);
+					transferTransaction.commit();
+				}
+				if (amount == maxAmount) break;
+			}
+			iterationTransaction.commit();
 		}
 
 		return amount;
