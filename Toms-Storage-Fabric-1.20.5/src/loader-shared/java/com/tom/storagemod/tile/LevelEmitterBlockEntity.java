@@ -113,8 +113,8 @@ public class LevelEmitterBlockEntity extends BlockEntity implements TickableServ
 	}
 
 	@Override
-	public void load(CompoundTag nbtIn, HolderLookup.Provider provider) {
-		super.load(nbtIn, provider);
+	public void loadAdditional(CompoundTag nbtIn, HolderLookup.Provider provider) {
+		super.loadAdditional(nbtIn, provider);
 		filter = ItemStack.parseOptional(provider, nbtIn.getCompound("Filter"));
 		count = nbtIn.getInt("Count");
 		lessThan = nbtIn.getBoolean("lessThan");

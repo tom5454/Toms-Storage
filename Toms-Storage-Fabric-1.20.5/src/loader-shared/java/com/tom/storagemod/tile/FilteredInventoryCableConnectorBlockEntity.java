@@ -54,8 +54,8 @@ public class FilteredInventoryCableConnectorBlockEntity extends AbstractInventor
 	}
 
 	@Override
-	public void load(CompoundTag tag, HolderLookup.Provider provider) {
-		super.load(tag, provider);
+	public void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+		super.loadAdditional(tag, provider);
 		filter.fromTag(tag.getList("filter", 10), provider);
 		if(tag.contains("allowList"))allowList = tag.getBoolean("allowList");
 		else allowList = true;

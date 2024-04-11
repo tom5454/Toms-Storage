@@ -69,8 +69,8 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 	private boolean reading;
 	@Override
-	public void load(CompoundTag compound, HolderLookup.Provider provider) {
-		super.load(compound, provider);
+	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.loadAdditional(compound, provider);
 		reading = true;
 		ListTag listnbt = compound.getList("CraftingTable", 10);
 

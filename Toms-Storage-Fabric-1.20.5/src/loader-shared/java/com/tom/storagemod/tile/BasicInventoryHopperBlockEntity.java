@@ -53,8 +53,8 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	}
 
 	@Override
-	public void load(CompoundTag nbtIn, HolderLookup.Provider provider) {
-		super.load(nbtIn, provider);
+	public void loadAdditional(CompoundTag nbtIn, HolderLookup.Provider provider) {
+		super.loadAdditional(nbtIn, provider);
 		this.filter = ItemStack.parseOptional(provider, nbtIn.getCompound("Filter"));
 	}
 

@@ -117,8 +117,8 @@ public class InventoryCableConnectorBlockEntity extends AbstractInventoryCableCo
 	}
 
 	@Override
-	public void load(CompoundTag nbt, HolderLookup.Provider provider) {
-		super.load(nbt, provider);
+	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+		super.loadAdditional(nbt, provider);
 		if(nbt.contains(CHANNEL_TAG)) {
 			channel = nbt.getUUID(CHANNEL_TAG);
 		} else {

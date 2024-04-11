@@ -4,13 +4,12 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -46,8 +45,8 @@ public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
-			TooltipFlag flagIn, RegistryAccess registryAccess) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+			TooltipFlag tooltipFlag) {
 		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
 		StorageModClient.tooltip("inventory_proxy", tooltip);
 	}

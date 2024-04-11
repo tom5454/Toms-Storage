@@ -2,7 +2,7 @@ package com.tom.storagemod.tile;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentMap.Builder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -36,8 +36,8 @@ public class PaintedBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void load(CompoundTag compound, HolderLookup.Provider provider) {
-		super.load(compound, provider);
+	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.loadAdditional(compound, provider);
 		blockState = NbtUtils.readBlockState(provider.lookupOrThrow(Registries.BLOCK), compound.getCompound("block"));
 		markDirtyClient();
 	}
@@ -80,14 +80,14 @@ public class PaintedBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void applyComponents(DataComponentMap dataComponentMap) {
-		super.applyComponents(dataComponentMap);
-		blockState = dataComponentMap.get(Content.paintComponent.get());
+	protected void applyImplicitComponents(DataComponentInput dataComponentInput) {
+		super.applyImplicitComponents(dataComponentInput);
+		blockState = dataComponentInput.get(Content.paintComponent.get());
 	}
 
 	@Override
-	public void collectComponents(DataComponentMap.Builder builder) {
-		super.collectComponents(builder);
+	protected void collectImplicitComponents(Builder builder) {
+		super.collectImplicitComponents(builder);
 		if (this.blockState != null) {
 			builder.set(Content.paintComponent.get(), blockState);
 		}

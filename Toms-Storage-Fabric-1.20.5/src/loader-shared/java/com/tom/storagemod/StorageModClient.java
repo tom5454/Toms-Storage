@@ -85,7 +85,7 @@ public class StorageModClient implements ClientModInitializer {
 
 			@Override
 			public void onInitializeModelLoader(Context ctx) {
-				ctx.modifyModelOnLoad().register((m, c) -> c.id().equals(PAINT) ? new BakedPaintedModel() : m);
+				ctx.resolveModel().register(c -> c.id().equals(PAINT) ? new BakedPaintedModel() : null);
 			}
 		});
 
@@ -160,7 +160,7 @@ public class StorageModClient implements ClientModInitializer {
 			}
 		});
 
-		ItemTooltipCallback.EVENT.register((s, c, l) -> {
+		ItemTooltipCallback.EVENT.register((s, t, c, l) -> {
 			Collections.addAll(l, tooltipExt);
 		});
 	}

@@ -169,9 +169,9 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 	}
 
 	@Override
-	public void load(CompoundTag compound, HolderLookup.Provider provider) {
+	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		sort = compound.getInt("sort");
-		super.load(compound, provider);
+		super.loadAdditional(compound, provider);
 	}
 
 	public String getLastSearch() {
