@@ -5,11 +5,11 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -77,8 +77,8 @@ public class InventoryCableConnectorBlock extends PlatformBaseEntityBlock implem
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
-			TooltipFlag flagIn, RegistryAccess registryAccess) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+			TooltipFlag tooltipFlag) {
 		StorageModClient.tooltip("inventory_cable_connector", tooltip);
 		if (Config.get().invLinkBeaconLvl != -1) {
 			StorageModClient.tooltip("inventory_cable_connector_link.beacon1", false, tooltip, Config.get().invLinkBeaconLvl);

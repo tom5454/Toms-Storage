@@ -28,7 +28,8 @@ public class WirelessTerminalItem extends Item implements WirelessTerminal {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+			TooltipFlag tooltipFlag) {
 		StorageModClient.tooltip("wireless_terminal", tooltip, Config.get().wirelessRange);
 	}
 

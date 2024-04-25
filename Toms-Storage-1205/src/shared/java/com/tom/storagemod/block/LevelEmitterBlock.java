@@ -5,13 +5,13 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -57,8 +57,8 @@ public class LevelEmitterBlock extends PlatformBaseEntityBlock implements IInven
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip,
-			TooltipFlag flagIn, RegistryAccess registryAccess) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+			TooltipFlag tooltipFlag) {
 		StorageModClient.tooltip("level_emitter", tooltip);
 	}
 

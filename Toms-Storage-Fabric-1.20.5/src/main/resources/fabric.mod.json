@@ -25,7 +25,7 @@
     "main": [
       "com.tom.storagemod.StorageMod"
     ],
-    "_modmenu": [
+    "modmenu": [
       "com.tom.storagemod.ModMenu"
     ],
 	"_rei_client": [

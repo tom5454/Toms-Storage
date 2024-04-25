@@ -27,6 +27,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
@@ -58,10 +59,11 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMenu> extends PlatformContainerScreen<T> implements IDataReceiver {
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
+		private Minecraft mc = Minecraft.getInstance();
 
 		@Override
 		public List<String> load(StoredItemStack key) throws Exception {
-			return key.getStack().getTooltipLines(Minecraft.getInstance().player, getTooltipFlag()).stream().map(Component::getString).collect(Collectors.toList());
+			return key.getStack().getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, getTooltipFlag()).stream().map(Component::getString).collect(Collectors.toList());
 		}
 
 	});

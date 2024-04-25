@@ -34,7 +34,8 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, TooltipContext tooltipContext, List<Component> tooltip,
+			TooltipFlag tooltipFlag) {
 		StorageModClient.tooltip("adv_wireless_terminal", tooltip, Config.get().advWirelessRange);
 		if (Config.get().wirelessTermBeaconLvl != -1) {
 			StorageModClient.tooltip("adv_wireless_terminal.beacon1", false, tooltip, Config.get().wirelessTermBeaconLvl);

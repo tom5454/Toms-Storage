@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"RSR",
+    "SWS",
+    "RSR"
+  ],
+  "key": {
+  	"R": {
+      "tag": "c:dusts/redstone"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "result": {
+    "id": "toms_storage:ts.item_filter",
+    "count": 1
+  }
+}

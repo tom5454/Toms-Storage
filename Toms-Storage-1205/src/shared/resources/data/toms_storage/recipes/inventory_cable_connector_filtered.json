@@ -7,7 +7,7 @@
   ],
   "key": {
   	"q": {
-      "item": "minecraft:quartz"
+      "tag": "c:gems/quartz"
     },
     "p": {
       "item": "minecraft:paper"
