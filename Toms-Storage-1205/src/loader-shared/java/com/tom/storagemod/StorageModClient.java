@@ -26,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -34,8 +35,6 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent.ClientTickEvent;
-import net.neoforged.neoforge.event.TickEvent.Phase;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -170,8 +169,8 @@ public class StorageModClient {
 	}
 
 	@SubscribeEvent
-	public static void clientTick(ClientTickEvent evt) {
-		if (Minecraft.getInstance().player == null || evt.phase == Phase.START)
+	public static void clientTick(ClientTickEvent.Post evt) {
+		if (Minecraft.getInstance().player == null)
 			return;
 
 		if(openTerm.consumeClick()) {

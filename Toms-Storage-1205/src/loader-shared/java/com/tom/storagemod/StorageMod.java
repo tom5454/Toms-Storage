@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -26,7 +26,7 @@ public class StorageMod {
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
 
-	public StorageMod(IEventBus bus) {
+	public StorageMod(ModContainer mc, IEventBus bus) {
 		// Register the setup method for modloading
 		bus.addListener(this::setup);
 		// Register the doClientStuff method for modloading
@@ -34,8 +34,8 @@ public class StorageMod {
 		if (FMLEnvironment.dist == Dist.CLIENT)StorageModClient.preInit(bus);
 		bus.addListener(this::registerCapabilities);
 
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
-		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
+		mc.registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
+		mc.registerConfig(ModConfig.Type.SERVER, Config.serverSpec);
 		bus.register(Config.get());
 		bus.register(NetworkHandler.class);
 
