@@ -28,10 +28,10 @@
     "modmenu": [
       "com.tom.storagemod.ModMenu"
     ],
-	"_rei_client": [
+	"rei_client": [
     	"com.tom.storagemod.rei.REIPlugin"
     ],
-    "_emi": [
+    "emi": [
     	"com.tom.storagemod.emi.EMIPlugin"
     ],
     "_jei_mod_plugin": [

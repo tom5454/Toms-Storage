@@ -69,7 +69,7 @@ public abstract class AbstractFilteredMenu extends AbstractContainerMenu impleme
 		CompoundTag t = new CompoundTag();
 		tag.put("setPhantom", t);
 		t.putInt("id", slot.index);
-		t.put("item", ingredient.save(pinv.player.registryAccess(), new CompoundTag()));
+		t.put("item", ingredient.save(pinv.player.registryAccess()));
 		NetworkHandler.sendDataToServer(tag);
 	}
 

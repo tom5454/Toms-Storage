@@ -86,6 +86,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 
 	private static List<Integer> handleRecipe(EmiRecipe recipe, AbstractContainerScreen<CraftingTerminalMenu> screen, boolean simulate) {
 		IAutoFillTerminal term = screen.getMenu();
+		Minecraft mc = Minecraft.getInstance();
 		ItemStack[][] stacks = recipe.getInputs().stream().map(i ->
 		i.getEmiStacks().stream().map(EmiStack::getItemStack).filter(s -> !s.isEmpty()).toArray(ItemStack[]::new)
 				).toArray(ItemStack[][]::new);
@@ -137,9 +138,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 						if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 							StoredItemStack s = new StoredItemStack(stacks[i][j]);
 							if(stored.contains(s) || Minecraft.getInstance().player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
-								CompoundTag tag = new CompoundTag();
-								stacks[i][j].save(tag);
-								CompoundTag.put("i" + (k++), tag);
+								CompoundTag.put("i" + (k++), stacks[i][j].save(mc.level.registryAccess()));
 							}
 						}
 					}

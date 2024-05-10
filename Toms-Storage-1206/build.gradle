@@ -89,9 +89,8 @@ sourceSets {
 			srcDir "src/shared/java"
 			srcDir "src/loader-shared/java"
 			srcDir "src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			exclude "com/tom/storagemod/jei/**"
-			exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
 			srcDir "src/shared/resources"
@@ -130,19 +129,19 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    /*runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
-    compileOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4:api"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta+1.20.6"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta+1.20.6:api"
     
-    compileOnly "dev.emi:emi-neoforge:1.0.29+1.20.4:api"
-	runtimeOnly "dev.emi:emi-neoforge:1.0.29+1.20.4"
+    compileOnly "dev.emi:emi-neoforge:1.1.6+1.20.6:api"
+	runtimeOnly "dev.emi:emi-neoforge:1.1.6+1.20.6"
 	
 	if(useLib) {
-    	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"
-		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:14.0.688"
-		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:14.0.688"
-		implementation "me.shedaniel.cloth:cloth-config-neoforge:13.0.121"
-    	implementation "dev.architectury:architectury-neoforge:11.0.9"
-    }*/
+    	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:15.0.728"
+		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:15.0.728"
+		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:15.0.728"
+		implementation "me.shedaniel.cloth:cloth-config-neoforge:14.0.126"
+    	implementation "dev.architectury:architectury-neoforge:12.0.27"
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

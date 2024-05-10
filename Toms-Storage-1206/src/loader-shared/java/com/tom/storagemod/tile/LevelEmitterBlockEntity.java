@@ -115,7 +115,9 @@ public class LevelEmitterBlockEntity extends BlockEntity implements TickableServ
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-		compound.put("Filter", getFilter().save(provider, new CompoundTag()));
+		ItemStack is = getFilter();
+		if (!is.isEmpty())
+			compound.put("Filter", is.save(provider, new CompoundTag()));
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
 	}

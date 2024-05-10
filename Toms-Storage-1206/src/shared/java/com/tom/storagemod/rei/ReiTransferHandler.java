@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +35,7 @@ public class ReiTransferHandler implements TransferHandler {
 			map(es -> es.getValue()).filter(e -> e != null).toArray(ItemStack[]::new)
 					).toArray(ItemStack[][]::new);
 			IAutoFillTerminal term = (IAutoFillTerminal) context.getMenu();
+			Minecraft mc = Minecraft.getInstance();
 			List<Integer> missing = new ArrayList<>();
 			int width = recipe instanceof SimpleGridMenuDisplay ? ((SimpleGridMenuDisplay)recipe).getWidth() : Integer.MAX_VALUE;
 			Set<StoredItemStack> stored = new HashSet<>(term.getStoredItems());
@@ -78,9 +80,7 @@ public class ReiTransferHandler implements TransferHandler {
 							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 								StoredItemStack s = new StoredItemStack(stacks[i][j]);
 								if(stored.contains(s) || context.getMinecraft().player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
-									CompoundTag tag = new CompoundTag();
-									stacks[i][j].save(tag);
-									CompoundTag.put("i" + (k++), tag);
+									CompoundTag.put("i" + (k++), stacks[i][j].save(mc.level.registryAccess()));
 								}
 							}
 						}
