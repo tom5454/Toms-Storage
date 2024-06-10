@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 public class StoredItemStack {
 	private ItemStack stack;
 	private long count;
-	private static final String ITEM_COUNT_NAME = "c", ITEMSTACK_NAME = "s";
 	private int hash;
 
 	public StoredItemStack(ItemStack stack, long count) {

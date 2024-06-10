@@ -45,9 +45,10 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
-    /*modImplementation "dev.emi:trinkets:3.8.0"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.3.0"
-	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.3.0"*/
+    modImplementation "dev.emi:trinkets:3.9.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:6.0.0-beta.3"
+	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:6.0.0-beta.3"
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")

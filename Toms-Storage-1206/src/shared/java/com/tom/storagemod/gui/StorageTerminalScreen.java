@@ -27,7 +27,6 @@ public class StorageTerminalScreen extends AbstractStorageTerminalScreen<Storage
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(st, mouseX, mouseY, partialTicks);
 		super.render(st, mouseX, mouseY, partialTicks);
 	}
 }

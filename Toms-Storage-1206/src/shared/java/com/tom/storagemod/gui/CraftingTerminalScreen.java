@@ -121,7 +121,6 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(st, mouseX, mouseY, partialTicks);
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
 			this.renderBg(st, partialTicks, mouseX, mouseY);
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);

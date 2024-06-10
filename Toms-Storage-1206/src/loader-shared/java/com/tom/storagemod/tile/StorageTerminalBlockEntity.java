@@ -173,6 +173,7 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.saveAdditional(compound, provider);
 		compound.putInt("sort", sort);
 	}
 
