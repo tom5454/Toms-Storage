@@ -90,13 +90,11 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 			} else {
 				ItemStack is = slot.getItem().copy();
 				is.setCount(1);
-				for(int i = 0;i<9;i++) {
-					Slot sl = this.slots.get(i);
-					if(ItemStack.isSameItemSameComponents(sl.getItem(), is))break;
-					if(sl.getItem().isEmpty()) {
-						sl.set(is);
-						break;
-					}
+				Slot sl = this.slots.get(0);
+				if(ItemStack.isSameItemSameComponents(sl.getItem(), is))return ItemStack.EMPTY;
+				if(sl.getItem().isEmpty()) {
+					sl.set(is);
+					return ItemStack.EMPTY;
 				}
 			}
 		}

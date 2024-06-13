@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -58,6 +59,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 			IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer) {
 		if (container instanceof IAutoFillTerminal) {
 			IAutoFillTerminal term = container;
+			Minecraft mc = Minecraft.getInstance();
 			List<IRecipeSlotView> missing = new ArrayList<>();
 			List<IRecipeSlotView> views = recipeSlots.getSlotViews();
 			List<ItemStack[]> inputs = new ArrayList<>();
@@ -106,9 +108,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
 								StoredItemStack s = new StoredItemStack(stacks[i][j]);
 								if(stored.contains(s) || player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
-									CompoundTag tag = new CompoundTag();
-									stacks[i][j].save(tag);
-									CompoundNBT.put("i" + (k++), tag);
+									CompoundNBT.put("i" + (k++), stacks[i][j].save(mc.level.registryAccess()));
 								}
 							}
 						}

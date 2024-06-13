@@ -34,7 +34,7 @@
     "emi": [
     	"com.tom.storagemod.emi.EMIPlugin"
     ],
-    "_jei_mod_plugin": [
+    "jei_mod_plugin": [
 		"com.tom.storagemod.jei.JEIHandler"
 	]
   },

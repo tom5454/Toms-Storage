@@ -11,10 +11,7 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
-import net.fabricmc.fabric.api.client.model.ModelProviderContext;
-import net.fabricmc.fabric.api.client.model.ModelProviderException;
-import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
@@ -27,7 +24,6 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -89,15 +85,11 @@ public class StorageModClient implements ClientModInitializer {
 			});
 		});
 
-		ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> new ModelResourceProvider() {
+		ModelLoadingPlugin.register(new ModelLoadingPlugin() {
 
 			@Override
-			public UnbakedModel loadModelResource(ResourceLocation resourceId, ModelProviderContext context)
-					throws ModelProviderException {
-				if(resourceId.equals(PAINT)) {
-					return new BakedPaintedModel();
-				}
-				return null;
+			public void onInitializeModelLoader(Context ctx) {
+				ctx.resolveModel().register(c -> c.id().equals(PAINT) ? new BakedPaintedModel() : null);
 			}
 		});
 
