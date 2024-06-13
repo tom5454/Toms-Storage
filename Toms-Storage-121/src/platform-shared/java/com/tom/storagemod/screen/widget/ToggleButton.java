@@ -1,0 +1,81 @@
+package com.tom.storagemod.screen.widget;
+
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+
+public class ToggleButton extends IconButton {
+	private ResourceLocation iconOn;
+	private boolean state;
+	private Tooltip ttTrue, ttFalse;
+
+	public static class Builder {
+		private int x, y;
+		private Component name = Component.empty();
+		private ResourceLocation on, off;
+
+		public Builder(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		public Builder name(Component name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder iconOn(ResourceLocation icon) {
+			this.on = icon;
+			return this;
+		}
+
+		public Builder iconOff(ResourceLocation icon) {
+			this.off = icon;
+			return this;
+		}
+
+		public ToggleButton build(BooleanConsumer pressable) {
+			return new ToggleButton(x, y, name, off, on, pressable);
+		}
+	}
+
+	public static Builder builder(int x, int y) {
+		return new Builder(x, y);
+	}
+
+	protected ToggleButton(int x, int y, Component name, ResourceLocation iconOff, ResourceLocation iconOn, BooleanConsumer pressable) {
+		super(x, y, name, iconOff, onPress(pressable));
+		this.iconOn = iconOn;
+	}
+
+	public void setState(boolean state) {
+		this.state = state;
+		super.setTooltip(state ? ttTrue : ttFalse);
+	}
+
+	public boolean getState() {
+		return state;
+	}
+
+	@Override
+	public ResourceLocation getIcon() {
+		return state ? iconOn : icon;
+	}
+
+	private static OnPress onPress(BooleanConsumer stateUpdate) {
+		return b -> stateUpdate.accept(!((ToggleButton)b).state);
+	}
+
+	@Override
+	public void setTooltip(Tooltip p_259796_) {
+		setTooltip(p_259796_, p_259796_);
+	}
+
+	public void setTooltip(Tooltip ttFalse, Tooltip ttTrue) {
+		this.ttFalse = ttFalse;
+		this.ttTrue = ttTrue;
+		super.setTooltip(state ? ttTrue : ttFalse);
+	}
+}

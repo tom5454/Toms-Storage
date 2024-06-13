@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"cdc",
+    "dtd",
+    "cdc"
+  ],
+  "key": {
+  	"d": {
+      "tag": "c:gems/diamond"
+    },
+    "c": {
+      "item": "minecraft:crafting_table"
+    },
+    "t": {
+      "item": "toms_storage:storage_terminal"
+    }
+  },
+  "result": {
+    "id": "toms_storage:crafting_terminal"
+  }
+}

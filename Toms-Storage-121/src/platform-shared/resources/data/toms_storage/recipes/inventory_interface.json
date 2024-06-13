@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"PtP",
+    "tct",
+    "PEP"
+  ],
+  "key": {
+  	"P": {
+      "tag": "minecraft:planks"
+    },
+    "c": {
+      "tag": "c:chests"
+    },
+    "t": {
+      "tag": "minecraft:trapdoors"
+    },
+    "E": {
+      "tag": "c:ender_pearls"
+    }
+  },
+  "result": {
+    "id": "toms_storage:inventory_interface"
+  }
+}

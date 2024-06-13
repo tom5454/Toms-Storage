@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"SCS",
+    "ICI",
+    "SCS"
+  ],
+  "key": {
+  	"S": {
+      "item": "minecraft:smooth_stone"
+    },
+    "C": {
+      "tag": "c:chests"
+    },
+    "I": {
+      "tag": "c:ingots/iron"
+    }
+  },
+  "result": {
+    "id": "toms_storage:filing_cabinet"
+  }
+}

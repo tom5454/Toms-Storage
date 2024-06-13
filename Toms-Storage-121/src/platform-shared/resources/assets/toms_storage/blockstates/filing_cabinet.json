@@ -1,0 +1,8 @@
+{
+	"variants": {
+		"facing=east": { "model": "toms_storage:block/filing_cabinet", "y": 90 },
+		"facing=north": { "model": "toms_storage:block/filing_cabinet" },
+		"facing=south": { "model": "toms_storage:block/filing_cabinet", "y": 180 },
+		"facing=west": { "model": "toms_storage:block/filing_cabinet", "y": 270 }
+	}
+}

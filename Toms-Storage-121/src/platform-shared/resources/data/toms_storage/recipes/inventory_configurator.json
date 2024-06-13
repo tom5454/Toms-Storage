@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	" T",
+    "S "
+  ],
+  "key": {
+  	"S": {
+      "tag": "c:rods/wooden"
+    },
+    "T": {
+      "tag": "toms_storage:trims"
+    }
+  },
+  "result": {
+    "id": "toms_storage:inventory_configurator"
+  }
+}

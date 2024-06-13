@@ -1,0 +1,122 @@
+package com.tom.storagemod.inventory;
+
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+import com.tom.storagemod.StorageModComponents;
+import com.tom.storagemod.util.IValidInfo;
+import com.tom.storagemod.util.WorldStates;
+
+public interface PlatformInventoryAccess extends IInventoryAccess {
+	public static final PlatformInventoryAccess EMPTY = new PlatformInventoryAccess() {
+
+		@Override
+		public IInventoryChangeTracker tracker() {
+			return InventoryChangeTracker.NULL;
+		}
+
+		@Override
+		public Storage<ItemVariant> get() {
+			return Storage.empty();
+		}
+
+		@Override
+		public ItemStack pullMatchingStack(ItemStack st, long max) {
+			return ItemStack.EMPTY;
+		}
+
+		@Override
+		public ItemStack pushStack(ItemStack stack) {
+			return stack;
+		}
+
+		@Override
+		public int getFreeSlotCount() {
+			return 0;
+		}
+	};
+
+	public static class BlockInventoryAccess implements PlatformInventoryAccess {
+		private BlockApiCache<Storage<ItemVariant>, Direction> cache;
+		private Direction d;
+		private IInventoryChangeTracker.Delegate tracker = new IInventoryChangeTracker.Delegate();
+
+		@Override
+		public Storage<ItemVariant> get() {
+			return cache != null ? cache.find(d) : null;
+		}
+
+		@Override
+		public IInventoryChangeTracker tracker() {
+			var itemHandler = get();
+			if (itemHandler != null)
+				tracker.setDelegate(WorldStates.getTracker(itemHandler));
+			else
+				tracker.setDelegate(InventoryChangeTracker.NULL);
+			return tracker;
+		}
+
+		public void onLoad(Level level, BlockPos p, Direction d, IValidInfo inventoryConnectorBlockEntity) {
+			cache = BlockApiCache.create(ItemStorage.SIDED, (ServerLevel) level, p);
+			this.d = d;
+		}
+
+		public static boolean hasInventoryAt(Level level, BlockPos pos, BlockState state, Direction direction) {
+			return ItemStorage.SIDED.find(level, pos, state, null, direction) != null;
+		}
+
+		public boolean exists() {
+			return get() != null;
+		}
+
+		@Override
+		public void markInvalid() {
+			cache = null;
+		}
+	}
+
+	@Override
+	Storage<ItemVariant> get();
+
+	@Override
+	default int getFreeSlotCount() {
+		Storage<ItemVariant> h = get();
+		if (h == null)return 0;
+		int em = 0;
+		for (StorageView<ItemVariant> slot : h) {
+			if (slot.isResourceBlank())em++;
+		}
+		return em;
+	}
+
+	@Override
+	default int getSlotCount() {
+		Storage<ItemVariant> h = get();
+		if (h == null)return 0;
+		int cnt = 0;
+		for (StorageView<ItemVariant> slot : h)cnt++;
+		return cnt;
+	}
+
+	public static BlockFilter getBlockFilterAt(Level level, BlockPos pos, boolean make) {
+		BlockEntity be = level.getBlockEntity(pos);
+		if (be == null)return null;
+		return StorageModComponents.BLOCK_FILTER.get(be).getFilter(make);
+	}
+
+	public static void removeBlockFilterAt(Level level, BlockPos pos) {
+		BlockEntity be = level.getBlockEntity(pos);
+		if (be == null)return;
+		StorageModComponents.BLOCK_FILTER.get(be).remove(level, pos);
+	}
+}

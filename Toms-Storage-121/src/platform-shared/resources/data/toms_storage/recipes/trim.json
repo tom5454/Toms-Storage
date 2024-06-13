@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"PSP",
+    "SCS",
+    "PSP"
+  ],
+  "key": {
+  	"P": {
+      "tag": "minecraft:planks"
+    },
+    "C": {
+      "tag": "c:chests"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "result": {
+    "id": "toms_storage:trim",
+    "count": 2
+  }
+}
