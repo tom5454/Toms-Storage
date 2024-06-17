@@ -83,7 +83,6 @@ sourceSets {
 			srcDir "../TomsStorage-1206/src/shared/java"
 			srcDir "src/loader-shared/java"
 			srcDir "../TomsStorage-1206/src/platform-shared/java"
-			exclude "com/tom/storagemod/jei/**"
 		}
 		resources {
 			srcDir "../TomsStorage-1206/src/shared/resources"
