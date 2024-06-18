@@ -57,6 +57,11 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	}
 
 	@Override
+	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context) {
+		return true;
+	}
+
+	@Override
 	public boolean craft(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context) {
 		AbstractContainerScreen<CraftingTerminalMenu> screen = context.getScreen();
 		handleRecipe(recipe, screen, false);

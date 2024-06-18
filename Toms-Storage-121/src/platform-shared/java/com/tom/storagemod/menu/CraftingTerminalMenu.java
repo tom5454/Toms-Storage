@@ -267,7 +267,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 					} else {
 						slotToFill.getItem().grow(1);
 					}
-					return 1;
+					return -1;
 				}
 			}
 			return -1;

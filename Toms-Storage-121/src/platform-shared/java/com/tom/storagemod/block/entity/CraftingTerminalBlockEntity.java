@@ -97,49 +97,55 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 
 	public void craft(Player thePlayer) {
 		if(currentRecipe.isPresent()) {
-			NonNullList<ItemStack> remainder = currentRecipe.get().value().getRemainingItems(craftMatrix.asCraftInput());
+			CraftingInput.Positioned craftinginput$positioned = this.craftMatrix.asPositionedCraftInput();
+			CraftingInput craftinginput = craftinginput$positioned.input();
+			NonNullList<ItemStack> remainder = currentRecipe.get().value().getRemainingItems(craftinginput);
 			boolean playerInvUpdate = false;
 			refillingGrid = true;
-			for (int i = 0; i < remainder.size(); ++i) {
-				ItemStack slot = craftMatrix.getItem(i);
-				ItemStack oldItem = slot.copy();
-				ItemStack rem = remainder.get(i);
-				if (ItemStack.matches(slot, rem))continue;
-				if (!slot.isEmpty()) {
-					craftMatrix.removeItem(i, 1);
-					slot = craftMatrix.getItem(i);
-				}
-				if(slot.isEmpty() && !oldItem.isEmpty()) {
-					StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
-					if(is == null && (getSorting() & (1 << 8)) != 0) {
-						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
-							ItemStack st = thePlayer.getInventory().getItem(j);
-							if(ItemStack.isSameItemSameComponents(oldItem, st)) {
-								st = thePlayer.getInventory().removeItem(j, 1);
-								if(!st.isEmpty()) {
-									is = new StoredItemStack(st, 1);
-									playerInvUpdate = true;
-									break;
+			int x = craftinginput$positioned.left();
+			int y = craftinginput$positioned.top();
+			for (int k = 0; k < craftinginput.height(); k++) {
+				for (int l = 0; l < craftinginput.width(); l++) {
+					int i = l + x + (k + y) * this.craftMatrix.getWidth();
+					ItemStack slot = this.craftMatrix.getItem(i);
+					ItemStack oldItem = slot.copy();
+					ItemStack rem = remainder.get(l + k * craftinginput.width());
+					if (!slot.isEmpty()) {
+						craftMatrix.removeItem(i, 1);
+						slot = craftMatrix.getItem(i);
+					}
+					if(slot.isEmpty() && !oldItem.isEmpty()) {
+						StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
+						if(is == null && (getSorting() & (1 << 8)) != 0) {
+							for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
+								ItemStack st = thePlayer.getInventory().getItem(j);
+								if(ItemStack.isSameItemSameComponents(oldItem, st)) {
+									st = thePlayer.getInventory().removeItem(j, 1);
+									if(!st.isEmpty()) {
+										is = new StoredItemStack(st, 1);
+										playerInvUpdate = true;
+										break;
+									}
 								}
 							}
 						}
+						if(is != null) {
+							craftMatrix.setItem(i, is.getActualStack());
+							slot = craftMatrix.getItem(i);
+						}
 					}
-					if(is != null) {
-						craftMatrix.setItem(i, is.getActualStack());
-						slot = craftMatrix.getItem(i);
+					if (rem.isEmpty()) {
+						continue;
 					}
+					if (slot.isEmpty()) {
+						craftMatrix.setItem(i, rem);
+						continue;
+					}
+					rem = pushStack(rem);
+					if(rem.isEmpty())continue;
+					if (thePlayer.getInventory().add(rem)) continue;
+					thePlayer.drop(rem, false);
 				}
-				if (rem.isEmpty()) {
-					continue;
-				}
-				if (slot.isEmpty()) {
-					craftMatrix.setItem(i, rem);
-					continue;
-				}
-				rem = pushStack(rem);
-				if(rem.isEmpty())continue;
-				if (thePlayer.getInventory().add(rem)) continue;
-				thePlayer.drop(rem, false);
 			}
 			refillingGrid = false;
 			onCraftingMatrixChanged();

@@ -16,7 +16,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -130,8 +129,6 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 					items.replaceAll((k, v) -> new StoredItemStack(v));
 				}
 				changeCount++;
-				var c = new StoredItemStack(new ItemStack(Items.BARRIER), changeCount);
-				items.put(c, c);
 			}
 			updateItems = false;
 		}

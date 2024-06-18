@@ -95,7 +95,7 @@ sourceSets {
 			srcDir "src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
-			if(!useLib)exclude "com/tom/storagemod/emi/**"
+			//if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/top/**"
 		}
 		resources {
@@ -144,9 +144,6 @@ dependencies {
     
     	implementation "curse.maven:polymorph-388800:5393930"
     
-    	compileOnly "dev.emi:emi-neoforge:1.1.6+1.20.6:api"
-		runtimeOnly "dev.emi:emi-neoforge:1.1.6+1.20.6"
-	
 		implementation "curse.maven:the-one-probe-245211:5084077"
   		implementation "curse.maven:jade-324717:5366595"
   	
@@ -158,6 +155,9 @@ dependencies {
     } else {
     	compileOnly files("libs/curios_dummy.jar")
     }
+    
+    compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"
+	runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

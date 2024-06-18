@@ -5,9 +5,10 @@
 		"1.20.4-latest": "1.6.12",
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.16",
-		"1.21-latest": "2.0.0"
+		"1.21-latest": "2.0.1"
 	},
 	"1.21": {
+		"2.0.1": "Fixed dupe bug with crafting terminal\nFixed missing recipes, tags, and loot tables\nFixed recipe book in the crafting terminal not filling in the recipe\nRemoved debug barrier item from the storage terminal\nFixed EMI crafting not working",
 		"2.0.0": "2.0.0 rewrite initial release"
 	},
 	"1.20.6": {
