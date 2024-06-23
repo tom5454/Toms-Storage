@@ -18,6 +18,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import com.tom.storagemod.StorageMod;
@@ -83,7 +84,7 @@ public class ItemPaintKit extends Item {
 		if(is.hasTag() && is.getTag().contains("block")) {
 			BlockState st = NBTUtil.readBlockState(is.getTag().getCompound("block"));
 			tc.append(" (");
-			tc.append(st.getBlock().getName().withStyle(TextFormatting.GREEN));
+			tc.append(new TranslationTextComponent(st.getBlock().getDescriptionId()).withStyle(TextFormatting.GREEN));
 			tc.append(")");
 		}
 		return tc;
