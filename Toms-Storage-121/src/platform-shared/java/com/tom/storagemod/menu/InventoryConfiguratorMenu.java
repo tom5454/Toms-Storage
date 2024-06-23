@@ -22,7 +22,7 @@ import com.tom.storagemod.util.Priority;
 
 public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 	private BlockPos pos;
-	private BlockFilter f;
+	private BlockFilter filter;
 	private InteractionHand hand;
 	public Direction side = Direction.DOWN;
 	public Priority priority = Priority.NORMAL;
@@ -36,7 +36,7 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 	public InventoryConfiguratorMenu(int wid, Inventory pinv, BlockPos te, BlockFilter f, InteractionHand hand) {
 		super(Content.invConfigMenu.get(), wid);
 		this.pos = te;
-		this.f = f;
+		this.filter = f;
 		this.hand = hand;
 
 		Container inv = f == null ? new SimpleContainer(1) : f.filter;
@@ -75,7 +75,7 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 		int arg = id >> 3;
 		switch (mode) {
 		case 0:
-			f.setPriority(Priority.VALUES[arg % Priority.VALUES.length]);
+			filter.setPriority(Priority.VALUES[arg % Priority.VALUES.length]);
 			break;
 
 		case 1:
@@ -83,7 +83,7 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 			ItemStack is = player.getItemInHand(hand);
 			if (is.is(Content.invConfig.get())) {
 				var c = new ConfiguratorComponent.Configurator(is);
-				c.startSelection(pos, f.getConnectedBlocks());
+				c.startSelection(pos, filter.getConnectedBlocks());
 				isClosed = true;
 				player.displayClientMessage(Component.translatable("tooltip.toms_storage.inventory_configurator.selection"), true);
 			}
@@ -92,26 +92,26 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 
 		case 2:
 		{
-			f.getConnectedBlocks().clear();
-			f.getConnectedBlocks().add(f.getMainPos());
+			filter.getConnectedBlocks().clear();
+			filter.getConnectedBlocks().add(filter.getMainPos());
 			ItemStack is = player.getItemInHand(hand);
 			if (is.is(Content.invConfig.get())) {
 				var c = new ConfiguratorComponent.Configurator(is);
-				c.setSelection(f.getConnectedBlocks());
+				c.setSelection(filter.getConnectedBlocks());
 			}
 		}
 		break;
 
 		case 3:
-			f.setSide(Direction.from3DDataValue(arg));
+			filter.setSide(Direction.from3DDataValue(arg));
 			break;
 
 		case 4:
-			f.setSkip(arg != 0);
+			filter.setSkip(arg != 0);
 			break;
 
 		case 5:
-			f.setKeepLast(arg != 0);
+			filter.setKeepLast(arg != 0);
 			break;
 
 		case 6:
@@ -119,7 +119,7 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 			if (arg >= 0 && arg < slots.size()) {
 				Slot s = slots.get(arg);
 				if (s instanceof ItemFilterSlot && s.getItem().getItem() instanceof IItemFilter f) {
-					f.openGui(s.getItem(), player, () -> s.getItem().getItem() == f);
+					f.openGui(s.getItem(), player, () -> s.getItem().getItem() == f, filter::markFilterDirty);
 				}
 			}
 		}

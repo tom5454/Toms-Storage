@@ -19,6 +19,7 @@ public class ItemFilterMenu extends AbstractFilteredMenu {
 	private SimpleItemFilter filter;
 	public boolean matchNBT, allowList;
 	private BooleanSupplier isValid;
+	private Runnable refresh;
 
 	public ItemFilterMenu(int wid, Inventory pinv) {
 		this(wid, pinv, new SimpleContainer(9));
@@ -26,10 +27,11 @@ public class ItemFilterMenu extends AbstractFilteredMenu {
 		addDataSlot(DataSlots.set(v -> allowList = v == 1));
 	}
 
-	public ItemFilterMenu(int wid, Inventory pinv, SimpleItemFilter filter, BooleanSupplier isValid) {
+	public ItemFilterMenu(int wid, Inventory pinv, SimpleItemFilter filter, BooleanSupplier isValid, Runnable refresh) {
 		this(wid, pinv, filter.getContainer());
 		this.filter = filter;
 		this.isValid = isValid;
+		this.refresh = refresh;
 		addDataSlot(DataSlots.get(() -> filter.isMatchNBT() ? 1 : 0));
 		addDataSlot(DataSlots.get(() -> filter.isAllowList() ? 1 : 0));
 	}
@@ -110,6 +112,7 @@ public class ItemFilterMenu extends AbstractFilteredMenu {
 	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		this.dispenserInventory.stopOpen(playerIn);
-		if(filter != null)filter.flush();
+		if (filter != null)filter.flush();
+		if (refresh != null)refresh.run();
 	}
 }

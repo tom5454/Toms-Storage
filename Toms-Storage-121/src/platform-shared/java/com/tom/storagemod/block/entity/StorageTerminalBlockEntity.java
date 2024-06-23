@@ -33,7 +33,7 @@ import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.platform.PlatformBlockEntity;
 import com.tom.storagemod.util.PlayerInvUtil;
-import com.tom.storagemod.util.TermRangeCalc;
+import com.tom.storagemod.util.BeaconLevelCalc;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 import com.tom.storagemod.util.Util;
 
@@ -137,7 +137,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 				if(level.isLoaded(p)) {
 					BlockState st = level.getBlockState(p);
 					if(st.is(Blocks.BEACON)) {
-						return TermRangeCalc.calcBeaconLevel(level, p.getX(), p.getY(), p.getZ());
+						return BeaconLevelCalc.calcBeaconLevel(level, p.getX(), p.getY(), p.getZ());
 					}
 				}
 				return 0;

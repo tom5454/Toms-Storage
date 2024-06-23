@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -49,7 +49,7 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 	
-	modImplementation("com.terraformersmc:modmenu:11.0.0-beta.1") {
+	modImplementation("com.terraformersmc:modmenu:11.0.1") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     
@@ -58,37 +58,37 @@ dependencies {
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.cardinal_components_version}"
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 	
+	// compile against the JEI API but do not include it at runtime
+	modCompileOnlyApi("mezz.jei:jei-1.21-common-api:${project.jei_version}")
+	modCompileOnlyApi("mezz.jei:jei-1.21-fabric-api:${project.jei_version}")
+	// at runtime, use the full JEI jar for Fabric
+	modRuntimeOnly("mezz.jei:jei-1.21-fabric:${project.jei_version}")
+	
 	if(useLib) {
 		modImplementation "dev.emi:trinkets:3.9.0"
-	
+		
 		modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 			exclude(group: "net.fabricmc.fabric-api")
-	        exclude(group: "me.shedaniel.cloth")
-	        exclude(group: "dev.architectury")
-	    }
-	    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
-	       exclude(group: "net.fabricmc.fabric-api")
-	       exclude(group: "me.shedaniel.cloth")
-	       exclude(group: "dev.architectury")
-	    }
-	    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
-	        exclude(group: "net.fabricmc.fabric-api")
-	        exclude(group: "me.shedaniel.cloth")
-	        exclude(group: "dev.architectury")
-	    }
-	    modImplementation("dev.architectury:architectury-fabric:12.0.28")
-    
+		    exclude(group: "me.shedaniel.cloth")
+		    exclude(group: "dev.architectury")
+		}
+		modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
+		   exclude(group: "net.fabricmc.fabric-api")
+		   exclude(group: "me.shedaniel.cloth")
+		   exclude(group: "dev.architectury")
+		}
+		modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
+		    exclude(group: "net.fabricmc.fabric-api")
+		    exclude(group: "me.shedaniel.cloth")
+		    exclude(group: "dev.architectury")
+		}
+		modImplementation("dev.architectury:architectury-fabric:13.0.1")
+	
     	modCompileOnly  "dev.emi:emi-fabric:1.1.6+1.20.6:api"
 		modLocalRuntime "dev.emi:emi-fabric:1.1.6+1.20.6"
 	
 		modImplementation("curse.maven:jade-324717:5366607")
 		modImplementation("curse.maven:polymorph-388800:5393928")
-		
-		// compile against the JEI API but do not include it at runtime
-		modCompileOnlyApi("mezz.jei:jei-1.20.6-common-api:${project.jei_version}")
-		modCompileOnlyApi("mezz.jei:jei-1.20.6-fabric-api:${project.jei_version}")
-		// at runtime, use the full JEI jar for Fabric
-		modRuntimeOnly("mezz.jei:jei-1.20.6-fabric:${project.jei_version}")
 	} else {
 		compileOnly files("libs/trinkets_dummy.jar")
 	}
@@ -98,7 +98,7 @@ sourceSets {
 	main {
 		java {
 			srcDir "../TomsStorage-121/src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/jei/**"
+			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 		}

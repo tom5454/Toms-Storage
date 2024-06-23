@@ -2,53 +2,30 @@ package com.tom.storagemod.screen;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.TagItemFilterMenu;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.screen.widget.IconButton;
+import com.tom.storagemod.screen.widget.ListWidget;
 import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.IDataReceiver;
 
 public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMenu> implements IDataReceiver {
 	private static final ResourceLocation GUI_TEXTURES = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/tag_filter.png");
-	private static final int LINES = 4;
-	protected static final WidgetSprites LIST_BUTTON_SPRITES = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_hovered")
-			);
-	protected static final WidgetSprites LIST_BUTTON_SPRITES_S = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_selected"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_selected_hovered")
-			);
-	protected static final WidgetSprites SCROLL_SPRITES = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_scroll"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_scroll_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_scroll_hovered")
-			);
 	private ToggleButton buttonAllowList;
 	private IconButton buttonAdd, buttonRemove;
 	private List<String> itemTags = new ArrayList<>();
@@ -70,24 +47,26 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 				build(s -> click(0, s)));
 		buttonAllowList.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.denyList")), Tooltip.create(Component.translatable("tooltip.toms_storage.allowList")));
 
-		itemTagList = new ListHandler(leftPos + 28, topPos + 15);
-		itemTagList.list = () -> itemTags;
-		filterList = new ListHandler(leftPos + 109, topPos + 15);
-		filterList.list = () -> filterTags;
+		itemTagList = addRenderableWidget(new ListHandler(leftPos + 28, topPos + 15));
+		itemTagList.setList(() -> itemTags);
+		filterList = addRenderableWidget(new ListHandler(leftPos + 109, topPos + 15));
+		filterList.setList(() -> filterTags);
 
 		buttonAdd = addRenderableWidget(new IconButton(leftPos + 90, topPos + 14, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), b -> {
-			if(itemTagList.selected != null) {
-				if(!filterTags.contains(itemTagList.selected))
-					filterTags.add(itemTagList.selected);
-				itemTagList.selected = null;
+			String sel = itemTagList.getSelected();
+			if(sel != null) {
+				if(!filterTags.contains(sel))
+					filterTags.add(sel);
+				itemTagList.setSelected(null);
 				sync();
 			}
 		}));
 
 		buttonRemove = addRenderableWidget(new IconButton(leftPos + 90, topPos + 32, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
-			if(filterList.selected != null) {
-				filterTags.remove(filterList.selected);
-				filterList.selected = null;
+			String sel = filterList.getSelected();
+			if(sel != null) {
+				filterTags.remove(sel);
+				filterList.setSelected(null);
 				sync();
 			}
 		}));
@@ -108,8 +87,8 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		if(!itemTags.equals(tags)) {
 			itemTags.clear();
 			itemTags.addAll(tags);
-			itemTagList.selected = null;
-			itemTagList.currentScroll = 0f;
+			itemTagList.setSelected(null);
+			itemTagList.setCurrentScroll(0f);
 		}
 	}
 
@@ -123,11 +102,9 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		buttonAllowList.setState(menu.allowList);
 		itemTagList.preRender(mouseX, mouseY);
 		filterList.preRender(mouseX, mouseY);
-		buttonAdd.active = itemTagList.selected != null;
-		buttonRemove.active = filterList.selected != null;
+		buttonAdd.active = itemTagList.getSelected() != null;
+		buttonRemove.active = filterList.getSelected() != null;
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		itemTagList.render(matrixStack, mouseX, mouseY);
-		filterList.render(matrixStack, mouseX, mouseY);
 		this.renderTooltip(matrixStack, mouseX, mouseY);
 
 		itemTagList.tooltip(matrixStack, mouseX, mouseY);
@@ -148,140 +125,34 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		for (int i = 0; i < list.size(); i++) {
 			filterTags.add(list.getString(i));
 		}
-		filterList.selected = null;
-		filterList.currentScroll = 0f;
+		filterList.setSelected(null);
+		filterList.setCurrentScroll(0f);
 	}
 
-	@Override
-	public boolean mouseScrolled(double x, double y, double xd, double yd) {
-		if(isHovering(27, 14, 61, 58, x, y) && itemTagList.mouseScrolled(yd))return true;
-		else if(isHovering(108, 14, 61, 58, x, y) && filterList.mouseScrolled(yd))return true;
-		return super.mouseScrolled(x, y, xd, yd);
-	}
-
-	public class ListHandler {
-		protected float currentScroll;
-		protected boolean isScrolling;
-		protected boolean wasClicking;
-		protected Supplier<List<String>> list;
-		protected String selected;
-		private List<ListEntry> listEntries = new ArrayList<>();
-		private int x, y;
+	public class ListHandler extends ListWidget<String> {
 
 		public ListHandler(int x, int y) {
-			for(int i = 0;i<LINES;i++) {
-				listEntries.add(new ListEntry(x, y + i * 14, i));
-			}
-			this.x = x;
-			this.y = y;
+			super(x, y, 61, 58, 14, Component.empty());
 		}
 
-		public void tooltip(GuiGraphics matrixStack, int mouseX, int mouseY) {
-			listEntries.stream().filter(s -> s.isHovered()).findFirst().ifPresent(le -> {
-				String id = le.getId();
-				if(id != null)matrixStack.renderTooltip(font, Component.literal(id), mouseX, mouseY);
-			});
+		@Override
+		protected Font getFont() {
+			return font;
 		}
 
-		public boolean needsScrollBars() {
-			return list.get().size() > LINES;
+		@Override
+		protected void addButton(AbstractWidget btn) {
+			addRenderableWidget(btn);
 		}
 
-		public void preRender(int mouseX, int mouseY) {
-			boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
-
-			int k = this.x + 56;
-			int l = this.y - 1;
-			int i1 = k + 14;
-			int j1 = l + 58;
-
-			if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
-				this.isScrolling = this.needsScrollBars();
-			}
-
-			if (!flag) {
-				this.isScrolling = false;
-			}
-			this.wasClicking = flag;
-
-			if (this.isScrolling) {
-				this.currentScroll = (mouseY - l - 4.5F) / (j1 - l - 9.0F);
-				this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
-			}
+		@Override
+		protected Component toComponent(String data) {
+			return Component.literal(data);
 		}
 
-		public void render(GuiGraphics st, int mouseX, int mouseY) {
-			int x = this.x + 55;
-			int y = this.y - 1 + (int) (49 * this.currentScroll);
-			boolean isHovered = mouseX >= x && mouseY >= y && mouseX < x + 5 && mouseY < y + 9;
-			st.blitSprite(SCROLL_SPRITES.get(this.needsScrollBars(), isHovered), x, y, 5, 9);
-		}
-
-		public boolean mouseScrolled(double dir) {
-			if (!this.needsScrollBars()) {
-				return false;
-			} else {
-				int i = list.get().size() - LINES;
-				this.currentScroll = (float)(this.currentScroll - dir / i);
-				this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
-				return true;
-			}
-		}
-
-		public class ListEntry extends Button {
-			private int id;
-
-			public ListEntry(int x, int y, int id) {
-				super(x, y, 53, 14, Component.empty(), null, DEFAULT_NARRATION);
-				this.id = id;
-				addRenderableWidget(this);
-			}
-
-			/**
-			 * Draws this button to the screen.
-			 */
-			@Override
-			public void renderWidget(GuiGraphics st, int mouseX, int mouseY, float pt) {
-				if (this.visible) {
-					String id = getId();
-					if(id != null) {
-						int x = getX();
-						int y = getY();
-						st.setColor(1.0f, 1.0f, 1.0f, this.alpha);
-						RenderSystem.enableBlend();
-						RenderSystem.enableDepthTest();
-						this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
-						var spr = (id.equals(selected) ? LIST_BUTTON_SPRITES_S : LIST_BUTTON_SPRITES).get(this.active, this.isHoveredOrFocused());
-						st.blitSprite(spr, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-						int c = this.active ? 0xFFFFFF : 0xA0A0A0;
-						int v = c | Mth.ceil(this.alpha * 255.0f) << 24;
-						int k = this.getX() + 2;
-						int l = this.getX() + this.getWidth() - 2;
-						AbstractWidget.renderScrollingString(st, font, Component.literal(id), k, this.getY(), l, this.getY() + this.getHeight(), v);
-					}
-				}
-			}
-
-			@Override
-			public void onPress() {
-				String id = getId();
-				if(id != null) {
-					selected = id;
-				}
-			}
-
-			private String getId() {
-				List<String> l = list.get();
-				int i = l.size() - LINES;
-				int j = (int) (currentScroll * i + 0.5D);
-				if (j < 0) {
-					j = 0;
-				}
-				if(this.id + j < l.size()) {
-					return l.get(this.id + j);
-				}
-				return null;
-			}
+		@Override
+		protected void renderTooltip(GuiGraphics graphics, String data, int mouseX, int mouseY) {
+			graphics.renderTooltip(font, Component.literal(data), mouseX, mouseY);
 		}
 	}
 }

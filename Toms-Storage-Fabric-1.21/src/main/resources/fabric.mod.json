@@ -46,8 +46,8 @@
 	"accessWidener" : "tomsstorage.accesswidener",
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric": "*",
-    "minecraft": ">=1.20.6"
+    "fabric": ">=0.100.3",
+    "minecraft": ">=1.21"
   },
   "custom": {
         "cardinal-components": [

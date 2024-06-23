@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.TickTask;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 
@@ -38,6 +40,7 @@ import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.platform.PlatformItem;
 import com.tom.storagemod.util.IDataReceiver;
 import com.tom.storagemod.util.PlayerInvUtil;
+import com.tom.storagemod.util.TickerUtil.OnLoadListener;
 
 import io.netty.buffer.ByteBufOutputStream;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -133,6 +136,13 @@ public class StorageMod implements ModInitializer {
 			if (entity != null) {
 				StorageModComponents.BLOCK_FILTER.get(entity).remove(world, pos);
 			}
+		});
+
+		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((be, w) -> {
+			if (be instanceof OnLoadListener l)
+				w.getServer().tell(new TickTask(0, () -> {
+					l.onLoad();
+				}));
 		});
 	}
 }

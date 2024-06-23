@@ -12,7 +12,7 @@ public class Config implements ConfigData {
 	public int advWirelessRange = 64;
 	@Tooltip
 	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlCrossDim = 4;
-	public int invLinkBeaconLvl = 1, invLinkBeaconLvlCrossDim = 2;
+	public int invLinkBeaconLvl = 0, invLinkBeaconRange = 4096, invLinkBeaconLvlSameDim = 1, invLinkBeaconLvlCrossDim = 2;
 	//public int inventoryConnectorMaxSlots = Integer.MAX_VALUE;
 
 	public static Config get() {

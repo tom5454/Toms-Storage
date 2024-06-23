@@ -32,6 +32,6 @@ public class PolyFilterItem extends Item implements IItemFilter {
 	}
 
 	@Override
-	public void openGui(ItemStack is, Player player, BooleanSupplier isValid) {
+	public void openGui(ItemStack is, Player player, BooleanSupplier isValid, Runnable refresh) {
 	}
 }

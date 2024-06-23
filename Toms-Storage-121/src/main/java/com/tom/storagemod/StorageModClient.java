@@ -32,6 +32,7 @@ import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
 import com.tom.storagemod.screen.FilingCabinetScreen;
 import com.tom.storagemod.screen.InventoryConfiguratorScreen;
+import com.tom.storagemod.screen.InventoryLinkScreen;
 import com.tom.storagemod.screen.ItemFilterScreen;
 import com.tom.storagemod.screen.LevelEmitterScreen;
 import com.tom.storagemod.screen.StorageTerminalScreen;
@@ -51,7 +52,7 @@ public class StorageModClient {
 		e.register(Content.storageTerminalMenu.get(), StorageTerminalScreen::new);
 		e.register(Content.craftingTerminalMenu.get(), CraftingTerminalScreen::new);
 		e.register(Content.levelEmitterMenu.get(), LevelEmitterScreen::new);
-		//e.register(Content.inventoryLink.get(), InventoryLinkScreen::new);
+		e.register(Content.inventoryLink.get(), InventoryLinkScreen::new);
 		e.register(Content.itemFilterMenu.get(), ItemFilterScreen::new);
 		e.register(Content.tagItemFilterMenu.get(), TagItemFilterScreen::new);
 		e.register(Content.invConfigMenu.get(), InventoryConfiguratorScreen::new);
@@ -91,8 +92,8 @@ public class StorageModClient {
 	private static void bakeModels(ModelEvent.ModifyBakingResult event) {
 		bindPaintedModel(event, Content.paintedTrim);
 		bindPaintedModel(event, Content.invCableFramed);
-		/*bindPaintedModel(event, Content.invProxy);
-		bindPaintedModel(event, Content.invCableConnectorFramed);*/
+		/*bindPaintedModel(event, Content.invProxy);*/
+		bindPaintedModel(event, Content.invCableConnectorFramed);
 	}
 
 	private static void bindPaintedModel(ModelEvent.ModifyBakingResult event, GameObject<? extends Block> block) {

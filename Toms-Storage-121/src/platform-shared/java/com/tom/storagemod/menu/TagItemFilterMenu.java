@@ -27,11 +27,13 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 	public boolean allowList;
 	private boolean synced;
 	private BooleanSupplier isValid;
+	private Runnable refresh;
 
-	public TagItemFilterMenu(int wid, Inventory pinv, TagFilter filter, BooleanSupplier isValid) {
+	public TagItemFilterMenu(int wid, Inventory pinv, TagFilter filter, BooleanSupplier isValid, Runnable refresh) {
 		this(wid, pinv);
 		this.filter = filter;
 		this.isValid = isValid;
+		this.refresh = refresh;
 	}
 
 	public TagItemFilterMenu(int wid, Inventory pinv) {
@@ -112,7 +114,8 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 	@Override
 	public void removed(Player playerIn) {
 		super.removed(playerIn);
-		if(filter != null)filter.flush();
+		if (filter != null)filter.flush();
+		if (refresh != null)refresh.run();
 	}
 
 	@Override

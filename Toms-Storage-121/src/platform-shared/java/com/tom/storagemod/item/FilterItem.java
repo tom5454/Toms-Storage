@@ -39,12 +39,12 @@ public class FilterItem extends Item implements IItemFilter {
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 		ItemStack is = player.getItemInHand(hand);
-		openGui(is, player, () -> player.getItemInHand(hand).getItem() == this);
+		openGui(is, player, () -> player.getItemInHand(hand).getItem() == this, null);
 		return InteractionResultHolder.sidedSuccess(is, world.isClientSide);
 	}
 
 	@Override
-	public void openGui(ItemStack is, Player player, BooleanSupplier isValid) {
-		player.openMenu(new SimpleMenuProvider((id, pi, pl) -> new ItemFilterMenu(id, pi, new SimpleItemFilter(is), isValid), is.getHoverName()));
+	public void openGui(ItemStack is, Player player, BooleanSupplier isValid, Runnable refresh) {
+		player.openMenu(new SimpleMenuProvider((id, pi, pl) -> new ItemFilterMenu(id, pi, new SimpleItemFilter(is), isValid, refresh), is.getHoverName()));
 	}
 }

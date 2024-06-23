@@ -10,5 +10,5 @@ import com.tom.storagemod.util.BlockFace;
 
 public interface IItemFilter {
 	ItemPredicate createFilter(BlockFace from, ItemStack stack);
-	void openGui(ItemStack is, Player player, BooleanSupplier isValid);
+	void openGui(ItemStack is, Player player, BooleanSupplier isValid, Runnable refresh);
 }

@@ -1,7 +1,7 @@
 package com.tom.storagemod.block.entity;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.Collection;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,7 +27,7 @@ public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implement
 		long time = level.getGameTime();
 		if(time % 20 == worldPosition.hashCode() % 20) {
 			networkAccess = null;
-			List<BlockPos> netBlocks = InventoryCableNetwork.getNetwork(level).getNetworkNodes(worldPosition);
+			Collection<BlockPos> netBlocks = InventoryCableNetwork.getNetwork(level).getNetworkNodes(worldPosition);
 			for (BlockPos p : netBlocks) {
 				if (!level.isLoaded(p))continue;
 

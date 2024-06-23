@@ -1,7 +1,14 @@
 package com.tom.storagemod.inventory;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -10,7 +17,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import com.tom.storagemod.Config;
+import com.tom.storagemod.block.entity.IInventoryConnector;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
+import com.tom.storagemod.util.Priority;
+import com.tom.storagemod.util.Priority.IPriority;
 import com.tom.storagemod.util.WorldStates;
 
 public abstract class MultiInventoryAccess implements IInventoryAccess {
@@ -21,8 +31,30 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 		WorldStates.trackers.put(getPlatformHandler(), tracker());
 	}
 
-	public List<IInventoryAccess> getConnected() {
-		return connected;
+	public void build(IInventoryConnector self, Collection<IInventoryConnector> connectors) {
+		connected.clear();
+		Queue<IInventoryConnector> q = new ArrayDeque<>();
+		q.add(self);
+		q.addAll(connectors);
+		Set<IInventoryConnector> all = new HashSet<>();
+		while (!q.isEmpty()) {
+			IInventoryConnector ic = q.poll();
+			if (all.add(ic)) {
+				q.addAll(ic.getConnectedConnectors());
+			}
+		}
+		boolean test = false;
+		if (test) {
+			all.forEach(c -> connected.addAll(c.getConnectedInventories()));
+			connected.sort(IPriority.compare().reversed());
+		} else {
+			var map = all.stream().flatMap(c -> c.getConnectedInventories().stream()).
+					collect(Collectors.groupingBy(IPriority.GETTER, () -> new EnumMap<>(Priority.class), Collectors.toList()));
+			for (int i = Priority.VALUES.length - 1; i >= 0; i--) {
+				connected.addAll(map.getOrDefault(Priority.VALUES[i], Collections.emptyList()));
+			}
+		}
+		refresh();
 	}
 
 	@Override
@@ -72,7 +104,15 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 		return c;
 	}
 
-	public void refresh() {
+	public void clear() {
+		connected.clear();
+	}
+
+	public int getInventoryCount() {
+		return connected.size();
+	}
+
+	protected void refresh() {
 	}
 
 	private static class ItemList extends ArrayList<StoredItemStack> {

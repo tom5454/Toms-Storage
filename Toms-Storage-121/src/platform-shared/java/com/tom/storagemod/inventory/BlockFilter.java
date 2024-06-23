@@ -37,7 +37,7 @@ public class BlockFilter {
 		priority = Priority.NORMAL;
 		connected = new HashSet<>();
 		connected.add(pos);
-		filter.addListener(__ -> filterNeedsUpdate = true);
+		filter.addListener(__ -> markFilterDirty());
 	}
 
 	public Set<BlockPos> getConnectedBlocks() {
@@ -149,5 +149,9 @@ public class BlockFilter {
 
 	public void setKeepLast(boolean keepLast) {
 		this.keepLast = keepLast;
+	}
+
+	public void markFilterDirty() {
+		filterNeedsUpdate = true;
 	}
 }

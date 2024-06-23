@@ -37,6 +37,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("adv_wireless_terminal", tooltip, Config.get().advWirelessRange);
 		if (Config.get().wirelessTermBeaconLvl != -1) {
+			ClientUtil.tooltip("adv_wireless_terminal.beacon", false, tooltip);
 			ClientUtil.tooltip("adv_wireless_terminal.beacon1", false, tooltip, Config.get().wirelessTermBeaconLvl);
 			if (Config.get().wirelessTermBeaconLvlCrossDim != -1) {
 				ClientUtil.tooltip("adv_wireless_terminal.beacon2", false, tooltip, Config.get().wirelessTermBeaconLvlCrossDim);

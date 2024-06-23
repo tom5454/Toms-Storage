@@ -37,6 +37,7 @@ import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
 import com.tom.storagemod.screen.InventoryConfiguratorScreen;
+import com.tom.storagemod.screen.InventoryLinkScreen;
 import com.tom.storagemod.screen.ItemFilterScreen;
 import com.tom.storagemod.screen.LevelEmitterScreen;
 import com.tom.storagemod.screen.StorageTerminalScreen;
@@ -54,14 +55,14 @@ public class StorageModClient implements ClientModInitializer {
 		MenuScreens.register(Content.craftingTerminalMenu.get(), CraftingTerminalScreen::new);
 		MenuScreens.register(Content.invConfigMenu.get(), InventoryConfiguratorScreen::new);
 		MenuScreens.register(Content.levelEmitterMenu.get(), LevelEmitterScreen::new);
-		//MenuScreens.register(Content.inventoryLink.get(), InventoryLinkScreen::new);
+		MenuScreens.register(Content.inventoryLink.get(), InventoryLinkScreen::new);
 		MenuScreens.register(Content.itemFilterMenu.get(), ItemFilterScreen::new);
 		MenuScreens.register(Content.tagItemFilterMenu.get(), TagItemFilterScreen::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.paintedTrim.get(), RenderType.translucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableFramed.get(), RenderType.translucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.levelEmitter.get(), RenderType.cutout());
-		//BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invCableConnectorPainted.get(), RenderType.translucent());
+		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableConnectorFramed.get(), RenderType.translucent());
 		//BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invProxyPainted.get(), RenderType.translucent());
 
 		ClientPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
@@ -95,7 +96,7 @@ public class StorageModClient implements ClientModInitializer {
 				}
 			}
 			return -1;
-		}, Content.paintedTrim.get(), Content.invCableFramed.get());
+		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get());
 
 		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
 			PoseStack ps = new PoseStack();
@@ -139,8 +140,8 @@ public class StorageModClient implements ClientModInitializer {
 	private static void bakeModels(Set<ModelResourceLocation> locs) {
 		bindPaintedModel(locs, Content.paintedTrim);
 		bindPaintedModel(locs, Content.invCableFramed);
-		/*bindPaintedModel(locs, Content.invProxy);
-		bindPaintedModel(locs, Content.invCableConnectorFramed);*/
+		/*bindPaintedModel(locs, Content.invProxy);*/
+		bindPaintedModel(locs, Content.invCableConnectorFramed);
 	}
 
 	private static void bindPaintedModel(Set<ModelResourceLocation> locs, GameObject<? extends Block> block) {

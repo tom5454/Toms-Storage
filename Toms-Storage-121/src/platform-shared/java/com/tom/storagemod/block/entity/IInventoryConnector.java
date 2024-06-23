@@ -1,11 +1,12 @@
 package com.tom.storagemod.block.entity;
 
-import java.util.Set;
+import java.util.Collection;
 
 import com.tom.storagemod.inventory.IInventoryAccess;
 
 public interface IInventoryConnector {
 	IInventoryAccess getMergedHandler();
-	Set<IInventoryAccess> getConnectedInventories();
+	Collection<IInventoryAccess> getConnectedInventories();
+	Collection<IInventoryConnector> getConnectedConnectors();
 	boolean isValid();
 }

@@ -47,7 +47,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.TickerUtil;
 
-public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCable, IForgeBlock, NeoForgeBlock {
+public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 	public static final MapCodec<LevelEmitterBlock> CODEC = ChestBlock.simpleCodec(properties -> new LevelEmitterBlock());

@@ -1,5 +1,6 @@
 package com.tom.storagemod.block.entity;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +29,6 @@ import com.tom.storagemod.inventory.PlatformInventoryAccess.BlockInventoryAccess
 import com.tom.storagemod.inventory.PlatformMultiInventoryAccess;
 import com.tom.storagemod.inventory.VanillaMultiblockInventories;
 import com.tom.storagemod.platform.PlatformBlockEntity;
-import com.tom.storagemod.util.Priority.IPriority;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 
 public class InventoryConnectorBlockEntity extends PlatformBlockEntity implements TickableServer, IInventoryConnector, IInventory {
@@ -47,23 +48,13 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		if(time % 20 == Math.abs(worldPosition.hashCode()) % 20) {
 			detectTouchingInventories();
 			detectCableNetwork();
-			handler.getConnected().clear();
-			BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
-			if (f != null) {
-				for (IInventoryAccess ii : connectedInvs) {
-					handler.getConnected().add(f.wrap(level, ii));
-				}
-			} else
-				handler.getConnected().addAll(connectedInvs);
-			linkedConnectors.forEach(ii -> handler.getConnected().addAll(ii.getConnectedInventories()));
-			handler.getConnected().sort(IPriority.compare().reversed());
-			handler.refresh();
+			handler.build(this, linkedConnectors);
 		}
 	}
 
 	private void detectCableNetwork() {
 		linkedConnectors.clear();
-		List<BlockPos> netBlocks = InventoryCableNetwork.getNetwork(level).getNetworkNodes(worldPosition);
+		Collection<BlockPos> netBlocks = InventoryCableNetwork.getNetwork(level).getNetworkNodes(worldPosition);
 
 		for (BlockPos p : netBlocks) {
 			if (!level.isLoaded(p))continue;
@@ -76,6 +67,9 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 	}
 
 	private void detectTouchingInventories() {
+		BlockFilter connFilter = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
+		UnaryOperator<IInventoryAccess> wrapper = connFilter != null ? i -> connFilter.wrap(level, i) : UnaryOperator.identity();
+
 		connectedInvs.clear();
 		Map<BlockPos, Direction> connected = new HashMap<>();
 		Set<BlockFilter> blockFilters = new HashSet<>();
@@ -130,7 +124,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 				acc.onLoad(level, p, d, this);
 			}
 			invA.put(s, acc);
-			connectedInvs.add(acc);
+			connectedInvs.add(wrapper.apply(acc));
 		});
 		blockFilters.forEach(f -> {
 			if (f.skip())return;
@@ -141,7 +135,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 				acc.onLoad(level, f.getMainPos(), f.getSide(), this);
 			}
 			invA.put(s, acc);
-			connectedInvs.add(f.wrap(level, acc));
+			connectedInvs.add(wrapper.apply(f.wrap(level, acc)));
 		});
 		invAccesses.values().forEach(IInventoryAccess::markInvalid);
 		invAccesses.clear();
@@ -159,11 +153,11 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 	public void setRemoved() {
 		super.setRemoved();
 		invAccesses.clear();
-		handler.getConnected().clear();
+		handler.clear();
 	}
 
 	public UsageInfo getUsage() {
-		return new UsageInfo(handler.getConnected().size(), handler.getSlotCount(), handler.getFreeSlotCount());
+		return new UsageInfo(handler.getInventoryCount(), handler.getSlotCount(), handler.getFreeSlotCount());
 	}
 
 	public record BlockSide(BlockPos pos, Direction side) {}
@@ -195,5 +189,10 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 
 	public List<BlockPos> getConnectedBlocks() {
 		return invAccesses.keySet().stream().map(b -> b.pos()).toList();
+	}
+
+	@Override
+	public Collection<IInventoryConnector> getConnectedConnectors() {
+		return linkedConnectors;
 	}
 }

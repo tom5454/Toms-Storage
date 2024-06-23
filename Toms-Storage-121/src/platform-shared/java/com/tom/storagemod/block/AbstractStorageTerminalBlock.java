@@ -185,6 +185,10 @@ public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock imple
 
 	@Override
 	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
-		return Collections.emptyList();
+		Direction d = state.getValue(AbstractStorageTerminalBlock.FACING);
+		TerminalPos p = state.getValue(AbstractStorageTerminalBlock.TERMINAL_POS);
+		if(p == TerminalPos.UP)d = Direction.UP;
+		if(p == TerminalPos.DOWN)d = Direction.DOWN;
+		return Collections.singletonList(pos.relative(d));
 	}
 }

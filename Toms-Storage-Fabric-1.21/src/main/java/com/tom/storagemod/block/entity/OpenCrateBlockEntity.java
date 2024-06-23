@@ -21,9 +21,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import com.tom.storagemod.Content;
-import com.tom.storagemod.util.TickerUtil.TickableServer0;
+import com.tom.storagemod.util.TickerUtil.TickableServer;
 
-public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlockEntity, TickableServer0 {
+public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlockEntity, TickableServer {
 	private List<ItemEntity> items = new ArrayList<>();
 	private Handler handler = new Handler();
 
@@ -32,7 +32,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements SidedStorageBlo
 	}
 
 	@Override
-	public void updateServer0() {
+	public void updateServer() {
 		if(level.getGameTime() % 5 == 0){
 			BlockState state = level.getBlockState(worldPosition);
 			Direction f = state.getValue(BlockStateProperties.FACING);

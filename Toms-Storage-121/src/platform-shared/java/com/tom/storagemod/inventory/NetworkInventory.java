@@ -1,7 +1,7 @@
 package com.tom.storagemod.inventory;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.Collection;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +23,7 @@ public class NetworkInventory {
 
 	public void scanNetwork(Level level, BlockPos worldPosition) {
 		networkAccess = null;
-		List<BlockPos> netBlocks = InventoryCableNetwork.getNetwork(level).getNetworkNodes(worldPosition);
+		Collection<BlockPos> netBlocks = InventoryCableNetwork.getNetwork(level).getNetworkNodes(worldPosition);
 
 		for (BlockPos p : netBlocks) {
 			if (!level.isLoaded(p))continue;

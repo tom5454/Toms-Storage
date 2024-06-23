@@ -1,9 +1,8 @@
 package com.tom.storagemod.inventory;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -23,13 +22,13 @@ public class InventoryCableNetwork {
 		this.level = level;
 	}
 
-	public List<BlockPos> getNetworkNodes(BlockPos from) {
+	public Collection<BlockPos> getNetworkNodes(BlockPos from) {
 		CableCache cache = caches.get(from);
 		if (cache != null)return cache.attached;
 		Set<BlockPos> checked = new HashSet<>();
 		Stack<BlockPos> next = new Stack<>();
 		Set<BlockPos> cables = new HashSet<>();
-		List<BlockPos> attached = new ArrayList<>();
+		Set<BlockPos> attached = new HashSet<>();
 		next.add(from);
 		while (!next.isEmpty()) {
 			BlockPos p = next.pop();
@@ -64,5 +63,5 @@ public class InventoryCableNetwork {
 		return WorldStates.cableNetworks.computeIfAbsent(level, InventoryCableNetwork::new);
 	}
 
-	private static record CableCache(Set<BlockPos> cables, List<BlockPos> attached) {}
+	private static record CableCache(Set<BlockPos> cables, Set<BlockPos> attached) {}
 }

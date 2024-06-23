@@ -105,6 +105,12 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 	}
 
 	@Override
+	public void clear() {
+		super.clear();
+		invSize = 0;
+	}
+
+	@Override
 	public void refresh() {
 		if(invSizes.length != connected.size())invSizes = new int[connected.size()];
 		invSize = 0;

@@ -19,7 +19,7 @@ public class Config {
 	public int wirelessRange;
 	public int advWirelessRange;
 	public int wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
-	public int invLinkBeaconLvl, invLinkBeaconLvlCrossDim;
+	public int invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 	//public int inventoryConnectorMaxSlots;
 
 	public static Config get() {
@@ -33,7 +33,7 @@ public class Config {
 		public BooleanValue onlyTrimsConnect, runMultithreaded;
 		public IntValue advWirelessRange;
 		public IntValue wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
-		public IntValue invLinkBeaconLvl, invLinkBeaconLvlCrossDim;
+		public IntValue invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 		//public IntValue inventoryConnectorMaxSlots;
 
 		private Server(ModConfigSpec.Builder builder) {
@@ -73,13 +73,24 @@ public class Config {
 					"Value of 0 only requires a single beacon block",
 					"Value of -1 disables this feature entirely").
 					translation("tomsstorage.config.inv_link_beacon_lvl").
-					defineInRange("invLinkBeaconLvl", 1, -1, 4);
+					defineInRange("invLinkBeaconLvl", 0, -1, 4);
+
+			invLinkBeaconRange = builder.comment("Inventory Linking range with beacons",
+					"Value of 0 disables this feature entirely").
+					translation("tomsstorage.config.inv_link_beacon_range").
+					defineInRange("invLinkBeaconRange", 4096, 0, Integer.MAX_VALUE);
+
+			invLinkBeaconLvlSameDim = builder.comment("Inventory Cable Connector requied beacon level for same dimension access with unlimited range",
+					"Value of 0 only requires a single beacon block",
+					"Value of -1 disables this feature entirely").
+					translation("tomsstorage.config.inv_link_beacon_lvl_same_dim").
+					defineInRange("invLinkBeaconLvlSameDim", 1, -1, 4);
 
 			invLinkBeaconLvlCrossDim = builder.comment("Inventory Cable Connector requied beacon level for cross dimensional access",
 					"Value of 0 only requires a single beacon block",
 					"Value of -1 disables this feature entirely").
 					translation("tomsstorage.config.inv_link_beacon_lvl_dim").
-					defineInRange("invLinkBeaconLvlDim", 2, -1, 4);
+					defineInRange("invLinkBeaconLvlCrossDim", 2, -1, 4);
 
 			runMultithreaded = builder.comment("Use multi threading to improve performance").
 					translation("tomsstorage.config.run_multithreaded").
@@ -130,6 +141,8 @@ public class Config {
 			wirelessTermBeaconLvl = SERVER.wirelessTermBeaconLvl.get();
 			wirelessTermBeaconLvlCrossDim = SERVER.wirelessTermBeaconLvlCrossDim.get();
 			invLinkBeaconLvl = SERVER.invLinkBeaconLvl.get();
+			invLinkBeaconRange = SERVER.invLinkBeaconRange.get();
+			invLinkBeaconLvlSameDim = SERVER.invLinkBeaconLvlSameDim.get();
 			invLinkBeaconLvlCrossDim = SERVER.invLinkBeaconLvlCrossDim.get();
 			runMultithreaded = SERVER.runMultithreaded.getAsBoolean();
 			//inventoryConnectorMaxSlots = SERVER.inventoryConnectorMaxSlots.getAsInt();
