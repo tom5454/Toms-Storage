@@ -5,7 +5,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import com.tom.storagemod.inventory.IInventoryAccess.IInventory;
 
-public class PlatformItemHandler implements IItemHandler {
+public class PlatformItemHandler implements IItemHandler, IProxy {
 	private IInventory access;
 
 	private IItemHandler getP() {
@@ -44,5 +44,10 @@ public class PlatformItemHandler implements IItemHandler {
 	@Override
 	public boolean isItemValid(int slot, ItemStack stack) {
 		return getP().isItemValid(slot, stack);
+	}
+
+	@Override
+	public IInventoryAccess getRootHandler() {
+		return access.getInventoryAccess();
 	}
 }

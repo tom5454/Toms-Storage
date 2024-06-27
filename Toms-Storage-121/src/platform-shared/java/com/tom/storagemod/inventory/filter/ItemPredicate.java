@@ -11,5 +11,7 @@ public interface ItemPredicate {
 		return true;
 	}
 
+	default void updateState() {}
+
 	public static final ItemPredicate TRUE = s -> true;
 }

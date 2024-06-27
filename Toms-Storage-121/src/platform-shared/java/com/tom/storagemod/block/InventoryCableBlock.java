@@ -33,6 +33,7 @@ import com.mojang.serialization.MapCodec;
 
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
+import com.tom.storagemod.util.BlockFace;
 
 public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable, NeoForgeBlock {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
@@ -90,10 +91,10 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 	}
 
 	@Override
-	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
-		List<BlockPos> next = new ArrayList<>();
+	public List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
+		List<BlockFace> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			if(state.getValue(DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.relative(d));
+			if(state.getValue(DIR_TO_PROPERTY[d.ordinal()]))next.add(new BlockFace(pos.relative(d), d.getOpposite()));
 		}
 		return next;
 	}

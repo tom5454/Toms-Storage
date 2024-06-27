@@ -45,6 +45,7 @@ import com.mojang.serialization.MapCodec;
 import com.tom.storagemod.block.entity.LevelEmitterBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
+import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock {
@@ -129,8 +130,9 @@ public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCabl
 	}
 
 	@Override
-	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
-		return Collections.singletonList(pos.relative(state.getValue(FACING).getOpposite()));
+	public List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
+		Direction d = state.getValue(FACING);
+		return Collections.singletonList(new BlockFace(pos.relative(d.getOpposite()), d));
 	}
 
 	@Override

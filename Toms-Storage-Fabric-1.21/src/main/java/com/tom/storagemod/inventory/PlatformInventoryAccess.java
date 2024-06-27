@@ -44,6 +44,11 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		public int getFreeSlotCount() {
 			return 0;
 		}
+
+		@Override
+		public IInventoryAccess getRootHandler() {
+			return this;
+		}
 	};
 
 	public static class BlockInventoryAccess implements PlatformInventoryAccess {
@@ -82,6 +87,11 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		@Override
 		public void markInvalid() {
 			cache = null;
+		}
+
+		@Override
+		public IInventoryAccess getRootHandler() {
+			return get() instanceof IProxy p ? p.getRootHandler() : this;
 		}
 	}
 

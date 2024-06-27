@@ -30,6 +30,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.tom.storagemod.client.ClientUtil;
+import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock implements IInventoryCable {
@@ -79,7 +80,7 @@ public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock imple
 	}
 
 	@Override
-	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
+	public List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
 		return Collections.emptyList();
 	}
 

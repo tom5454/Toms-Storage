@@ -22,6 +22,7 @@ import com.tom.storagemod.block.IInventoryNode;
 import com.tom.storagemod.inventory.BlockFilter;
 import com.tom.storagemod.inventory.IInventoryAccess;
 import com.tom.storagemod.inventory.IInventoryAccess.IInventory;
+import com.tom.storagemod.inventory.IInventoryConnectorReference;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.inventory.MultiInventoryAccess;
 import com.tom.storagemod.inventory.PlatformInventoryAccess;
@@ -29,14 +30,15 @@ import com.tom.storagemod.inventory.PlatformInventoryAccess.BlockInventoryAccess
 import com.tom.storagemod.inventory.PlatformMultiInventoryAccess;
 import com.tom.storagemod.inventory.VanillaMultiblockInventories;
 import com.tom.storagemod.platform.PlatformBlockEntity;
+import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 
-public class InventoryConnectorBlockEntity extends PlatformBlockEntity implements TickableServer, IInventoryConnector, IInventory {
+public class InventoryConnectorBlockEntity extends PlatformBlockEntity implements TickableServer, IInventoryConnector, IInventory, IInventoryConnectorReference {
 	private MultiInventoryAccess handler = new PlatformMultiInventoryAccess();
-	private Map<BlockSide, BlockInventoryAccess> invAccesses = new HashMap<>();
+	private Map<BlockFace, BlockInventoryAccess> invAccesses = new HashMap<>();
 	private Set<IInventoryAccess> connectedInvs = new HashSet<>();
 	private Set<IInventoryConnector> linkedConnectors = new HashSet<>();
-	private Set<BlockPos> interfaces = new HashSet<>();
+	private Set<BlockFace> interfaces = new HashSet<>();
 
 	public InventoryConnectorBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
 		super(Content.connectorBE.get(), p_155229_, p_155230_);
@@ -73,7 +75,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		connectedInvs.clear();
 		Map<BlockPos, Direction> connected = new HashMap<>();
 		Set<BlockFilter> blockFilters = new HashSet<>();
-		Set<BlockPos> interfaces = new HashSet<>();
+		Set<BlockFace> interfaces = new HashSet<>();
 
 		Stack<BlockPos> toCheck = new Stack<>();
 		Set<BlockPos> checkedBlocks = new HashSet<>();
@@ -99,8 +101,9 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 					BlockState state = level.getBlockState(p);
 					if(state.is(StorageTags.TRIMS)) {
 						toCheck.add(p);
-					} else if(state.getBlock() instanceof IInventoryNode in) {
-						interfaces.add(p);
+					} else if(state.getBlock() instanceof IInventoryNode) {
+						interfaces.add(new BlockFace(p, Direction.DOWN));
+						toCheck.add(p);
 					} else if(!state.is(StorageTags.INV_CONNECTOR_SKIP) && !onlyTrims && BlockInventoryAccess.hasInventoryAt(level, p, state, d.getOpposite())) {
 						BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, p, false);
 						if (f != null)blockFilters.add(f);
@@ -115,9 +118,9 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 
 		blockFilters.forEach(f -> f.getConnectedBlocks().forEach(connected::remove));
 
-		Map<BlockSide, BlockInventoryAccess> invA = new HashMap<>();
+		Map<BlockFace, BlockInventoryAccess> invA = new HashMap<>();
 		connected.forEach((p, d) -> {
-			BlockSide s = new BlockSide(p, d);
+			BlockFace s = new BlockFace(p, d);
 			BlockInventoryAccess acc = invAccesses.remove(s);
 			if (acc == null) {
 				acc = new BlockInventoryAccess();
@@ -128,7 +131,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		});
 		blockFilters.forEach(f -> {
 			if (f.skip())return;
-			BlockSide s = new BlockSide(f.getMainPos(), f.getSide());
+			BlockFace s = new BlockFace(f.getMainPos(), f.getSide());
 			BlockInventoryAccess acc = invAccesses.remove(s);
 			if (acc == null) {
 				acc = new BlockInventoryAccess();
@@ -160,7 +163,6 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		return new UsageInfo(handler.getInventoryCount(), handler.getSlotCount(), handler.getFreeSlotCount());
 	}
 
-	public record BlockSide(BlockPos pos, Direction side) {}
 	public record UsageInfo(int blocks, int all, int free) {}
 
 	@Override
@@ -173,7 +175,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		return connectedInvs;
 	}
 
-	public Set<BlockPos> getInterfaces() {
+	public Set<BlockFace> getInterfaces() {
 		return interfaces;
 	}
 
@@ -194,5 +196,10 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 	@Override
 	public Collection<IInventoryConnector> getConnectedConnectors() {
 		return linkedConnectors;
+	}
+
+	@Override
+	public IInventoryConnector getConnectorRef() {
+		return this;
 	}
 }

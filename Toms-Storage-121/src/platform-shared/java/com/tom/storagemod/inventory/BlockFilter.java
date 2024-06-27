@@ -18,7 +18,7 @@ import net.minecraft.world.phys.AABB;
 
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.item.IItemFilter;
-import com.tom.storagemod.util.BlockFace;
+import com.tom.storagemod.util.BlockFaceReference;
 import com.tom.storagemod.util.Priority;
 
 public class BlockFilter {
@@ -98,7 +98,7 @@ public class BlockFilter {
 		ItemStack filter = this.filter.getItem(0);
 		if (filterNeedsUpdate || !itemPred.configMatch(filter)) {
 			if (filter.getItem() instanceof IItemFilter f) {
-				itemPred = f.createFilter(new BlockFace(level, pos, side), filter);
+				itemPred = f.createFilter(new BlockFaceReference(level, pos, side), filter);
 			} else
 				itemPred = ItemPredicate.TRUE;
 			filterNeedsUpdate = false;

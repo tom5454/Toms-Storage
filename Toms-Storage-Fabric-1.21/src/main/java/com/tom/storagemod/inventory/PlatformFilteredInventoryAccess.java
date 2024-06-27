@@ -9,9 +9,11 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.BlankVariantView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import com.google.common.collect.Iterators;
 
+import com.tom.storagemod.inventory.InventoryImage.FabricStack;
 import com.tom.storagemod.util.Priority;
 import com.tom.storagemod.util.Priority.IPriority;
 
@@ -38,6 +40,11 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 			}
 
 			@Override
+			protected int getCount(FabricStack is) {
+				return (int) (filter.isKeepLast() ? is.count() - 1 : is.count());
+			}
+
+			@Override
 			protected StorageView<ItemVariant> getSlotHandler(StorageView<ItemVariant> def) {
 				if (def instanceof FilteringStorageView s && s.getOuter() == PlatformFilteredInventoryAccess.this)
 					return def;
@@ -47,6 +54,18 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 			@Override
 			protected Storage<ItemVariant> getSlotHandler(Storage<ItemVariant> def) {
 				return PlatformFilteredInventoryAccess.this;
+			}
+
+			@Override
+			public InventoryImage prepForOffThread(Level level) {
+				filter.getItemPred().updateState();
+				return super.prepForOffThread(level);
+			}
+
+			@Override
+			public long getChangeTracker(Level level) {
+				filter.getItemPred().updateState();
+				return super.getChangeTracker(level);
 			}
 		};
 	}
@@ -171,5 +190,10 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 		public PlatformFilteredInventoryAccess getOuter() {
 			return PlatformFilteredInventoryAccess.this;
 		}
+	}
+
+	@Override
+	public IInventoryAccess getRootHandler() {
+		return acc.getRootHandler();
 	}
 }

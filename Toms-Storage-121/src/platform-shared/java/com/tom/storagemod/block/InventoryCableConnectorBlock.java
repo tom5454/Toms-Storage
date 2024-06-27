@@ -45,6 +45,7 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.block.entity.InventoryCableConnectorBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
+import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public class InventoryCableConnectorBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock {
@@ -135,11 +136,11 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	}
 
 	@Override
-	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
+	public List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
 		Direction f = state.getValue(FACING);
-		List<BlockPos> next = new ArrayList<>();
+		List<BlockFace> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			if(d != f && state.getValue(InventoryCableBlock.DIR_TO_PROPERTY[d.ordinal()]))next.add(pos.relative(d));
+			if(d != f && state.getValue(InventoryCableBlock.DIR_TO_PROPERTY[d.ordinal()]))next.add(new BlockFace(pos.relative(d), d.getOpposite()));
 		}
 		return next;
 	}
@@ -279,20 +280,21 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
 			BlockHitResult hit) {
-		if (world.isClientSide) {
-			return InteractionResult.SUCCESS;
-		}
-
 		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
-		if (blockEntity_1 instanceof InventoryCableConnectorBlockEntity term) {
-			if(term.stillValid(player)) {
-				player.openMenu(term);
+		if (blockEntity_1 instanceof InventoryCableConnectorBlockEntity be && be.hasBeacon()) {
+			if (world.isClientSide) {
+				return InteractionResult.SUCCESS;
+			}
+
+			if(be.stillValid(player)) {
+				player.openMenu(be);
+				return InteractionResult.SUCCESS;
 			} else {
 				player.displayClientMessage(Component.translatable("chat.toms_storage.inv_link_access_denied"), true);
 				return InteractionResult.PASS;
 			}
 		}
-		return InteractionResult.SUCCESS;
+		return InteractionResult.PASS;
 	}
 
 	@Override

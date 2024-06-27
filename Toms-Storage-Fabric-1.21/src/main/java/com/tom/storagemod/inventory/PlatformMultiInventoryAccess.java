@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class PlatformMultiInventoryAccess extends MultiInventoryAccess implements Storage<ItemVariant> {
 	private boolean iterating;
+	private boolean calling;
 
 	@Override
 	public Storage<ItemVariant> get() {
@@ -22,6 +23,8 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 	@Override
 	public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
 		StoragePreconditions.notNegative(maxAmount);
+		if(calling)return 0L;
+		calling = true;
 		long amount = 0;
 
 		try (Transaction iterationTransaction = Transaction.openNested(transaction)) {
@@ -36,6 +39,8 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 			}
 
 			iterationTransaction.commit();
+		} finally {
+			calling = false;
 		}
 
 		return amount;
@@ -44,6 +49,8 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 	@Override
 	public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
 		StoragePreconditions.notNegative(maxAmount);
+		if(calling)return 0L;
+		calling = true;
 		long amount = 0;
 
 		try (Transaction iterationTransaction = Transaction.openNested(transaction)) {
@@ -57,6 +64,8 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 				if (amount == maxAmount) break;
 			}
 			iterationTransaction.commit();
+		} finally {
+			calling = false;
 		}
 
 		return amount;

@@ -10,12 +10,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.inventory.IInventoryAccess;
 import com.tom.storagemod.inventory.IInventoryAccess.IInventory;
+import com.tom.storagemod.inventory.IInventoryConnectorReference;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.inventory.PlatformInventoryAccess;
 import com.tom.storagemod.platform.PlatformBlockEntity;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 
-public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implements TickableServer, IInventory {
+public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implements TickableServer, IInventory, IInventoryConnectorReference {
 	private WeakReference<IInventoryConnector> networkAccess;
 
 	public InventoryInterfaceBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
@@ -49,4 +50,12 @@ public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implement
 		return PlatformInventoryAccess.EMPTY;
 	}
 
+	@Override
+	public IInventoryConnector getConnectorRef() {
+		if (networkAccess != null) {
+			IInventoryConnector net = networkAccess.get();
+			if (net != null && net.isValid())return net;
+		}
+		return null;
+	}
 }

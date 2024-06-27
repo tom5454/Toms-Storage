@@ -43,15 +43,16 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 				q.addAll(ic.getConnectedConnectors());
 			}
 		}
-		boolean test = false;
-		if (test) {
-			all.forEach(c -> connected.addAll(c.getConnectedInventories()));
-			connected.sort(IPriority.compare().reversed());
-		} else {
-			var map = all.stream().flatMap(c -> c.getConnectedInventories().stream()).
-					collect(Collectors.groupingBy(IPriority.GETTER, () -> new EnumMap<>(Priority.class), Collectors.toList()));
-			for (int i = Priority.VALUES.length - 1; i >= 0; i--) {
-				connected.addAll(map.getOrDefault(Priority.VALUES[i], Collections.emptyList()));
+		var map = all.stream().flatMap(c -> c.getConnectedInventories().stream()).
+				collect(Collectors.groupingBy(IPriority.GETTER, () -> new EnumMap<>(Priority.class), Collectors.toList()));
+		Set<IInventoryAccess> allRoots = new HashSet<>();
+		allRoots.add(this);
+		for (int i = Priority.VALUES.length - 1; i >= 0; i--) {
+			for (IInventoryAccess a : map.getOrDefault(Priority.VALUES[i], Collections.emptyList())) {
+				IInventoryAccess root = a.getRootHandler();
+				if (root instanceof MultiInventoryAccess)continue;//skip
+				if (allRoots.add(root))
+					connected.add(a);
 			}
 		}
 		refresh();
@@ -113,6 +114,11 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 	}
 
 	protected void refresh() {
+	}
+
+	@Override
+	public IInventoryAccess getRootHandler() {
+		return this;
 	}
 
 	private static class ItemList extends ArrayList<StoredItemStack> {
@@ -274,5 +280,9 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 			}
 			return null;
 		}
+	}
+
+	public Collection<IInventoryAccess> getConnected() {
+		return connected;
 	}
 }

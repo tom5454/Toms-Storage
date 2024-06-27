@@ -1,6 +1,7 @@
 package com.tom.storagemod.inventory;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -14,9 +15,12 @@ import net.minecraft.world.level.Level;
 
 import com.tom.storagemod.inventory.IInventoryAccess.IChangeNotifier;
 import com.tom.storagemod.inventory.IInventoryAccess.IInventoryChangeTracker;
+import com.tom.storagemod.inventory.IInventoryAccess.IMultiThreadedTracker;
+import com.tom.storagemod.inventory.InventoryImage.FabricStack;
+import com.tom.storagemod.inventory.InventoryImage.InvState;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 
-public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeNotifier {
+public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeNotifier, IMultiThreadedTracker<InventoryImage, InvState> {
 	public static final InventoryChangeTracker NULL = new InventoryChangeTracker(null);
 	private WeakReference<Storage<ItemVariant>> storage;
 	private long lastUpdate, lastVersion, lastChange;
@@ -55,6 +59,10 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 
 	protected int getCount(StorageView<ItemVariant> is) {
 		return (int) is.getAmount();
+	}
+
+	protected int getCount(FabricStack is) {
+		return (int) is.count();
 	}
 
 	private boolean updateChange(StorageView<ItemVariant> iv) {
@@ -156,5 +164,65 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 		if (slot.getView() != null && updateChange(slot.getView())) {
 			lastChange = System.nanoTime();
 		}
+	}
+
+	@Override
+	public InventoryImage prepForOffThread(Level level) {
+		if (lastUpdate == level.getGameTime())return null;
+		Storage<ItemVariant> h = storage.get();
+		if (h == null)return null;
+		long ver = h.getVersion();
+		if (ver == lastVersion)return null;
+		InventoryImage im = new InventoryImage(ver);
+		for (StorageView<ItemVariant> is : h)im.addStack(is);
+		return im;
+	}
+
+	@Override
+	public InvState processOffThread(InventoryImage array) {
+		boolean change = false;
+		var st = array.getStacks();
+		Map<StorageView<ItemVariant>, StoredItemStack> mod = new HashMap<>();
+		for (int i = 0; i < st.size(); i++) {
+			FabricStack s = st.get(i);
+			change |= updateChangeM(s, mod);
+		}
+		if (change) return new InvState(System.nanoTime(), array.getVersion(), mod);
+		return new InvState(lastChange, lastVersion, Collections.emptyMap());
+	}
+
+	private boolean updateChangeM(FabricStack st, Map<StorageView<ItemVariant>, StoredItemStack> mod) {
+		StorageView<ItemVariant> uv = st.uv();
+		StorageView<ItemVariant> iv = st.view();
+		StoredItemStack li = lastItems.get(uv);
+		if (!st.item().isBlank()) {
+			ItemStack is = st.item().toStack();
+			if (checkFilter(new StoredItemStack(is, st.count(), st.item().hashCode()))) {
+				int cnt = getCount(iv);
+				if (li == null || !ItemStack.isSameItemSameComponents(li.getStack(), is)) {
+					mod.put(uv, new StoredItemStack(is, cnt, st.item().hashCode()));
+					return true;
+				} else if(li.getQuantity() != cnt) {
+					li.setCount(cnt);
+					return true;
+				}
+				return false;
+			}
+		}
+		if (li != null) {
+			mod.put(uv, null);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public long finishOffThreadProcess(Level level, InvState ct) {
+		if (ct == null)return lastChange;
+		lastChange = ct.change();
+		lastVersion = ct.version();
+		lastUpdate = level.getGameTime();
+		lastItems.putAll(ct.mod());
+		return lastChange;
 	}
 }

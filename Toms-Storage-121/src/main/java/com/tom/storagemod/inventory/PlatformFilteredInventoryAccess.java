@@ -1,6 +1,7 @@
 package com.tom.storagemod.inventory;
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import com.tom.storagemod.util.Priority;
@@ -29,6 +30,18 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 			@Override
 			protected IItemHandler getSlotHandler(IItemHandler def) {
 				return PlatformFilteredInventoryAccess.this;
+			}
+
+			@Override
+			public ItemStack[] prepForOffThread(Level level) {
+				filter.getItemPred().updateState();
+				return super.prepForOffThread(level);
+			}
+
+			@Override
+			public long getChangeTracker(Level level) {
+				filter.getItemPred().updateState();
+				return super.getChangeTracker(level);
 			}
 		};
 	}
@@ -112,5 +125,10 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 
 	private boolean test(ItemStack stack) {
 		return filter.getItemPred().test(new StoredItemStack(stack, stack.getCount()));
+	}
+
+	@Override
+	public IInventoryAccess getRootHandler() {
+		return acc.getRootHandler();
 	}
 }

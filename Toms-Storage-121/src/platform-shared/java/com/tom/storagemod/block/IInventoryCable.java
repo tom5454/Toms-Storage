@@ -8,6 +8,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.tom.storagemod.util.BlockFace;
+
 public interface IInventoryCable {
 	default boolean canConnectFrom(BlockState state, Direction dir) {
 		return true;
@@ -16,10 +18,10 @@ public interface IInventoryCable {
 	/**
 	 * Return next blocks for scanning
 	 * */
-	default List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
-		List<BlockPos> next = new ArrayList<>();
+	default List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
+		List<BlockFace> next = new ArrayList<>();
 		for (Direction d : Direction.values()) {
-			next.add(pos.relative(d));
+			next.add(new BlockFace(pos.relative(d), d.getOpposite()));
 		}
 		return next;
 	}

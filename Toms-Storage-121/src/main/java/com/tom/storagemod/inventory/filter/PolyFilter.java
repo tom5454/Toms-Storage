@@ -10,19 +10,20 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.inventory.StoredItemStack;
-import com.tom.storagemod.util.BlockFace;
+import com.tom.storagemod.util.BlockFaceReference;
 
 public class PolyFilter implements ItemPredicate {
-	private BlockFace face;
+	private BlockFaceReference face;
 	private Set<ItemStack> filter;
 	private long lastCheck;
 
-	public PolyFilter(BlockFace face) {
+	public PolyFilter(BlockFaceReference face) {
 		this.face = face;
 		this.filter = new HashSet<>();
 	}
 
-	private void updateFilter() {
+	@Override
+	public void updateState() {
 		long time = face.level().getGameTime();
 		if(time - lastCheck >= 10) {
 			lastCheck = time;
@@ -37,7 +38,6 @@ public class PolyFilter implements ItemPredicate {
 
 	@Override
 	public boolean test(StoredItemStack stack) {
-		updateFilter();
 		for(ItemStack is : filter) {
 			if(ItemStack.isSameItemSameComponents(stack.getStack(), is))return true;
 		}

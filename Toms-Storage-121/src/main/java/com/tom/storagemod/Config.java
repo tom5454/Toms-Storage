@@ -38,66 +38,66 @@ public class Config {
 
 		private Server(ModConfigSpec.Builder builder) {
 			invConnectorScanRange = builder.comment("Inventory Connector Range").
-					translation("tomsstorage.config.inventory_connector_range").
+					translation("config.toms_storage.inventory_connector_range").
 					defineInRange("inventoryConnectorRange", 16, 4, 256);
 
 			onlyTrimsConnect = builder.comment("Only Allow Trims to Connect Inventories").
-					translation("tomsstorage.config.only_trims_connect").
+					translation("config.toms_storage.only_trims_connect").
 					define("onlyTrimsConnect", false);
 
 			invConnectorCableRange = builder.comment("Inventory Cable Connector Maximum number of cables").
-					translation("tomsstorage.config.inv_cable_connector_max_scan").
+					translation("config.toms_storage.inv_cable_connector_max_scan").
 					defineInRange("invCableConnectorMaxScanSize", 2048, 16, Integer.MAX_VALUE);
 
 			wirelessRange = builder.comment("Wireless terminal reach").
-					translation("tomsstorage.config.wireless_reach").
+					translation("config.toms_storage.wireless_reach").
 					defineInRange("wirelessReach", 16, 4, 64);
 
 			advWirelessRange = builder.comment("Wireless terminal reach").
-					translation("tomsstorage.config.adv_wireless_range").
+					translation("config.toms_storage.adv_wireless_range").
 					defineInRange("advWirelessRange", 64, 16, 512);
 
 			wirelessTermBeaconLvl = builder.comment("Adv Wireless terminal requied beacon level for infinite range",
 					"Value of 0 only requires a single beacon block nearby",
 					"Value of -1 disables this feature entirely").
-					translation("tomsstorage.config.adv_wireless_beacon_lvl").
+					translation("config.toms_storage.adv_wireless_beacon_lvl").
 					defineInRange("wirelessTermBeaconLvl", 1, -1, 4);
 
 			wirelessTermBeaconLvlCrossDim = builder.comment("Adv Wireless terminal requied beacon level for cross dimensional access",
 					"Value of 0 only requires a single beacon block nearby",
 					"Value of -1 disables this feature entirely").
-					translation("tomsstorage.config.adv_wireless_beacon_lvl_dim").
+					translation("config.toms_storage.adv_wireless_beacon_lvl_dim").
 					defineInRange("wirelessTermBeaconLvlDim", 4, -1, 4);
 
 			invLinkBeaconLvl = builder.comment("Inventory Cable Connector requied beacon level for inventory linking",
 					"Value of 0 only requires a single beacon block",
 					"Value of -1 disables this feature entirely").
-					translation("tomsstorage.config.inv_link_beacon_lvl").
+					translation("config.toms_storage.inv_link_beacon_lvl").
 					defineInRange("invLinkBeaconLvl", 0, -1, 4);
 
 			invLinkBeaconRange = builder.comment("Inventory Linking range with beacons",
 					"Value of 0 disables this feature entirely").
-					translation("tomsstorage.config.inv_link_beacon_range").
+					translation("config.toms_storage.inv_link_beacon_range").
 					defineInRange("invLinkBeaconRange", 4096, 0, Integer.MAX_VALUE);
 
 			invLinkBeaconLvlSameDim = builder.comment("Inventory Cable Connector requied beacon level for same dimension access with unlimited range",
 					"Value of 0 only requires a single beacon block",
 					"Value of -1 disables this feature entirely").
-					translation("tomsstorage.config.inv_link_beacon_lvl_same_dim").
+					translation("config.toms_storage.inv_link_beacon_lvl_same_dim").
 					defineInRange("invLinkBeaconLvlSameDim", 1, -1, 4);
 
 			invLinkBeaconLvlCrossDim = builder.comment("Inventory Cable Connector requied beacon level for cross dimensional access",
 					"Value of 0 only requires a single beacon block",
 					"Value of -1 disables this feature entirely").
-					translation("tomsstorage.config.inv_link_beacon_lvl_dim").
+					translation("config.toms_storage.inv_link_beacon_lvl_dim").
 					defineInRange("invLinkBeaconLvlCrossDim", 2, -1, 4);
 
-			runMultithreaded = builder.comment("Use multi threading to improve performance").
-					translation("tomsstorage.config.run_multithreaded").
+			runMultithreaded = builder.comment("Use multithreading to improve performance").
+					translation("config.toms_storage.run_multithreaded").
 					define("runMultithreaded", true);
 
 			/*inventoryConnectorMaxSlots = builder.comment("Inventory Connector maximum slots").
-					translation("tomsstorage.config.inv_connector_max_slots").
+					translation("config.toms_storage.inv_connector_max_slots").
 					defineInRange("inventoryConnectorMaxSlots", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);*/
 		}
 	}

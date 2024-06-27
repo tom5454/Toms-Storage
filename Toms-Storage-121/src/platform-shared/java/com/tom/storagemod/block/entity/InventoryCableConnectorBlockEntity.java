@@ -1,8 +1,10 @@
 package com.tom.storagemod.block.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.inventory.BlockFilter;
 import com.tom.storagemod.inventory.IInventoryAccess;
+import com.tom.storagemod.inventory.IInventoryConnectorReference;
 import com.tom.storagemod.inventory.IInventoryLink;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.inventory.MultiInventoryAccess;
@@ -41,8 +44,9 @@ import com.tom.storagemod.util.TickerUtil.TickableServer;
 public class InventoryCableConnectorBlockEntity extends PlatformBlockEntity implements MenuProvider, TickableServer, IInventoryConnector, IInventoryLink {
 	private static final String CHANNEL_TAG = "channel";
 	private BlockInventoryAccess block = new BlockInventoryAccess();
-	private MultiInventoryAccess remoteHandler = new PlatformMultiInventoryAccess();
+	private MultiInventoryAccess mergedHandler = new PlatformMultiInventoryAccess();
 	private Set<IInventoryConnector> linkedConnectors = new HashSet<>();
+	private Collection<IInventoryAccess> filteredMerge = Collections.emptyList();
 	private IInventoryAccess self = block;
 	private UUID channel = null;
 	private int beaconLevel = -1;
@@ -74,11 +78,12 @@ public class InventoryCableConnectorBlockEntity extends PlatformBlockEntity impl
 			Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
 			BlockPos pos = worldPosition.relative(facing);
 			BlockState st = level.getBlockState(pos);
-			remoteHandler.clear();
+			mergedHandler.clear();
 			linkedConnectors.clear();
+			beaconLevel = -1;
 			if (st.is(Blocks.BEACON)) {
 				beaconLevel = BeaconLevelCalc.calcBeaconLevel(level, pos.getX(), pos.getY(), pos.getZ());
-				self = remoteHandler;
+				self = mergedHandler;
 				if (channel != null) {
 					Channel chn = RemoteConnections.get(level).getChannel(channel);
 					if(chn != null) {
@@ -86,14 +91,34 @@ public class InventoryCableConnectorBlockEntity extends PlatformBlockEntity impl
 						chn.register((ServerLevel) level, worldPosition);
 						Set<IInventoryLink> links = chn.findOthers((ServerLevel) level, worldPosition, beaconLevel);
 						links.forEach(l -> linkedConnectors.add(l.getConnector()));
-						remoteHandler.build(this, linkedConnectors);
+						mergedHandler.build(this, linkedConnectors);
 					}
 				}
 			} else {
-				beaconLevel = -1;
-				BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
-				if (f != null)self = f.wrap(level, block);
-				else self = block;
+				BlockEntity be = level.getBlockEntity(pos);
+				if (be instanceof IInventoryConnectorReference ref) {
+					var inv = ref.getConnectorRef();
+					if (inv != null) {
+						self = mergedHandler;
+						mergedHandler.build(this, Collections.singletonList(inv));
+
+						BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
+						if (f != null) {
+							List<IInventoryAccess> invs = new ArrayList<>();
+							for (IInventoryAccess a : mergedHandler.getConnected()) {
+								invs.add(f.wrap(level, a));
+							}
+							filteredMerge = invs;
+							mergedHandler.build(this, Collections.emptyList());
+						} else filteredMerge = mergedHandler.getConnected();
+					} else {
+						self = PlatformInventoryAccess.EMPTY;
+					}
+				} else {
+					BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
+					if (f != null)self = f.wrap(level, block);
+					else self = block;
+				}
 			}
 		}
 	}
@@ -136,7 +161,7 @@ public class InventoryCableConnectorBlockEntity extends PlatformBlockEntity impl
 
 	@Override
 	public Collection<IInventoryAccess> getConnectedInventories() {
-		return beaconLevel >= 0 ? Collections.emptyList() : Collections.singleton(self);
+		return beaconLevel >= 0 ? Collections.emptyList() : self == mergedHandler ? filteredMerge : Collections.singleton(self);
 	}
 
 	@Override
@@ -200,5 +225,13 @@ public class InventoryCableConnectorBlockEntity extends PlatformBlockEntity impl
 	@Override
 	public Collection<IInventoryConnector> getConnectedConnectors() {
 		return linkedConnectors;
+	}
+
+	public boolean hasBeacon() {
+		BlockState state = level.getBlockState(worldPosition);
+		Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
+		BlockPos pos = worldPosition.relative(facing);
+		BlockState st = level.getBlockState(pos);
+		return st.is(Blocks.BEACON);
 	}
 }

@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level;
 
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 
-public interface IInventoryAccess extends IChangeTrackerAccess {
+public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 
 	default ItemStack pullMatchingStack(ItemStack st, long max) {
 		InventorySlot slot = null;
@@ -41,6 +41,9 @@ public interface IInventoryAccess extends IChangeTrackerAccess {
 
 	@Deprecated
 	Object get();
+
+	@Override
+	IInventoryAccess getRootHandler();
 
 	@SuppressWarnings("unchecked")
 	default <T> T getPlatformHandler() {

@@ -37,6 +37,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.tom.storagemod.block.entity.StorageTerminalBlockEntity;
+import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, IInventoryCable {
@@ -184,11 +185,11 @@ public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock imple
 	}
 
 	@Override
-	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
+	public List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
 		Direction d = state.getValue(AbstractStorageTerminalBlock.FACING);
 		TerminalPos p = state.getValue(AbstractStorageTerminalBlock.TERMINAL_POS);
 		if(p == TerminalPos.UP)d = Direction.UP;
 		if(p == TerminalPos.DOWN)d = Direction.DOWN;
-		return Collections.singletonList(pos.relative(d));
+		return Collections.singletonList(new BlockFace(pos.relative(d), d.getOpposite()));
 	}
 }

@@ -14,7 +14,7 @@ import com.google.common.collect.MapMaker;
 
 import com.tom.storagemod.inventory.IInventoryAccess.IInventory;
 
-public class PlatformItemHandler implements Storage<ItemVariant> {
+public class PlatformItemHandler implements Storage<ItemVariant>, IProxy {
 	private static final Map<IInventory, PlatformItemHandler> WRAPPERS = new MapMaker().weakValues().makeMap();
 	private IInventory access;
 
@@ -78,5 +78,10 @@ public class PlatformItemHandler implements Storage<ItemVariant> {
 	@Override
 	public long getVersion() {
 		return getP().getVersion();
+	}
+
+	@Override
+	public IInventoryAccess getRootHandler() {
+		return access.getInventoryAccess();
 	}
 }

@@ -31,6 +31,7 @@ import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity;
 import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity.UsageInfo;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
+import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public class InventoryConnectorBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock {
@@ -108,8 +109,8 @@ public class InventoryConnectorBlock extends BaseEntityBlock implements IInvento
 	}
 
 	@Override
-	public List<BlockPos> nextScan(Level world, BlockState state, BlockPos pos) {
-		List<BlockPos> l = IInventoryCable.super.nextScan(world, state, pos);
+	public List<BlockFace> nextScan(Level world, BlockState state, BlockPos pos) {
+		List<BlockFace> l = IInventoryCable.super.nextScan(world, state, pos);
 		if (world.getBlockEntity(pos) instanceof InventoryConnectorBlockEntity be) {
 			l.addAll(be.getInterfaces());
 		}

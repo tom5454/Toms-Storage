@@ -15,7 +15,7 @@ import com.tom.storagemod.inventory.InventorySlot;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.item.IItemFilter;
-import com.tom.storagemod.util.BlockFace;
+import com.tom.storagemod.util.BlockFaceReference;
 
 public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBlockEntity {
 	private ItemStack filter = ItemStack.EMPTY;
@@ -46,7 +46,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		this.filter = filter;
 		if (this.filter.isEmpty())filterPred = null;
 		else if (this.filter.getItem() instanceof IItemFilter i) {
-			filterPred = i.createFilter(BlockFace.touching(level, worldPosition, getBlockState().getValue(AbstractInventoryHopperBlock.FACING)), filter);
+			filterPred = i.createFilter(BlockFaceReference.touching(level, worldPosition, getBlockState().getValue(AbstractInventoryHopperBlock.FACING)), filter);
 		} else {
 			filterPred = s -> ItemStack.isSameItemSameComponents(s.getStack(), filter);
 		}
@@ -81,6 +81,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		if (topChange != t) {
 			topChange = t;
 			waiting = 0;
+			topSlot = null;
 		} else cooldown = 4;
 		if (waiting == 1)return;
 
@@ -93,6 +94,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		if (waiting == 2)return;
 
 		boolean topWasNull = topSlot == null;
+		if(hasFilter)filterPred.updateState();
 		if (topSlot == null || waiting == 3)
 			topSlot = tt.findSlotAfter(topSlot, hasFilter ? filterPred : (s -> true), false, true);
 

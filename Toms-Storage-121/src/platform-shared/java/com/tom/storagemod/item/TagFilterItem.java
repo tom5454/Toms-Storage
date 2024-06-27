@@ -17,7 +17,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.inventory.filter.TagFilter;
 import com.tom.storagemod.menu.TagItemFilterMenu;
-import com.tom.storagemod.util.BlockFace;
+import com.tom.storagemod.util.BlockFaceReference;
 
 public class TagFilterItem extends Item implements IItemFilter {
 
@@ -32,7 +32,7 @@ public class TagFilterItem extends Item implements IItemFilter {
 	}
 
 	@Override
-	public ItemPredicate createFilter(BlockFace face, ItemStack stack) {
+	public ItemPredicate createFilter(BlockFaceReference face, ItemStack stack) {
 		return new TagFilter(stack);
 	}
 

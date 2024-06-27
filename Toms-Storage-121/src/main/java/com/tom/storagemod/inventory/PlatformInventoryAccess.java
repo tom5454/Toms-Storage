@@ -44,6 +44,11 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		public int getFreeSlotCount() {
 			return 0;
 		}
+
+		@Override
+		public IInventoryAccess getRootHandler() {
+			return this;
+		}
 	};
 
 	public static class BlockInventoryAccess implements PlatformInventoryAccess {
@@ -87,41 +92,15 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		public boolean exists() {
 			return itemCache.getCapability() != null;
 		}
+
+		@Override
+		public IInventoryAccess getRootHandler() {
+			return get() instanceof IProxy p ? p.getRootHandler() : this;
+		}
 	}
 
 	@Override
 	IItemHandler get();
-
-	/*@Override
-	public default ItemStack pullMatchingStack(ItemStack st, long max) {
-		IItemHandler itemHandler = get();
-		if (!st.isEmpty() && itemHandler != null && max > 0) {
-			ItemStack ret = ItemStack.EMPTY;
-			for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
-				ItemStack s = itemHandler.getStackInSlot(i);
-				if(ItemStack.isSameItemSameTags(s, st)) {
-					ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
-					if(!pulled.isEmpty()) {
-						if(ret.isEmpty())ret = pulled;
-						else ret.grow(pulled.getCount());
-						max -= pulled.getCount();
-						if(max < 1)break;
-					}
-				}
-			}
-			return ret;
-		}
-		return ItemStack.EMPTY;
-	}
-
-	@Override
-	public default ItemStack pushStack(ItemStack stack) {
-		IItemHandler itemHandler = get();
-		if (!stack.isEmpty() && itemHandler != null) {
-			return ItemHandlerHelper.insertItemStacked(itemHandler, stack, false);
-		}
-		return stack;
-	}*/
 
 	@Override
 	public default int getFreeSlotCount() {
