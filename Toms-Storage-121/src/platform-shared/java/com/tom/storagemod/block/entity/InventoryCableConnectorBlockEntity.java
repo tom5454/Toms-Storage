@@ -37,11 +37,10 @@ import com.tom.storagemod.inventory.PlatformMultiInventoryAccess;
 import com.tom.storagemod.inventory.RemoteConnections;
 import com.tom.storagemod.inventory.RemoteConnections.Channel;
 import com.tom.storagemod.menu.InventoryLinkMenu;
-import com.tom.storagemod.platform.PlatformBlockEntity;
 import com.tom.storagemod.util.BeaconLevelCalc;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 
-public class InventoryCableConnectorBlockEntity extends PlatformBlockEntity implements MenuProvider, TickableServer, IInventoryConnector, IInventoryLink {
+public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity implements MenuProvider, TickableServer, IInventoryConnector, IInventoryLink {
 	private static final String CHANNEL_TAG = "channel";
 	private BlockInventoryAccess block = new BlockInventoryAccess();
 	private MultiInventoryAccess mergedHandler = new PlatformMultiInventoryAccess();

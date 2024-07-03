@@ -32,8 +32,8 @@ import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.platform.PlatformBlockEntity;
-import com.tom.storagemod.util.PlayerInvUtil;
 import com.tom.storagemod.util.BeaconLevelCalc;
+import com.tom.storagemod.util.PlayerInvUtil;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 import com.tom.storagemod.util.Util;
 
@@ -145,7 +145,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		}
 	}
 
-	public boolean canInteractWith(Player player) {
+	public boolean canInteractWith(Player player, boolean menuCheck) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
 		int d = 4;
 		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
@@ -154,7 +154,8 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 			else return player.level() == level;
 		}
 		d = Math.max(d, termReach);
-		return player.level() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
+		if (menuCheck)d *= 2;
+		return player.level() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*d);
 	}
 
 	public int getSorting() {

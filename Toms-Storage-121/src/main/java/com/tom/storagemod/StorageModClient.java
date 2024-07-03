@@ -74,7 +74,7 @@ public class StorageModClient {
 	}
 
 	private static void registerColors(RegisterColorHandlersEvent.Block event) {
-		event.register(StorageModClient::getColor, Content.paintedTrim.get(), Content.invCableFramed.get());//, Content.invProxy.get(), Content.invCableConnectorFramed.get()
+		event.register(StorageModClient::getColor, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invProxy.get(), Content.invCableConnectorFramed.get());
 	}
 
 	private static int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tintIndex) {
@@ -92,7 +92,7 @@ public class StorageModClient {
 	private static void bakeModels(ModelEvent.ModifyBakingResult event) {
 		bindPaintedModel(event, Content.paintedTrim);
 		bindPaintedModel(event, Content.invCableFramed);
-		/*bindPaintedModel(event, Content.invProxy);*/
+		bindPaintedModel(event, Content.invProxy);
 		bindPaintedModel(event, Content.invCableConnectorFramed);
 	}
 

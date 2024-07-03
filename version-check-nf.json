@@ -5,9 +5,10 @@
 		"1.20.4-latest": "1.6.12",
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.16",
-		"1.21-latest": "2.0.3"
+		"1.21-latest": "2.0.4"
 	},
 	"1.21": {
+		"2.0.4": "Added Inventory Proxy\nFixed storage terminals not connecting to inventory cables\nFixed Framed Inventor Cable Connector painting not working\nFixed Advanced Terminal not working across dimensions\nFixed Advanced Terminal range is doubled",
 		"2.0.3": "Fixed inventory cable connector showing access denied message incorrectly\nFixed crash with inventory cable connectors on inventory connectors\nFixed deadlock with polymorphic item filter\nFixed configs missing localizations\nFixed existing localizations not loading",
 		"2.0.2": "Added Inventory Cable connectors\nFixed inventory configurator menu not updating the filter\nImproved advanced wireless terminal description\nFixed inventory cable network leaking memory",
 		"2.0.1": "Fixed dupe bug with crafting terminal\nFixed missing recipes, tags, and loot tables\nFixed recipe book in the crafting terminal not filling in the recipe\nRemoved debug barrier item from the storage terminal\nFixed EMI crafting not working",

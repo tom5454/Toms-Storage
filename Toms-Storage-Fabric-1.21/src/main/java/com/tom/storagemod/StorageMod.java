@@ -111,6 +111,7 @@ public class StorageMod implements ModInitializer {
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.connectorBE.get());
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.invInterfaceBE.get());
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> InventoryStorage.of(be.getInv(), side), Content.filingCabinetBE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.invProxyBE.get());
 
 		ResourceLocation at = ResourceLocation.tryBuild(modid, "left_click_item_on_block");
 		ResourceLocation rl = ResourceLocation.tryBuild(modid, "use_item_first");

@@ -181,7 +181,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 
 	@Override
 	public boolean stillValid(Player playerIn) {
-		return te == null || te.canInteractWith(playerIn);
+		return te == null || te.canInteractWith(playerIn, true);
 	}
 
 	public final void scrollTo(float p_148329_1_) {

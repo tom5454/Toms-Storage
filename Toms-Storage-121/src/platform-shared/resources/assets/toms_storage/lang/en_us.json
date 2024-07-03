@@ -140,6 +140,7 @@
 	"chat.toms_storage.terminal_bound": "Bound Advanced Wireless Terminal",
 	"chat.toms_storage.terminal_invalid_block": "Invalid block",
 	"chat.toms_storage.terminal_out_of_range": "Terminal out of range",
+	"chat.toms_storage.terminal_not_loaded": "Terminal out of range (Not Loaded)",
 	"chat.toms_storage.inv_link_access_denied": "Access Denied",
 	"chat.toms_storage.area_too_big": "Selected Area Too Big",
 	

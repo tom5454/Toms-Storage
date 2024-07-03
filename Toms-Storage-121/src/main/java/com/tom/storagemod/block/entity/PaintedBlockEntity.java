@@ -10,15 +10,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.client.model.data.ModelProperty;
 
 import com.tom.storagemod.Content;
+import com.tom.storagemod.platform.PlatformBlockEntity;
 
-public class PaintedBlockEntity extends BlockEntity {
+public class PaintedBlockEntity extends PlatformBlockEntity {
 	public static final ModelProperty<Supplier<BlockState>> FACADE_STATE = new ModelProperty<>();
 	private BlockState blockState;
 

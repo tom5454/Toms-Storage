@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -31,14 +30,14 @@ public class InventoryCableNetwork {
 		Stack<BlockFace> next = new Stack<>();
 		Set<BlockPos> cables = new HashSet<>();
 		Set<BlockPos> attached = new HashSet<>();
-		next.add(new BlockFace(from, Direction.DOWN));
+		next.add(new BlockFace(from, null));
 		while (!next.isEmpty()) {
 			BlockFace p = next.pop();
 			if (checked.contains(p.pos()))continue;
 			checked.add(p.pos());
 			if (!level.isLoaded(p.pos()))continue;
 			BlockState st = level.getBlockState(p.pos());
-			if (st.getBlock() instanceof IInventoryCable c && c.canConnectFrom(st, p.from())) {
+			if (st.getBlock() instanceof IInventoryCable c && (p.from() == null || c.canConnectFrom(st, p.from()))) {
 				CableCache cc = caches.get(p.pos());
 				if (cc != null) {
 					cables.addAll(cc.cables);

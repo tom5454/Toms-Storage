@@ -67,17 +67,17 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 				int y = pos.pos().getY();
 				int z = pos.pos().getZ();
 				Level termWorld = worldIn.getServer().getLevel(pos.dim());
-				if(termWorld.isLoaded(new BlockPos(x, y, z))) {
+				if (termWorld.isLoaded(new BlockPos(x, y, z))) {
 					BlockHitResult lookingAt = new BlockHitResult(new Vec3(x, y, z), Direction.UP, new BlockPos(x, y, z), true);
 					BlockState state = termWorld.getBlockState(lookingAt.getBlockPos());
 					if(state.is(StorageTags.REMOTE_ACTIVATE)) {
-						InteractionResult r = state.useWithoutItem(worldIn, playerIn, lookingAt);
+						InteractionResult r = state.useWithoutItem(termWorld, playerIn, lookingAt);
 						return r;
 					} else {
 						playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_invalid_block"), true);
 					}
 				} else {
-					playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_out_of_range"), true);
+					playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_not_loaded"), true);
 				}
 			} else {
 				return InteractionResult.CONSUME;

@@ -22,4 +22,7 @@ public class PlatformBlockEntity extends BlockEntity implements IValidInfo, OnLo
 	@Override
 	public void onLoad() {
 	}
+
+	protected void markCapsInvalid() {
+	}
 }

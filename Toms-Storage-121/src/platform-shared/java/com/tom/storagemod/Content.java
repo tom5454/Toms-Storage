@@ -25,6 +25,7 @@ import com.tom.storagemod.block.InventoryCableBlock;
 import com.tom.storagemod.block.InventoryCableConnectorBlock;
 import com.tom.storagemod.block.InventoryConnectorBlock;
 import com.tom.storagemod.block.InventoryInterfaceBlock;
+import com.tom.storagemod.block.InventoryProxyBlock;
 import com.tom.storagemod.block.LevelEmitterBlock;
 import com.tom.storagemod.block.OpenCrateBlock;
 import com.tom.storagemod.block.PaintedTrimBlock;
@@ -36,6 +37,7 @@ import com.tom.storagemod.block.entity.FilingCabinetBlockEntity;
 import com.tom.storagemod.block.entity.InventoryCableConnectorBlockEntity;
 import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity;
 import com.tom.storagemod.block.entity.InventoryInterfaceBlockEntity;
+import com.tom.storagemod.block.entity.InventoryProxyBlockEntity;
 import com.tom.storagemod.block.entity.LevelEmitterBlockEntity;
 import com.tom.storagemod.block.entity.OpenCrateBlockEntity;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
@@ -79,6 +81,7 @@ public class Content {
 	public static final GameObject<FilingCabinetBlock> filingCabinet = blockWithItem("filing_cabinet", FilingCabinetBlock::new);
 	public static final GameObject<InventoryCableConnectorBlock> invCableConnector = blockWithItem("inventory_cable_connector", InventoryCableConnectorBlock::new);
 	public static final GameObject<FramedInventoryCableConnectorBlock> invCableConnectorFramed = blockWithItem("inventory_cable_connector_framed", FramedInventoryCableConnectorBlock::new);
+	public static final GameObject<InventoryProxyBlock> invProxy = blockWithItem("inventory_proxy", InventoryProxyBlock::new);
 
 	public static final GameObject<PaintKitItem> paintingKit = item("paint_kit", PaintKitItem::new);
 	public static final GameObject<WirelessTerminalItem> wirelessTerminal = item("wireless_terminal", WirelessTerminalItem::new);
@@ -90,7 +93,7 @@ public class Content {
 
 	public static final GameObjectBlockEntity<InventoryConnectorBlockEntity> connectorBE = blockEntity("inventory_connector", InventoryConnectorBlockEntity::new, connector);
 	public static final GameObjectBlockEntity<OpenCrateBlockEntity> openCrateBE = blockEntity("open_crate", OpenCrateBlockEntity::new, openCrate);
-	public static final GameObjectBlockEntity<PaintedBlockEntity> paintedBE = blockEntity("painted", PaintedBlockEntity::new, Content.paintedTrim, Content.invCableFramed);
+	public static final GameObjectBlockEntity<PaintedBlockEntity> paintedBE = blockEntity("painted", PaintedBlockEntity::new, paintedTrim, invCableFramed);
 	public static final GameObjectBlockEntity<StorageTerminalBlockEntity> terminalBE = blockEntity("storage_terminal", StorageTerminalBlockEntity::new, terminal);
 	public static final GameObjectBlockEntity<CraftingTerminalBlockEntity> craftingTerminalBE = blockEntity("crafting_terminal", CraftingTerminalBlockEntity::new, craftingTerminal);
 	public static final GameObjectBlockEntity<LevelEmitterBlockEntity> levelEmitterBE = blockEntity("level_emitter", LevelEmitterBlockEntity::new, levelEmitter);
@@ -98,11 +101,12 @@ public class Content {
 	public static final GameObjectBlockEntity<InventoryInterfaceBlockEntity> invInterfaceBE = blockEntity("inventory_interface", InventoryInterfaceBlockEntity::new, invInterface);
 	public static final GameObjectBlockEntity<FilingCabinetBlockEntity> filingCabinetBE = blockEntity("filing_cabinet", FilingCabinetBlockEntity::new, filingCabinet);
 	public static final GameObjectBlockEntity<InventoryCableConnectorBlockEntity> cableConnectorBE = blockEntity("inv_cable_connector", InventoryCableConnectorBlockEntity::new, invCableConnector, invCableConnectorFramed);
+	public static final GameObjectBlockEntity<InventoryProxyBlockEntity> invProxyBE = blockEntity("inv_proxy", InventoryProxyBlockEntity::new, invProxy);
 
 	public static final GameObject<MenuType<StorageTerminalMenu>> storageTerminalMenu = menu("storage_terminal", StorageTerminalMenu::new);
 	public static final GameObject<MenuType<CraftingTerminalMenu>> craftingTerminalMenu = menu("crafting_terminal", CraftingTerminalMenu::new);
 	public static final GameObject<MenuType<LevelEmitterMenu>> levelEmitterMenu = menu("level_emitter", LevelEmitterMenu::new);
-	public static GameObject<MenuType<InventoryLinkMenu>> inventoryLink = menu("inventory_link", InventoryLinkMenu::new);
+	public static final GameObject<MenuType<InventoryLinkMenu>> inventoryLink = menu("inventory_link", InventoryLinkMenu::new);
 	public static final GameObject<MenuType<ItemFilterMenu>> itemFilterMenu = menu("item_filter", ItemFilterMenu::new);
 	public static final GameObject<MenuType<TagItemFilterMenu>> tagItemFilterMenu = menu("tag_item_filter", TagItemFilterMenu::new);
 	public static final GameObject<MenuType<InventoryConfiguratorMenu>> invConfigMenu = menu("inventory_configurator", InventoryConfiguratorMenu::new);

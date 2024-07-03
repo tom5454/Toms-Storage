@@ -93,6 +93,9 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		public IInventoryAccess getRootHandler() {
 			return get() instanceof IProxy p ? p.getRootHandler() : this;
 		}
+
+		protected void onInvalid() {
+		}
 	}
 
 	@Override

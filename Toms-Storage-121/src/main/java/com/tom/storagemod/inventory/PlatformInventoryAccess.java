@@ -61,8 +61,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 			itemCache = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, (ServerLevel) level, worldPosition, side, () -> valid && isValid.isObjectValid(), this::onInvalid);
 		}
 
-		private void onInvalid() {
-
+		protected void onInvalid() {
 		}
 
 		@Override

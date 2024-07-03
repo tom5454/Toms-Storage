@@ -60,6 +60,7 @@ public class StorageMod {
 		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.connectorBE.get(), (be, side) -> new PlatformItemHandler(be));
 		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.invInterfaceBE.get(), (be, side) -> new PlatformItemHandler(be));
 		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.filingCabinetBE.get(), (be, side) -> new InvWrapper(be.getInv()));
+		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.invProxyBE.get(), (be, side) -> new PlatformItemHandler(be));
 	}
 
 	public void enqueueIMC(InterModEnqueueEvent e) {

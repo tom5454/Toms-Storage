@@ -63,7 +63,7 @@ public class StorageModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableFramed.get(), RenderType.translucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.levelEmitter.get(), RenderType.cutout());
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableConnectorFramed.get(), RenderType.translucent());
-		//BlockRenderLayerMap.INSTANCE.putBlock(StorageMod.invProxyPainted.get(), RenderType.translucent());
+		BlockRenderLayerMap.INSTANCE.putBlock(Content.invProxy.get(), RenderType.translucent());
 
 		ClientPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
 			if(Minecraft.getInstance().screen instanceof IDataReceiver d) {
@@ -96,7 +96,7 @@ public class StorageModClient implements ClientModInitializer {
 				}
 			}
 			return -1;
-		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get());
+		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get(), Content.invProxy.get());
 
 		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
 			PoseStack ps = new PoseStack();
@@ -140,7 +140,7 @@ public class StorageModClient implements ClientModInitializer {
 	private static void bakeModels(Set<ModelResourceLocation> locs) {
 		bindPaintedModel(locs, Content.paintedTrim);
 		bindPaintedModel(locs, Content.invCableFramed);
-		/*bindPaintedModel(locs, Content.invProxy);*/
+		bindPaintedModel(locs, Content.invProxy);
 		bindPaintedModel(locs, Content.invCableConnectorFramed);
 	}
 

@@ -10,13 +10,13 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.Content;
+import com.tom.storagemod.platform.PlatformBlockEntity;
 
-public class PaintedBlockEntity extends BlockEntity {
+public class PaintedBlockEntity extends PlatformBlockEntity {
 	private BlockState blockState;
 
 	public PaintedBlockEntity(BlockPos pos, BlockState state) {

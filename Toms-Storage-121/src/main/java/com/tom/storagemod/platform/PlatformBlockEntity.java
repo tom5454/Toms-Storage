@@ -17,4 +17,8 @@ public class PlatformBlockEntity extends BlockEntity implements IValidInfo {
 	public boolean isObjectValid() {
 		return !isRemoved();
 	}
+
+	protected void markCapsInvalid() {
+		level.invalidateCapabilities(worldPosition);
+	}
 }
