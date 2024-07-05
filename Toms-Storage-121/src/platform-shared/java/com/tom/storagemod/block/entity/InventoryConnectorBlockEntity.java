@@ -150,6 +150,11 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 			this.interfaces = interfaces;
 			net.markNodeInvalid(worldPosition);
 		}
+
+		for (BlockFace blockFace : this.interfaces) {
+			if (level.getBlockEntity(blockFace.pos()) instanceof InventoryInterfaceBlockEntity ii)
+				ii.setConnectorAccess(this);
+		}
 	}
 
 	@Override

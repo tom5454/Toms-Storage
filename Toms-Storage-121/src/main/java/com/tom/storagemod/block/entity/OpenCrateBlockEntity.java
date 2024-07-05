@@ -28,7 +28,7 @@ public class OpenCrateBlockEntity extends BlockEntity implements TickableServer,
 
 	@Override
 	public void updateServer() {
-		if(level.getGameTime() % 5 == 0){
+		if(level.getGameTime() % 5 == Math.abs(worldPosition.hashCode()) % 5){
 			BlockState state = level.getBlockState(worldPosition);
 			Direction f = state.getValue(BlockStateProperties.FACING);
 			BlockPos p = worldPosition.relative(f);

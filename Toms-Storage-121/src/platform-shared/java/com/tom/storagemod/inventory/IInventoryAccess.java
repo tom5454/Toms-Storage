@@ -47,7 +47,8 @@ public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 
 	@SuppressWarnings("unchecked")
 	default <T> T getPlatformHandler() {
-		return (T) get();
+		T t = (T) get();
+		return t != null ? t : (T) PlatformInventoryAccess.EMPTY.get();
 	}
 
 	default void markInvalid() {}

@@ -132,7 +132,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 			}
 			updateItems = false;
 		}
-		if(level.getGameTime() % 40 == 5) {
+		if(level.getGameTime() % 40 == Math.abs(worldPosition.hashCode()) % 40) {
 			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(8)).mapToInt(p -> {
 				if(level.isLoaded(p)) {
 					BlockState st = level.getBlockState(p);
@@ -147,14 +147,14 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 
 	public boolean canInteractWith(Player player, boolean menuCheck) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
-		int d = 4;
+		int d = 6;
 		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
 		if(Config.get().wirelessTermBeaconLvl != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvl && termReach > 0) {
 			if(Config.get().wirelessTermBeaconLvlCrossDim != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvlCrossDim)return true;
 			else return player.level() == level;
 		}
 		d = Math.max(d, termReach);
-		if (menuCheck)d *= 2;
+		if (menuCheck)d += (d / 4);
 		return player.level() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*d);
 	}
 

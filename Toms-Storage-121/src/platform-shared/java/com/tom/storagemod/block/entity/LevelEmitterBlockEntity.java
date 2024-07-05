@@ -36,7 +36,7 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 
 	@Override
 	public void updateServer() {
-		if (level.getGameTime() % 10 != worldPosition.hashCode() % 10)return;
+		if (level.getGameTime() % 10 != Math.abs(worldPosition.hashCode()) % 10)return;
 		BlockState state = level.getBlockState(worldPosition);
 		boolean p = state.getValue(LevelEmitterBlock.POWERED);
 		boolean currState = false;
