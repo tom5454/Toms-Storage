@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.components.ConfiguratorComponent;
 import com.tom.storagemod.inventory.BlockFilter;
+import com.tom.storagemod.inventory.PlatformInventoryAccess;
 import com.tom.storagemod.item.IItemFilter;
 import com.tom.storagemod.menu.slot.ItemFilterSlot;
 import com.tom.storagemod.util.DataSlots;
@@ -125,9 +126,18 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 		}
 		break;
 
+		case 7: {
+			isClosed = true;
+			PlatformInventoryAccess.removeBlockFilterAt(player.level(), pos);
+		}
+		break;
+
 		default:
 			break;
 		}
+
+		player.level().blockEntityChanged(pos);
+
 		return true;
 	}
 }

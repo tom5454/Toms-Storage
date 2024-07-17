@@ -77,7 +77,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	public void removed(Player playerIn) {
 		super.removed(playerIn);
 		if(te != null)
-			((CraftingTerminalBlockEntity) te).unregisterCrafting(this);
+			((CraftingTerminalBlockEntity) te).unregisterCrafting(playerIn, this);
 	}
 
 	private void init() {
@@ -179,6 +179,8 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	public boolean clickMenuButton(Player playerIn, int id) {
 		if(te != null && id == 0)
 			((CraftingTerminalBlockEntity) te).clear();
+		else if(te != null && id == 1)
+			((CraftingTerminalBlockEntity) te).polymorphUpdate(playerIn);
 		else super.clickMenuButton(playerIn, id);
 		return false;
 	}
@@ -303,5 +305,9 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public List<StoredItemStack> getStoredItems() {
 		return itemList;
+	}
+
+	public Slot getCraftingResultSlot() {
+		return craftingResultSlot;
 	}
 }

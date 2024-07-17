@@ -9,8 +9,10 @@ import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,6 +30,7 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -38,6 +41,7 @@ import com.tom.storagemod.block.entity.BlockFilterAttachment;
 import com.tom.storagemod.platform.GameObject.GameRegistry;
 import com.tom.storagemod.platform.GameObject.GameRegistryBE;
 
+import io.netty.buffer.ByteBuf;
 import top.theillusivec4.curios.api.CuriosCapability;
 
 public class Platform {
@@ -101,5 +105,9 @@ public class Platform {
 
 	public static boolean notifyBlocks(Level level, BlockPos worldPosition, Direction direction) {
 		return !EventHooks.onNeighborNotify(level, worldPosition, level.getBlockState(worldPosition), EnumSet.of(direction), false).isCanceled();
+	}
+
+	public static RegistryFriendlyByteBuf makeRegByteBuf(ByteBuf buffer, RegistryAccess reg) {
+		return new RegistryFriendlyByteBuf(buffer, reg, ConnectionType.NEOFORGE);
 	}
 }

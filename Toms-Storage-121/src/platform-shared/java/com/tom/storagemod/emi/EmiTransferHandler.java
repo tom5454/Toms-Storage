@@ -20,6 +20,7 @@ import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
+import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.recipe.handler.EmiCraftContext;
@@ -42,14 +43,14 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 		return Collections.emptyList();
 	}
 
-	/* Disabled due to massive frame lag
-	 * @Override
+	@Override
 	public EmiPlayerInventory getInventory(AbstractContainerScreen<CraftingTerminalMenu> screen) {
 		List<EmiStack> stacks = new ArrayList<>();
 		screen.getMenu().slots.subList(1, screen.getMenu().slots.size()).stream().map(Slot::getItem).map(EmiStack::of).forEach(stacks::add);
-		screen.getMenu().getStoredItems().forEach(s -> stacks.add(EmiStack.of(s.getStack(), s.getQuantity())));
+		//Causes lag
+		//screen.getMenu().getStoredItems().forEach(s -> stacks.add(EmiStack.of(s.getStack(), s.getQuantity())));
 		return new EmiPlayerInventory(stacks);
-	}*/
+	}
 
 	@Override
 	public boolean supportsRecipe(EmiRecipe recipe) {

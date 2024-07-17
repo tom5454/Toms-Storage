@@ -4,15 +4,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandler;
 
+import com.tom.storagemod.inventory.filter.IFilter;
 import com.tom.storagemod.util.Priority;
 import com.tom.storagemod.util.Priority.IPriority;
 
 public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPriority, IItemHandler {
 	private final IInventoryAccess acc;
-	private final BlockFilter filter;
+	private final IFilter filter;
 	private final InventoryChangeTracker tracker;
 
-	public PlatformFilteredInventoryAccess(IInventoryAccess acc, BlockFilter filter) {
+	public PlatformFilteredInventoryAccess(IInventoryAccess acc, IFilter filter) {
 		this.acc = acc;
 		this.filter = filter;
 		this.tracker = new InventoryChangeTracker(acc.getPlatformHandler()) {
@@ -54,7 +55,13 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 	@Override
 	public ItemStack pushStack(ItemStack stack) {
 		if (!test(stack))return stack;
-		return acc.pushStack(stack);
+		return IInventoryAccess.super.pushStack(stack);
+	}
+
+	@Override
+	public ItemStack pullMatchingStack(ItemStack st, long max) {
+		if (!test(st))return ItemStack.EMPTY;
+		return IInventoryAccess.super.pullMatchingStack(st, max);
 	}
 
 	@Override
@@ -74,7 +81,8 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 
 	@Override
 	public Priority getPriority() {
-		return filter.getPriority();
+		Priority pr = IPriority.get(acc);
+		return pr.add(filter.getPriority());
 	}
 
 	@Override
@@ -130,5 +138,18 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 	@Override
 	public IInventoryAccess getRootHandler() {
 		return acc.getRootHandler();
+	}
+
+	@Override
+	public String toString() {
+		return "Filtering: {" + acc + " by " + filter + "}";
+	}
+
+	public IFilter getFilter() {
+		return filter;
+	}
+
+	public IInventoryAccess getActualInventory() {
+		return acc;
 	}
 }

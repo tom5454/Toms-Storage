@@ -16,20 +16,24 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 
+import com.tom.storagemod.StorageTags;
+import com.tom.storagemod.inventory.filter.IFilter;
+import com.tom.storagemod.inventory.filter.ItemFilter;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.item.IItemFilter;
 import com.tom.storagemod.util.BlockFaceReference;
 import com.tom.storagemod.util.Priority;
 
-public class BlockFilter {
+public class BlockFilter implements IFilter {
 	private BlockPos pos;
 	private Direction side;
 	private Set<BlockPos> connected;
 	public SimpleContainer filter = new SimpleContainer(1);
 	private boolean skip, keepLast;
 	private Priority priority;
-	private ItemPredicate itemPred = ItemPredicate.TRUE;
+	private ItemFilter itemFilter = ItemFilter.TRUE;
 	private boolean filterNeedsUpdate = true;
+	private boolean multiblockFilled;
 
 	public BlockFilter(BlockPos pos) {
 		this.pos = pos;
@@ -86,6 +90,7 @@ public class BlockFilter {
 		filter.setItem(0, ItemStack.parseOptional(provider, tag.getCompound("filter")));
 		priority = Priority.VALUES[Math.abs(tag.getInt("priority")) % Priority.VALUES.length];
 		keepLast = tag.getBoolean("keepLast");
+		multiblockFilled = true;
 	}
 
 	public void dropContents(LevelAccessor level, BlockPos pos2) {
@@ -96,12 +101,16 @@ public class BlockFilter {
 
 	public IInventoryAccess wrap(Level level, IInventoryAccess acc) {
 		ItemStack filter = this.filter.getItem(0);
-		if (filterNeedsUpdate || !itemPred.configMatch(filter)) {
+		if (filterNeedsUpdate || !itemFilter.configMatch(filter)) {
 			if (filter.getItem() instanceof IItemFilter f) {
-				itemPred = f.createFilter(new BlockFaceReference(level, pos, side), filter);
+				itemFilter = f.createFilter(new BlockFaceReference(level, pos, side), filter);
 			} else
-				itemPred = ItemPredicate.TRUE;
+				itemFilter = ItemFilter.TRUE;
 			filterNeedsUpdate = false;
+		}
+		if (acc instanceof PlatformFilteredInventoryAccess f) {
+			MultiFilter mf = new MultiFilter(f.getFilter(), this);
+			return new PlatformFilteredInventoryAccess(f.getActualInventory(), mf);
 		}
 		return new PlatformFilteredInventoryAccess(acc, this);
 	}
@@ -112,11 +121,25 @@ public class BlockFilter {
 
 	public static BlockFilter findBlockFilterAt(Level level, BlockPos pos) {
 		return BlockPos.betweenClosedStream(new AABB(pos).inflate(8)).
-				map(p -> PlatformInventoryAccess.getBlockFilterAt(level, p, false)).
+				map(p -> getFilterAt(level, p)).
 				filter(p -> p != null && p.getConnectedBlocks().contains(pos)).findFirst().
-				orElseGet(() -> PlatformInventoryAccess.getBlockFilterAt(level, pos, true));
+				orElseGet(() -> {
+					if (level.getBlockState(pos).is(StorageTags.INV_CONFIG_SKIP))return null;
+					return getOrCreateFilterAt(level, pos);
+				});
 	}
 
+	public static BlockFilter getFilterAt(Level level, BlockPos pos) {
+		return PlatformInventoryAccess.getBlockFilterAt(level, pos, false);
+	}
+
+	public static BlockFilter getOrCreateFilterAt(Level level, BlockPos pos) {
+		var f = PlatformInventoryAccess.getBlockFilterAt(level, pos, true);
+		if (f != null)f.fillMultiblock(level);
+		return f;
+	}
+
+	@Override
 	public Priority getPriority() {
 		return priority;
 	}
@@ -125,8 +148,9 @@ public class BlockFilter {
 		this.priority = priority;
 	}
 
+	@Override
 	public ItemPredicate getItemPred() {
-		return itemPred;
+		return itemFilter;
 	}
 
 	public void setSkip(boolean skip) {
@@ -143,6 +167,7 @@ public class BlockFilter {
 		connected.add(pos.immutable());
 	}
 
+	@Override
 	public boolean isKeepLast() {
 		return keepLast;
 	}
@@ -153,5 +178,16 @@ public class BlockFilter {
 
 	public void markFilterDirty() {
 		filterNeedsUpdate = true;
+	}
+
+	private void fillMultiblock(Level level) {
+		if (multiblockFilled)return;
+		VanillaMultiblockInventories.checkChest(level, pos, level.getBlockState(pos), p -> addConnected(level, p));
+		multiblockFilled = true;
+	}
+
+	@Override
+	public String toString() {
+		return "BlockFilter@" + pos;
 	}
 }

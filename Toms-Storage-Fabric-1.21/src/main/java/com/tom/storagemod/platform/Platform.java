@@ -11,9 +11,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -34,6 +36,7 @@ import com.tom.storagemod.platform.GameObject.GameRegistry;
 import com.tom.storagemod.platform.GameObject.GameRegistryBE;
 
 import dev.emi.trinkets.api.TrinketsApi;
+import io.netty.buffer.ByteBuf;
 
 public class Platform {
 	public static final GameRegistry<Item> ITEMS = new GameRegistry<>(BuiltInRegistries.ITEM);
@@ -79,5 +82,9 @@ public class Platform {
 
 	public static boolean notifyBlocks(Level level, BlockPos worldPosition, Direction direction) {
 		return true;
+	}
+
+	public static RegistryFriendlyByteBuf makeRegByteBuf(ByteBuf buffer, RegistryAccess reg) {
+		return new RegistryFriendlyByteBuf(buffer, reg);
 	}
 }

@@ -1,12 +1,14 @@
 package com.tom.storagemod.inventory;
 
+import java.util.Arrays;
+
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 
 public class PlatformMultiInventoryAccess extends MultiInventoryAccess implements IItemHandler {
-	private int[] invSizes = new int[0];
-	private int invSize;
+	private int[] offsets = new int[0];
+	private int invSize, offsetsSize;
 	private boolean calling;
 
 	@Override
@@ -14,21 +16,25 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		return this;
 	}
 
+	private int findInventory(int slot) {
+		int arrayIndex = Arrays.binarySearch(offsets, 0, offsetsSize, slot);
+		if (arrayIndex < 0) {
+			arrayIndex = -arrayIndex - 2;
+		}
+		return arrayIndex;
+	}
+
 	@Override
 	public boolean isItemValid(int slot, ItemStack stack) {
 		if(calling)return false;
 		if(slot >= invSize)return false;
 		calling = true;
-		for (int i = 0; i < invSizes.length; i++) {
-			if(slot >= invSizes[i])slot -= invSizes[i];
-			else {
-				boolean r = getHandler(i).isItemValid(slot, stack);
-				calling = false;
-				return r;
-			}
-		}
+
+		int arrayIndex = findInventory(slot);
+
+		boolean r = getHandler(arrayIndex).isItemValid(slot - offsets[arrayIndex], stack);
 		calling = false;
-		return false;
+		return r;
 	}
 
 	@Override
@@ -36,16 +42,12 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		if(calling)return stack;
 		if(slot >= invSize)return stack;
 		calling = true;
-		for (int i = 0; i < invSizes.length; i++) {
-			if(slot >= invSizes[i])slot -= invSizes[i];
-			else {
-				ItemStack s = getHandler(i).insertItem(slot, stack, simulate);
-				calling = false;
-				return s;
-			}
-		}
+
+		int arrayIndex = findInventory(slot);
+
+		ItemStack s = getHandler(arrayIndex).insertItem(slot - offsets[arrayIndex], stack, simulate);
 		calling = false;
-		return stack;
+		return s;
 	}
 
 	@Override
@@ -53,16 +55,12 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		if(calling)return ItemStack.EMPTY;
 		if(slot >= invSize)return ItemStack.EMPTY;
 		calling = true;
-		for (int i = 0; i < invSizes.length; i++) {
-			if(slot >= invSizes[i])slot -= invSizes[i];
-			else {
-				ItemStack s = getHandler(i).getStackInSlot(slot);
-				calling = false;
-				return s;
-			}
-		}
+
+		int arrayIndex = findInventory(slot);
+
+		ItemStack s = getHandler(arrayIndex).getStackInSlot(slot - offsets[arrayIndex]);
 		calling = false;
-		return ItemStack.EMPTY;
+		return s;
 	}
 
 	@Override
@@ -75,16 +73,12 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		if(calling)return 0;
 		if(slot >= invSize)return 0;
 		calling = true;
-		for (int i = 0; i < invSizes.length; i++) {
-			if(slot >= invSizes[i])slot -= invSizes[i];
-			else {
-				int r = getHandler(i).getSlotLimit(slot);
-				calling = false;
-				return r;
-			}
-		}
+
+		int arrayIndex = findInventory(slot);
+
+		int r = getHandler(arrayIndex).getSlotLimit(slot - offsets[arrayIndex]);
 		calling = false;
-		return 0;
+		return r;
 	}
 
 	@Override
@@ -92,16 +86,12 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		if(calling)return ItemStack.EMPTY;
 		if(slot >= invSize)return ItemStack.EMPTY;
 		calling = true;
-		for (int i = 0; i < invSizes.length; i++) {
-			if(slot >= invSizes[i])slot -= invSizes[i];
-			else {
-				ItemStack s = getHandler(i).extractItem(slot, amount, simulate);
-				calling = false;
-				return s;
-			}
-		}
+
+		int arrayIndex = findInventory(slot);
+
+		ItemStack s = getHandler(arrayIndex).extractItem(slot - offsets[arrayIndex], amount, simulate);
 		calling = false;
-		return ItemStack.EMPTY;
+		return s;
 	}
 
 	@Override
@@ -112,17 +102,20 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 
 	@Override
 	public void refresh() {
-		if(invSizes.length != connected.size())invSizes = new int[connected.size()];
+		if(offsets.length != connected.size())offsets = new int[connected.size()];
 		invSize = 0;
-		for (int i = 0; i < invSizes.length; i++) {
+		int hOff = 0;
+		for (int i = 0; i < offsets.length; i++) {
 			IItemHandler ih = getHandler(i);
-			if(ih == null)invSizes[i] = 0;
-			else {
+			if(ih == null) {
+				hOff++;
+			} else {
 				int s = ih.getSlots();
-				invSizes[i] = s;
+				offsets[i - hOff] = invSize;
 				invSize += s;
 			}
 		}
+		offsetsSize = offsets.length - hOff;
 	}
 
 	private IItemHandler getHandler(int i) {

@@ -9,4 +9,5 @@ public class StorageTags {
 	public static final TagKey<Block> REMOTE_ACTIVATE = BlockTags.create(ResourceLocation.tryBuild(StorageMod.modid, "remote_activate"));
 	public static final TagKey<Block> TRIMS = BlockTags.create(ResourceLocation.tryBuild(StorageMod.modid, "trims"));
 	public static final TagKey<Block> INV_CONNECTOR_SKIP = BlockTags.create(ResourceLocation.tryBuild(StorageMod.modid, "inventory_connector_skip"));
+	public static final TagKey<Block> INV_CONFIG_SKIP = BlockTags.create(ResourceLocation.tryBuild(StorageMod.modid, "inventory_configurator_skip"));
 }

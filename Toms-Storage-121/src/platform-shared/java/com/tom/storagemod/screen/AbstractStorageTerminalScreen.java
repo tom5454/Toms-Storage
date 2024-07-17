@@ -307,13 +307,15 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				getMenu().scrollTo(0);
 				this.currentScroll = 0;
 				int searchType = buttonSearchType.getSearchType();
-				if ((searchType & 4) > 0) {
-					IAutoFillTerminal.sync(searchString);
-				}
-				if ((searchType & 2) > 0) {
-					CompoundTag nbt = new CompoundTag();
-					nbt.putString("s", searchString);
-					menu.sendMessage(nbt);
+				if (searchType != -1) {
+					if ((searchType & 4) > 0) {
+						IAutoFillTerminal.sync(searchString);
+					}
+					if ((searchType & 2) > 0) {
+						CompoundTag nbt = new CompoundTag();
+						nbt.putString("s", searchString);
+						menu.sendMessage(nbt);
+					}
 				}
 				onUpdateSearch(searchString);
 			} else {
@@ -685,5 +687,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		AE, RS, DEF,
 		;
 		public static final ControllMode[] VALUES = values();
+	}
+
+	public int getRowCount() {
+		return rowCount;
 	}
 }

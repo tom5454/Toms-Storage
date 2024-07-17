@@ -64,6 +64,8 @@ dependencies {
 	// at runtime, use the full JEI jar for Fabric
 	modRuntimeOnly("mezz.jei:jei-1.21-fabric:${project.jei_version}")
 	
+	modImplementation "curse.maven:polymorph-388800:5480539"
+	
 	if(useLib) {
 		modImplementation "dev.emi:trinkets:3.9.0"
 		

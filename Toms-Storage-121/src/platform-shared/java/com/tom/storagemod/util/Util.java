@@ -1,6 +1,6 @@
 package com.tom.storagemod.util;
 
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Spliterator;
@@ -11,11 +11,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class Util {
-	static final Set<Collector.Characteristics> CH_NOID = Collections.emptySet();
+	static final Set<Collector.Characteristics> CH_UNORDERED_NOID = EnumSet.of(Characteristics.UNORDERED);
 
 	public static <T> Stream<T> stream(Iterator<T> itr) {
 		return StreamSupport.stream(
@@ -29,7 +30,7 @@ public class Util {
 				(a, t) -> { a.setValue(op.apply(a.value, t)); },
 				(a, b) -> { a.setValue(op.apply(a.value, b.value)); return a; },
 				a -> copier.apply(a.value),
-				CH_NOID);
+				CH_UNORDERED_NOID);
 	}
 
 	private static class Holder<T> {

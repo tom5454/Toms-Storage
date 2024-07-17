@@ -1,5 +1,6 @@
 package com.tom.storagemod.block.entity;
 
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -22,8 +23,10 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.Content;
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
+import com.tom.storagemod.polymorph.PolymorphHelper;
 import com.tom.storagemod.util.CraftingMatrix;
 
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
@@ -38,6 +41,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	private HashSet<CraftingTerminalMenu> craftingListeners = new HashSet<>();
 	private boolean refillingGrid;
 	private int craftingCooldown;
+	private WeakReference<Player> polymorphPlayer;
 
 	public CraftingTerminalBlockEntity(BlockPos pos, BlockState state) {
 		super(Content.craftingTerminalBE.get(), pos, state);
@@ -154,8 +158,10 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		}
 	}
 
-	public void unregisterCrafting(CraftingTerminalMenu containerCraftingTerminal) {
+	public void unregisterCrafting(Player playerIn, CraftingTerminalMenu containerCraftingTerminal) {
 		craftingListeners.remove(containerCraftingTerminal);
+		if (polymorphPlayer != null && polymorphPlayer.get() == playerIn)
+			polymorphPlayer = null;
 	}
 
 	public void registerCrafting(CraftingTerminalMenu containerCraftingTerminal) {
@@ -166,7 +172,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		if(refillingGrid)return;
 		CraftingInput input = craftMatrix.asCraftInput();
 		if (currentRecipe.isEmpty() || !currentRecipe.get().value().matches(input, level)) {
-			currentRecipe = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+			currentRecipe = getRecipe(input);
 		}
 
 		if (currentRecipe.isEmpty()) {
@@ -181,6 +187,14 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		if (!reading) {
 			setChanged();
 		}
+	}
+
+	private Optional<RecipeHolder<CraftingRecipe>> getRecipe(CraftingInput input) {
+		if (StorageMod.polymorph && polymorphPlayer != null) {
+			Player pl = polymorphPlayer.get();
+			return PolymorphHelper.getRecipe(pl, RecipeType.CRAFTING, input, level);
+		}
+		return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
 	}
 
 	public void clear() {
@@ -241,5 +255,11 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 
 	public boolean canCraft() {
 		return craftingCooldown + craftResult.getItem(0).getCount() <= craftResult.getItem(0).getMaxStackSize();
+	}
+
+	public void polymorphUpdate(Player playerIn) {
+		polymorphPlayer = new WeakReference<>(playerIn);
+		currentRecipe = Optional.empty();
+		onCraftingMatrixChanged();
 	}
 }

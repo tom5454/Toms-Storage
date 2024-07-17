@@ -8,5 +8,5 @@ public interface IInventoryConnector {
 	IInventoryAccess getMergedHandler();
 	Collection<IInventoryAccess> getConnectedInventories();
 	Collection<IInventoryConnector> getConnectedConnectors();
-	boolean isValid();
+	boolean hasConnectedInventories();
 }

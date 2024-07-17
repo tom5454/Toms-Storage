@@ -13,7 +13,7 @@ import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.util.BlockFaceReference;
 import com.tom.storagemod.util.Util;
 
-public class PolyFilter implements ItemPredicate {
+public class PolyFilter implements ItemFilter {
 	private BlockFaceReference face;
 	private Set<ItemStack> filter;
 	private long lastCheck;

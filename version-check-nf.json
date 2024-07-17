@@ -5,9 +5,10 @@
 		"1.20.4-latest": "1.6.12",
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.16",
-		"1.21-latest": "2.0.5"
+		"1.21-latest": "2.0.6"
 	},
 	"1.21": {
+		"2.0.6": "Added Polymorph support\nAdded content tooltips for item filters\nImproved inventory configurator\nImproved performance on NeoForge\nFiling Cabinet now drops it's content when broken\nFixed inventory cable connector missing the correct tool\nFixed inventory cable connectors breaking the inventory network in some cases\nFixed inventory cable connectors loosing filters\nFixed advanced terminal keybind not working on NeoForge\nFixed terminal syncing JEI/REI/EMI in some cases, when sync is turned off\nFixed the recipe book in the crafting terminal\nFixed JEI show recipes is in the wrong place",
 		"2.0.5": "Fixed crash with inventory interface\nFixed inventory interface not working in some cases\nFixed level emitter not working in some cases",
 		"2.0.4": "Added Inventory Proxy\nFixed storage terminals not connecting to inventory cables\nFixed Framed Inventor Cable Connector painting not working\nFixed Advanced Terminal not working across dimensions\nFixed Advanced Terminal range is doubled",
 		"2.0.3": "Fixed inventory cable connector showing access denied message incorrectly\nFixed crash with inventory cable connectors on inventory connectors\nFixed deadlock with polymorphic item filter\nFixed configs missing localizations\nFixed existing localizations not loading",

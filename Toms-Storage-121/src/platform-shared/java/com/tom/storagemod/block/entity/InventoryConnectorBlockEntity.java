@@ -25,7 +25,6 @@ import com.tom.storagemod.inventory.IInventoryAccess.IInventory;
 import com.tom.storagemod.inventory.IInventoryConnectorReference;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.inventory.MultiInventoryAccess;
-import com.tom.storagemod.inventory.PlatformInventoryAccess;
 import com.tom.storagemod.inventory.PlatformInventoryAccess.BlockInventoryAccess;
 import com.tom.storagemod.inventory.PlatformMultiInventoryAccess;
 import com.tom.storagemod.inventory.VanillaMultiblockInventories;
@@ -69,7 +68,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 	}
 
 	private void detectTouchingInventories() {
-		BlockFilter connFilter = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
+		BlockFilter connFilter = BlockFilter.getFilterAt(level, worldPosition);
 		UnaryOperator<IInventoryAccess> wrapper = connFilter != null ? i -> connFilter.wrap(level, i) : UnaryOperator.identity();
 
 		connectedInvs.clear();
@@ -86,7 +85,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		boolean onlyTrims = Config.get().onlyTrims;
 
 		Consumer<BlockPos> mbCheck = opos -> {
-			BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, opos, false);
+			BlockFilter f = BlockFilter.getFilterAt(level, opos);
 			if (f != null)blockFilters.add(f);
 			toCheck.add(opos);
 			checkedBlocks.add(opos);
@@ -105,7 +104,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 						interfaces.add(new BlockFace(p, Direction.DOWN));
 						toCheck.add(p);
 					} else if(!state.is(StorageTags.INV_CONNECTOR_SKIP) && !onlyTrims && BlockInventoryAccess.hasInventoryAt(level, p, state, d.getOpposite())) {
-						BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, p, false);
+						BlockFilter f = BlockFilter.getFilterAt(level, p);
 						if (f != null)blockFilters.add(f);
 						connected.put(p, d.getOpposite());
 						toCheck.add(p);
@@ -185,7 +184,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 	}
 
 	@Override
-	public boolean isValid() {
+	public boolean hasConnectedInventories() {
 		return !isRemoved();
 	}
 

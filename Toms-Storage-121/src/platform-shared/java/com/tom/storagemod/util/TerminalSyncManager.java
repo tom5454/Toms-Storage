@@ -25,6 +25,7 @@ import net.minecraft.world.item.component.ItemLore;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.platform.Platform;
 
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -42,7 +43,7 @@ public class TerminalSyncManager {
 	private RegistryFriendlyByteBuf workBuf;
 
 	public TerminalSyncManager(RegistryAccess reg) {
-		workBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(MAX_PACKET_SIZE, MAX_PACKET_SIZE * 2), reg);
+		workBuf = Platform.makeRegByteBuf(Unpooled.buffer(MAX_PACKET_SIZE, MAX_PACKET_SIZE * 2), reg);
 	}
 
 	private void write(RegistryFriendlyByteBuf buf, StoredItemStack stack) {
@@ -164,7 +165,7 @@ public class TerminalSyncManager {
 
 	public boolean receiveUpdate(RegistryAccess registryAccess, CompoundTag tag) {
 		if(tag.contains("d")) {
-			RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray("d")), registryAccess);
+			RegistryFriendlyByteBuf buf = Platform.makeRegByteBuf(Unpooled.wrappedBuffer(tag.getByteArray("d")), registryAccess);
 			List<StoredItemStack> in = new ArrayList<>();
 			short len = tag.getShort("l");
 			for (int i = 0; i < len; i++) {

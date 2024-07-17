@@ -14,16 +14,17 @@ import net.minecraft.world.level.Level;
 import com.google.common.collect.Iterators;
 
 import com.tom.storagemod.inventory.InventoryImage.FabricStack;
+import com.tom.storagemod.inventory.filter.IFilter;
 import com.tom.storagemod.util.Priority;
 import com.tom.storagemod.util.Priority.IPriority;
 
 public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVariant> implements IInventoryAccess, IPriority {
 	private BlankVariantView<ItemVariant> nullSlot = new BlankVariantView<>(ItemVariant.blank(), 0);
 	private final IInventoryAccess acc;
-	private final BlockFilter filter;
+	private final IFilter filter;
 	private final InventoryChangeTracker tracker;
 
-	public PlatformFilteredInventoryAccess(IInventoryAccess acc, BlockFilter filter) {
+	public PlatformFilteredInventoryAccess(IInventoryAccess acc, IFilter filter) {
 		super(acc::getPlatformHandler);
 		this.acc = acc;
 		this.filter = filter;
@@ -78,7 +79,13 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 	@Override
 	public ItemStack pushStack(ItemStack stack) {
 		if (!test(stack))return stack;
-		return acc.pushStack(stack);
+		return IInventoryAccess.super.pushStack(stack);
+	}
+
+	@Override
+	public ItemStack pullMatchingStack(ItemStack st, long max) {
+		if (!test(st))return ItemStack.EMPTY;
+		return IInventoryAccess.super.pullMatchingStack(st, max);
 	}
 
 	@Override
@@ -139,7 +146,8 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 
 	@Override
 	public Priority getPriority() {
-		return filter.getPriority();
+		Priority pr = IPriority.get(acc);
+		return pr.add(filter.getPriority());
 	}
 
 	private boolean test(ItemStack stack) {
@@ -195,5 +203,18 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 	@Override
 	public IInventoryAccess getRootHandler() {
 		return acc.getRootHandler();
+	}
+
+	@Override
+	public String toString() {
+		return "Filtering: {" + acc + "}";
+	}
+
+	public IFilter getFilter() {
+		return filter;
+	}
+
+	public IInventoryAccess getActualInventory() {
+		return acc;
 	}
 }

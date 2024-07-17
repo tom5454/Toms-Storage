@@ -22,7 +22,7 @@ public class InventoryConfiguratorScreen extends PlatformContainerScreen<Invento
 	private static final ResourceLocation GUI_TEXTURES = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/inventory_configurator.png");
 	protected EnumCycleButton<Priority> buttonPriority;
 	protected EnumCycleButton<Direction> buttonSide;
-	protected IconButton buttonAddConnected, buttonRemoveAll;
+	protected IconButton buttonAddConnected, buttonRemoveAll, buttonRemoveFilter;
 	protected ToggleButton buttonSkip, buttonKeepLast;
 
 	public InventoryConfiguratorScreen(InventoryConfiguratorMenu menu, Inventory p_97742_, Component p_97743_) {
@@ -77,6 +77,11 @@ public class InventoryConfiguratorScreen extends PlatformContainerScreen<Invento
 
 		buttonPriority.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.priority_" + s.name().toLowerCase(Locale.ROOT)));
 		buttonSide.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.side_" + s.name().toLowerCase(Locale.ROOT)));
+
+		buttonRemoveFilter = addRenderableWidget(new IconButton(leftPos + imageWidth - 22, topPos - 22, Component.translatable("narrator.toms_storage.removeFilter"), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
+			click(7);
+		}));
+		buttonRemoveFilter.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.inv_config.remove_filter")));
 	}
 
 	@Override

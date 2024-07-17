@@ -82,7 +82,7 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 			int z = c.bound().getZ();
 			BlockPos pos = new BlockPos(x, y, z);
 			if (player.distanceToSqr(x, y, z) < 16*16 && level.isLoaded(pos)) {
-				BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, pos, true);
+				BlockFilter f = BlockFilter.getOrCreateFilterAt(level, pos);
 				if (f == null) {
 					stack.set(Content.configuratorComponent.get(), ConfiguratorComponent.empty());
 				} else if (useOn != null && c.selecting() && !(player.isSecondaryUseActive() && rclk)) {
@@ -91,6 +91,7 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 							if (!f.getConnectedBlocks().remove(useOn))
 								f.addConnected(level, useOn);
 							c.setSelection(f.getConnectedBlocks());
+							level.blockEntityChanged(pos);
 							return;
 						}
 					} else if (!player.isSecondaryUseActive()) {
@@ -104,7 +105,7 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 
 							if (bb.getXsize() * bb.getYsize() * bb.getZsize() < 64) {
 								BlockPos.betweenClosedStream(bb).forEach(p -> f.addConnected(level, p));
-
+								level.blockEntityChanged(pos);
 								c.massSelectEnd(f.getConnectedBlocks());
 							} else {
 								player.displayClientMessage(Component.translatable("chat.toms_storage.area_too_big"), true);
@@ -130,12 +131,17 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 			}
 		}
 		if (useOn != null && player.distanceToSqr(useOn.getX(), useOn.getY(), useOn.getZ()) < 256) {
-			BlockFilter f = BlockFilter.findBlockFilterAt(level, useOn);
 			if (!rclk && level.getBlockEntity(useOn) instanceof InventoryConnectorBlockEntity ic) {
 				c.clear();
 				c.showInvBox(ic.getConnectedBlocks());
+				/*MultiInventoryAccess mih = (MultiInventoryAccess) ic.getMergedHandler();
+				System.out.println("Network Diagnostics:");
+				for (var ih : mih.getConnected()) {
+					System.out.println(ih + " " + IPriority.get(ih));
+				}*/
 				return;
 			}
+			BlockFilter f = BlockFilter.findBlockFilterAt(level, useOn);
 			if (f == null)return;
 			if (rclk) {
 				//Open UI

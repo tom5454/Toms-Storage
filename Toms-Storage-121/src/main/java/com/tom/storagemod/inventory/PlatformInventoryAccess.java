@@ -96,6 +96,11 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		public IInventoryAccess getRootHandler() {
 			return get() instanceof IProxy p ? p.getRootHandler() : this;
 		}
+
+		@Override
+		public String toString() {
+			return "BlockInventoryAccess at " + itemCache.pos();
+		}
 	}
 
 	@Override

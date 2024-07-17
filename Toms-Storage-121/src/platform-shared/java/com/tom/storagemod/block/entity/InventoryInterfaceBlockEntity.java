@@ -56,7 +56,7 @@ public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implement
 	public IInventoryAccess getInventoryAccess() {
 		if (networkAccess != null) {
 			IInventoryConnector net = networkAccess.get();
-			if (net != null && net.isValid())return net.getMergedHandler();
+			if (net != null && net.hasConnectedInventories())return net.getMergedHandler();
 		}
 		return PlatformInventoryAccess.EMPTY;
 	}
@@ -65,7 +65,7 @@ public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implement
 	public IInventoryConnector getConnectorRef() {
 		if (networkAccess != null) {
 			IInventoryConnector net = networkAccess.get();
-			if (net != null && net.isValid())return net;
+			if (net != null && net.hasConnectedInventories())return net;
 		}
 		return null;
 	}

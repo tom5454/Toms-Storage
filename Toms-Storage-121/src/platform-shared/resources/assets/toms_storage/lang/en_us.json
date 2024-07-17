@@ -131,6 +131,11 @@
 	"tooltip.toms_storage.inventory_connector.channel.owner": "Owner: %s",
 	"tooltip.toms_storage.inventory_connector.channel.owner.self": "Owner: %s (You)",
 	"tooltip.toms_storage.inventory_connector.channel.owner.unknown": "Owner: Unknown",
+	"tooltip.toms_storage.inv_config.remove_filter": "Clear Configuration",
+	"tooltip.toms_storage.item_filter.contents": "Contents:",
+	"tooltip.toms_storage.item_filter.prefix": "- %s",
+	"tooltip.toms_storage.item_filter.no_items": "No items",
+	"tooltip.toms_storage.hold_control_for_details": "Hold %s for configuration details.",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",

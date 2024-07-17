@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -19,6 +20,7 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import com.tom.storagemod.inventory.PlatformItemHandler;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
+import com.tom.storagemod.polymorph.PolymorphTerminalWidget;
 
 //The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
@@ -27,6 +29,8 @@ public class StorageMod {
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
+
+	public static boolean polymorph;
 
 	public StorageMod(ModContainer mc, IEventBus bus) {
 		// Register the setup method for modloading
@@ -45,6 +49,8 @@ public class StorageMod {
 		Content.init();
 
 		Platform.register(bus);
+
+		polymorph = ModList.get().isLoaded("polymorph");
 	}
 
 	private void setup(final FMLCommonSetupEvent event) {
@@ -53,6 +59,7 @@ public class StorageMod {
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
 		StorageModClient.clientSetup();
+		if (polymorph)PolymorphTerminalWidget.register();
 	}
 
 	private void registerCapabilities(RegisterCapabilitiesEvent event) {

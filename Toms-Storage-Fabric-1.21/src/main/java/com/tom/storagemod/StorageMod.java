@@ -21,6 +21,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -57,6 +58,8 @@ public class StorageMod implements ModInitializer {
 	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
 	private static Config LOADED_CONFIG = configHolder.getConfig();
 	public static Config CONFIG = new Config();
+
+	public static boolean polymorph;
 
 	public StorageMod() {
 	}
@@ -145,5 +148,7 @@ public class StorageMod implements ModInitializer {
 					l.onLoad();
 				}));
 		});
+
+		polymorph = FabricLoader.getInstance().isModLoaded("polymorph");
 	}
 }

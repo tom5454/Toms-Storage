@@ -52,6 +52,7 @@ public class PaintedBlockEntity extends PlatformBlockEntity {
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.saveAdditional(compound, provider);
 		if (blockState != null) {
 			compound.put("block", NbtUtils.writeBlockState(blockState));
 		}

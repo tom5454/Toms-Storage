@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -28,6 +29,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.BakedPaintedModel;
 import com.tom.storagemod.client.ClientUtil;
+import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
 import com.tom.storagemod.screen.FilingCabinetScreen;
@@ -112,4 +114,13 @@ public class StorageModClient {
 		}
 	}
 
+	@SubscribeEvent
+	public static void clientTick(ClientTickEvent.Post evt) {
+		if (Minecraft.getInstance().player == null)
+			return;
+
+		if(openTerm.consumeClick()) {
+			NetworkHandler.openTerminal();
+		}
+	}
 }

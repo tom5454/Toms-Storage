@@ -29,7 +29,7 @@ public class NetworkInventory {
 			if (!level.isLoaded(p))continue;
 
 			BlockEntity be = level.getBlockEntity(p);
-			if (be instanceof IInventoryConnector te) {
+			if (be instanceof IInventoryConnector te && te.hasConnectedInventories()) {
 				networkAccess = new WeakReference<>(te);
 				break;
 			}
@@ -37,14 +37,19 @@ public class NetworkInventory {
 	}
 
 	public IInventoryAccess getAccess(Level level, BlockPos worldPosition) {
-		if (block.exists())return block;
+		if (block.exists()) {
+			if (block.get() instanceof PlatformItemHandler h) {
+				return h.getRootHandler();
+			}
+			return block;
+		}
 		if (level.getGameTime() - lastUpdate > 10) {
 			scanNetwork(level, worldPosition);
 			lastUpdate = level.getGameTime();
 		}
 		if (networkAccess != null) {
 			IInventoryConnector net = networkAccess.get();
-			if (net != null && net.isValid())return net.getMergedHandler();
+			if (net != null && net.hasConnectedInventories())return net.getMergedHandler();
 		}
 		return block;
 	}

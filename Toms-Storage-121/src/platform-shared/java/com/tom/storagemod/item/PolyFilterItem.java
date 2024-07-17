@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 import com.tom.storagemod.client.ClientUtil;
-import com.tom.storagemod.inventory.filter.ItemPredicate;
+import com.tom.storagemod.inventory.filter.ItemFilter;
 import com.tom.storagemod.inventory.filter.PolyFilter;
 import com.tom.storagemod.util.BlockFaceReference;
 
@@ -27,7 +27,7 @@ public class PolyFilterItem extends Item implements IItemFilter {
 	}
 
 	@Override
-	public ItemPredicate createFilter(BlockFaceReference face, ItemStack stack) {
+	public ItemFilter createFilter(BlockFaceReference face, ItemStack stack) {
 		return new PolyFilter(face);
 	}
 

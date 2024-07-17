@@ -2,8 +2,6 @@ package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -13,7 +11,6 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -78,25 +75,5 @@ public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvide
 	@Override
 	public Component getCustomName() {
 		return this.name;
-	}
-
-	@Override
-	protected void applyImplicitComponents(BlockEntity.DataComponentInput p_338855_) {
-		super.applyImplicitComponents(p_338855_);
-		this.name = p_338855_.get(DataComponents.CUSTOM_NAME);
-		p_338855_.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(inv.getItems());
-	}
-
-	@Override
-	protected void collectImplicitComponents(DataComponentMap.Builder p_338252_) {
-		super.collectImplicitComponents(p_338252_);
-		p_338252_.set(DataComponents.CUSTOM_NAME, this.name);
-		p_338252_.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(inv.getItems()));
-	}
-
-	@Override
-	public void removeComponentsFromTag(CompoundTag p_330762_) {
-		p_330762_.remove("CustomName");
-		p_330762_.remove("inventory");
 	}
 }

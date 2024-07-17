@@ -58,9 +58,9 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		imageWidth = 194;
 		imageHeight = 256;
 		super.init();
-		this.widthTooNarrow = this.width < 379;
+		this.widthTooNarrow = this.width < 379 || true;
 		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
+		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
 		addWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
 		btnClr = new ButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, b -> clearGrid());
@@ -76,7 +76,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
 			this.recipeBookGui.initVisuals();
 			this.recipeBookGui.toggleVisibility();
-			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth);
+			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
 			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.topPos + 38 + rowCount * 18);
 			setButtonsPos();
 		}));
@@ -127,11 +127,14 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-			this.renderBg(st, partialTicks, mouseX, mouseY);
+			st.pose().pushPose();
+			st.pose().translate(0, 0, -1000);
+			super.render(st, -1, -1, partialTicks);
+			st.pose().popPose();
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
-			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 			super.render(st, mouseX, mouseY, partialTicks);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 			this.recipeBookGui.renderGhostRecipe(st, this.leftPos, this.topPos, true, partialTicks);
 		}
 
@@ -152,6 +155,8 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			return true;
 		}
 		if (this.widthTooNarrow && this.recipeBookGui.isVisible()) {
+			if (this.recipeBookGui.hasClickedOutside(x, y, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, b))
+				this.recipeBookGui.toggleVisibility();
 			return false;
 		}
 		return super.mouseClicked(x, y, b);
@@ -204,6 +209,10 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				searchField.setFocused(false);
 				return true;
 			}
+		}
+		if(code == GLFW.GLFW_KEY_ESCAPE && this.recipeBookGui.isVisible() && this.widthTooNarrow) {
+			this.recipeBookGui.toggleVisibility();
+			return true;
 		}
 		return super.keyPressed(code, p_231046_2_, p_231046_3_);
 	}

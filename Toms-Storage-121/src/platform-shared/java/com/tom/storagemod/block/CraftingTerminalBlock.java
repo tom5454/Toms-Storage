@@ -37,7 +37,6 @@ public class CraftingTerminalBlock extends AbstractStorageTerminalBlock {
 		ClientUtil.tooltip("crafting_terminal", tooltip);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState state2, boolean flag) {
 		if (!state.is(state2.getBlock())) {

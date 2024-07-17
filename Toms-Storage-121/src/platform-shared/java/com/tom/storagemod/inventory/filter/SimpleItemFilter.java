@@ -5,7 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.util.AbstractSimpleItemFilter;
 
-public class SimpleItemFilter extends AbstractSimpleItemFilter implements ItemPredicate {
+public class SimpleItemFilter extends AbstractSimpleItemFilter implements ItemFilter {
 	public SimpleItemFilter(ItemStack stack) {
 		super(stack);
 	}

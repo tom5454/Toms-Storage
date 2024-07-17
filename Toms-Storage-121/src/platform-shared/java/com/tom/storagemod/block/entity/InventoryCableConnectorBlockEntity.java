@@ -80,28 +80,28 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 			mergedHandler.clear();
 			linkedConnectors.clear();
 			beaconLevel = -1;
+			detectCableNetwork();
 			if (st.is(Blocks.BEACON)) {
 				beaconLevel = BeaconLevelCalc.calcBeaconLevel(level, pos.getX(), pos.getY(), pos.getZ());
 				self = mergedHandler;
 				if (channel != null) {
 					Channel chn = RemoteConnections.get(level).getChannel(channel);
 					if(chn != null) {
-						detectCableNetwork();
 						chn.register((ServerLevel) level, worldPosition);
 						Set<IInventoryLink> links = chn.findOthers((ServerLevel) level, worldPosition, beaconLevel);
 						links.forEach(l -> linkedConnectors.add(l.getConnector()));
-						mergedHandler.build(this, linkedConnectors);
 					}
 				}
+				mergedHandler.build(this, linkedConnectors);
 			} else {
 				BlockEntity be = level.getBlockEntity(pos);
 				if (be instanceof IInventoryConnectorReference ref) {
 					var inv = ref.getConnectorRef();
 					if (inv != null) {
 						self = mergedHandler;
-						mergedHandler.build(this, Collections.singletonList(inv));
+						mergedHandler.build(inv, Collections.emptyList());
 
-						BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
+						BlockFilter f = BlockFilter.getFilterAt(level, worldPosition);
 						if (f != null) {
 							List<IInventoryAccess> invs = new ArrayList<>();
 							for (IInventoryAccess a : mergedHandler.getConnected()) {
@@ -114,7 +114,7 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 						self = PlatformInventoryAccess.EMPTY;
 					}
 				} else {
-					BlockFilter f = PlatformInventoryAccess.getBlockFilterAt(level, worldPosition, false);
+					BlockFilter f = BlockFilter.getFilterAt(level, worldPosition);
 					if (f != null)self = f.wrap(level, block);
 					else self = block;
 				}
@@ -164,8 +164,8 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 	}
 
 	@Override
-	public boolean isValid() {
-		return !isRemoved();
+	public boolean hasConnectedInventories() {
+		return !isRemoved() && beaconLevel >= 0;
 	}
 
 	@Override

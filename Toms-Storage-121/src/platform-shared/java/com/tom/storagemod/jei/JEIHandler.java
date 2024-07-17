@@ -1,5 +1,8 @@
 package com.tom.storagemod.jei;
 
+import java.util.Collection;
+import java.util.List;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -13,6 +16,8 @@ import com.tom.storagemod.util.IAutoFillTerminal.ISearchHandler;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.gui.handlers.IGuiClickableArea;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -29,7 +34,17 @@ public class JEIHandler implements IModPlugin {
 
 	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-		registration.addRecipeClickArea(CraftingTerminalScreen.class, 83, 125, 28, 23, new RecipeType[] { RecipeTypes.CRAFTING });
+		registration.addGuiContainerHandler(CraftingTerminalScreen.class, new IGuiContainerHandler<CraftingTerminalScreen>() {
+			@SuppressWarnings("rawtypes")
+			private RecipeType[] rt = new RecipeType[] { RecipeTypes.CRAFTING };
+
+			@Override
+			public Collection<IGuiClickableArea> getGuiClickableAreas(CraftingTerminalScreen containerScreen, double mouseX, double mouseY) {
+				int rowCount = containerScreen.getRowCount();
+				IGuiClickableArea clickableArea = IGuiClickableArea.createBasic(83, 35 + rowCount * 18, 28, 23, rt);
+				return List.of(clickableArea);
+			}
+		});
 		registration.addGhostIngredientHandler(AbstractFilteredScreen.class, new JeiGhostIngredientHandler());
 	}
 
