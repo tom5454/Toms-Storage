@@ -236,17 +236,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getMenu().itemListClientSorted.clear();
-			boolean searchMod = false;
-			boolean searchTag = false;
-			String search = searchString;
-			if (searchString.startsWith("@")) {
-				searchMod = true;
-				search = searchString.substring(1);
-			} else if (searchString.startsWith("$")) {
-				searchTag = true;
-				search = searchString.substring(1);
-			}
-			Pattern m = null;
+			boolean searchMod = searchString.startsWith("@");
+			boolean searchNbt = (!searchMod) && searchString.startsWith("$");
+			boolean searchTag = (!(searchMod || searchNbt)) && searchString.startsWith("#");
+			String search = (searchMod || searchNbt || searchTag) ? searchString.substring(1) : searchString;
+			Pattern m;
 			try {
 				m = Pattern.compile(search.toLowerCase(), Pattern.CASE_INSENSITIVE);
 			} catch (Throwable ignore) {
@@ -263,7 +257,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					if (is != null && is.getStack() != null) {
 						String dspName;
 						if (searchMod) dspName = BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace();
-						else if (searchTag && is.getStack().hasTag()) dspName = String.valueOf(is.getStack().getTag());
+						else if (searchNbt && is.getStack().hasTag()) dspName = String.valueOf(is.getStack().getTag());
+						else if (searchTag) dspName = is.getStack().getTags().toList().toString();
 						else dspName = is.getStack().getHoverName().getString();
 						notDone = true;
 						if (m.matcher(dspName.toLowerCase()).find()) {
