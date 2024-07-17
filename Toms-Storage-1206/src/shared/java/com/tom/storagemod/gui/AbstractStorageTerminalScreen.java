@@ -239,9 +239,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getMenu().itemListClientSorted.clear();
 			boolean searchMod = false;
+			boolean searchComponent = false;
 			String search = searchString;
 			if (searchString.startsWith("@")) {
 				searchMod = true;
+				search = searchString.substring(1);
+			} else if (searchString.startsWith("$")) {
+				searchComponent = true;
 				search = searchString.substring(1);
 			}
 			Pattern m = null;
@@ -259,7 +263,14 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
 					StoredItemStack is = getMenu().itemListClient.get(i);
 					if (is != null && is.getStack() != null) {
-						String dspName = searchMod ? BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace() : is.getStack().getHoverName().getString();
+						String dspName;
+						if (searchMod) {
+							dspName = BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace();
+						} else if (searchComponent && !is.getStack().getComponentsPatch().isEmpty()) {
+							dspName = is.getStack().getComponentsPatch().toString();
+						} else {
+							dspName = is.getStack().getHoverName().getString();
+						}
 						notDone = true;
 						if (m.matcher(dspName.toLowerCase()).find()) {
 							addStackToClientList(is);
