@@ -1,10 +1,6 @@
 package com.tom.storagemod.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,6 +61,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 
 	});
+	private static final LoadingCache<StoredItemStack, String> nbtCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> String.valueOf(key.getStack().getTag())
+	));
+	private static final LoadingCache<StoredItemStack, List<String>> tagCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> key.getStack().getTags().map(Object::toString).toList()
+	));
 	protected Minecraft mc = Minecraft.getInstance();
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
@@ -266,11 +268,18 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 							notDone = false;
 						}
 						if (notDone) {
-							for (String lp : tooltipCache.get(is)) {
-								if (m.matcher(lp).find()) {
+							if (searchNbt) {
+								if (m.matcher(nbtCache.get(is)).find()) {
 									addStackToClientList(is);
-									notDone = false;
 									break;
+								}
+							} else {
+								List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
+								for (String lp : list) {
+									if (m.matcher(lp).find()) {
+										addStackToClientList(is);
+										break;
+									}
 								}
 							}
 						}
