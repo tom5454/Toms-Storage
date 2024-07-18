@@ -1,10 +1,6 @@
 package com.tom.storagemod.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -57,7 +53,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMenu> extends PlatformContainerScreen<T> implements IDataReceiver {
-	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
+	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<>() {
 
 		@Override
 		public List<String> load(StoredItemStack key) throws Exception {
@@ -65,6 +61,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 
 	});
+	private static final LoadingCache<StoredItemStack, String> nbtCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> String.valueOf(key.getStack().getTag())
+	));
+	private static final LoadingCache<StoredItemStack, List<String>> tagCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> key.getStack().getTags().map(Object::toString).toList()
+	));
 	protected Minecraft mc = Minecraft.getInstance();
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
@@ -236,13 +238,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getMenu().itemListClientSorted.clear();
-			boolean searchMod = false;
-			String search = searchString;
-			if (searchString.startsWith("@")) {
-				searchMod = true;
-				search = searchString.substring(1);
-			}
-			Pattern m = null;
+			boolean searchMod = searchString.startsWith("@");
+			boolean searchNbt = (!searchMod) && searchString.startsWith("$");
+			boolean searchTag = (!(searchMod || searchNbt)) && searchString.startsWith("#");
+			String search = (searchMod || searchNbt || searchTag) ? searchString.substring(1) : searchString;
+			Pattern m;
 			try {
 				m = Pattern.compile(search.toLowerCase(), Pattern.CASE_INSENSITIVE);
 			} catch (Throwable ignore) {
@@ -257,18 +257,29 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
 					StoredItemStack is = getMenu().itemListClient.get(i);
 					if (is != null && is.getStack() != null) {
-						String dspName = searchMod ? BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace() : is.getStack().getHoverName().getString();
+						String dspName;
+						if (searchMod) dspName = BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace();
+						else if (searchNbt && is.getStack().hasTag()) dspName = String.valueOf(is.getStack().getTag());
+						else if (searchTag) dspName = is.getStack().getTags().toList().toString();
+						else dspName = is.getStack().getHoverName().getString();
 						notDone = true;
 						if (m.matcher(dspName.toLowerCase()).find()) {
 							addStackToClientList(is);
 							notDone = false;
 						}
 						if (notDone) {
-							for (String lp : tooltipCache.get(is)) {
-								if (m.matcher(lp).find()) {
+							if (searchNbt) {
+								if (m.matcher(nbtCache.get(is)).find()) {
 									addStackToClientList(is);
-									notDone = false;
 									break;
+								}
+							} else {
+								List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
+								for (String lp : list) {
+									if (m.matcher(lp).find()) {
+										addStackToClientList(is);
+										break;
+									}
 								}
 							}
 						}
