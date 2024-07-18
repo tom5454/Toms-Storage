@@ -285,7 +285,6 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 							if (searchComponent) {
 								if (m.matcher(componentCache.get(is)).find()) {
 									addStackToClientList(is);
-									break;
 								}
 							} else {
 								List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
