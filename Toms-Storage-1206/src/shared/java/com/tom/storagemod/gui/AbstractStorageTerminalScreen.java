@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.core.component.DataComponentPatch;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
@@ -67,6 +70,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 
 	});
+	private static final LoadingCache<StoredItemStack, String> componentCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> DataComponentPatch.CODEC.encodeStart(JsonOps.COMPRESSED, key.getStack().getComponentsPatch()).mapOrElse(JsonElement::toString, e -> "")
+	));
+	private static final LoadingCache<StoredItemStack, List<String>> tagCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> key.getStack().getTags().map(Object::toString).toList()
+	));
 	protected Minecraft mc = Minecraft.getInstance();
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
@@ -261,7 +270,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						if (searchMod) {
 							dspName = BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace();
 						} else if (searchComponent && !is.getStack().getComponentsPatch().isEmpty()) {
-							dspName = is.getStack().getComponentsPatch().toString();
+							dspName = DataComponentPatch.CODEC.encodeStart(JsonOps.COMPRESSED, is.getStack().getComponentsPatch()).mapOrElse(JsonElement::toString, e -> "");
 						} else if (searchTag) {
 							dspName = is.getStack().getTags().toList().toString();
 						} else {
@@ -273,11 +282,18 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 							notDone = false;
 						}
 						if (notDone) {
-							for (String lp : tooltipCache.get(is)) {
-								if (m.matcher(lp).find()) {
+							if (searchComponent) {
+								if (m.matcher(componentCache.get(is)).find()) {
 									addStackToClientList(is);
-									notDone = false;
 									break;
+								}
+							} else {
+								List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
+								for (String lp : list) {
+									if (m.matcher(lp).find()) {
+										addStackToClientList(is);
+										break;
+									}
 								}
 							}
 						}
