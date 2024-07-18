@@ -261,7 +261,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					return;
 				}
 			}
-			boolean notDone = false;
+			boolean notDone;
 			try {
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
 					StoredItemStack is = getMenu().itemListClient.get(i);
@@ -270,29 +270,23 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						if (searchMod) {
 							dspName = BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace();
 						} else if (searchComponent && !is.getStack().getComponentsPatch().isEmpty()) {
-							dspName = DataComponentPatch.CODEC.encodeStart(JsonOps.COMPRESSED, is.getStack().getComponentsPatch()).mapOrElse(JsonElement::toString, e -> "");
-						} else if (searchTag) {
-							dspName = is.getStack().getTags().toList().toString();
+							dspName = componentCache.get(is);
 						} else {
 							dspName = is.getStack().getHoverName().getString();
 						}
 						notDone = true;
-						if (m.matcher(dspName.toLowerCase()).find()) {
-							addStackToClientList(is);
-							notDone = false;
+						if (!searchTag) {
+							if (m.matcher(dspName.toLowerCase()).find()) {
+								addStackToClientList(is);
+								notDone = false;
+							}
 						}
-						if (notDone) {
-							if (searchComponent) {
-								if (m.matcher(componentCache.get(is)).find()) {
+						if (notDone && !(searchMod || searchComponent)) {
+							List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
+							for (String lp : list) {
+								if (m.matcher(lp).find()) {
 									addStackToClientList(is);
-								}
-							} else {
-								List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
-								for (String lp : list) {
-									if (m.matcher(lp).find()) {
-										addStackToClientList(is);
-										break;
-									}
+									break;
 								}
 							}
 						}
