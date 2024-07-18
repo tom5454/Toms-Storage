@@ -79,14 +79,14 @@ dependencies {
 sourceSets {
 	main {
 		java {
-			srcDir "../Toms-Storage-120/src/shared/java"
-			srcDir "../Toms-StorageFabric-1.20/src/loader-shared/java"
-			srcDir "../Toms-Storage-1202/src/platform-shared/java"
+			srcDir "../TomsStorage-120/src/shared/java"
+			srcDir "../TomsStorageFabric-1.20/src/loader-shared/java"
+			srcDir "../TomsStorage-1202/src/platform-shared/java"
 		}
 		resources {
-			srcDir "../Toms-Storage-120/src/shared/resources"
-			srcDir "../Toms-StorageFabric-1.20/src/loader-shared/resources"
-			srcDir "../Toms-Storage-1202/src/platform-shared/resources"
+			srcDir "../TomsStorage-120/src/shared/resources"
+			srcDir "../TomsStorageFabric-1.20/src/loader-shared/resources"
+			srcDir "../TomsStorage-1202/src/platform-shared/resources"
 		}
 	}
 }
