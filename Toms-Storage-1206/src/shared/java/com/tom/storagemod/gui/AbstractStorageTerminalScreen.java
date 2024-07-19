@@ -9,6 +9,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.core.component.DataComponentPatch;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
@@ -67,6 +70,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 
 	});
+	private static final LoadingCache<StoredItemStack, String> componentCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> DataComponentPatch.CODEC.encodeStart(JsonOps.COMPRESSED, key.getStack().getComponentsPatch()).mapOrElse(JsonElement::toString, e -> "")
+	));
+	private static final LoadingCache<StoredItemStack, List<String>> tagCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> key.getStack().getTags().map(Object::toString).toList()
+	));
 	protected Minecraft mc = Minecraft.getInstance();
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
@@ -238,13 +247,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getMenu().itemListClientSorted.clear();
-			boolean searchMod = false;
-			String search = searchString;
-			if (searchString.startsWith("@")) {
-				searchMod = true;
-				search = searchString.substring(1);
-			}
-			Pattern m = null;
+			boolean searchMod = searchString.startsWith("@");
+			boolean searchComponent = (!searchMod) && searchString.startsWith("$");
+			boolean searchTag = (!(searchMod || searchComponent)) && searchString.startsWith("#");
+			String search = (searchMod || searchComponent || searchTag) ? searchString.substring(1) : searchString;
+			Pattern m;
 			try {
 				m = Pattern.compile(search.toLowerCase(), Pattern.CASE_INSENSITIVE);
 			} catch (Throwable ignore) {
@@ -254,22 +261,31 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					return;
 				}
 			}
-			boolean notDone = false;
+			boolean notDone;
 			try {
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
 					StoredItemStack is = getMenu().itemListClient.get(i);
 					if (is != null && is.getStack() != null) {
-						String dspName = searchMod ? BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace() : is.getStack().getHoverName().getString();
-						notDone = true;
-						if (m.matcher(dspName.toLowerCase()).find()) {
-							addStackToClientList(is);
-							notDone = false;
+						String dspName;
+						if (searchMod) {
+							dspName = BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace();
+						} else if (searchComponent && !is.getStack().getComponentsPatch().isEmpty()) {
+							dspName = componentCache.get(is);
+						} else {
+							dspName = is.getStack().getHoverName().getString();
 						}
-						if (notDone) {
-							for (String lp : tooltipCache.get(is)) {
+						notDone = true;
+						if (!searchTag) {
+							if (m.matcher(dspName.toLowerCase()).find()) {
+								addStackToClientList(is);
+								notDone = false;
+							}
+						}
+						if (notDone && !(searchMod || searchComponent)) {
+							List<String> list = searchTag ? tagCache.get(is) : tooltipCache.get(is);
+							for (String lp : list) {
 								if (m.matcher(lp).find()) {
 									addStackToClientList(is);
-									notDone = false;
 									break;
 								}
 							}
