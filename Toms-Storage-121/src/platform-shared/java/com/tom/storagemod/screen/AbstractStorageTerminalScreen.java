@@ -248,7 +248,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				String part = or[i].trim();
 				if (part.isEmpty())continue;
 				String[] sp = part.split(" ");
-				Predicate<StoredItemStack> p = Predicates.alwaysTrue();
+				Predicate<StoredItemStack> p = (__) -> true;
 				for (int j = 0; j < sp.length; j++) {
 					String s = sp[j].toLowerCase();
 					if (s.startsWith("@")) {
