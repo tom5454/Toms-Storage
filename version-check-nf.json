@@ -1,13 +1,14 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/toms-storage",
 	"promos": {
-		"1.20.2-latest": "1.6.11",
-		"1.20.4-latest": "1.6.12",
+		"1.20.2-latest": "1.6.12",
+		"1.20.4-latest": "1.6.13",
 		"1.20.5-latest": "1.6.13",
-		"1.20.6-latest": "1.6.16",
-		"1.21-latest": "2.0.6"
+		"1.20.6-latest": "1.6.17",
+		"1.21-latest": "2.0.7"
 	},
 	"1.21": {
+		"2.0.7": "Added Smart Search option to toggle EMI craftable item list (previously disabled due to lag)\nAdded Component search with `$` (#417)\nAdded Jade/TheOneProbe support",
 		"2.0.6": "Added Polymorph support\nAdded content tooltips for item filters\nImproved inventory configurator\nImproved performance on NeoForge\nFiling Cabinet now drops it's content when broken\nFixed inventory cable connector missing the correct tool\nFixed inventory cable connectors breaking the inventory network in some cases\nFixed inventory cable connectors loosing filters\nFixed advanced terminal keybind not working on NeoForge\nFixed terminal syncing JEI/REI/EMI in some cases, when sync is turned off\nFixed the recipe book in the crafting terminal\nFixed JEI show recipes is in the wrong place",
 		"2.0.5": "Fixed crash with inventory interface\nFixed inventory interface not working in some cases\nFixed level emitter not working in some cases",
 		"2.0.4": "Added Inventory Proxy\nFixed storage terminals not connecting to inventory cables\nFixed Framed Inventor Cable Connector painting not working\nFixed Advanced Terminal not working across dimensions\nFixed Advanced Terminal range is doubled",
@@ -17,6 +18,7 @@
 		"2.0.0": "2.0.0 rewrite initial release"
 	},
 	"1.20.6": {
+		"1.6.17": "Added NBT/component and tag search",
 		"1.6.16": "Added JEI Compat\nFixed dupe bug with Tag Item Filter",
 		"1.6.15": "Fixed storage terminal screens background",
 		"1.6.14": "Fixed chunks failing to save\nEMI, REI, Curios support",
@@ -27,6 +29,7 @@
 		"1.6.12": "1.20.5 port"
 	},
 	"1.20.4": {
+		"1.6.13": "Added NBT/component and tag search\nFixed dark terminal background on 1.20.4",
 		"1.6.12": "Fixed dupe bug with Tag Item Filter",
 		"1.6.11": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.10": "Added JEI support",
@@ -34,6 +37,7 @@
 		"1.6.8": "1.20.4 port"
 	},
 	"1.20.2": {
+		"1.6.12": "Added NBT/component and tag search",
 		"1.6.11": "Fixed dupe bug with Tag Item Filter",
 		"1.6.10": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.9": "Added curios support",

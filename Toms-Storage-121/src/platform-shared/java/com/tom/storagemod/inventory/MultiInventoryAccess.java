@@ -227,7 +227,7 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 				}
 				return items[i];
 			});
-			if (parallel)return str.parallel().flatMap(List::parallelStream).unordered();
+			if (parallel)return str.toList().parallelStream().flatMap(List::parallelStream).unordered();
 			else return str.flatMap(List::stream);
 		}
 

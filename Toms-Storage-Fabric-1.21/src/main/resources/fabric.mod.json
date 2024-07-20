@@ -39,7 +39,10 @@
 	],
 	"cardinal-components": [
     	"com.tom.storagemod.StorageModComponents"
-    ]
+    ],
+    "jade": [
+		"com.tom.storagemod.jade.JadePlugin"
+	]
   },
   "mixins": [
   ],

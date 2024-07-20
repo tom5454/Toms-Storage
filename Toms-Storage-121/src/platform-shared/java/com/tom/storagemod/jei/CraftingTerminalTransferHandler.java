@@ -60,8 +60,8 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 	@Override
 	public @Nullable IRecipeTransferError transferRecipe(C container, RecipeHolder<CraftingRecipe> recipe,
 			IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer) {
-		if (container instanceof IAutoFillTerminal) {
-			IAutoFillTerminal term = container;
+		if (container instanceof IAutoFillTerminal term) {
+			if (!term.isSmartSearch() && !doTransfer)return null;
 			Minecraft mc = Minecraft.getInstance();
 			List<IRecipeSlotView> missing = new ArrayList<>();
 			List<IRecipeSlotView> views = recipeSlots.getSlotViews();

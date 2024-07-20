@@ -55,10 +55,18 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		private BlockApiCache<Storage<ItemVariant>, Direction> cache;
 		private Direction d;
 		private IInventoryChangeTracker.Delegate tracker = new IInventoryChangeTracker.Delegate();
+		private long lastCheck;
+		private Storage<ItemVariant> storageCache;
 
 		@Override
 		public Storage<ItemVariant> get() {
-			return cache != null ? cache.find(d) : null;
+			if (cache.getWorld().getGameTime() == lastCheck) {
+				return storageCache;
+			}
+			Storage<ItemVariant> sv = cache != null ? cache.find(d) : null;
+			lastCheck = cache.getWorld().getGameTime();
+			storageCache = sv;
+			return sv;
 		}
 
 		@Override
@@ -87,6 +95,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		@Override
 		public void markInvalid() {
 			cache = null;
+			storageCache = null;
 		}
 
 		@Override

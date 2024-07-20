@@ -66,6 +66,8 @@ dependencies {
 	
 	modImplementation "curse.maven:polymorph-388800:5480539"
 	
+	modImplementation ("curse.maven:jade-324717:5493289")
+	
 	if(useLib) {
 		modImplementation "dev.emi:trinkets:3.9.0"
 		
@@ -88,9 +90,6 @@ dependencies {
 	
     	modCompileOnly  "dev.emi:emi-fabric:1.1.6+1.20.6:api"
 		modLocalRuntime "dev.emi:emi-fabric:1.1.6+1.20.6"
-	
-		modImplementation("curse.maven:jade-324717:5366607")
-		modImplementation("curse.maven:polymorph-388800:5393928")
 	} else {
 		compileOnly files("libs/trinkets_dummy.jar")
 	}
@@ -123,8 +122,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {

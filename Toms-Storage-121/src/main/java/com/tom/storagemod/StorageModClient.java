@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
@@ -20,6 +21,8 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -43,11 +46,16 @@ import com.tom.storagemod.screen.TagItemFilterScreen;
 public class StorageModClient {
 	public static KeyMapping openTerm;
 
-	public static void preInit(IEventBus bus) {
+	public static void preInit(ModContainer mc, IEventBus bus) {
 		bus.addListener(StorageModClient::registerColors);
 		bus.addListener(StorageModClient::initKeybinds);
 		bus.addListener(StorageModClient::bakeModels);
 		bus.addListener(StorageModClient::registerScreens);
+
+		try {
+			mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+		} catch (Throwable e) {
+		}
 	}
 
 	private static void registerScreens(RegisterMenuScreensEvent e) {

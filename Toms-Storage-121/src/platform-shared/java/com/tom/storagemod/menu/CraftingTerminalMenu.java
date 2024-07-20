@@ -310,4 +310,9 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	public Slot getCraftingResultSlot() {
 		return craftingResultSlot;
 	}
+
+	@Override
+	public boolean isSmartSearch() {
+		return (searchType & 8) == 0;
+	}
 }

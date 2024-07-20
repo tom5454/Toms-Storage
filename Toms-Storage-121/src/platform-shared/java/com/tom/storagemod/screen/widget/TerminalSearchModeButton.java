@@ -50,6 +50,16 @@ public class TerminalSearchModeButton extends IconButton {
 							() -> {
 								b.flipBit(4);
 								sendUpdate.run();
+							}),
+					new ButtonElement(
+							() -> {
+								return canSync ?
+										Component.translatable("tooltip.toms_storage.opt.search_smart", sh, (b.searchType & 8) == 0 ? CommonComponents.GUI_YES : CommonComponents.GUI_NO) :
+											Component.literal("").append(Component.translatable("tooltip.toms_storage.opt.search_smart", sh, CommonComponents.GUI_NO).withStyle(ChatFormatting.DARK_GRAY));
+							},
+							() -> {
+								b.flipBit(8);
+								sendUpdate.run();
 							})
 					);
 		};

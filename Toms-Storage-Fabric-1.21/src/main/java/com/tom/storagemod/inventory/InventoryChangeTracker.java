@@ -1,6 +1,5 @@
 package com.tom.storagemod.inventory;
 
-import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,17 +21,17 @@ import com.tom.storagemod.inventory.filter.ItemPredicate;
 
 public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeNotifier, IMultiThreadedTracker<InventoryImage, InvState> {
 	public static final InventoryChangeTracker NULL = new InventoryChangeTracker(null);
-	private WeakReference<Storage<ItemVariant>> storage;
+	private Storage<ItemVariant> storage;
 	private long lastUpdate, lastVersion, lastChange;
 	private Map<StorageView<ItemVariant>, StoredItemStack> lastItems = new HashMap<>();
 
 	public InventoryChangeTracker(Storage<ItemVariant> itemHandler) {
-		storage = new WeakReference<>(itemHandler);
+		storage = itemHandler;
 	}
 
 	@Override
 	public long getChangeTracker(Level level) {
-		Storage<ItemVariant> h = storage.get();
+		Storage<ItemVariant> h = storage;
 		if (h == null)return 0L;
 		if (lastUpdate != level.getGameTime()) {
 			long ver = h.getVersion();
@@ -94,14 +93,14 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 
 	@Override
 	public Stream<StoredItemStack> streamWrappedStacks(boolean parallel) {
-		Storage<ItemVariant> h = storage.get();
+		Storage<ItemVariant> h = storage;
 		if (h == null)return Stream.empty();
 		return lastItems.values().stream().filter(e -> e != null);
 	}
 
 	@Override
 	public long countItems(StoredItemStack filter) {
-		Storage<ItemVariant> h = storage.get();
+		Storage<ItemVariant> h = storage;
 		if (h == null)return 0;
 		long c = 0;
 		for (StoredItemStack is : lastItems.values()) {
@@ -112,7 +111,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 
 	@Override
 	public InventorySlot findSlot(ItemPredicate filter, boolean findEmpty) {
-		Storage<ItemVariant> h = storage.get();
+		Storage<ItemVariant> h = storage;
 		if (h == null)return null;
 		for (var slot : h) {
 			if (slot.isResourceBlank()) {
@@ -140,7 +139,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 
 	@Override
 	public InventorySlot findSlotDest(StoredItemStack forStack) {
-		Storage<ItemVariant> h = storage.get();
+		Storage<ItemVariant> h = storage;
 		if (h == null)return null;
 		if (!checkFilter(forStack))return null;
 		ItemVariant iv = ItemVariant.of(forStack.getStack());
@@ -169,7 +168,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 	@Override
 	public InventoryImage prepForOffThread(Level level) {
 		if (lastUpdate == level.getGameTime())return null;
-		Storage<ItemVariant> h = storage.get();
+		Storage<ItemVariant> h = storage;
 		if (h == null)return null;
 		long ver = h.getVersion();
 		if (ver == lastVersion)return null;
@@ -224,5 +223,9 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 		lastUpdate = level.getGameTime();
 		lastItems.putAll(ct.mod());
 		return lastChange;
+	}
+
+	public void refresh(Storage<ItemVariant> h) {
+		storage = h;
 	}
 }

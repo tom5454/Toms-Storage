@@ -1,14 +1,16 @@
 package com.tom.storagemod.screen;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonElement;
-import com.mojang.serialization.JsonOps;
-import net.minecraft.core.component.DataComponentPatch;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
@@ -17,6 +19,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -34,11 +37,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.serialization.JsonOps;
 
 import com.google.common.base.Predicates;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.gson.JsonElement;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
@@ -65,20 +70,27 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMenu> extends PlatformContainerScreen<T> implements IDataReceiver {
 	private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.parse("container/creative_inventory/scroller");
 	private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ResourceLocation.parse("container/creative_inventory/scroller_disabled");
-	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(new CacheLoader<StoredItemStack, List<String>>() {
-		private Minecraft mc = Minecraft.getInstance();
-
-		@Override
-		public List<String> load(StoredItemStack key) throws Exception {
-			return key.getStack().getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, getTooltipFlag()).stream().map(Component::getString).collect(Collectors.toList());
-		}
-
-	});
-	private static final LoadingCache<StoredItemStack, String> componentCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
-			key -> DataComponentPatch.CODEC.encodeStart(JsonOps.COMPRESSED, key.getStack().getComponentsPatch()).mapOrElse(JsonElement::toString, e -> "")
-	));
 	private static final ResourceLocation FLOATING_SLOT = ResourceLocation.tryBuild(StorageMod.modid, "widget/floating_slot");
-	protected Minecraft mc = Minecraft.getInstance();
+
+	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache =
+			CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(key -> {
+				var mc = Minecraft.getInstance();
+				var flag = mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
+				return key.getStack().getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, flag).
+						stream().map(Component::getString).collect(Collectors.toList());
+			}));
+
+	private static final LoadingCache<StoredItemStack, String> componentCache =
+			CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(key -> {
+				var ctx = Minecraft.getInstance().level.registryAccess().createSerializationContext(JsonOps.COMPRESSED);
+				return DataComponentPatch.CODEC.encodeStart(ctx, key.getStack().getComponentsPatch()).
+						mapOrElse(JsonElement::toString, e -> "");
+			}));
+
+	private static final LoadingCache<StoredItemStack, List<String>> tagCache =
+			CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+					key -> key.getStack().getTags().map(t -> t.location().toString()).toList()
+					));
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
 	protected float currentScroll;
@@ -113,14 +125,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	}
 
 	protected void onPacket() {
-		int s = menu.terminalData;
-		controllMode = (s & 0b000_00_0_11) % ControllMode.VALUES.length;
-		boolean rev = (s & 0b000_00_1_00) > 0;
-		int type = (s & 0b000_11_0_00) >> 3;
+		controllMode = (menu.modes & 0xF) % ControllMode.VALUES.length;
+		boolean rev = (menu.sorting & 0x100) > 0;
+		int type = menu.sorting & 0xFF;
 		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
-		int searchType = (s & 0b111_00_0_00) >> 5;
-		ghostItems = (s & 0b1_0_000_00_0_00) == 0;
-		boolean tallMode  =  (s & 0b1_0_0_000_00_0_00) != 0;
+		int searchType = menu.searchType;
+		ghostItems = (menu.sorting & 0x200) == 0;
+		boolean tallMode  =  (menu.modes & 0x10) != 0;
 		if (tallMode != this.tallMode) {
 			this.tallMode = tallMode;
 			init();
@@ -144,20 +155,22 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	protected void sendUpdate() {
 		CompoundTag c = new CompoundTag();
-		c.putInt("d", updateData());
+		int sort = 0;
+		sort |= (comparator.type() & 0xFF);
+		sort |= (comparator.isReversed() ? 0x100 : 0);
+		sort |= (ghostItems ? 0 : 0x200);
+		c.putInt("s", sort);
+		c.putInt("st", buttonSearchType.getSearchType());
+		c.putInt("m", writeModes());
 		CompoundTag msg = new CompoundTag();
 		msg.put("c", c);
 		menu.sendMessage(msg);
 	}
 
-	protected int updateData() {
+	protected int writeModes() {
 		int d = 0;
-		d |= (controllMode & 0b000_0_11);
-		d |= ((comparator.isReversed() ? 1 : 0) << 2);
-		d |= (comparator.type() << 3);
-		d |= ((buttonSearchType.getSearchType() & 0b111) << 5);
-		d |= ((ghostItems ? 0 : 1) << 9);
-		d |= ((tallMode ? 1 : 0) << 10);
+		d |= (controllMode & 0xF);
+		d |= (tallMode ? 0x10 : 0);
 		return d;
 	}
 
@@ -176,7 +189,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
 		}
 		Slot offh = getMenu().offhand;
-		if (mc.options.mainHand().get() == HumanoidArm.RIGHT) {
+		if (minecraft.options.mainHand().get() == HumanoidArm.RIGHT) {
 			offh.x = -26;
 		} else {
 			offh.x = 186;
@@ -261,7 +274,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				String part = or[i].trim();
 				if (part.isEmpty())continue;
 				String[] sp = part.split(" ");
-				Predicate<StoredItemStack> p = (__) -> true;
+				Predicate<StoredItemStack> p = Predicates.alwaysTrue();
 				for (int j = 0; j < sp.length; j++) {
 					String s = sp[j].toLowerCase();
 					if (s.startsWith("@")) {
@@ -270,20 +283,26 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					} else if (s.startsWith("#")) {
 						String fs = s.substring(1);
 						p = p.and(is -> {
-							return is.getStack().getTags().map(t -> t.location().toString()).anyMatch(st -> st.contains(fs));
+							try {
+								return tagCache.get(is).stream().anyMatch(st -> st.contains(fs));
+							} catch (Exception e) {
+								return false;
+							}
 						});
 					} else if (s.startsWith("$")) {
-						String fs = s.substring(1);
-						Pattern m = buildPattern(fs);
-						if (m == null) {
-							continue;
-						}
-						p = p.and(is -> m.matcher(Optional.ofNullable(componentCache.getIfPresent(is)).orElse("")).find());
+						Pattern m = buildPattern(s.substring(1));
+						if (m == null)continue;
+						p = p.and(is -> {
+							if (is.getStack().getComponentsPatch().isEmpty())return false;
+							try {
+								return m.matcher(componentCache.get(is)).find();
+							} catch (Exception e) {
+								return false;
+							}
+						});
 					} else {
 						Pattern m = buildPattern(s);
-						if (m == null) {
-							continue;
-						}
+						if (m == null)continue;
 						p = p.and(is -> {
 							try {
 								String dspName = is.getStack().getHoverName().getString();
@@ -341,10 +360,6 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	private void addStackToClientList(StoredItemStack is) {
 		getMenu().itemListClientSorted.add(is);
-	}
-
-	public static TooltipFlag getTooltipFlag(){
-		return Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
 	}
 
 	@Override
@@ -423,13 +438,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					if (slot.stack.getQuantity() > 9999) {
 						ClientUtil.setTooltip(Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()));
 					}
-					st.renderTooltip(font, slot.stack.getActualStack(), mouseX, mouseY);
+					st.renderTooltip(font, slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack(), mouseX, mouseY);
 					ClientUtil.setTooltip();
 				}
 			} else {
 				this.renderTooltip(st, mouseX, mouseY);
 			}
-		}
+		} else clearTooltipForNextRenderPass();
 	}
 
 	@Override
@@ -480,7 +495,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		float inverseScaleFactor = 1.0f / scaleFactor;
 		int X = (int) (((float) x + 0 + 16.0f - fr.width(stackSize) * scaleFactor) * inverseScaleFactor);
 		int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-		st.drawString(fr, stackSize, X, Y, 16777215, true);
+		st.drawString(fr, stackSize, X, Y, size == 0 ? 0xFFFF00 : 16777215, true);
 		st.pose().popPose();
 		RenderSystem.enableDepthTest();
 	}
@@ -520,7 +535,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					}
 				}
 			}
-		} else if (GLFW.glfwGetKey(mc.getWindow().getWindow(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
+		} else if (GLFW.glfwGetKey(minecraft.getWindow().getWindow(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
 			storageSlotClick(null, SlotAction.SPACE_CLICK, false);
 		} else {
 			if (isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseX, mouseY)) {
@@ -704,5 +719,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	public int getRowCount() {
 		return rowCount;
+	}
+
+	public boolean isSmartItemSearchOn() {
+		return (buttonSearchType.getSearchType() & 8) == 0;
 	}
 }

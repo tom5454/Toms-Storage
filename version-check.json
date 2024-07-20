@@ -14,18 +14,20 @@
 		"1.19.2-latest": "1.5.11",
 		"1.19.3-latest": "1.5.11",
 		"1.19.4-latest": "1.5.12",
-		"1.20-latest": "1.6.7",
-		"1.20.1-latest": "1.6.7",
-		"1.20.2-latest": "1.6.9",
-		"1.20.4-latest": "1.6.10"
+		"1.20-latest": "1.6.8",
+		"1.20.1-latest": "1.6.8",
+		"1.20.2-latest": "1.6.10",
+		"1.20.4-latest": "1.6.11"
 	},
 	"1.20.4": {
+		"1.6.11": "Added NBT/component and tag search\nFixed dark terminal background on 1.20.4",
 		"1.6.10": "Fixed dupe bug with Tag Item Filter",
 		"1.6.9": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.8": "Added JEI support",
 		"1.6.7": "1.20.4 port"
 	},
 	"1.20.2": {
+		"1.6.10": "Added NBT/component and tag search",
 		"1.6.9": "Fixed dupe bug with Tag Item Filter",
 		"1.6.8": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.7": "Added REI support",
@@ -33,6 +35,7 @@
 		"1.6.5": "1.20.2 port"
 	},
 	"1.20.1": {
+		"1.6.8": "Added NBT/component and tag search",
 		"1.6.7": "Fixed dupe bug with Tag Item Filter",
 		"1.6.6": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.5": "Fixed EMI not working on 1.20\nFixed crash with VisualOverhaul",
@@ -41,6 +44,7 @@
 		"1.6.2": "Curio and EMI integration"
 	},
 	"1.20": {
+		"1.6.8": "Added NBT/component and tag search",
 		"1.6.7": "Fixed dupe bug with Tag Item Filter",
 		"1.6.6": "Fixed crash with Inventory Hopper\nUpdated Chinese Translations",
 		"1.6.5": "Fixed EMI not working on 1.20\nFixed crash with VisualOverhaul",

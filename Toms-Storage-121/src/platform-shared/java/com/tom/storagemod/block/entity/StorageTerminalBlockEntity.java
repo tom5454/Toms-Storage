@@ -41,6 +41,8 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	private NetworkInventory itemCache = new NetworkInventory();
 	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
 	private int sort;
+	private int searchType;
+	private int modes;
 	private String lastSearch = "";
 	private boolean updateItems;
 	private int changeCount;
@@ -162,19 +164,57 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		return sort;
 	}
 
+	public int getModes() {
+		return modes;
+	}
+
+	public int getSearchType() {
+		return searchType;
+	}
+
 	public void setSorting(int newC) {
 		sort = newC;
+		setChanged();
+	}
+
+	public void setModes(int modes) {
+		this.modes = modes;
+		setChanged();
+	}
+
+	public void setSearchType(int searchType) {
+		this.searchType = searchType;
+		setChanged();
 	}
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		super.saveAdditional(compound, provider);
-		compound.putInt("sort", sort);
+		compound.putInt("sorting", sort);
+		compound.putInt("modes", modes);
+		compound.putInt("searchType", searchType);
 	}
 
 	@Override
 	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-		sort = compound.getInt("sort");
+		if (compound.contains("sort")) {
+			// Convert old format
+			int s = compound.getInt("sort");
+			int controllMode = (s & 0b000_00_0_11);
+			boolean rev = (s & 0b000_00_1_00) > 0;
+			int type = (s & 0b000_11_0_00) >> 3;
+			searchType = (s & 0b111_00_0_00) >> 5;
+			boolean ghostItems = (s & 0b1_0_000_00_0_00) != 0;
+			boolean tallMode  =  (s & 0b1_0_0_000_00_0_00) != 0;
+			boolean pullFromInv = (s & (1 << 8)) != 0;//Crafting Terminal
+
+			modes = controllMode | (tallMode ? 0x10 : 0) | (pullFromInv ? 0x20 : 0);
+			sort = type | (rev ? 0x100 : 0) | (ghostItems ? 0x200 : 0);
+		} else {
+			sort = compound.getInt("sorting");
+			modes = compound.getInt("modes");
+			searchType = compound.getInt("searchType");
+		}
 		super.loadAdditional(compound, provider);
 	}
 

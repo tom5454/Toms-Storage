@@ -47,7 +47,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	private int lines;
 	protected Inventory pinv;
 	public Runnable onPacket;
-	public int terminalData, beaconLvl, changeCount;
+	public int sorting, modes, searchType, beaconLvl, changeCount;
 	public String search;
 	public boolean noSort;
 	public Slot offhand;
@@ -63,12 +63,14 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 		this.pinv = inv;
 		this.sync = new TerminalSyncManager(inv.player.registryAccess());
 		addStorageSlots();
-		addDataSlot(DataSlots.create(v -> {
-			terminalData = v;
-			if(onPacket != null)
-				onPacket.run();
-		}, () -> te != null ? te.getSorting() : 0));
+		addDataSlot(DataSlots.create(v -> sorting = v, () -> te != null ? te.getSorting() : 0).onUpdate(this::updateGui));
+		addDataSlot(DataSlots.create(v -> modes = v, () -> te != null ? te.getModes() : 0).onUpdate(this::updateGui));
+		addDataSlot(DataSlots.create(v -> searchType = v, () -> te != null ? te.getSearchType() : 0).onUpdate(this::updateGui));
 		addDataSlot(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : 0));
+	}
+
+	private void updateGui() {
+		if(onPacket != null)onPacket.run();
 	}
 
 	public StorageTerminalMenu(MenuType<?> type, int id, Inventory inv) {
@@ -304,7 +306,9 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 		sync.receiveInteract(message, this);
 		if(message.contains("c")) {
 			CompoundTag d = message.getCompound("c");
-			te.setSorting(d.getInt("d"));
+			te.setSorting(d.getInt("s"));
+			te.setSearchType(d.getInt("st"));
+			te.setModes(d.getInt("m"));
 		}
 	}
 

@@ -18,6 +18,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
+import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
@@ -47,8 +48,8 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	public EmiPlayerInventory getInventory(AbstractContainerScreen<CraftingTerminalMenu> screen) {
 		List<EmiStack> stacks = new ArrayList<>();
 		screen.getMenu().slots.subList(1, screen.getMenu().slots.size()).stream().map(Slot::getItem).map(EmiStack::of).forEach(stacks::add);
-		//Causes lag
-		//screen.getMenu().getStoredItems().forEach(s -> stacks.add(EmiStack.of(s.getStack(), s.getQuantity())));
+		if (screen instanceof AbstractStorageTerminalScreen scr && scr.isSmartItemSearchOn())
+			screen.getMenu().getStoredItems().forEach(s -> stacks.add(EmiStack.of(s.getStack(), s.getQuantity())));
 		return new EmiPlayerInventory(stacks);
 	}
 
@@ -59,7 +60,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 
 	@Override
 	public boolean canCraft(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context) {
-		return true;
+		return context.getInventory().canCraft(recipe);
 	}
 
 	@Override
@@ -73,17 +74,19 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	@Override
 	public void render(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context, List<Widget> widgets,
 			GuiGraphics matrices) {
-		RenderSystem.enableDepthTest();
-		List<Integer> missing = handleRecipe(recipe, context.getScreen(), true);
-		int i = 0;
-		for (Widget w : widgets) {
-			if (w instanceof SlotWidget sw) {
-				int j = i++;
-				EmiIngredient stack = sw.getStack();
-				Bounds bounds = sw.getBounds();
-				if (sw.getRecipe() == null && !stack.isEmpty()) {
-					if (missing.contains(j)) {
-						matrices.fill(bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
+		if (context.getScreen() instanceof AbstractStorageTerminalScreen scr && scr.isSmartItemSearchOn()) {
+			RenderSystem.enableDepthTest();
+			List<Integer> missing = handleRecipe(recipe, context.getScreen(), true);
+			int i = 0;
+			for (Widget w : widgets) {
+				if (w instanceof SlotWidget sw) {
+					int j = i++;
+					EmiIngredient stack = sw.getStack();
+					Bounds bounds = sw.getBounds();
+					if (sw.getRecipe() == null && !stack.isEmpty()) {
+						if (missing.contains(j)) {
+							matrices.fill(bounds.x(), bounds.y(), bounds.x() + bounds.width(), bounds.y() + bounds.height(), 0x44FF0000);
+						}
 					}
 				}
 			}

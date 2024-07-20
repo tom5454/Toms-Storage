@@ -11,6 +11,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
 import me.shedaniel.math.Rectangle;
@@ -29,6 +30,9 @@ public class ReiTransferHandler implements TransferHandler {
 		if(context.getMenu() instanceof IAutoFillTerminal) {
 			if (!context.getDisplay().getCategoryIdentifier().equals(CRAFTING) || context.getMinecraft().screen == context.getContainerScreen())
 				return Result.createNotApplicable();
+			if (context.getContainerScreen() instanceof AbstractStorageTerminalScreen scr && !context.isActuallyCrafting() && !scr.isSmartItemSearchOn()) {
+				return Result.createSuccessful().blocksFurtherHandling();
+			}
 			Display recipe = context.getDisplay();
 			ItemStack[][] stacks = recipe.getInputEntries().stream().map(l ->
 			l.stream().filter(es -> es.getDefinition().getValueType() == ItemStack.class).

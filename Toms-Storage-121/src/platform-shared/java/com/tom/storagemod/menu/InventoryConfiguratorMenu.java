@@ -140,4 +140,11 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 
 		return true;
 	}
+
+	@Override
+	public void removed(Player player) {
+		super.removed(player);
+		if (!player.level().isClientSide)
+			player.level().blockEntityChanged(pos);
+	}
 }

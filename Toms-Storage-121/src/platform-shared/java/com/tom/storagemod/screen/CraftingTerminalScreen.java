@@ -106,15 +106,14 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	@Override
 	protected void onPacket() {
 		super.onPacket();
-		int s = menu.terminalData;
-		boolean pullFromInv = (s & (1 << 8)) != 0;
+		boolean pullFromInv = (menu.modes & 0x20) != 0;
 		buttonPullFromInv.setState(pullFromInv);
 	}
 
 	@Override
-	protected int updateData() {
-		int d = super.updateData();
-		d |= (buttonPullFromInv.getState() ? 1 : 0) << 8;
+	protected int writeModes() {
+		int d = super.writeModes();
+		d |= (buttonPullFromInv.getState() ? 0x20 : 0);
 		return d;
 	}
 

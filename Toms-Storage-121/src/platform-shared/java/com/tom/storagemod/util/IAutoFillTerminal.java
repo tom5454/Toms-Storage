@@ -13,6 +13,7 @@ public interface IAutoFillTerminal {
 
 	void sendMessage(CompoundTag compound);
 	List<StoredItemStack> getStoredItems();
+	boolean isSmartSearch();
 
 	static boolean hasSync() {
 		return !updateSearch.isEmpty();

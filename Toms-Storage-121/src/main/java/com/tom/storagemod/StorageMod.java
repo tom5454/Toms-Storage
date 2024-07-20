@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -21,6 +22,7 @@ import com.tom.storagemod.inventory.PlatformItemHandler;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.polymorph.PolymorphTerminalWidget;
+import com.tom.storagemod.top.TheOneProbeHandler;
 
 //The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
@@ -37,7 +39,7 @@ public class StorageMod {
 		bus.addListener(this::setup);
 		// Register the doClientStuff method for modloading
 		bus.addListener(this::doClientStuff);
-		if (FMLEnvironment.dist == Dist.CLIENT)StorageModClient.preInit(bus);
+		if (FMLEnvironment.dist == Dist.CLIENT)StorageModClient.preInit(mc, bus);
 		bus.addListener(this::registerCapabilities);
 		bus.addListener(this::enqueueIMC);
 
@@ -71,7 +73,7 @@ public class StorageMod {
 	}
 
 	public void enqueueIMC(InterModEnqueueEvent e) {
-		/*if(ModList.get().isLoaded("theoneprobe"))
-			InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeHandler.create());*/
+		if(ModList.get().isLoaded("theoneprobe"))
+			InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeHandler.create());
 	}
 }
