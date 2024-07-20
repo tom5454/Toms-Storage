@@ -172,8 +172,8 @@ dependencies {
   	// at runtime, use the full JEI jar
   	runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:16.0.0.28")
   	
-  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:6.0.1+1.20.2")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:6.0.1+1.20.2:api")
+  	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:6.1.0+1.20.2")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:6.1.0+1.20.2:api")
     
     compileOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.2:api")
 	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.2")
