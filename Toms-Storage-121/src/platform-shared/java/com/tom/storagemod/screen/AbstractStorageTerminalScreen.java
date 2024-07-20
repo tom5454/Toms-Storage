@@ -1,16 +1,14 @@
 package com.tom.storagemod.screen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.core.component.DataComponentPatch;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
@@ -76,6 +74,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 
 	});
+	private static final LoadingCache<StoredItemStack, String> componentCache = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
+			key -> DataComponentPatch.CODEC.encodeStart(JsonOps.COMPRESSED, key.getStack().getComponentsPatch()).mapOrElse(JsonElement::toString, e -> "")
+	));
 	private static final ResourceLocation FLOATING_SLOT = ResourceLocation.tryBuild(StorageMod.modid, "widget/floating_slot");
 	protected Minecraft mc = Minecraft.getInstance();
 
@@ -238,6 +239,18 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		updateSearch();
 	}
 
+	private static Pattern buildPattern(String s) {
+		try {
+			return Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+		} catch (Throwable ignore) {
+			try {
+				return Pattern.compile(Pattern.quote(s), Pattern.CASE_INSENSITIVE);
+			} catch (Throwable ignored) {
+				return null;
+			}
+		}
+	}
+
 	protected void updateSearch() {
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
@@ -248,7 +261,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				String part = or[i].trim();
 				if (part.isEmpty())continue;
 				String[] sp = part.split(" ");
-				Predicate<StoredItemStack> p = Predicates.alwaysTrue();
+				Predicate<StoredItemStack> p = (__) -> true;
 				for (int j = 0; j < sp.length; j++) {
 					String s = sp[j].toLowerCase();
 					if (s.startsWith("@")) {
@@ -259,26 +272,26 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						p = p.and(is -> {
 							return is.getStack().getTags().map(t -> t.location().toString()).anyMatch(st -> st.contains(fs));
 						});
-					} else {
-						Pattern m = null;
-						try {
-							m = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-						} catch (Throwable ignore) {
-							try {
-								m = Pattern.compile(Pattern.quote(s), Pattern.CASE_INSENSITIVE);
-							} catch (Throwable __) {
-								continue;
-							}
+					} else if (s.startsWith("$")) {
+						String fs = s.substring(1);
+						Pattern m = buildPattern(fs);
+						if (m == null) {
+							continue;
 						}
-						final Pattern fm = m;
+						p = p.and(is -> m.matcher(Optional.ofNullable(componentCache.getIfPresent(is)).orElse("")).find());
+					} else {
+						Pattern m = buildPattern(s);
+						if (m == null) {
+							continue;
+						}
 						p = p.and(is -> {
 							try {
 								String dspName = is.getStack().getHoverName().getString();
-								if (fm.matcher(dspName.toLowerCase()).find()) {
+								if (m.matcher(dspName.toLowerCase()).find()) {
 									return true;
 								}
 								for (String lp : tooltipCache.get(is)) {
-									if (fm.matcher(lp).find()) {
+									if (m.matcher(lp).find()) {
 										return true;
 									}
 								}
