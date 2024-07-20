@@ -239,6 +239,18 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		updateSearch();
 	}
 
+	private static Pattern buildPattern(String s) {
+		try {
+			return Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+		} catch (Throwable ignore) {
+			try {
+				return Pattern.compile(Pattern.quote(s), Pattern.CASE_INSENSITIVE);
+			} catch (Throwable ignored) {
+				return null;
+			}
+		}
+	}
+
 	protected void updateSearch() {
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
@@ -262,38 +274,24 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						});
 					} else if (s.startsWith("$")) {
 						String fs = s.substring(1);
-						Pattern m;
-						try {
-							m = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-						} catch (Throwable ignore) {
-							try {
-								m = Pattern.compile(Pattern.quote(fs), Pattern.CASE_INSENSITIVE);
-							} catch (Throwable ignored) {
-								continue;
-							}
+						Pattern m = buildPattern(fs);
+						if (m == null) {
+							continue;
 						}
-						final Pattern fm = m;
-						p = p.and(is -> fm.matcher(Optional.ofNullable(componentCache.getIfPresent(is)).orElse("")).find());
+						p = p.and(is -> m.matcher(Optional.ofNullable(componentCache.getIfPresent(is)).orElse("")).find());
 					} else {
-						Pattern m = null;
-						try {
-							m = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
-						} catch (Throwable ignore) {
-							try {
-								m = Pattern.compile(Pattern.quote(s), Pattern.CASE_INSENSITIVE);
-							} catch (Throwable __) {
-								continue;
-							}
+						Pattern m = buildPattern(s);
+						if (m == null) {
+							continue;
 						}
-						final Pattern fm = m;
 						p = p.and(is -> {
 							try {
 								String dspName = is.getStack().getHoverName().getString();
-								if (fm.matcher(dspName.toLowerCase()).find()) {
+								if (m.matcher(dspName.toLowerCase()).find()) {
 									return true;
 								}
 								for (String lp : tooltipCache.get(is)) {
-									if (fm.matcher(lp).find()) {
+									if (m.matcher(lp).find()) {
 										return true;
 									}
 								}
