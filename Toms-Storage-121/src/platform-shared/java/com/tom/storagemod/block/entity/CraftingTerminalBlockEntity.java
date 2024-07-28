@@ -120,7 +120,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					}
 					if(slot.isEmpty() && !oldItem.isEmpty()) {
 						StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
-						if(is == null && (getSorting() & (1 << 8)) != 0) {
+						if(is == null && (getModes() & 0x20) != 0) {
 							for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {
 								ItemStack st = thePlayer.getInventory().getItem(j);
 								if(ItemStack.isSameItemSameComponents(oldItem, st)) {

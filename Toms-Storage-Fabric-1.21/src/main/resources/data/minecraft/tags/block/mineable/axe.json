@@ -4,6 +4,7 @@
 	"toms_storage:crafting_terminal",
 	"toms_storage:inventory_cable_framed",
 	"toms_storage:inventory_cable",
+	"toms_storage:inventory_cable_connector",
 	"toms_storage:inventory_connector",
 	"toms_storage:basic_inventory_hopper",
 	"toms_storage:level_emitter",
