@@ -29,6 +29,16 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
+
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.client.settings.KeyConflictContext;
+
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,6 +56,7 @@ import com.tom.storagemod.gui.GuiLevelEmitter;
 import com.tom.storagemod.gui.GuiStorageTerminal;
 import com.tom.storagemod.item.ItemWirelessTerminal;
 import com.tom.storagemod.model.BakedPaintedModel;
+import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.tile.TileEntityPainted;
 
 public class ClientProxy implements IProxy {
@@ -54,6 +65,8 @@ public class ClientProxy implements IProxy {
 	public void setup() {
 
 	}
+
+	public static KeyBinding openTerm;
 
 	@Override
 	public void clientSetup() {
@@ -78,7 +91,10 @@ public class ClientProxy implements IProxy {
 			}
 			return -1;
 		}, StorageMod.paintedTrim, StorageMod.invCableFramed, StorageMod.invProxy);
+		openTerm = new KeyBinding("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputMappings.Type.KEYSYM.getOrCreate(66), "key.categories.gameplay");
+		ClientRegistry.registerKeyBinding(openTerm);
 		MinecraftForge.EVENT_BUS.addListener(ClientProxy::renderWorldLastEvent);
+		MinecraftForge.EVENT_BUS.register(ClientProxy.class);
 	}
 
 	private static void bakeModels(ModelBakeEvent event) {
@@ -140,6 +156,16 @@ public class ClientProxy implements IProxy {
 			}
 		} else if(addShift) {
 			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.hold_shift_for_info").withStyle(TextFormatting.ITALIC, TextFormatting.GRAY));
+		}
+	}
+
+	@SubscribeEvent
+	public static void clientTick(ClientTickEvent evt) {
+		if (Minecraft.getInstance().player == null || evt.phase == Phase.START)
+			return;
+
+		if(openTerm.consumeClick()) {
+			NetworkHandler.openTerminal();
 		}
 	}
 }

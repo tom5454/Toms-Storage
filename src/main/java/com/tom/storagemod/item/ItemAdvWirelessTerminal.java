@@ -21,6 +21,9 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+
+import net.minecraft.util.text.KeybindTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import com.tom.storagemod.Config;
@@ -51,11 +54,16 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 			String dim = stack.getTag().getString("BindDim");
 			tooltip.add(new TranslationTextComponent("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
+		tooltip.add(new TranslationTextComponent("tooltip.toms_storage.adv_wireless_terminal.keybind", new TranslationTextComponent("tooltip.toms_storage.adv_wireless_terminal.keybind.outline", new KeybindTextComponent("Tom's Storage: Open Terminal").withStyle(TextFormatting.GREEN))));
 	}
 
 	@Override
 	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		ItemStack stack = playerIn.getItemInHand(handIn);
+		return activateTerminal(worldIn, stack, playerIn, handIn);
+	}
+	
+	public ActionResult<ItemStack> activateTerminal(World worldIn, ItemStack stack, PlayerEntity playerIn, Hand handIn) {
 		if(stack.hasTag() && stack.getTag().contains("BindX")) {
 			if(!worldIn.isClientSide) {
 				int x = stack.getTag().getInt("BindX");
@@ -105,5 +113,14 @@ public class ItemAdvWirelessTerminal extends Item implements WirelessTerminal {
 	@Override
 	public int getRange(PlayerEntity pl, ItemStack stack) {
 		return Config.advWirelessRange;
+	}
+	@Override
+	public void open(PlayerEntity sender, ItemStack t) {
+		activateTerminal(sender.level, t, sender, Hand.MAIN_HAND);
+	}
+
+	@Override
+	public boolean canOpen(ItemStack t) {
+		return false;
 	}
 }

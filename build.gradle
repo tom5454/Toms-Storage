@@ -120,6 +120,9 @@ repositories {
     }
 	maven { url 'https://jitpack.io' }
 	maven {
+        url = "https://maven.theillusivec4.top/"
+    }
+	maven {
     	// location of the maven that hosts JEI files since January 2023
     	name = "Jared's maven"
     	url = "https://maven.blamejared.com/"
@@ -162,6 +165,8 @@ dependencies {
   	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22:api")
   	// at runtime, use the full TOP jar
   	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.3")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.3:api")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
