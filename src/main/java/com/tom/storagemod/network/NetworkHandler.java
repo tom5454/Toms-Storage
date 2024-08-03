@@ -2,14 +2,12 @@ package com.tom.storagemod.network;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.function.Predicate;
-
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -56,20 +54,8 @@ public class NetworkHandler {
 	public static void handleData(OpenTerminalPacket packet, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().enqueueWork(() -> {
 			ServerPlayerEntity sender = ctx.get().getSender();
-			
-			ItemStack t = PlayerInvUtil.findItem(
-				sender, 
-				new Predicate<ItemStack>() {
-					@Override
-					public boolean test(ItemStack i) {
-						if (i.getItem() instanceof WirelessTerminal) {
-							return true;
-						}
-						return false;
-					}
-			}, 
-			ItemStack.EMPTY,
-			Function.identity());
+
+			ItemStack t = PlayerInvUtil.findItem(sender, i -> i.getItem() instanceof WirelessTerminal && ((WirelessTerminal) i.getItem()).canOpen(i), ItemStack.EMPTY, Function.identity());
 			if(!t.isEmpty())
 				((WirelessTerminal)t.getItem()).open(sender, t);
 		});

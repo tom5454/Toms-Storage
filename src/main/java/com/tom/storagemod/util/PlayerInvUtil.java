@@ -1,14 +1,13 @@
 package com.tom.storagemod.util;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.fml.ModList;

@@ -165,6 +165,7 @@ dependencies {
   	compileOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22:api")
   	// at runtime, use the full TOP jar
   	runtimeOnly fg.deobf("mcjty.theoneprobe:TheOneProbe-1.16:1.16-3.1.4-22")
+  	
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.3")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.3:api")
 }

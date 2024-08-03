@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -29,19 +31,13 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
-
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.client.settings.KeyConflictContext;
-
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -94,7 +90,7 @@ public class ClientProxy implements IProxy {
 		openTerm = new KeyBinding("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputMappings.Type.KEYSYM.getOrCreate(66), "key.categories.gameplay");
 		ClientRegistry.registerKeyBinding(openTerm);
 		MinecraftForge.EVENT_BUS.addListener(ClientProxy::renderWorldLastEvent);
-		MinecraftForge.EVENT_BUS.register(ClientProxy.class);
+		MinecraftForge.EVENT_BUS.addListener(ClientProxy::clientTick);
 	}
 
 	private static void bakeModels(ModelBakeEvent event) {
@@ -159,7 +155,6 @@ public class ClientProxy implements IProxy {
 		}
 	}
 
-	@SubscribeEvent
 	public static void clientTick(ClientTickEvent evt) {
 		if (Minecraft.getInstance().player == null || evt.phase == Phase.START)
 			return;

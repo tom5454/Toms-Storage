@@ -3,7 +3,6 @@ package com.tom.storagemod.tile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
-import java.util.function.Predicate;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -152,20 +151,7 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	public boolean canInteractWith(PlayerEntity player) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
-		int termReach = PlayerInvUtil.findItem(
-			player, 
-			new Predicate<ItemStack>() {
-				@Override
-				public boolean test(ItemStack i) {
-					if (i.getItem() instanceof WirelessTerminal) {
-						return true;
-					}
-					return false;
-				}
-			},
-			0,
-			i -> ((WirelessTerminal)i.getItem()).getRange(player, i)
-		);
+		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
 		if(Config.wirelessTermBeaconLvl != -1 && beaconLevel >= Config.wirelessTermBeaconLvl && termReach > 0) {
 			if(Config.wirelessTermBeaconLvlDim != -1 && beaconLevel >= Config.wirelessTermBeaconLvlDim)return true;
 			else return player.level == level;
