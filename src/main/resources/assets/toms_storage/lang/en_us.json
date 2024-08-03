@@ -69,6 +69,8 @@
 	"tooltip.toms_storage.adv_wireless_terminal.beacon1": "Build a level %d beacon in an 8 block radius of the bound terminal to make it accessible from anywhere in the same dimension.",
 	"tooltip.toms_storage.adv_wireless_terminal.beacon2": "Build a level %d beacon to make it accessible from anywhere across dimensions.",
 	"tooltip.toms_storage.adv_wireless_terminal.bound": "Bound to (%s, %s, %s) in %s",
+	"tooltip.toms_storage.adv_wireless_terminal.keybind": "Press the %s key to open",
+	"tooltip.toms_storage.adv_wireless_terminal.keybind.outline": "[%s]",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
@@ -85,5 +87,7 @@
 	"tomsstorage.config.multiblock_inv": "Multiblock inventories",
 	"tomsstorage.config.adv_wireless_range": "Advanced wireless terminal range",
 	"tomsstorage.config.adv_wireless_beacon_lvl": "Advanced wireless terminal requied beacon level for infinite range\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
-	"tomsstorage.config.adv_wireless_beacon_lvl_dim": "Adv Wireless terminal requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely"
+	"tomsstorage.config.adv_wireless_beacon_lvl_dim": "Adv Wireless terminal requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
+
+	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal"
 }

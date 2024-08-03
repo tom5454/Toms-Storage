@@ -3,6 +3,7 @@ package com.tom.storagemod.tile;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
+import java.util.function.Predicate;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -36,6 +37,7 @@ import com.tom.storagemod.block.StorageTerminalBase;
 import com.tom.storagemod.block.StorageTerminalBase.TerminalPos;
 import com.tom.storagemod.gui.ContainerStorageTerminal;
 import com.tom.storagemod.item.WirelessTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 
 public class TileEntityStorageTerminal extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 	private IItemHandler itemHandler;
@@ -150,9 +152,20 @@ public class TileEntityStorageTerminal extends TileEntity implements INamedConta
 
 	public boolean canInteractWith(PlayerEntity player) {
 		if(level.getBlockEntity(worldPosition) != this)return false;
-		int termReach = 0;
-		if(player.getMainHandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getMainHandItem().getItem()).getRange(player, player.getMainHandItem()));
-		if(player.getOffhandItem().getItem() instanceof WirelessTerminal)termReach = Math.max(termReach, ((WirelessTerminal)player.getOffhandItem().getItem()).getRange(player, player.getOffhandItem()));
+		int termReach = PlayerInvUtil.findItem(
+			player, 
+			new Predicate<ItemStack>() {
+				@Override
+				public boolean test(ItemStack i) {
+					if (i.getItem() instanceof WirelessTerminal) {
+						return true;
+					}
+					return false;
+				}
+			},
+			0,
+			i -> ((WirelessTerminal)i.getItem()).getRange(player, i)
+		);
 		if(Config.wirelessTermBeaconLvl != -1 && beaconLevel >= Config.wirelessTermBeaconLvl && termReach > 0) {
 			if(Config.wirelessTermBeaconLvlDim != -1 && beaconLevel >= Config.wirelessTermBeaconLvlDim)return true;
 			else return player.level == level;

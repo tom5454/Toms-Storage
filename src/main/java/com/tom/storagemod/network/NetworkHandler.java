@@ -1,11 +1,15 @@
 package com.tom.storagemod.network;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.Predicate;
+
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.ItemStack;
 
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -14,6 +18,8 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.item.WirelessTerminal;
+import com.tom.storagemod.util.PlayerInvUtil;
 
 public class NetworkHandler {
 	private static final String PROTOCOL_VERSION = "1";
@@ -25,6 +31,7 @@ public class NetworkHandler {
 			);
 	public static void init() {
 		INSTANCE.registerMessage(0, DataPacket.class, DataPacket::toBytes, DataPacket::new, NetworkHandler::handleData);
+		INSTANCE.registerMessage(1, OpenTerminalPacket.class, (a, b) -> {}, b -> new OpenTerminalPacket(), NetworkHandler::handleData);
 		StorageMod.LOGGER.info("Initilaized Network Handler");
 	}
 
@@ -46,11 +53,37 @@ public class NetworkHandler {
 		ctx.get().setPacketHandled(true);
 	}
 
+	public static void handleData(OpenTerminalPacket packet, Supplier<NetworkEvent.Context> ctx) {
+		ctx.get().enqueueWork(() -> {
+			ServerPlayerEntity sender = ctx.get().getSender();
+			
+			ItemStack t = PlayerInvUtil.findItem(
+				sender, 
+				new Predicate<ItemStack>() {
+					@Override
+					public boolean test(ItemStack i) {
+						if (i.getItem() instanceof WirelessTerminal) {
+							return true;
+						}
+						return false;
+					}
+			}, 
+			ItemStack.EMPTY,
+			Function.identity());
+			if(!t.isEmpty())
+				((WirelessTerminal)t.getItem()).open(sender, t);
+		});
+	}
+
 	public static void sendDataToServer(CompoundNBT tag) {
 		INSTANCE.sendToServer(new DataPacket(tag));
 	}
 
 	public static void sendTo(ServerPlayerEntity pl, CompoundNBT tag) {
 		INSTANCE.send(PacketDistributor.PLAYER.with(() -> pl), new DataPacket(tag));
+	}
+
+	public static void openTerminal() {
+		INSTANCE.sendToServer(new OpenTerminalPacket());
 	}
 }

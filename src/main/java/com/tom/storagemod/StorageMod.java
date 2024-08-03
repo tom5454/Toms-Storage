@@ -17,12 +17,15 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.ModList;
 
 import com.tom.storagemod.block.BlockInventoryCable;
 import com.tom.storagemod.block.BlockInventoryCableConnector;
@@ -59,6 +62,9 @@ import com.tom.storagemod.tile.TileEntityLevelEmitter;
 import com.tom.storagemod.tile.TileEntityOpenCrate;
 import com.tom.storagemod.tile.TileEntityPainted;
 import com.tom.storagemod.tile.TileEntityStorageTerminal;
+
+import top.theillusivec4.curios.api.SlotTypeMessage;
+import top.theillusivec4.curios.api.SlotTypePreset;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
@@ -111,6 +117,7 @@ public class StorageMod {
 		//FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 		// Register the doClientStuff method for modloading
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::sendIMC);
 
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.serverSpec);
 		FMLJavaModLoadingContext.get().getModEventBus().register(Config.class);
@@ -127,6 +134,11 @@ public class StorageMod {
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
 		proxy.clientSetup();
+	}
+
+	public void sendIMC(InterModEnqueueEvent e) {
+		if(ModList.get().isLoaded("curios"))
+			InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BELT.getMessageBuilder().build());
 	}
 
 	public static final ItemGroup STORAGE_MOD_TAB = new ItemGroup("toms_storage") {
