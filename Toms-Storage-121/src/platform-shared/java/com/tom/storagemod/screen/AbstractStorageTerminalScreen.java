@@ -136,21 +136,22 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			this.tallMode = tallMode;
 			init();
 		}
-		if(!searchField.isFocused() && (searchType & 1) > 0) {
-			searchField.setFocused(true);
+		if (searchType != -1) {
+			if(!searchField.isFocused() && (searchType & 1) > 0) {
+				searchField.setFocused(true);
+			}
+			buttonSearchType.setSearchType(searchType);
+			if(!loadedSearch && menu.search != null) {
+				loadedSearch = true;
+				if((searchType & 2) > 0)
+					searchField.setValue(menu.search);
+			}
 		}
 		buttonSortingType.setState(SortingTypes.VALUES[type % SortingTypes.VALUES.length]);
 		buttonDirection.setState(rev);
-		buttonSearchType.setSearchType(searchType);
 		buttonCtrlMode.setState(ControllMode.VALUES[controllMode]);
 		buttonGhostMode.setState(ghostItems);
 		buttonTallMode.setState(tallMode);
-
-		if(!loadedSearch && menu.search != null) {
-			loadedSearch = true;
-			if((searchType & 2) > 0)
-				searchField.setValue(menu.search);
-		}
 	}
 
 	protected void sendUpdate() {

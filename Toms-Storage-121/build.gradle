@@ -158,6 +158,10 @@ dependencies {
 	
 	implementation "curse.maven:the-one-probe-245211:5502323"
     implementation "curse.maven:jade-324717:5529595"
+    
+    implementation "curse.maven:functional-storage-556861:5545676"
+    implementation "curse.maven:titanium-287342:5507166"
+    implementation "curse.maven:adorned-1036809:5546365"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

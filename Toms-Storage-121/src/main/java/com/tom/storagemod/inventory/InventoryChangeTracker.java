@@ -158,12 +158,15 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 		if (!checkFilter(forStack))return null;
 		for (int i = 0; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
-			if (is == null) {
-				if (h.isItemValid(i, forStack.getStack()))return new InventorySlot(getSlotHandler(h), this, i);
+			if (is == null && !h.isItemValid(i, forStack.getStack())) {
 				continue;
 			}
-			if (is.getQuantity() < is.getMaxStackSize() && is.equalItem(forStack))
-				return new InventorySlot(getSlotHandler(h), this, i);
+			if (is == null || is.equalItem(forStack)) {
+				int rem = h.insertItem(i, forStack.getActualStack(), true).getCount();
+				if (rem < forStack.getQuantity()) {
+					return new InventorySlot(getSlotHandler(h), this, i);
+				}
+			}
 		}
 		return null;
 	}
@@ -195,12 +198,15 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 		if (h.getSlots() <= slot.getId() + 1)return loop ? findSlotDest(forStack) : null;
 		for (int i = slot.getId() + 1; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
-			if (is == null) {
-				if (h.isItemValid(i, forStack.getStack()))return new InventorySlot(getSlotHandler(h), this, i);
+			if (is == null && !h.isItemValid(i, forStack.getStack())) {
 				continue;
 			}
-			if (is.getQuantity() < is.getMaxStackSize() && is.equalItem(forStack))
-				return new InventorySlot(getSlotHandler(h), this, i);
+			if (is == null || is.equalItem(forStack)) {
+				int rem = h.insertItem(i, forStack.getActualStack(), true).getCount();
+				if (rem < forStack.getQuantity()) {
+					return new InventorySlot(getSlotHandler(h), this, i);
+				}
+			}
 		}
 		return null;
 	}

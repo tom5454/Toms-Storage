@@ -47,7 +47,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	private int lines;
 	protected Inventory pinv;
 	public Runnable onPacket;
-	public int sorting, modes, searchType, beaconLvl, changeCount;
+	public int sorting, modes, searchType = -1, beaconLvl, changeCount;
 	public String search;
 	public boolean noSort;
 	public Slot offhand;
