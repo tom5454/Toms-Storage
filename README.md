@@ -11,6 +11,9 @@ Features:
 - Filtered connectors
 - Inventory Hopper
 
+Terminals also work on create contraptions if [Create Contraption Terminals](https://www.curseforge.com/minecraft/mc-mods/create-contraption-terminals) is installed.  
+![Terminals on a Train](https://cdn.modrinth.com/data/gOPAFzp0/images/3f9eaa8b5f8decb0d119381f933403e219236efc.png)  
+
 Mod Spotlights:  
 [![My Spotlight Video](https://img.youtube.com/vi/RwRKNhZ7uec/0.jpg)](https://www.youtube.com/watch?v=RwRKNhZ7uec)  
 [![Rockit14's Spotlight Video](https://img.youtube.com/vi/nW5ElcWiC3c/0.jpg)](https://www.youtube.com/watch?v=nW5ElcWiC3c)

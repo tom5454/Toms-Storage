@@ -70,27 +70,30 @@ dependencies {
 	
 	modImplementation "dev.emi:trinkets:3.10.0"
 	
-	if(useLib) {
-		modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
-			exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
-		   exclude(group: "net.fabricmc.fabric-api")
-		   exclude(group: "me.shedaniel.cloth")
-		   exclude(group: "dev.architectury")
-		}
-		modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
-		    exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modImplementation("dev.architectury:architectury-fabric:13.0.1")
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
+		exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
+	   exclude(group: "net.fabricmc.fabric-api")
+	   exclude(group: "me.shedaniel.cloth")
+	   exclude(group: "dev.architectury")
+	}
+	modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
+	    exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modImplementation("dev.architectury:architectury-fabric:13.0.6")
 	
-    	modCompileOnly  "dev.emi:emi-fabric:1.1.6+1.20.6:api"
-		modLocalRuntime "dev.emi:emi-fabric:1.1.6+1.20.6"
+	if(useLib) {
+    	modCompileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
+		modLocalRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
+		
+		modCompileOnly "curse.maven:vivecraft-667903:5753745"
 	} else {
+		compileOnly files("../TomsStorage-121/libs/vc_dummy.jar")
 	}
 }
 
@@ -99,7 +102,7 @@ sourceSets {
 		java {
 			srcDir "../TomsStorage-121/src/platform-shared/java"
 			//if(!useLib)exclude "com/tom/storagemod/jei/**"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 		}
 		resources {

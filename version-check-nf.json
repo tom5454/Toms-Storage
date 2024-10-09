@@ -5,13 +5,15 @@
 		"1.20.4-latest": "1.6.13",
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.17",
-		"1.21-latest": "2.0.9",
-		"1.21.1-latest": "2.0.9"
+		"1.21-latest": "2.0.10",
+		"1.21.1-latest": "2.0.10"
 	},
 	"1.21.1": {
+		"2.0.10": "Fixed wireless terminal highlighting with ViveCraft\nAdded Japanese translations (#461)",
 		"2.0.9": "Fixed terminal search keep not working\nFixed drawer like blocks not working\nFixed curios not working"
 	},
 	"1.21": {
+		"2.0.10": "Fixed wireless terminal highlighting with ViveCraft\nAdded Japanese translations (#461)",
 		"2.0.9": "Fixed terminal search keep not working\nFixed drawer like blocks not working\nFixed curios not working",
 		"2.0.8": "Fixed version number on NeoForge\nFixed Pull from Inventory not working",
 		"2.0.7": "Added Smart Search option to toggle EMI craftable item list (previously disabled due to lag)\nAdded Component search with `$` (#417)\nAdded Jade/TheOneProbe support",

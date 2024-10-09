@@ -29,6 +29,7 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.item.WirelessTerminalItem;
+import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.util.ComponentJoiner;
 
 public class ClientUtil {
@@ -66,7 +67,7 @@ public class ClientUtil {
 		if (!WirelessTerminalItem.isPlayerHolding(player))
 			return;
 
-		BlockHitResult lookingAt = (BlockHitResult) player.pick(Config.get().wirelessRange, 0f, true);
+		BlockHitResult lookingAt = rayTrace(player, Config.get().wirelessRange, true);
 		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
 		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 			BlockPos pos = lookingAt.getBlockPos();
@@ -75,6 +76,14 @@ public class ClientUtil {
 			drawShape(ps, buf, state.getOcclusionShape(player.level(), pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
 			mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
 		}
+	}
+
+	private static BlockHitResult rayTrace(Player player, double maxDist, boolean hitFluids) {
+		if (Platform.vivecraft) {
+			var vr = ViveCraftHelper.rayTraceVR(maxDist, hitFluids);
+			if (vr != null)return (BlockHitResult) vr;
+		}
+		return (BlockHitResult) player.pick(maxDist, 0f, hitFluids);
 	}
 
 	public static void drawConfiguratorOutline(PoseStack ps) {

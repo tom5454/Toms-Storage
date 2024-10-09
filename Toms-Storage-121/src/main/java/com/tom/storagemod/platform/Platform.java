@@ -68,6 +68,8 @@ public class Platform {
 	public static final Supplier<AttachmentType<BlockFilterAttachment>> BLOCK_FILTER = ATTACHMENT_TYPES.register(
 			"block_filter", () -> AttachmentType.serializable(BlockFilterAttachment::new).build());
 
+	public static boolean vivecraft = ModList.get().isLoaded("vivecraft");
+
 	public static <I extends Item> I addItemToTab(I item) {
 		tabItems.add(item);
 		return item;

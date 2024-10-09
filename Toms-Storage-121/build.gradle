@@ -94,7 +94,7 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			if(!useLib)exclude "com/tom/storagemod/jei/**"
+			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			//if(!useLib)exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/top/**"
 		}
@@ -133,12 +133,12 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
+    // at runtime, use the full JEI jar
+  	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.19.0.219"
+  		
     if(useLib) {
-    	compileOnly "mezz.jei:jei-1.20.6-neoforge-api:18.0.0.59"
-    	compileOnly "mezz.jei:jei-1.20.6-common-api:18.0.0.59"
-    	// at runtime, use the full JEI jar
-  		runtimeOnly "mezz.jei:jei-1.20.6-neoforge:18.0.0.59"
-  	
     	runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.6+1.20.6"
     	compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.6+1.20.6:api"
   	
@@ -147,8 +147,11 @@ dependencies {
 		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:14.0.688"
 		implementation "me.shedaniel.cloth:cloth-config-neoforge:13.0.121"
     	implementation "dev.architectury:architectury-neoforge:11.0.9"
+    	
+    	compileOnly "curse.maven:vivecraft-667903:5753747"
     } else {
     	compileOnly files("libs/curios_dummy.jar")
+    	compileOnly files("libs/vc_dummy.jar")
     }
     
     compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"

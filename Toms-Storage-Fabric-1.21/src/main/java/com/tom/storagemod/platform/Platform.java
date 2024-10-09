@@ -62,6 +62,8 @@ public class Platform {
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP, STORAGE_MOD_TAB);
 	}
 
+	public static boolean vivecraft = FabricLoader.getInstance().isModLoaded("vivecraft");
+
 	public static InteractionResult checkUse(Level worldIn, BlockHitResult lookingAt, Player playerIn, InteractionHand handIn) {
 		InteractionResult r = UseBlockCallback.EVENT.invoker().interact(playerIn, worldIn, handIn, lookingAt);
 		if(r == InteractionResult.PASS)return null;
