@@ -1,0 +1,70 @@
+package com.tom.storagemod.jei;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+import com.tom.storagemod.item.IItemFilter;
+import com.tom.storagemod.menu.AbstractFilteredMenu;
+import com.tom.storagemod.menu.slot.FilterSlot;
+import com.tom.storagemod.menu.slot.PhantomSlot;
+import com.tom.storagemod.screen.AbstractFilteredScreen;
+
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.handlers.IGhostIngredientHandler;
+import mezz.jei.api.ingredients.ITypedIngredient;
+
+@SuppressWarnings("rawtypes")
+public class JeiGhostIngredientHandler implements IGhostIngredientHandler<AbstractFilteredScreen> {
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <I> List<Target<I>> getTargetsTyped(AbstractFilteredScreen gui, ITypedIngredient<I> ingredient, boolean doStart) {
+		if (ingredient.getType() == VanillaTypes.ITEM_STACK) {
+			ItemStack stack = (ItemStack) ingredient.getIngredient();
+			List<Target<ItemStack>> targets = new ArrayList<>();
+			boolean filter = stack.getItem() instanceof IItemFilter;
+			for (Slot slot : gui.getMenu().slots) {
+				if (slot instanceof PhantomSlot) {
+					targets.add(new SlotTarget(gui, slot));
+				} else if (!filter && slot instanceof FilterSlot) {
+					ItemStack s = slot.getItem();
+					boolean sf = !s.isEmpty() && s.getItem() instanceof IItemFilter;
+					if(!sf)targets.add(new SlotTarget(gui, slot));
+				}
+			}
+			return (List) targets;
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public void onComplete() {
+	}
+
+	private static class SlotTarget implements Target<ItemStack> {
+		private Slot slot;
+		private Rect2i area;
+		private AbstractFilteredScreen gui;
+
+		public SlotTarget(AbstractFilteredScreen gui, Slot slot) {
+			this.slot = slot;
+			this.gui = gui;
+			this.area = new Rect2i(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, 16, 16);
+		}
+
+		@Override
+		public Rect2i getArea() {
+			return area;
+		}
+
+		@Override
+		public void accept(ItemStack ingredient) {
+			((AbstractFilteredMenu) gui.getMenu()).setPhantom(slot, ingredient);
+		}
+	}
+}

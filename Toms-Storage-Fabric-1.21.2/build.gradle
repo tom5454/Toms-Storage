@@ -1,0 +1,171 @@
+plugins {
+	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'maven-publish'
+}
+
+repositories {
+maven { url 'https://jitpack.io' }
+jcenter()
+maven { url "https://maven.shedaniel.me/" }
+maven { url "https://maven.terraformersmc.com/releases/"}
+maven { url "https://maven.architectury.dev/" }
+maven {
+		name = "Ladysnake Libs"
+		url = 'https://maven.ladysnake.org/releases'
+	}
+maven {
+    // location of the maven that hosts JEI files since January 2023
+    name = "Jared's maven"
+    url = "https://maven.blamejared.com/"
+  }
+ maven {
+        url 'https://www.cursemaven.com'
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+def useLib = System.getProperty("useLib")
+
+dependencies {
+	//to change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	
+	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+	
+    if(useLib) {
+    	modImplementation("com.terraformersmc:modmenu:11.0.1") {
+        	exclude(group: "net.fabricmc.fabric-api")
+    	}
+		
+		// compile against the JEI API but do not include it at runtime
+		modCompileOnlyApi("mezz.jei:jei-1.21-common-api:${project.jei_version}")
+		modCompileOnlyApi("mezz.jei:jei-1.21-fabric-api:${project.jei_version}")
+		// at runtime, use the full JEI jar for Fabric
+		modRuntimeOnly("mezz.jei:jei-1.21-fabric:${project.jei_version}")
+		
+		modImplementation "curse.maven:polymorph-388800:5480539"
+		
+		modImplementation ("curse.maven:jade-324717:5493289")
+		
+		modImplementation "dev.emi:trinkets:3.10.0"
+		
+		modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
+			exclude(group: "net.fabricmc.fabric-api")
+		    exclude(group: "me.shedaniel.cloth")
+		    exclude(group: "dev.architectury")
+		}
+		modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
+		   exclude(group: "net.fabricmc.fabric-api")
+		   exclude(group: "me.shedaniel.cloth")
+		   exclude(group: "dev.architectury")
+		}
+		modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
+		    exclude(group: "net.fabricmc.fabric-api")
+		    exclude(group: "me.shedaniel.cloth")
+		    exclude(group: "dev.architectury")
+		}
+		modImplementation("dev.architectury:architectury-fabric:13.0.6")
+	
+    	modCompileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
+		modLocalRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
+		
+		modCompileOnly "curse.maven:vivecraft-667903:5753745"
+	} else {
+		compileOnly files("../TomsStorage-1212/libs/vc_dummy.jar")
+		compileOnly files("../TomsStorage-1212/libs/polymorph_dummy.jar")
+		compileOnly files("libs/trinkets_dummy.jar")
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir "../TomsStorage-1212/src/platform-shared/java"
+			if(!useLib)exclude "com/tom/storagemod/jei/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			if(!useLib)exclude "com/tom/storagemod/emi/**"
+			if(!useLib)exclude "com/tom/storagemod/jade/**"
+			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
+			if(!useLib)exclude "com/tom/storagemod/ModMenu.java"
+		}
+		resources {
+			srcDir "../TomsStorage-1212/src/platform-shared/resources"
+		}
+	}
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/tomsstorage.accesswidener")
+}
+
+eclipse {
+    // Run when importing the project
+    synchronizationTasks 'genSources'
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
+}
+
+jar {
+	from "LICENSE"
+}
+
+// configure the maven publication
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			// add all the jars that should be included when publishing to maven
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
+			}
+		}
+	}
+
+	// select the repositories you want to publish to
+	repositories {
+		// uncomment to publish to the local maven
+		// mavenLocal()
+		def mavenURL = System.getProperty("mavenDir")
+		if ("${mavenURL}" != "null") {
+			maven {
+				url = file(mavenURL)
+			}
+		}
+	}
+}

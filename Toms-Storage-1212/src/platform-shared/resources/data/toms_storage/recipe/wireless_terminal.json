@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"PCP",
+    "aGg",
+    "PEP"
+  ],
+  "key": {
+  	"P": "#minecraft:planks",
+    "a": "minecraft:spyglass",
+    "C": "minecraft:comparator",
+    "E": "#c:ender_pearls",
+    "G": "#c:dusts/glowstone",
+    "g": "#c:glass_blocks/colorless"
+  },
+  "result": {
+    "id": "toms_storage:wireless_terminal"
+  }
+}

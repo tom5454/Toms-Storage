@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"PCP",
+    "cDc",
+    "PEP"
+  ],
+  "key": {
+  	"P": "#minecraft:planks",
+    "c": "#c:chests",
+    "D": "#c:gems/diamond",
+    "C": "minecraft:comparator",
+    "E": "#c:ender_pearls"
+  },
+  "result": {
+    "id": "toms_storage:inventory_connector"
+  }
+}

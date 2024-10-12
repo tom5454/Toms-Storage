@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "toms_storage:trim",
+  "ingredients": [
+	"toms_storage:painted_trim",
+	"minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "toms_storage:trim"
+  }
+}

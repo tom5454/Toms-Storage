@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+  	"PCP",
+    "cGg",
+    "PCP"
+  ],
+  "key": {
+  	"P": "#minecraft:planks",
+    "c": "#c:chests",
+    "C": "minecraft:comparator",
+    "G": "#c:dusts/glowstone",
+    "g": "#c:glass_blocks/colorless"
+  },
+  "result": {
+    "id": "toms_storage:storage_terminal"
+  }
+}
