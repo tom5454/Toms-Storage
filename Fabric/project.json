@@ -1,0 +1,44 @@
+{
+  "type": "fabric",
+  "name": "toms_storage_fabric-1.21",
+  "mcVer": "1.21",
+  "verId": "1.21",
+  "display": "Tom's Storage 1.21",
+  "git": "Toms-Storage/Toms-Storage-Fabric-1.21",
+  "subver": [
+    "1.21"
+  ],
+   "versionType": "release",
+  "j21": true,
+  "appendMCVersion": false,
+  "depProjects": [
+    {
+      "slug": "roughly-enough-items",
+      "type": "optionalDependency"
+    },
+    {
+      "slug": "jei",
+      "type": "optionalDependency"
+    },
+    {
+      "slug": "emi",
+      "type": "optionalDependency"
+    },
+    {
+      "slug": "cloth-config",
+      "type": "embeddedLibrary"
+    },
+    {
+      "slug": "indium",
+      "type": "optionalDependency"
+    },
+    {
+      "slug": "polymorph",
+      "type": "optionalDependency"
+    },
+    {
+      "slug": "trinkets",
+      "type": "optionalDependency"
+    }
+  ]
+}

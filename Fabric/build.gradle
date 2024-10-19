@@ -93,20 +93,20 @@ dependencies {
 		
 		modCompileOnly "curse.maven:vivecraft-667903:5753745"
 	} else {
-		compileOnly files("../TomsStorage-121/libs/vc_dummy.jar")
+		compileOnly files("../NeoForge/libs/vc_dummy.jar")
 	}
 }
 
 sourceSets {
 	main {
 		java {
-			srcDir "../TomsStorage-121/src/platform-shared/java"
+			srcDir "../NeoForge/src/platform-shared/java"
 			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 		}
 		resources {
-			srcDir "../TomsStorage-121/src/platform-shared/resources"
+			srcDir "../NeoForge/src/platform-shared/resources"
 		}
 	}
 }
