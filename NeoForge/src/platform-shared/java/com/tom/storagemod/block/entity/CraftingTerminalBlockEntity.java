@@ -194,7 +194,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 			Player pl = polymorphPlayer.get();
 			return PolymorphHelper.getRecipe(pl, RecipeType.CRAFTING, input, level);
 		}
-		return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
+		return level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
 	}
 
 	public void clear() {

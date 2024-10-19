@@ -7,28 +7,27 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.redstone.Orientation;
 
 import com.mojang.serialization.MapCodec;
 
@@ -44,10 +43,10 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
-	public static final MapCodec<FramedInventoryCableBlock> CODEC = ChestBlock.simpleCodec(properties -> new FramedInventoryCableBlock());
+	public static final MapCodec<FramedInventoryCableBlock> CODEC = simpleCodec(FramedInventoryCableBlock::new);
 
-	public FramedInventoryCableBlock() {
-		super(Block.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(2).noOcclusion());
+	public FramedInventoryCableBlock(Block.Properties pr) {
+		super(pr);
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)
 				.setValue(UP, false)
@@ -84,8 +83,10 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	}
 
 	@Override
-	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return stateIn.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(facing), IInventoryCable.canConnect(facingState, facing));
+	protected BlockState updateShape(BlockState blockState, LevelReader levelReader,
+			ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2,
+			BlockState blockState2, RandomSource randomSource) {
+		return blockState.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(direction), IInventoryCable.canConnect(blockState2, direction));
 	}
 
 	@Override
@@ -162,11 +163,6 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	}
 
 	@Override
-	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
-		return false;
-	}
-
-	@Override
 	protected MapCodec<? extends BaseEntityBlock> codec() {
 		return CODEC;
 	}
@@ -178,13 +174,15 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	}
 
 	@Override
-	public void neighborChanged(BlockState p_60509_, Level p_60510_, BlockPos p_60511_, Block p_60512_,
-			BlockPos p_60513_, boolean p_60514_) {
-		super.neighborChanged(p_60509_, p_60510_, p_60511_, p_60512_, p_60513_, p_60514_);
-		if (!p_60510_.isClientSide) {
-			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(p_60510_);
-			n.markNodeInvalid(p_60511_);
-			n.markNodeInvalid(p_60513_);
+	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
+			Orientation orientation, boolean bl) {
+		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
+		if (!level.isClientSide) {
+			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
+			n.markNodeInvalid(blockPos);
+			for (var d : orientation.getDirections()) {
+				n.markNodeInvalid(blockPos.relative(d));
+			}
 		}
 	}
 

@@ -6,24 +6,12 @@
     "PEP"
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "a": {
-      "item": "minecraft:spyglass"
-    },
-    "C": {
-      "item": "minecraft:comparator"
-    },
-    "E": {
-      "tag": "c:ender_pearls"
-    },
-    "G": {
-      "tag": "c:dusts/glowstone"
-    },
-    "g": {
-      "tag": "c:glass_blocks/colorless"
-    }
+  	"P": "#minecraft:planks",
+    "a": "minecraft:spyglass",
+    "C": "minecraft:comparator",
+    "E": "#c:ender_pearls",
+    "G": "#c:dusts/glowstone",
+    "g": "#c:glass_blocks/colorless"
   },
   "result": {
     "id": "toms_storage:wireless_terminal"

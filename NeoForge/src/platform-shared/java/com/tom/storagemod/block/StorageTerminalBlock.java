@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -18,10 +18,10 @@ import com.tom.storagemod.block.entity.StorageTerminalBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
 public class StorageTerminalBlock extends AbstractStorageTerminalBlock {
-	public static final MapCodec<StorageTerminalBlock> CODEC = ChestBlock.simpleCodec(properties -> new StorageTerminalBlock());
+	public static final MapCodec<StorageTerminalBlock> CODEC = simpleCodec(StorageTerminalBlock::new);
 
-	public StorageTerminalBlock() {
-		super();
+	public StorageTerminalBlock(Block.Properties pr) {
+		super(pr);
 	}
 
 	@Override

@@ -35,7 +35,6 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.network.DataPacket;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
-import com.tom.storagemod.polymorph.PolymorphTerminalWidget;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
 import com.tom.storagemod.screen.InventoryConfiguratorScreen;
 import com.tom.storagemod.screen.InventoryLinkScreen;
@@ -76,7 +75,7 @@ public class StorageModClient implements ClientModInitializer {
 			private Set<ModelResourceLocation> locs = new HashSet<>();
 
 			@Override
-			public void onInitializeModelLoader(Context ctx) {
+			public void initialize(Context ctx) {
 				bakeModels(locs);
 				ctx.modifyModelAfterBake().register((p, c) -> {
 					if (locs.contains(c.topLevelId()) && !(p instanceof BakedPaintedModel)) {
@@ -137,7 +136,7 @@ public class StorageModClient implements ClientModInitializer {
 			ClientUtil.collectExtraTooltips(s, l);
 		});
 
-		if (StorageMod.polymorph)PolymorphTerminalWidget.register();
+		//if (StorageMod.polymorph)PolymorphTerminalWidget.register();
 	}
 
 	private static void bakeModels(Set<ModelResourceLocation> locs) {

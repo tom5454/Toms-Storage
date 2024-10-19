@@ -9,7 +9,6 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,8 +27,8 @@ import com.tom.storagemod.components.WorldPos;
 
 public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 
-	public AdvWirelessTerminalItem() {
-		super(new Properties().stacksTo(1));
+	public AdvWirelessTerminalItem(Item.Properties pr) {
+		super(pr);
 	}
 
 	@Override
@@ -55,8 +54,8 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
-		return new InteractionResultHolder<>(activateTerminal(worldIn, playerIn.getItemInHand(handIn), playerIn, handIn), playerIn.getItemInHand(handIn));
+	public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
+		return activateTerminal(worldIn, playerIn.getItemInHand(handIn), playerIn, handIn);
 	}
 
 	public static InteractionResult activateTerminal(Level worldIn, ItemStack stack, Player playerIn, InteractionHand handIn) {

@@ -2,8 +2,8 @@ package com.tom.storagemod.platform;
 
 import java.util.List;
 
-import net.minecraft.client.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 
 public interface NeoForgeMenu {
-	List<RecipeBookCategories> getRecipeBookCategories();
+	List<RecipeBookCategory> getRecipeBookCategories();
 }

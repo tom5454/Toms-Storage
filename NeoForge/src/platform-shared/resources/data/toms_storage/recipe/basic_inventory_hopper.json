@@ -5,15 +5,9 @@
     " H "
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "c": {
-      "item": "toms_storage:inventory_cable"
-    },
-    "H": {
-      "item": "minecraft:hopper"
-    }
+  	"P": "#minecraft:planks",
+    "c": "toms_storage:inventory_cable",
+    "H": "minecraft:hopper"
   },
   "result": {
     "id": "toms_storage:basic_inventory_hopper"

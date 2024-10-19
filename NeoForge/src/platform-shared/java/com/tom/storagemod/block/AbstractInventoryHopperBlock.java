@@ -24,7 +24,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -34,7 +35,7 @@ import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock implements IInventoryCable {
-	public static final DirectionProperty FACING = BlockStateProperties.FACING;
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 
 	protected AbstractInventoryHopperBlock(Properties p_49224_) {
@@ -118,8 +119,9 @@ public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock imple
 	}
 
 	@Override
-	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		this.updateState(worldIn, pos, state);
+	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
+			Orientation orientation, boolean bl) {
+		this.updateState(level, blockPos, blockState);
 	}
 
 	private void updateState(Level worldIn, BlockPos pos, BlockState state) {

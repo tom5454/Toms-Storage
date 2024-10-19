@@ -11,12 +11,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MapColor;
 
 import com.mojang.serialization.MapCodec;
 
@@ -25,10 +22,10 @@ import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
 public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable {
-	public static final MapCodec<PaintedTrimBlock> CODEC = ChestBlock.simpleCodec(properties -> new PaintedTrimBlock());
+	public static final MapCodec<PaintedTrimBlock> CODEC = simpleCodec(PaintedTrimBlock::new);
 
-	public PaintedTrimBlock() {
-		super(Block.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3));
+	public PaintedTrimBlock(Block.Properties pr) {
+		super(pr);
 	}
 
 	@Override

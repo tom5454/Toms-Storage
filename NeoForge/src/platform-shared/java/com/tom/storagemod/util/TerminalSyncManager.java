@@ -18,7 +18,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
@@ -225,7 +225,7 @@ public class TerminalSyncManager {
 		return new ArrayList<>(this.itemList.values());
 	}
 
-	public void fillStackedContents(StackedContents stc) {
+	public void fillStackedContents(StackedItemContents stc) {
 		items.forEach((s, c) -> stc.accountSimpleStack(c.getActualStack()));
 	}
 

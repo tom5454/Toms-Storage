@@ -6,19 +6,18 @@ import java.util.Map;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import com.mojang.datafixers.util.Pair;
@@ -35,7 +34,7 @@ import com.tom.storagemod.util.TerminalSyncManager;
 import com.tom.storagemod.util.TerminalSyncManager.InteractHandler;
 import com.tom.storagemod.util.TerminalSyncManager.SlotAction;
 
-public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> implements IDataReceiver, InteractHandler {
+public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver, InteractHandler {
 	protected StorageTerminalBlockEntity te;
 	protected int playerSlotsStart;
 	public List<SlotStorage> storageSlotList = new ArrayList<>();
@@ -265,34 +264,6 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 		return ItemStack.EMPTY;
 	}
 
-	@Override
-	public void fillCraftSlotsStackedContents(StackedContents itemHelperIn) {
-	}
-
-	@Override
-	public void clearCraftingContent() {
-	}
-
-	@Override
-	public int getResultSlotIndex() {
-		return 0;
-	}
-
-	@Override
-	public int getGridWidth() {
-		return 0;
-	}
-
-	@Override
-	public int getGridHeight() {
-		return 0;
-	}
-
-	@Override
-	public int getSize() {
-		return 0;
-	}
-
 	public void sendMessage(CompoundTag compound) {
 		NetworkHandler.sendDataToServer(compound);
 	}
@@ -315,11 +286,6 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	@Override
 	public RecipeBookType getRecipeBookType() {
 		return RecipeBookType.CRAFTING;
-	}
-
-	@Override
-	public boolean shouldMoveToInventory(int p_150635_) {
-		return false;
 	}
 
 	@Override
@@ -426,7 +392,12 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	}
 
 	@Override
-	public boolean recipeMatches(RecipeHolder<CraftingRecipe> recipeHolder) {
-		return false;
+	public PostPlaceAction handlePlacement(boolean bl, boolean bl2, RecipeHolder<?> recipeHolder,
+			ServerLevel serverLevel, Inventory inventory) {
+		return PostPlaceAction.NOTHING;
+	}
+
+	@Override
+	public void fillCraftSlotsStackedContents(StackedItemContents stackedItemContents) {
 	}
 }

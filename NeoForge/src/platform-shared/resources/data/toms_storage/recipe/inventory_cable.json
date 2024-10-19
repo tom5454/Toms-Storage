@@ -6,18 +6,10 @@
     "SPS"
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    },
-    "c": {
-      "tag": "c:chests"
-    },
-    "T": {
-      "tag": "minecraft:trapdoors"
-    }
+  	"P": "#minecraft:planks",
+    "S": "#c:rods/wooden",
+    "c": "#c:chests",
+    "T": "#minecraft:trapdoors"
   },
   "result": {
     "id": "toms_storage:inventory_cable",

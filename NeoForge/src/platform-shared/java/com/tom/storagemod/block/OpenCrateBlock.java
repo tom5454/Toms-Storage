@@ -12,18 +12,15 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.MapColor;
 
 import com.mojang.serialization.MapCodec;
 
@@ -32,10 +29,10 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.util.TickerUtil;
 
 public class OpenCrateBlock extends BaseEntityBlock {
-	public static final MapCodec<OpenCrateBlock> CODEC = ChestBlock.simpleCodec(properties -> new OpenCrateBlock());
+	public static final MapCodec<OpenCrateBlock> CODEC = simpleCodec(OpenCrateBlock::new);
 
-	public OpenCrateBlock() {
-		super(Block.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3));
+	public OpenCrateBlock(Block.Properties pr) {
+		super(pr);
 		registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.DOWN));
 	}
 

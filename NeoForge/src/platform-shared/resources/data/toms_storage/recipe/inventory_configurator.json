@@ -5,12 +5,8 @@
     "S "
   ],
   "key": {
-  	"S": {
-      "tag": "c:rods/wooden"
-    },
-    "T": {
-      "tag": "toms_storage:trims"
-    }
+  	"S": "#c:rods/wooden",
+    "T": "#toms_storage:trims"
   },
   "result": {
     "id": "toms_storage:inventory_configurator"

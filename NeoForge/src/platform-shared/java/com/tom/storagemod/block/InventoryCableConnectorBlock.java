@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
@@ -17,14 +18,13 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -32,8 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -55,17 +55,13 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
-	public static final DirectionProperty FACING = BlockStateProperties.FACING;
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	private static final Direction[] FACING_VALUES = Direction.values();
 	protected VoxelShape[][] shapes;
-	public static final MapCodec<InventoryCableConnectorBlock> CODEC = ChestBlock.simpleCodec(properties -> new InventoryCableConnectorBlock());
+	public static final MapCodec<InventoryCableConnectorBlock> CODEC = simpleCodec(InventoryCableConnectorBlock::new);
 
-	public InventoryCableConnectorBlock() {
-		this(false);
-	}
-
-	protected InventoryCableConnectorBlock(boolean dummy) {
-		super(Block.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3).noOcclusion());
+	public InventoryCableConnectorBlock(Block.Properties pr) {
+		super(pr);
 		this.shapes = this.makeShapes(0.125f);
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)
@@ -116,7 +112,9 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	}
 
 	@Override
-	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
+	protected BlockState updateShape(BlockState stateIn, LevelReader levelReader,
+			ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction facing, BlockPos facingPos,
+			BlockState facingState, RandomSource randomSource) {
 		Direction f = stateIn.getValue(FACING);
 		if(facing == f)
 			return stateIn.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(facing), !facingState.isAir());
@@ -309,13 +307,15 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	}
 
 	@Override
-	public void neighborChanged(BlockState p_60509_, Level p_60510_, BlockPos p_60511_, Block p_60512_,
-			BlockPos p_60513_, boolean p_60514_) {
-		super.neighborChanged(p_60509_, p_60510_, p_60511_, p_60512_, p_60513_, p_60514_);
-		if (!p_60510_.isClientSide) {
-			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(p_60510_);
-			n.markNodeInvalid(p_60511_);
-			n.markNodeInvalid(p_60513_);
+	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
+			Orientation orientation, boolean bl) {
+		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
+		if (!level.isClientSide) {
+			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
+			n.markNodeInvalid(blockPos);
+			for (var d : orientation.getDirections()) {
+				n.markNodeInvalid(blockPos.relative(d));
+			}
 		}
 	}
 

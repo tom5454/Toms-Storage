@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import com.tom.storagemod.StorageModComponents;
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.IValidInfo;
 import com.tom.storagemod.util.WorldStates;
 
@@ -134,12 +134,17 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 	public static BlockFilter getBlockFilterAt(Level level, BlockPos pos, boolean make) {
 		BlockEntity be = level.getBlockEntity(pos);
 		if (be == null)return null;
-		return StorageModComponents.BLOCK_FILTER.get(be).getFilter(make);
+		if (!be.hasAttached(StorageMod.BLOCK_FILTER) && !make)return null;
+		return be.getAttachedOrCreate(StorageMod.BLOCK_FILTER, () -> new BlockFilter(pos));
 	}
 
 	public static void removeBlockFilterAt(Level level, BlockPos pos) {
 		BlockEntity be = level.getBlockEntity(pos);
 		if (be == null)return;
-		StorageModComponents.BLOCK_FILTER.get(be).remove(level, pos);
+		var bf = be.getAttachedOrElse(StorageMod.BLOCK_FILTER, null);
+		if (bf != null) {
+			bf.dropContents(level, pos);
+			be.removeAttached(StorageMod.BLOCK_FILTER);
+		}
 	}
 }

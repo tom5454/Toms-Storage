@@ -16,8 +16,8 @@ import com.tom.storagemod.util.BlockFaceReference;
 
 public class PolyFilterItem extends Item implements IItemFilter {
 
-	public PolyFilterItem() {
-		super(new Properties().stacksTo(1));
+	public PolyFilterItem(Item.Properties pr) {
+		super(pr);
 	}
 
 	@Override

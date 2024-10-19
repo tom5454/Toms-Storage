@@ -6,18 +6,10 @@
     "PTP"
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "C": {
-      "tag": "c:chests"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    },
-    "T": {
-      "tag": "minecraft:trapdoors"
-    }
+  	"P": "#minecraft:planks",
+    "C": "#c:chests",
+    "S": "#c:rods/wooden",
+    "T": "#minecraft:trapdoors"
   },
   "result": {
     "id": "toms_storage:open_crate"

@@ -7,37 +7,37 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
+import com.tom.storagemod.screen.widget.CraftingTerminalRecipeBookWidget;
 import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
 public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<CraftingTerminalMenu> implements RecipeUpdateListener {
 	private static final ResourceLocation gui = ResourceLocation.tryBuild("toms_storage", "textures/gui/crafting_terminal.png");
-	private final RecipeBookComponent recipeBookGui;
+	private final CraftingTerminalRecipeBookWidget recipeBookGui;
 	private boolean widthTooNarrow;
 	private ToggleButton buttonPullFromInv;
 	private ButtonClear btnClr;
 
 	public CraftingTerminalScreen(CraftingTerminalMenu screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn, 5, 256, 7, 17);
-		recipeBookGui = new RecipeBookComponent();
+		recipeBookGui = new CraftingTerminalRecipeBookWidget(screenContainer);
 	}
 
 	@Override
@@ -59,9 +59,10 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		imageHeight = 256;
 		super.init();
 		this.widthTooNarrow = this.width < 379 || true;
-		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
+		if(this.recipeBookGui.isVisible())recipeBookGui.toggleVisibility();//
+		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow);
 		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
-		addWidget(recipeBookGui);
+		//addWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
 		btnClr = new ButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, b -> clearGrid());
 		addRenderableWidget(btnClr);
@@ -73,13 +74,12 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 					sendUpdate();
 				}));
 		buttonPullFromInv.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.crafting_pull_off")), Tooltip.create(Component.translatable("tooltip.toms_storage.crafting_pull_on")));
-		addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
-			this.recipeBookGui.initVisuals();
+		/*addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
 			this.recipeBookGui.toggleVisibility();
 			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
 			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.topPos + 38 + rowCount * 18);
 			setButtonsPos();
-		}));
+		}));*/
 		setButtonsPos();
 		onPacket();
 	}
@@ -130,15 +130,15 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			st.pose().translate(0, 0, -1000);
 			super.render(st, -1, -1, partialTicks);
 			st.pose().popPose();
-			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			//this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
 			super.render(st, mouseX, mouseY, partialTicks);
-			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
-			this.recipeBookGui.renderGhostRecipe(st, this.leftPos, this.topPos, true, partialTicks);
+			//this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			//this.recipeBookGui.renderGhostRecipe(st, true);
 		}
 
 		this.renderTooltip(st, mouseX, mouseY);
-		this.recipeBookGui.renderTooltip(st, this.leftPos, this.topPos, mouseX, mouseY);
+		this.recipeBookGui.renderTooltip(st, mouseX, mouseY, hoveredSlot);
 		this.setInitialFocus(this.recipeBookGui);
 	}
 
@@ -181,11 +181,6 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		this.recipeBookGui.recipesUpdated();
 	}
 
-	@Override
-	public RecipeBookComponent getRecipeBookComponent() {
-		return this.recipeBookGui;
-	}
-
 	private void clearGrid() {
 		this.minecraft.gameMode.handleInventoryButtonClick((this.menu).containerId, 0);
 	}
@@ -195,14 +190,14 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		if(code == GLFW.GLFW_KEY_S && hoveredSlot != null) {
 			ItemStack itemstack = null;
 
-			for (int i = 0; i < this.recipeBookGui.ghostRecipe.size(); ++i) {
-				GhostRecipe.GhostIngredient ghostrecipe$ghostingredient = this.recipeBookGui.ghostRecipe.get(i);
+			/*for (int i = 0; i < this.recipeBookGui.ghostSlots.size(); ++i) {
+				GhostRecipe.GhostIngredient ghostrecipe$ghostingredient = this.recipeBookGui.ghostSlots.get(i);
 				int j = ghostrecipe$ghostingredient.getX();
 				int k = ghostrecipe$ghostingredient.getY();
 				if (j == hoveredSlot.x && k == hoveredSlot.y) {
 					itemstack = ghostrecipe$ghostingredient.getItem();
 				}
-			}
+			}*/
 			if(itemstack != null) {
 				searchField.setValue(itemstack.getHoverName().getString());
 				searchField.setFocused(false);
@@ -239,8 +234,13 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				RenderSystem.enableBlend();
 				RenderSystem.defaultBlendFunc();
 				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				st.blitSprite(SPRITES.get(this.active, this.isHoveredOrFocused()), x, y, this.width, this.height);
+				st.blitSprite(RenderType::guiTextured, SPRITES.get(this.active, this.isHoveredOrFocused()), x, y, this.width, this.height);
 			}
 		}
+	}
+
+	@Override
+	public void fillGhostRecipe(RecipeDisplay recipeDisplay) {
+		recipeBookGui.fillGhostRecipe(recipeDisplay);
 	}
 }

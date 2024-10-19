@@ -7,7 +7,6 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -73,7 +72,7 @@ public class ClientUtil {
 			BlockPos pos = lookingAt.getBlockPos();
 			Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
 			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
-			drawShape(ps, buf, state.getOcclusionShape(player.level(), pos), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
+			drawShape(ps, buf, state.getOcclusionShape(), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
 			mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
 		}
 	}
@@ -107,7 +106,7 @@ public class ClientUtil {
 			double y = pos.getY() - renderPos.y;
 			double z = pos.getZ() - renderPos.z;
 
-			LevelRenderer.renderLineBox(ps, buf, x, y, z, x + 1, y + 1, z + 1, 1, 1, 1, 0.4f);
+			renderLineBox(ps, buf, x, y, z, x + 1, y + 1, z + 1, 1, 1, 1, 0.4f);
 		}
 
 		VertexConsumer bufNd = mc.renderBuffers().bufferSource().getBuffer(CustomRenderTypes.linesNoDepth());
@@ -119,7 +118,7 @@ public class ClientUtil {
 
 			AABB bb = AABB.encapsulatingFullBlocks(new BlockPos(sx, sy, sz), hr.getBlockPos());
 			bb = bb.move(-renderPos.x, -renderPos.y, -renderPos.z);
-			LevelRenderer.renderLineBox(ps, bufNd, bb, 1, 1, 0, 0.4f);
+			renderLineBox(ps, bufNd, bb, 1, 1, 0, 0.4f);
 		}
 
 		if (!c.isBound())return;
@@ -127,7 +126,7 @@ public class ClientUtil {
 		double y = c.bound().getY() - renderPos.y;
 		double z = c.bound().getZ() - renderPos.z;
 
-		LevelRenderer.renderLineBox(ps, bufNd, x, y, z, x + 1, y + 1, z + 1, 1f, 0, 0, 1f);
+		renderLineBox(ps, bufNd, x, y, z, x + 1, y + 1, z + 1, 1f, 0, 0, 1f);
 
 		mc.renderBuffers().bufferSource().endBatch();
 	}
@@ -149,5 +148,53 @@ public class ClientUtil {
 
 	public static Component multilineTooltip(String text, Object... objects) {
 		return Arrays.stream(I18n.get(text, objects).split("\\\\")).map(Component::literal).collect(ComponentJoiner.joining(Component.empty(), Component.literal("\n")));
+	}
+
+	public static void renderLineBox(final PoseStack poseStack, final VertexConsumer vertexConsumer, final AABB aABB,
+			final float f, final float g, final float h, final float i) {
+		renderLineBox(poseStack, vertexConsumer, aABB.minX, aABB.minY, aABB.minZ, aABB.maxX, aABB.maxY, aABB.maxZ, f, g,
+				h, i, f, g, h);
+	}
+
+	public static void renderLineBox(final PoseStack poseStack, final VertexConsumer vertexConsumer, final double d,
+			final double e, final double f, final double g, final double h, final double i, final float j,
+			final float k, final float l, final float m) {
+		renderLineBox(poseStack, vertexConsumer, d, e, f, g, h, i, j, k, l, m, j, k, l);
+	}
+
+	public static void renderLineBox(final PoseStack poseStack, final VertexConsumer vertexConsumer, final double d,
+			final double e, final double f, final double g, final double h, final double i, final float j,
+			final float k, final float l, final float m, final float n, final float o, final float p) {
+		final PoseStack.Pose pose = poseStack.last();
+		final float q = (float) d;
+		final float r = (float) e;
+		final float s = (float) f;
+		final float t = (float) g;
+		final float u = (float) h;
+		final float v = (float) i;
+		vertexConsumer.addVertex(pose, q, r, s).setColor(j, o, p, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, s).setColor(j, o, p, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, s).setColor(n, k, p, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, u, s).setColor(n, k, p, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, s).setColor(n, o, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, r, v).setColor(n, o, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, t, r, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, -1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, u, s).setColor(j, k, l, m).setNormal(pose, -1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, -1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, v).setColor(j, k, l, m).setNormal(pose, 0.0f, -1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, -1.0f);
+		vertexConsumer.addVertex(pose, t, r, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, -1.0f);
+		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
 	}
 }

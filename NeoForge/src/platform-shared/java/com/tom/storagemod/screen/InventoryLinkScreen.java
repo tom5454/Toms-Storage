@@ -17,6 +17,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -78,7 +79,7 @@ public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMe
 	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(gui, i, j, 0, 0, this.imageWidth, this.imageHeight);
+		matrixStack.blit(RenderType::guiTextured, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
@@ -224,7 +225,7 @@ public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMe
 		@Override
 		protected void renderEntry(GuiGraphics st, int x, int y, int width, int height, LinkChannel id, int mouseX,
 				int mouseY, float pt) {
-			st.blitSprite(id.publicChannel ? publicChannel : privateChannel, x + width - 16, y, 16, 16);
+			st.blitSprite(RenderType::guiTextured, id.publicChannel ? publicChannel : privateChannel, x + width - 16, y, 16, 16);
 		}
 
 		@Override

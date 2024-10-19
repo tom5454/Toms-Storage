@@ -6,15 +6,9 @@
     "SCS"
   ],
   "key": {
-  	"S": {
-      "item": "minecraft:smooth_stone"
-    },
-    "C": {
-      "tag": "c:chests"
-    },
-    "I": {
-      "tag": "c:ingots/iron"
-    }
+  	"S": "minecraft:smooth_stone",
+    "C": "#c:chests",
+    "I": "#c:ingots/iron"
   },
   "result": {
     "id": "toms_storage:filing_cabinet"

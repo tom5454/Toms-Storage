@@ -27,8 +27,8 @@ import com.tom.storagemod.client.ClientUtil;
 
 public class PaintKitItem extends Item {
 
-	public PaintKitItem() {
-		super(new Properties().durability(100));
+	public PaintKitItem(Item.Properties pr) {
+		super(pr);
 	}
 
 	@Override

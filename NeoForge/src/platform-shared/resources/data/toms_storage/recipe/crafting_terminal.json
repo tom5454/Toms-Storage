@@ -6,15 +6,9 @@
     "cdc"
   ],
   "key": {
-  	"d": {
-      "tag": "c:gems/diamond"
-    },
-    "c": {
-      "item": "minecraft:crafting_table"
-    },
-    "t": {
-      "item": "toms_storage:storage_terminal"
-    }
+  	"d": "#c:gems/diamond",
+    "c": "minecraft:crafting_table",
+    "t": "toms_storage:storage_terminal"
   },
   "result": {
     "id": "toms_storage:crafting_terminal"

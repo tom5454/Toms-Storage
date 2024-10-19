@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -27,8 +27,8 @@ import com.tom.storagemod.util.BlockFaceReference;
 
 public class FilterItem extends Item implements IItemFilter {
 
-	public FilterItem() {
-		super(new Properties().stacksTo(1));
+	public FilterItem(Item.Properties pr) {
+		super(pr);
 	}
 
 	@Override
@@ -65,10 +65,10 @@ public class FilterItem extends Item implements IItemFilter {
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+	public InteractionResult use(Level world, Player player, InteractionHand hand) {
 		ItemStack is = player.getItemInHand(hand);
 		openGui(is, player, () -> player.getItemInHand(hand).getItem() == this, null);
-		return InteractionResultHolder.sidedSuccess(is, world.isClientSide);
+		return InteractionResult.SUCCESS_SERVER;
 	}
 
 	@Override

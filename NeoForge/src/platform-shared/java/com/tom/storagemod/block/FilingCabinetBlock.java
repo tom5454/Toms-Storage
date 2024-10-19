@@ -3,6 +3,7 @@ package com.tom.storagemod.block;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
@@ -14,17 +15,14 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.mojang.serialization.MapCodec;
@@ -33,11 +31,11 @@ import com.tom.storagemod.block.entity.FilingCabinetBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
 public class FilingCabinetBlock extends BaseEntityBlock {
-	public static final MapCodec<FilingCabinetBlock> CODEC = ChestBlock.simpleCodec(properties -> new FilingCabinetBlock());
-	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+	public static final MapCodec<FilingCabinetBlock> CODEC = simpleCodec(FilingCabinetBlock::new);
+	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-	public FilingCabinetBlock() {
-		super(Block.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).strength(3));
+	public FilingCabinetBlock(Block.Properties pr) {
+		super(pr);
 	}
 
 	@Override

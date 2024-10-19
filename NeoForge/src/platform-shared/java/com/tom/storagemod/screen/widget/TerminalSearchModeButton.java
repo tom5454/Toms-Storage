@@ -3,6 +3,7 @@ package com.tom.storagemod.screen.widget;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -78,10 +79,10 @@ public class TerminalSearchModeButton extends IconButton {
 	protected void drawIcon(GuiGraphics st, int mouseX, int mouseY, float pt) {
 		int x = getX();
 		int y = getY();
-		st.blitSprite(ICON, x + 1, y + 1, 14, 14);
-		if((searchType & 1) > 0)st.blitSprite(AUTO, x + 1, y + 1, 14, 14);
-		if((searchType & 2) > 0)st.blitSprite(KEEP, x + 1, y + 1, 14, 14);
-		if((searchType & 4) > 0)st.blitSprite(SYNC, x + 1, y + 1, 14, 14);
+		st.blitSprite(RenderType::guiTextured, ICON, x + 1, y + 1, 14, 14);
+		if((searchType & 1) > 0)st.blitSprite(RenderType::guiTextured, AUTO, x + 1, y + 1, 14, 14);
+		if((searchType & 2) > 0)st.blitSprite(RenderType::guiTextured, KEEP, x + 1, y + 1, 14, 14);
+		if((searchType & 4) > 0)st.blitSprite(RenderType::guiTextured, SYNC, x + 1, y + 1, 14, 14);
 	}
 
 	public void setSearchType(int searchType) {

@@ -1,7 +1,5 @@
 package com.tom.storagemod.item;
 
-import java.util.function.Function;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -15,15 +13,7 @@ import com.tom.storagemod.Content;
 
 public class PaintedBlockItem extends BlockItem {
 
-	public static Function<Block, Item> makeHidden() {
-		return b -> new PaintedBlockItem(b, new Item.Properties());
-	}
-
-	public static Function<Block, Item> make() {
-		return b -> new PaintedBlockItem(b, new Properties());
-	}
-
-	private PaintedBlockItem(Block block, Item.Properties p) {
+	public PaintedBlockItem(Block block, Item.Properties p) {
 		super(block, p);
 	}
 

@@ -9,17 +9,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MapColor;
+
+import com.mojang.serialization.MapCodec;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.client.ClientUtil;
 
 public class TrimBlock extends Block implements IPaintable {
+	public static final MapCodec<TrimBlock> CODEC = simpleCodec(TrimBlock::new);
 
-	public TrimBlock() {
-		super(Block.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3));
+	public TrimBlock(Block.Properties pr) {
+		super(pr);
 	}
 
 	@Override
@@ -33,5 +34,10 @@ public class TrimBlock extends Block implements IPaintable {
 	public boolean paint(Level world, BlockPos pos, BlockState to) {
 		world.setBlockAndUpdate(pos, Content.paintedTrim.get().defaultBlockState());
 		return Content.paintedTrim.get().paint(world, pos, to);
+	}
+
+	@Override
+	protected MapCodec<? extends Block> codec() {
+		return CODEC;
 	}
 }

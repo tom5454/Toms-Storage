@@ -18,6 +18,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -415,7 +416,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		i = k;
 		j = l;
 		k = j1;
-		st.blitSprite(this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
+		st.blitSprite(RenderType::guiTextured, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
 
 		searchField.render(st, mouseX, mouseY, partialTicks);
 
@@ -479,7 +480,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		if (mouseX >= getGuiLeft() + slot.xDisplayPosition - 1 && mouseY >= getGuiTop() + slot.yDisplayPosition - 1 && mouseX < getGuiLeft() + slot.xDisplayPosition + 17 && mouseY < getGuiTop() + slot.yDisplayPosition + 17) {
 			int l = slot.xDisplayPosition;
 			int t = slot.yDisplayPosition;
-			renderSlotHighlight(st, l, t, 0);
+			st.fill(l, t, l + 16, t + 16, -2130706433);
+			renderSlot(st, fakeSlotUnderMouse);
 			return true;
 		}
 		return false;
@@ -610,6 +612,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		return ControllMode.VALUES[controllMode];
 	}
 
+	@Override
 	public Font getFont() {
 		return font;
 	}
@@ -653,22 +656,22 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	@Override
 	protected void renderBg(GuiGraphics st, float partialTicks, int mouseX, int mouseY) {
 		if(tallMode) {
-			st.blit(getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY);
+			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY, 256, 256);
 			int guiStart = textureSlotCount * 18 + slotStartY;
 			int guiRStart = rowCount * 18 + slotStartY;
 			int guiSize = guiHeight - textureSlotCount * 18 - slotStartY;
-			st.blit(getGui(), this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize);
+			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize, 256, 256);
 			int scrollbarW = 25;
-			st.blit(getGui(), this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18);
+			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 			for (int i = 1;i < rowCount - 1;i++) {
-				st.blit(getGui(), this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18);
+				st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 			}
-			st.blit(getGui(), this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18);
+			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 		} else
-			st.blit(getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 
 		Slot offh = getMenu().offhand;
-		st.blitSprite(FLOATING_SLOT, this.leftPos + offh.x - 8, this.topPos + offh.y - 8, 32, 32);
+		st.blitSprite(RenderType::guiTextured, FLOATING_SLOT, this.leftPos + offh.x - 8, this.topPos + offh.y - 8, 32, 32);
 	}
 
 	protected void onUpdateSearch(String text) {}

@@ -6,18 +6,10 @@
     " H "
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "c": {
-      "item": "toms_storage:inventory_cable"
-    },
-    "H": {
-      "item": "minecraft:comparator"
-    },
-	"t": {
-	  "item": "minecraft:redstone_torch"
-	}
+  	"P": "#minecraft:planks",
+    "c": "toms_storage:inventory_cable",
+    "H": "minecraft:comparator",
+	"t": "minecraft:redstone_torch"
   },
   "result": {
     "id": "toms_storage:level_emitter"

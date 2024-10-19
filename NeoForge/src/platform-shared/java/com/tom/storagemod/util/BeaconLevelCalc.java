@@ -17,7 +17,7 @@ public class BeaconLevelCalc {
 
 			for(int j = 1; j <= 4; i = j++) {
 				int k = y - j;
-				if (k < world.getMinBuildHeight()) {
+				if (k < world.getMinY()) {
 					break;
 				}
 

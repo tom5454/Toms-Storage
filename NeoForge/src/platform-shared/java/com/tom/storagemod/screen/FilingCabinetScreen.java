@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -56,7 +57,7 @@ public class FilingCabinetScreen extends PlatformContainerScreen<FilingCabinetMe
 		i = k;
 		j = l;
 		k = j1;
-		st.blitSprite(SCROLLER_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
+		st.blitSprite(RenderType::guiTextured, SCROLLER_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
 		this.renderTooltip(st, mouseX, mouseY);
 	}
 
@@ -64,9 +65,9 @@ public class FilingCabinetScreen extends PlatformContainerScreen<FilingCabinetMe
 	protected void renderBg(GuiGraphics st, float p_282334_, int p_282603_, int p_282158_) {
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		st.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17);
-		st.blit(CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96);
-		st.blit(SIDE_SCROLLBAR, i + 170, j, 0, 0, 24, 115, 24, 115);
+		st.blit(RenderType::guiTextured, CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17, 256, 256);
+		st.blit(RenderType::guiTextured, CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96, 256, 256);
+		st.blit(RenderType::guiTextured, SIDE_SCROLLBAR, i + 170, j, 0, 0, 24, 115, 24, 115, 256, 256);
 	}
 
 	@Override

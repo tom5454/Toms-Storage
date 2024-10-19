@@ -6,13 +6,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -31,8 +31,8 @@ import com.tom.storagemod.platform.PlatformItem;
 
 public class InventoryConfiguratorItem extends PlatformItem implements ILeftClickListener {
 
-	public InventoryConfiguratorItem() {
-		super(new Properties().stacksTo(1).component(Content.configuratorComponent.get(), ConfiguratorComponent.empty()));
+	public InventoryConfiguratorItem(Item.Properties pr) {
+		super(pr);
 	}
 
 	@Override
@@ -44,9 +44,9 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		action(level, player, player.getItemInHand(hand), true, null, hand);
-		return InteractionResultHolder.success(player.getItemInHand(hand));
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override

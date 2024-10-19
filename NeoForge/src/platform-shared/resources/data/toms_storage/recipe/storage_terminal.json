@@ -6,21 +6,11 @@
     "PCP"
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "c": {
-      "tag": "c:chests"
-    },
-    "C": {
-      "item": "minecraft:comparator"
-    },
-    "G": {
-      "tag": "c:dusts/glowstone"
-    },
-    "g": {
-      "tag": "c:glass_blocks/colorless"
-    }
+  	"P": "#minecraft:planks",
+    "c": "#c:chests",
+    "C": "minecraft:comparator",
+    "G": "#c:dusts/glowstone",
+    "g": "#c:glass_blocks/colorless"
   },
   "result": {
     "id": "toms_storage:storage_terminal"

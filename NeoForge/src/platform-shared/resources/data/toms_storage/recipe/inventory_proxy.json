@@ -6,15 +6,9 @@
     "PTP"
   ],
   "key": {
-  	"P": {
-      "tag": "minecraft:planks"
-    },
-    "C": {
-      "tag": "c:chests"
-    },
-    "T": {
-      "tag": "minecraft:trapdoors"
-    }
+  	"P": "#minecraft:planks",
+    "C": "#c:chests",
+    "T": "#minecraft:trapdoors"
   },
   "result": {
     "id": "toms_storage:inventory_proxy"

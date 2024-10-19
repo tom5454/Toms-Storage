@@ -6,15 +6,9 @@
     "RSR"
   ],
   "key": {
-  	"R": {
-      "tag": "c:dusts/redstone"
-    },
-    "W": {
-      "tag": "minecraft:wool"
-    },
-    "S": {
-      "tag": "c:rods/wooden"
-    }
+  	"R": "#c:dusts/redstone",
+    "W": "#minecraft:wool",
+    "S": "#c:rods/wooden"
   },
   "result": {
     "id": "toms_storage:item_filter"

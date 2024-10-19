@@ -6,7 +6,7 @@ import java.util.List;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
@@ -105,13 +105,12 @@ public class CraftingMatrix implements CraftingContainer {
 	}
 
 	@Override
-	public void fillStackedContents(StackedContents stackedContents) {
+	public void fillStackedContents(StackedItemContents stackedItemContents) {
 		Iterator<ItemStack> var2 = this.items.iterator();
 
 		while (var2.hasNext()) {
 			ItemStack itemStack = var2.next();
-			stackedContents.accountSimpleStack(itemStack);
+			stackedItemContents.accountSimpleStack(itemStack);
 		}
-
 	}
 }

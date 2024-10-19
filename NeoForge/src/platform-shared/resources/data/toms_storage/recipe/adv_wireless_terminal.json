@@ -1,15 +1,9 @@
 {
   "type": "minecraft:smithing_transform",
-  "base": {
-    "item": "toms_storage:wireless_terminal"
-  },
-  "addition": {
-    "item": "minecraft:netherite_ingot"
-  },
+  "base": "toms_storage:wireless_terminal",
+  "addition": "minecraft:netherite_ingot",
   "result": {
     "id": "toms_storage:adv_wireless_terminal"
   },
-  "template": {
-    "item": "minecraft:netherite_upgrade_smithing_template"
-  }
+  "template": "minecraft:netherite_upgrade_smithing_template"
 }

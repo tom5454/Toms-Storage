@@ -12,6 +12,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
+import net.minecraft.world.level.redstone.Orientation;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.LevelEmitterBlock;
@@ -61,8 +63,10 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 			Direction direction = state.getValue(LevelEmitterBlock.FACING);
 			BlockPos blockpos = worldPosition.relative(direction);
 			if (Platform.notifyBlocks(level, worldPosition, direction)) {
-				level.neighborChanged(blockpos, state.getBlock(), worldPosition);
-				level.updateNeighborsAtExceptFromFacing(blockpos, state.getBlock(), direction.getOpposite());
+				final Orientation orientation = ExperimentalRedstoneUtils.initialOrientation(level, direction,
+						direction.getAxis().isHorizontal() ? Direction.UP : direction);
+				level.updateNeighborsAt(blockpos, state.getBlock(), orientation);
+				level.updateNeighborsAt(blockpos.relative(direction), state.getBlock(), orientation);
 			}
 		}
 	}

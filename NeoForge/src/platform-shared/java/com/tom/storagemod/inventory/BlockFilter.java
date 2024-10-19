@@ -1,20 +1,21 @@
 package com.tom.storagemod.inventory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import com.tom.storagemod.StorageTags;
 import com.tom.storagemod.inventory.filter.IFilter;
@@ -35,12 +36,40 @@ public class BlockFilter implements IFilter {
 	private boolean filterNeedsUpdate = true;
 	private boolean multiblockFilled;
 
+	private static record BlockFilterState(BlockPos pos, List<BlockPos> connected, boolean skip, Direction side, ItemStack filter, Priority priority, boolean keepLast) {}
+
+	private static final Codec<BlockFilterState> STATE_CODEC = RecordCodecBuilder.<BlockFilterState>mapCodec(b -> {
+		return b.group(
+				BlockPos.CODEC.fieldOf("pos").forGetter(BlockFilterState::pos),
+				Codec.list(BlockPos.CODEC).fieldOf("connected").forGetter(BlockFilterState::connected),
+				Codec.BOOL.fieldOf("skip").forGetter(BlockFilterState::skip),
+				Direction.CODEC.fieldOf("side").forGetter(BlockFilterState::side),
+				ItemStack.OPTIONAL_CODEC.fieldOf("filter").forGetter(BlockFilterState::filter),
+				Priority.CODEC.fieldOf("priority").forGetter(BlockFilterState::priority),
+				Codec.BOOL.fieldOf("keep_last").forGetter(BlockFilterState::keepLast)
+				).apply(b, BlockFilterState::new);
+	}).codec();
+	public static final Codec<BlockFilter> CODEC = STATE_CODEC.xmap(BlockFilter::new, BlockFilter::storeState);
+
 	public BlockFilter(BlockPos pos) {
 		this.pos = pos;
 		side = Direction.DOWN;
 		priority = Priority.NORMAL;
 		connected = new HashSet<>();
 		connected.add(pos);
+		filter.addListener(__ -> markFilterDirty());
+	}
+
+	public BlockFilter(BlockFilterState state) {
+		this.pos = state.pos();
+		this.connected = new HashSet<>(state.connected());
+		this.skip = state.skip();
+		this.side = state.side();
+		filter.setItem(0, state.filter());
+		this.priority = state.priority();
+		this.keepLast = state.keepLast();
+		multiblockFilled = true;
+
 		filter.addListener(__ -> markFilterDirty());
 	}
 
@@ -56,41 +85,8 @@ public class BlockFilter implements IFilter {
 		return side;
 	}
 
-	public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-		CompoundTag tag = new CompoundTag();
-		ListTag conn = new ListTag();
-		connected.forEach(e -> {
-			CompoundTag t = new CompoundTag();
-			t.putInt("x", e.getX() - pos.getX());
-			t.putInt("y", e.getY() - pos.getY());
-			t.putInt("z", e.getZ() - pos.getZ());
-			conn.add(t);
-		});
-		tag.put("connected", conn);
-		tag.putBoolean("skip", skip);
-		tag.putString("side", side.getSerializedName());
-		if (!filter.getItem(0).isEmpty())
-			tag.put("filter", filter.getItem(0).save(provider));
-		tag.putInt("priority", priority.ordinal());
-		tag.putBoolean("keepLast", keepLast);
-		return tag;
-	}
-
-	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-		ListTag conn = tag.getList("connected", Tag.TAG_COMPOUND);
-		for (int i = 0;i<conn.size();i++) {
-			CompoundTag t = conn.getCompound(i);
-			int x = t.getInt("x") + pos.getX();
-			int y = t.getInt("y") + pos.getY();
-			int z = t.getInt("z") + pos.getZ();
-			connected.add(new BlockPos(x, y, z));
-		}
-		skip = tag.getBoolean("skip");
-		side = Direction.byName(tag.getString("side"));
-		filter.setItem(0, ItemStack.parseOptional(provider, tag.getCompound("filter")));
-		priority = Priority.VALUES[Math.abs(tag.getInt("priority")) % Priority.VALUES.length];
-		keepLast = tag.getBoolean("keepLast");
-		multiblockFilled = true;
+	public BlockFilterState storeState() {
+		return new BlockFilterState(pos, new ArrayList<>(connected), skip, side, filter.getItem(0).copy(), priority, keepLast);
 	}
 
 	public void dropContents(LevelAccessor level, BlockPos pos2) {

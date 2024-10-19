@@ -8,6 +8,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -32,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.tom.storagemod.inventory.BlockFilter;
 import com.tom.storagemod.inventory.PlatformItemHandler;
 import com.tom.storagemod.item.ILeftClickListener;
 import com.tom.storagemod.item.WirelessTerminal;
@@ -58,6 +61,8 @@ public class StorageMod implements ModInitializer {
 	public static ConfigHolder<Config> configHolder = AutoConfig.register(Config.class, GsonConfigSerializer::new);
 	private static Config LOADED_CONFIG = configHolder.getConfig();
 	public static Config CONFIG = new Config();
+
+	public static final AttachmentType<BlockFilter> BLOCK_FILTER = AttachmentRegistry.createPersistent(ResourceLocation.tryBuild(StorageMod.modid, "block_filter"), BlockFilter.CODEC);
 
 	public static boolean polymorph;
 
@@ -138,13 +143,17 @@ public class StorageMod implements ModInitializer {
 
 		PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, entity) -> {
 			if (entity != null) {
-				StorageModComponents.BLOCK_FILTER.get(entity).remove(world, pos);
+				var bf = entity.getAttachedOrElse(BLOCK_FILTER, null);
+				if (bf != null) {
+					bf.dropContents(world, pos);
+					entity.removeAttached(BLOCK_FILTER);
+				}
 			}
 		});
 
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((be, w) -> {
 			if (be instanceof OnLoadListener l)
-				w.getServer().tell(new TickTask(0, () -> {
+				w.getServer().schedule(new TickTask(0, () -> {
 					l.onLoad();
 				}));
 		});

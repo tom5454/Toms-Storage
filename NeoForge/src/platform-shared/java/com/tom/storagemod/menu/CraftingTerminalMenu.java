@@ -2,16 +2,15 @@ package com.tom.storagemod.menu;
 
 import java.util.List;
 
-import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.recipebook.ServerPlaceRecipe;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
@@ -19,8 +18,8 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import com.google.common.collect.Lists;
@@ -185,7 +184,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		return false;
 	}
 
-	@Override
+	/*@Override
 	public void fillCraftSlotsStackedContents(StackedContents itemHelperIn) {
 		this.craftMatrix.fillStackedContents(itemHelperIn);
 		if(te != null)sync.fillStackedContents(itemHelperIn);
@@ -223,20 +222,20 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public int getSize() {
 		return 10;
-	}
+	}*/
 
 	@Override
-	public java.util.List<RecipeBookCategories> getRecipeBookCategories() {
-		return Lists.newArrayList(RecipeBookCategories.CRAFTING_SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
+	public java.util.List<RecipeBookCategory> getRecipeBookCategories() {
+		return Lists.newArrayList(RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
 	}
 
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	@Override
 	public void handlePlacement(boolean p_40119_, RecipeHolder<?> p_300860_, ServerPlayer p_40121_) {
 		new RecipePlacer().recipeClicked(p_40121_, (RecipeHolder<CraftingRecipe>) p_300860_, p_40119_);
 	}
 
-	private class RecipePlacer extends ServerPlaceRecipe<CraftingInput, CraftingRecipe> {
+	private class RecipePlacer extends ServerPlaceRecipe<CraftingRecipe> {
 
 		public RecipePlacer() {
 			super(CraftingTerminalMenu.this);
@@ -280,7 +279,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 			((CraftingTerminalBlockEntity) te).clear();
 			this.menu.clearCraftingContent();
 		}
-	}
+	}*/
 
 	@Override
 	public void receive(CompoundTag message) {
@@ -314,5 +313,20 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public boolean isSmartSearch() {
 		return (searchType & 8) == 0;
+	}
+
+	@Override
+	public PostPlaceAction handlePlacement(boolean bl, boolean bl2, RecipeHolder<?> recipeHolder,
+			ServerLevel serverLevel, Inventory inventory) {
+		return PostPlaceAction.NOTHING;
+	}
+
+	@Override
+	public void fillCraftSlotsStackedContents(StackedItemContents stackedItemContents) {
+		this.craftMatrix.fillStackedContents(stackedItemContents);
+		if(te != null)sync.fillStackedContents(stackedItemContents);
+		else itemList.forEach(e -> {
+			stackedItemContents.accountSimpleStack(e.getActualStack());
+		});
 	}
 }

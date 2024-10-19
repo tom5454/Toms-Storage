@@ -1,7 +1,8 @@
 package com.tom.storagemod;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.flag.FeatureFlags;
@@ -12,9 +13,11 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
 
 import com.tom.storagemod.block.BasicInventoryHopperBlock;
 import com.tom.storagemod.block.CraftingTerminalBlock;
@@ -64,32 +67,33 @@ import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.TagItemFilterMenu;
 import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.platform.GameObject.GameObjectBlockEntity;
+import com.tom.storagemod.platform.GameObject.GameRegistryBE.BEFactory;
 import com.tom.storagemod.platform.Platform;
 
 public class Content {
-	public static final GameObject<InventoryConnectorBlock> connector = blockWithItem("inventory_connector", InventoryConnectorBlock::new);
-	public static final GameObject<StorageTerminalBlock> terminal = blockWithItem("storage_terminal", StorageTerminalBlock::new);
-	public static final GameObject<CraftingTerminalBlock> craftingTerminal = blockWithItem("crafting_terminal", CraftingTerminalBlock::new);
-	public static final GameObject<OpenCrateBlock> openCrate = blockWithItem("open_crate", OpenCrateBlock::new);
-	public static final GameObject<TrimBlock> inventoryTrim = blockWithItem("trim", TrimBlock::new);
-	public static final GameObject<PaintedTrimBlock> paintedTrim = blockWithItemNoTab("painted_trim", PaintedTrimBlock::new, PaintedBlockItem.makeHidden());
-	public static final GameObject<LevelEmitterBlock> levelEmitter = blockWithItem("level_emitter", LevelEmitterBlock::new);
-	public static final GameObject<InventoryCableBlock> invCable = blockWithItem("inventory_cable", InventoryCableBlock::new);
-	public static final GameObject<FramedInventoryCableBlock> invCableFramed = blockWithItem("inventory_cable_framed", FramedInventoryCableBlock::new, PaintedBlockItem.make());
-	public static final GameObject<BasicInventoryHopperBlock> basicInvHopper = blockWithItem("basic_inventory_hopper", BasicInventoryHopperBlock::new);
-	public static final GameObject<InventoryInterfaceBlock> invInterface = blockWithItem("inventory_interface", InventoryInterfaceBlock::new);
-	public static final GameObject<FilingCabinetBlock> filingCabinet = blockWithItem("filing_cabinet", FilingCabinetBlock::new);
-	public static final GameObject<InventoryCableConnectorBlock> invCableConnector = blockWithItem("inventory_cable_connector", InventoryCableConnectorBlock::new);
-	public static final GameObject<FramedInventoryCableConnectorBlock> invCableConnectorFramed = blockWithItem("inventory_cable_connector_framed", FramedInventoryCableConnectorBlock::new);
-	public static final GameObject<InventoryProxyBlock> invProxy = blockWithItem("inventory_proxy", InventoryProxyBlock::new);
+	public static final GameObject<InventoryConnectorBlock> connector = blockWithItem("inventory_connector", InventoryConnectorBlock::new, p -> wooden(p));
+	public static final GameObject<StorageTerminalBlock> terminal = blockWithItem("storage_terminal", StorageTerminalBlock::new, p -> wooden(p).lightLevel(s -> 6));
+	public static final GameObject<CraftingTerminalBlock> craftingTerminal = blockWithItem("crafting_terminal", CraftingTerminalBlock::new, p -> wooden(p).lightLevel(s -> 6));
+	public static final GameObject<OpenCrateBlock> openCrate = blockWithItem("open_crate", OpenCrateBlock::new, p -> wooden(p));
+	public static final GameObject<TrimBlock> inventoryTrim = blockWithItem("trim", TrimBlock::new, p -> wooden(p));
+	public static final GameObject<PaintedTrimBlock> paintedTrim = blockWithItemNoTab("painted_trim", PaintedTrimBlock::new, PaintedBlockItem::new, p -> wooden(p), p -> p);
+	public static final GameObject<LevelEmitterBlock> levelEmitter = blockWithItem("level_emitter", LevelEmitterBlock::new, p -> wooden(p).noOcclusion());
+	public static final GameObject<InventoryCableBlock> invCable = blockWithItem("inventory_cable", InventoryCableBlock::new, p -> wooden(p));
+	public static final GameObject<FramedInventoryCableBlock> invCableFramed = blockWithItem("inventory_cable_framed", FramedInventoryCableBlock::new, PaintedBlockItem::new, p -> wooden(p).noOcclusion(), p -> p);
+	public static final GameObject<BasicInventoryHopperBlock> basicInvHopper = blockWithItem("basic_inventory_hopper", BasicInventoryHopperBlock::new, p -> wooden(p).noOcclusion());
+	public static final GameObject<InventoryInterfaceBlock> invInterface = blockWithItem("inventory_interface", InventoryInterfaceBlock::new, p -> wooden(p));
+	public static final GameObject<FilingCabinetBlock> filingCabinet = blockWithItem("filing_cabinet", FilingCabinetBlock::new, p -> p.mapColor(MapColor.STONE).sound(SoundType.STONE).strength(3));
+	public static final GameObject<InventoryCableConnectorBlock> invCableConnector = blockWithItem("inventory_cable_connector", InventoryCableConnectorBlock::new, p -> wooden(p).noOcclusion());
+	public static final GameObject<FramedInventoryCableConnectorBlock> invCableConnectorFramed = blockWithItem("inventory_cable_connector_framed", FramedInventoryCableConnectorBlock::new, p -> wooden(p));
+	public static final GameObject<InventoryProxyBlock> invProxy = blockWithItem("inventory_proxy", InventoryProxyBlock::new, p -> wooden(p));
 
-	public static final GameObject<PaintKitItem> paintingKit = item("paint_kit", PaintKitItem::new);
-	public static final GameObject<WirelessTerminalItem> wirelessTerminal = item("wireless_terminal", WirelessTerminalItem::new);
-	public static final GameObject<AdvWirelessTerminalItem> advWirelessTerminal = item("adv_wireless_terminal", AdvWirelessTerminalItem::new);
-	public static final GameObject<FilterItem> itemFilter = item("item_filter", FilterItem::new);
-	public static final GameObject<PolyFilterItem> polyItemFilter = item("polymorphic_item_filter", PolyFilterItem::new);
-	public static final GameObject<TagFilterItem> tagItemFilter = item("tag_item_filter", TagFilterItem::new);
-	public static final GameObject<InventoryConfiguratorItem> invConfig = item("inventory_configurator", InventoryConfiguratorItem::new);
+	public static final GameObject<PaintKitItem> paintingKit = item("paint_kit", PaintKitItem::new, p -> p.durability(100));
+	public static final GameObject<WirelessTerminalItem> wirelessTerminal = item("wireless_terminal", WirelessTerminalItem::new, p -> p.stacksTo(1));
+	public static final GameObject<AdvWirelessTerminalItem> advWirelessTerminal = item("adv_wireless_terminal", AdvWirelessTerminalItem::new, p -> p.stacksTo(1));
+	public static final GameObject<FilterItem> itemFilter = item("item_filter", FilterItem::new, p -> p.stacksTo(1));
+	public static final GameObject<PolyFilterItem> polyItemFilter = item("polymorphic_item_filter", PolyFilterItem::new, p -> p.stacksTo(1));
+	public static final GameObject<TagFilterItem> tagItemFilter = item("tag_item_filter", TagFilterItem::new, p -> p.stacksTo(1));
+	public static final GameObject<InventoryConfiguratorItem> invConfig = item("inventory_configurator", InventoryConfiguratorItem::new, p -> p.stacksTo(1).component(Content.configuratorComponent.get(), ConfiguratorComponent.empty()));
 
 	public static final GameObjectBlockEntity<InventoryConnectorBlockEntity> connectorBE = blockEntity("inventory_connector", InventoryConnectorBlockEntity::new, connector);
 	public static final GameObjectBlockEntity<OpenCrateBlockEntity> openCrateBE = blockEntity("open_crate", OpenCrateBlockEntity::new, openCrate);
@@ -118,33 +122,37 @@ public class Content {
 	public static final GameObject<DataComponentType<TagFilterComponent>> tagFilterComponent = Platform.DATA_COMPONENT_TYPES.register("tag_filter", () -> DataComponentType.<TagFilterComponent>builder().persistent(TagFilterComponent.CODEC).build());
 	public static final GameObject<DataComponentType<ConfiguratorComponent>> configuratorComponent = Platform.DATA_COMPONENT_TYPES.register("configurator", () -> DataComponentType.<ConfiguratorComponent>builder().persistent(ConfiguratorComponent.CODEC).build());
 
-	private static <B extends Block> GameObject<B> blockWithItem(String name, Supplier<B> create) {
-		return blockWithItem(name, create, b -> new BlockItem(b, new Properties()));
+	private static BlockBehaviour.Properties wooden(BlockBehaviour.Properties p) {
+		return p.mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3);
 	}
 
-	private static <B extends Block, I extends Item> GameObject<B> blockWithItem(String name, Supplier<B> create, Function<Block, I> createItem) {
-		GameObject<B> re = Platform.BLOCKS.register(name, create);
-		item(name, () -> createItem.apply(re.get()));
+	private static <B extends Block> GameObject<B> blockWithItem(String name, Function<BlockBehaviour.Properties, B> create, UnaryOperator<BlockBehaviour.Properties> defaultProps) {
+		return blockWithItem(name, create, BlockItem::new, defaultProps, UnaryOperator.identity());
+	}
+
+	private static <B extends Block, I extends Item> GameObject<B> blockWithItem(String name, Function<BlockBehaviour.Properties, B> create, BiFunction<Block, Item.Properties, I> createItem, UnaryOperator<BlockBehaviour.Properties> defaultProps, UnaryOperator<Item.Properties> defaultItemProps) {
+		GameObject<B> re = Platform.BLOCKS.register(name, k -> create.apply(defaultProps.apply(BlockBehaviour.Properties.of().setId(k))));
+		item(name, p -> createItem.apply(re.get(), p), p -> defaultItemProps.apply(p.useBlockDescriptionPrefix()));
 		return re;
 	}
 
-	private static <B extends Block, I extends Item> GameObject<B> blockWithItemNoTab(String name, Supplier<B> create, Function<Block, I> createItem) {
-		GameObject<B> re = Platform.BLOCKS.register(name, create);
-		itemNoTab(name, () -> createItem.apply(re.get()));
+	private static <B extends Block, I extends Item> GameObject<B> blockWithItemNoTab(String name, Function<BlockBehaviour.Properties, B> create, BiFunction<Block, Item.Properties, I> createItem, UnaryOperator<BlockBehaviour.Properties> defaultProps, UnaryOperator<Item.Properties> defaultItemProps) {
+		GameObject<B> re = Platform.BLOCKS.register(name, k -> create.apply(defaultProps.apply(BlockBehaviour.Properties.of().setId(k))));
+		itemNoTab(name, p -> createItem.apply(re.get(), p), p -> defaultItemProps.apply(p.useBlockDescriptionPrefix()));
 		return re;
 	}
 
-	private static <I extends Item> GameObject<I> item(String name, Supplier<I> fact) {
-		return Platform.ITEMS.register(name, () -> Platform.addItemToTab(fact.get()));
+	private static <I extends Item> GameObject<I> item(String name, Function<Item.Properties, I> fact, UnaryOperator<Item.Properties> defaultProps) {
+		return itemNoTab(name, p -> Platform.addItemToTab(fact.apply(p)), defaultProps);
 	}
 
-	private static <I extends Item> GameObject<I> itemNoTab(String name, Supplier<I> fact) {
-		return Platform.ITEMS.register(name, fact);
+	private static <I extends Item> GameObject<I> itemNoTab(String name, Function<Item.Properties, I> fact, UnaryOperator<Item.Properties> defaultProps) {
+		return Platform.ITEMS.register(name, k -> fact.apply(defaultProps.apply(new Properties().setId(k))));
 	}
 
 	@SuppressWarnings("unchecked")
 	@SafeVarargs
-	private static <BE extends BlockEntity> GameObjectBlockEntity<BE> blockEntity(String name, BlockEntitySupplier<? extends BE> create, GameObject<? extends Block>... blocks) {
+	private static <BE extends BlockEntity> GameObjectBlockEntity<BE> blockEntity(String name, BEFactory<? extends BE> create, GameObject<? extends Block>... blocks) {
 		return (GameObjectBlockEntity<BE>) Platform.BLOCK_ENTITY.registerBE(name, create, blocks);
 	}
 

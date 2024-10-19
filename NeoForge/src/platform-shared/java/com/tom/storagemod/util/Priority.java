@@ -2,8 +2,12 @@ package com.tom.storagemod.util;
 
 import java.util.Comparator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
+
+import com.mojang.serialization.Codec;
 
 public enum Priority {
 	LOWEST,
@@ -13,6 +17,9 @@ public enum Priority {
 	HIGHEST
 	;
 	public static final Priority[] VALUES = values();
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static final Codec<Priority> CODEC = StringRepresentable.fromEnum((Supplier) Priority::values);
 
 	public static interface IPriority {
 		public static final Function<Object, Priority> GETTER = IPriority::get;
