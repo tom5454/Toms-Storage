@@ -19,7 +19,7 @@ import com.tom.storagemod.screen.widget.IconButton;
 import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.Priority;
 
-public class InventoryConfiguratorScreen extends PlatformContainerScreen<InventoryConfiguratorMenu> {
+public class InventoryConfiguratorScreen extends TSContainerScreen<InventoryConfiguratorMenu> {
 	private static final ResourceLocation GUI_TEXTURES = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/inventory_configurator.png");
 	protected EnumCycleButton<Priority> buttonPriority;
 	protected EnumCycleButton<Direction> buttonSide;

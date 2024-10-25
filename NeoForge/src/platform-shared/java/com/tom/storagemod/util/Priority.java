@@ -1,15 +1,15 @@
 package com.tom.storagemod.util;
 
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 
 import com.mojang.serialization.Codec;
 
-public enum Priority {
+public enum Priority implements StringRepresentable {
 	LOWEST,
 	LOW,
 	NORMAL,
@@ -17,9 +17,13 @@ public enum Priority {
 	HIGHEST
 	;
 	public static final Priority[] VALUES = values();
+	private final String name;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static final Codec<Priority> CODEC = StringRepresentable.fromEnum((Supplier) Priority::values);
+	private Priority() {
+		name = name().toLowerCase(Locale.ROOT);
+	}
+
+	public static final Codec<Priority> CODEC = StringRepresentable.fromEnum(Priority::values);
 
 	public static interface IPriority {
 		public static final Function<Object, Priority> GETTER = IPriority::get;
@@ -48,5 +52,10 @@ public enum Priority {
 
 	public static Priority fromSorting(int sorting) {
 		return Priority.values()[Mth.clamp(sorting + 2, 0, Priority.values().length - 1)];
+	}
+
+	@Override
+	public String getSerializedName() {
+		return name;
 	}
 }

@@ -1,5 +1,13 @@
 accessWidener	v1	named
 accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent searchBox Lnet/minecraft/client/gui/components/EditBox;
+accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent ghostSlots Lnet/minecraft/client/gui/screens/recipebook/GhostSlots;
+
+accessible field net/minecraft/client/gui/screens/recipebook/GhostSlots ingredients Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
+accessible field net/minecraft/client/gui/screens/recipebook/GhostSlots slotSelectTime Lnet/minecraft/client/gui/screens/recipebook/SlotSelectTime;
+accessible class net/minecraft/client/gui/screens/recipebook/GhostSlots$GhostSlot
 
 mutable field net/minecraft/world/inventory/Slot x I
 mutable field net/minecraft/world/inventory/Slot y I
+
+accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots setInput (Lnet/minecraft/world/inventory/Slot;Lnet/minecraft/util/context/ContextMap;Lnet/minecraft/world/item/crafting/display/SlotDisplay;)V
+accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots setResult (Lnet/minecraft/world/inventory/Slot;Lnet/minecraft/util/context/ContextMap;Lnet/minecraft/world/item/crafting/display/SlotDisplay;)V

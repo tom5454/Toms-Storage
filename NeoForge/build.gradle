@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.142'
+    id 'net.neoforged.gradle.userdev' version '7.0.165'
 }
 
 version = mod_version
@@ -31,7 +31,7 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-1.21'
+    archivesName = 'toms_storage-1.21.3'
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -68,7 +68,7 @@ runs {
 
     server {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        programArgument '--nogui'
+        arguments '--nogui'
     }
 
     // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -83,7 +83,7 @@ runs {
         // workingDirectory project.file('run-data')
 
         // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        arguments '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
@@ -94,9 +94,11 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			//if(!useLib)exclude "com/tom/storagemod/jei/**"
-			//if(!useLib)exclude "com/tom/storagemod/emi/**"
+			if(!useLib)exclude "com/tom/storagemod/jei/**"
+			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/top/**"
+			if(!useLib)exclude "com/tom/storagemod/jade/**"
+			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
 			srcDir "src/platform-shared/resources"
@@ -133,12 +135,15 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
-    compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
-    // at runtime, use the full JEI jar
-  	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.19.0.219"
+    
+    implementation "curse.maven:the-one-probe-245211:5502323"
   		
     if(useLib) {
+     	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
+    	compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
+    	// at runtime, use the full JEI jar
+  		runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.19.0.219"
+  	
     	runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.6+1.20.6"
     	compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.6+1.20.6:api"
   	
@@ -149,22 +154,18 @@ dependencies {
     	implementation "dev.architectury:architectury-neoforge:11.0.9"
     	
     	compileOnly "curse.maven:vivecraft-667903:5753747"
+    	
+    	compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"
+		runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"
+	
+		implementation "curse.maven:polymorph-388800:5480541"
+	
+    	implementation "curse.maven:jade-324717:5529595"
     } else {
     	compileOnly files("libs/curios_dummy.jar")
     	compileOnly files("libs/vc_dummy.jar")
+    	compileOnly files("libs/polymorph_dummy.jar")
     }
-    
-    compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"
-	runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"
-	
-	implementation "curse.maven:polymorph-388800:5480541"
-	
-	implementation "curse.maven:the-one-probe-245211:5502323"
-    implementation "curse.maven:jade-324717:5529595"
-    
-    implementation "curse.maven:functional-storage-556861:5545676"
-    implementation "curse.maven:titanium-287342:5507166"
-    implementation "curse.maven:adorned-1036809:5546365"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

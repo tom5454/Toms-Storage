@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -13,13 +14,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import com.google.common.collect.Lists;
@@ -27,11 +28,10 @@ import com.google.common.collect.Lists;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.CraftingTerminalBlockEntity;
 import com.tom.storagemod.inventory.StoredItemStack;
-import com.tom.storagemod.platform.NeoForgeMenu;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
 
-public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFillTerminal, IDataReceiver, NeoForgeMenu {
+public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFillTerminal, IDataReceiver {
 	public static class SlotCrafting extends Slot {
 		public SlotCrafting(Container inventoryIn, int index, int xPosition, int yPosition) {
 			super(inventoryIn, index, xPosition, yPosition);
@@ -224,11 +224,6 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		return 10;
 	}*/
 
-	@Override
-	public java.util.List<RecipeBookCategory> getRecipeBookCategories() {
-		return Lists.newArrayList(RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC, RecipeBookCategories.CRAFTING_REDSTONE);
-	}
-
 	/*@SuppressWarnings("unchecked")
 	@Override
 	public void handlePlacement(boolean p_40119_, RecipeHolder<?> p_300860_, ServerPlayer p_40121_) {
@@ -318,7 +313,34 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public PostPlaceAction handlePlacement(boolean bl, boolean bl2, RecipeHolder<?> recipeHolder,
 			ServerLevel serverLevel, Inventory inventory) {
-		return PostPlaceAction.NOTHING;
+		RecipeHolder<CraftingRecipe> recipeholder = (RecipeHolder<CraftingRecipe>)recipeHolder;
+		//this.beginPlacingRecipe();
+
+		RecipeBookMenu.PostPlaceAction recipebookmenu$postplaceaction;
+		try {
+			List<Slot> list = getInputGridSlots();
+			recipebookmenu$postplaceaction = ServerPlaceRecipe.placeRecipe(new ServerPlaceRecipe.CraftingMenuAccess<CraftingRecipe>() {
+				@Override
+				public void fillCraftSlotsStackedContents(StackedItemContents p_363395_) {
+					CraftingTerminalMenu.this.fillCraftSlotsStackedContents(p_363395_);
+				}
+
+				@Override
+				public void clearCraftingContent() {
+					CraftingTerminalMenu.this.craftResult.clearContent();
+					CraftingTerminalMenu.this.craftMatrix.clearContent();
+				}
+
+				@Override
+				public boolean recipeMatches(RecipeHolder<CraftingRecipe> p_365206_) {
+					return p_365206_.value().matches(CraftingTerminalMenu.this.craftMatrix.asCraftInput(), CraftingTerminalMenu.this.pinv.player.level());
+				}
+			}, 3, 3, list, list, inventory, recipeholder, bl, bl2);
+		} finally {
+			//this.finishPlacingRecipe(p_379885_, (RecipeHolder<CraftingRecipe>)p_364981_);
+		}
+
+		return recipebookmenu$postplaceaction;
 	}
 
 	@Override
@@ -328,5 +350,9 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		else itemList.forEach(e -> {
 			stackedItemContents.accountSimpleStack(e.getActualStack());
 		});
+	}
+
+	public List<Slot> getInputGridSlots() {
+		return this.slots.subList(1, 10);
 	}
 }

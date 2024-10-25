@@ -21,7 +21,6 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import com.tom.storagemod.inventory.PlatformItemHandler;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
-import com.tom.storagemod.polymorph.PolymorphTerminalWidget;
 import com.tom.storagemod.top.TheOneProbeHandler;
 
 //The value here should match an entry in the META-INF/mods.toml file
@@ -61,7 +60,7 @@ public class StorageMod {
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
 		StorageModClient.clientSetup();
-		if (polymorph)PolymorphTerminalWidget.register();
+		//if (polymorph)PolymorphTerminalWidget.register();
 	}
 
 	private void registerCapabilities(RegisterCapabilitiesEvent event) {

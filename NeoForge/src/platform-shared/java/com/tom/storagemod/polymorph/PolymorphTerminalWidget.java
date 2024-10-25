@@ -21,7 +21,7 @@ public class PolymorphTerminalWidget extends PlayerRecipesWidget {
 	public void selectRecipe(ResourceLocation resourceLocation) {
 		super.selectRecipe(resourceLocation);
 		var mc = Minecraft.getInstance();
-		/*mc.level.getRecipeManager().byKey(resourceLocation).ifPresent(recipe -> {
+		/*mc.getConnection().recipes().byKey(resourceLocation).ifPresent(recipe -> {
 			mc.gameMode.handleInventoryButtonClick((this.menu).containerId, 1);
 		});*/
 	}

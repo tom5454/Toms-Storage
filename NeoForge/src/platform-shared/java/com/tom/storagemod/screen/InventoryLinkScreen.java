@@ -35,7 +35,7 @@ import com.tom.storagemod.screen.widget.ListWidget;
 import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.IDataReceiver;
 
-public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMenu> implements IDataReceiver {
+public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> implements IDataReceiver {
 	private static final ResourceLocation gui = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/inventory_link.png");
 	private static final ResourceLocation privateChannel = ResourceLocation.tryBuild(StorageMod.modid, "icons/lock_on");
 	private static final ResourceLocation publicChannel = ResourceLocation.tryBuild(StorageMod.modid, "icons/lock_off");

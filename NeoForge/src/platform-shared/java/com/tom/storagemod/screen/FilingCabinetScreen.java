@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Inventory;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.FilingCabinetMenu;
 
-public class FilingCabinetScreen extends PlatformContainerScreen<FilingCabinetMenu> {
+public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 	private static final ResourceLocation CONTAINER_BACKGROUND = ResourceLocation.parse("textures/gui/container/generic_54.png");
 	private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.parse("container/creative_inventory/scroller");
 	private static final ResourceLocation SIDE_SCROLLBAR = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/side_scrollbar.png");

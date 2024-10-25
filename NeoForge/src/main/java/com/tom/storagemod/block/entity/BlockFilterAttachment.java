@@ -2,6 +2,7 @@ package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -17,12 +18,12 @@ public class BlockFilterAttachment implements INBTSerializable<CompoundTag> {
 
 	@Override
 	public CompoundTag serializeNBT(Provider provider) {
-		return filter.serializeNBT(provider);
+		return (CompoundTag) BlockFilter.STATE_CODEC.encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), filter.storeState()).getOrThrow();
 	}
 
 	@Override
 	public void deserializeNBT(Provider provider, CompoundTag nbt) {
-		filter.deserializeNBT(provider, nbt);
+		BlockFilter.STATE_CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), nbt).ifSuccess(filter::loadFromState);
 	}
 
 	public BlockFilter getFilter() {

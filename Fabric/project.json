@@ -1,16 +1,17 @@
 {
   "type": "fabric",
-  "name": "toms_storage_fabric-1.21.2",
+  "name": "toms_storage_fabric-1.21.3",
   "mcVer": "1.21",
-  "verId": "1.21.2",
-  "display": "Tom's Storage 1.21.2",
-  "git": "Toms-Storage/Toms-Storage-Fabric-1.21.2",
+  "verId": "1.21.3",
+  "display": "Tom's Storage 1.21.3",
   "subver": [
-    "1.21.2"
+	"1.21.2",
+    "1.21.3"
   ],
-   "versionType": "beta",
+   "versionType": "release",
   "j21": true,
-  "appendMCVersion": true,
+  "appendMCVersion": false,
+  "onGit": true,
   "depProjects": [
     {
       "slug": "roughly-enough-items",

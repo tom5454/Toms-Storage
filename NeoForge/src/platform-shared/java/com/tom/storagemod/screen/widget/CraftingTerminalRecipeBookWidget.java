@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
 import net.minecraft.client.gui.screens.recipebook.SearchRecipeBookCategory;
 import net.minecraft.network.chat.Component;
+import net.minecraft.recipebook.PlaceRecipeHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.entity.player.StackedItemContents;
@@ -75,7 +76,7 @@ public class CraftingTerminalRecipeBookWidget extends RecipeBookComponent<Crafti
 
 	@Override
 	protected void fillGhostRecipe(GhostSlots ghostSlots, RecipeDisplay recipeDisplay, ContextMap contextMap) {
-		/*ghostSlots.setResult(this.menu.getResultSlot(), contextMap, recipeDisplay.result());
+		ghostSlots.setResult(this.menu.getCraftingResultSlot(), contextMap, recipeDisplay.result());
 		Objects.requireNonNull(recipeDisplay);
 		switch (recipeDisplay) {
 		case ShapedCraftingRecipeDisplay shapedCraftingRecipeDisplay:
@@ -98,13 +99,13 @@ public class CraftingTerminalRecipeBookWidget extends RecipeBookComponent<Crafti
 				int i = Math.min(shapelessCraftingRecipeDisplay.ingredients().size(), list2.size());
 
 				for (int j = 0; j < i; j++) {
-					ghostSlots.setInput((Slot)list2.get(j), contextMap, (SlotDisplay)shapelessCraftingRecipeDisplay.ingredients().get(j));
+					ghostSlots.setInput(list2.get(j), contextMap, shapelessCraftingRecipeDisplay.ingredients().get(j));
 				}
 				break label15;
 			}
 		default:
 			break;
-		}*/
+		}
 	}
 
 }

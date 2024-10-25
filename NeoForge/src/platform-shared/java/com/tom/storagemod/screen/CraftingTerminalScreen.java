@@ -7,6 +7,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
@@ -62,7 +63,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		if(this.recipeBookGui.isVisible())recipeBookGui.toggleVisibility();//
 		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow);
 		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
-		//addWidget(recipeBookGui);
+		addWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
 		btnClr = new ButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, b -> clearGrid());
 		addRenderableWidget(btnClr);
@@ -74,12 +75,12 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 					sendUpdate();
 				}));
 		buttonPullFromInv.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.crafting_pull_off")), Tooltip.create(Component.translatable("tooltip.toms_storage.crafting_pull_on")));
-		/*addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
+		addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
 			this.recipeBookGui.toggleVisibility();
 			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
 			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.topPos + 38 + rowCount * 18);
 			setButtonsPos();
-		}));*/
+		}));
 		setButtonsPos();
 		onPacket();
 	}
@@ -130,11 +131,11 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			st.pose().translate(0, 0, -1000);
 			super.render(st, -1, -1, partialTicks);
 			st.pose().popPose();
-			//this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
 			super.render(st, mouseX, mouseY, partialTicks);
-			//this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
-			//this.recipeBookGui.renderGhostRecipe(st, true);
+			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			this.recipeBookGui.renderGhostRecipe(st, true);
 		}
 
 		this.renderTooltip(st, mouseX, mouseY);
@@ -190,14 +191,12 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		if(code == GLFW.GLFW_KEY_S && hoveredSlot != null) {
 			ItemStack itemstack = null;
 
-			/*for (int i = 0; i < this.recipeBookGui.ghostSlots.size(); ++i) {
-				GhostRecipe.GhostIngredient ghostrecipe$ghostingredient = this.recipeBookGui.ghostSlots.get(i);
-				int j = ghostrecipe$ghostingredient.getX();
-				int k = ghostrecipe$ghostingredient.getY();
-				if (j == hoveredSlot.x && k == hoveredSlot.y) {
-					itemstack = ghostrecipe$ghostingredient.getItem();
+			for (var e : this.recipeBookGui.ghostSlots.ingredients.entrySet()) {
+				if (e.getKey() == hoveredSlot) {
+					itemstack = e.getValue().getItem(this.recipeBookGui.ghostSlots.slotSelectTime.currentIndex());
+					break;
 				}
-			}*/
+			}
 			if(itemstack != null) {
 				searchField.setValue(itemstack.getHoverName().getString());
 				searchField.setFocused(false);

@@ -36,9 +36,9 @@ public class BlockFilter implements IFilter {
 	private boolean filterNeedsUpdate = true;
 	private boolean multiblockFilled;
 
-	private static record BlockFilterState(BlockPos pos, List<BlockPos> connected, boolean skip, Direction side, ItemStack filter, Priority priority, boolean keepLast) {}
+	public static record BlockFilterState(BlockPos pos, List<BlockPos> connected, boolean skip, Direction side, ItemStack filter, Priority priority, boolean keepLast) {}
 
-	private static final Codec<BlockFilterState> STATE_CODEC = RecordCodecBuilder.<BlockFilterState>mapCodec(b -> {
+	public static final Codec<BlockFilterState> STATE_CODEC = RecordCodecBuilder.<BlockFilterState>mapCodec(b -> {
 		return b.group(
 				BlockPos.CODEC.fieldOf("pos").forGetter(BlockFilterState::pos),
 				Codec.list(BlockPos.CODEC).fieldOf("connected").forGetter(BlockFilterState::connected),
@@ -62,6 +62,11 @@ public class BlockFilter implements IFilter {
 
 	public BlockFilter(BlockFilterState state) {
 		this.pos = state.pos();
+		loadFromState(state);
+		filter.addListener(__ -> markFilterDirty());
+	}
+
+	public void loadFromState(BlockFilterState state) {
 		this.connected = new HashSet<>(state.connected());
 		this.skip = state.skip();
 		this.side = state.side();
@@ -69,8 +74,6 @@ public class BlockFilter implements IFilter {
 		this.priority = state.priority();
 		this.keepLast = state.keepLast();
 		multiblockFilled = true;
-
-		filter.addListener(__ -> markFilterDirty());
 	}
 
 	public Set<BlockPos> getConnectedBlocks() {
