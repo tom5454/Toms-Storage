@@ -193,7 +193,7 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconRange.@Tooltip": "Value of 0 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "Inventory Cable Connector requied beacon level for same dimension access with unlimited range\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "Inventory Cable Connector requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
-	"text.autoconfig.toms_storage.option.runMultithreaded": "Use multithreading to improve performance",
+	"text.autoconfig.toms_storage.option.runMultithreaded": "Utiliser le multithreading pour améliorer les performances",
 	
 	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Ouvrir la console",
 	
