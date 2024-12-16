@@ -34,6 +34,7 @@ import com.mojang.serialization.MapCodec;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
+import org.jetbrains.annotations.Nullable;
 
 public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable, NeoForgeBlock {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
@@ -169,13 +170,15 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 
 	@Override
 	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
-			Orientation orientation, boolean bl) {
+								   @Nullable Orientation orientation, boolean bl) {
 		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
 		if (!level.isClientSide) {
 			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
 			n.markNodeInvalid(blockPos);
-			for (var d : orientation.getDirections()) {
-				n.markNodeInvalid(blockPos.relative(d));
+			if (orientation != null) {
+				for (var d : orientation.getDirections()) {
+					n.markNodeInvalid(blockPos.relative(d));
+				}
 			}
 		}
 	}
