@@ -21,7 +21,6 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import com.tom.storagemod.inventory.PlatformItemHandler;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
-import com.tom.storagemod.top.TheOneProbeHandler;
 
 //The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
@@ -73,6 +72,13 @@ public class StorageMod {
 
 	public void enqueueIMC(InterModEnqueueEvent e) {
 		if(ModList.get().isLoaded("theoneprobe"))
-			InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> TheOneProbeHandler.create());
+			InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> {
+				try {
+					return Class.forName("com.tom.storagemod.top.TheOneProbeHandler").getConstructor().newInstance();
+				} catch (Throwable e1) {
+					LOGGER.warn("Failed to init TheOneProbeHandler", e1);
+					return null;
+				}
+			});
 	}
 }

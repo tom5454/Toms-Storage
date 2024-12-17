@@ -96,7 +96,7 @@ sourceSets {
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
-			//if(!useLib)exclude "com/tom/storagemod/top/**"
+			if(!useLib)exclude "com/tom/storagemod/top/**"
 			if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
@@ -136,8 +136,6 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    implementation "curse.maven:the-one-probe-245211:5502323"
-  		
     if(useLib) {
      	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
     	compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
@@ -161,6 +159,8 @@ dependencies {
 		implementation "curse.maven:polymorph-388800:5480541"
 	
     	implementation "curse.maven:jade-324717:5529595"
+    	
+    	implementation "curse.maven:the-one-probe-245211:5502323"
     } else {
     	compileOnly files("libs/curios_dummy.jar")
     	compileOnly files("libs/vc_dummy.jar")

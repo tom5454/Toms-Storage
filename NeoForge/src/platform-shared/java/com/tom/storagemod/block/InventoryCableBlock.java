@@ -3,6 +3,8 @@ package com.tom.storagemod.block;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -169,13 +171,19 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 
 	@Override
 	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
-			Orientation orientation, boolean bl) {
+			@Nullable Orientation orientation, boolean bl) {
 		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
 		if (!level.isClientSide) {
 			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
 			n.markNodeInvalid(blockPos);
-			for (var d : orientation.getDirections()) {
-				n.markNodeInvalid(blockPos.relative(d));
+			if (orientation != null) {
+				for (var d : orientation.getDirections()) {
+					n.markNodeInvalid(blockPos.relative(d));
+				}
+			} else {
+				for (var d : Direction.values()) {
+					n.markNodeInvalid(blockPos.relative(d));
+				}
 			}
 		}
 	}
