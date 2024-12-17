@@ -181,7 +181,7 @@ public class InventoryLinkScreen extends PlatformContainerScreen<InventoryLinkMe
 		private int id;
 
 		public ListEntry(int x, int y, int id) {
-			super(x, y, 106, 16, null, null);
+			super(x, y, 106, 16, Component.empty(), null);
 			this.id = id;
 			addRenderableWidget(this);
 		}

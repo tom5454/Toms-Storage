@@ -218,7 +218,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 			private int id;
 
 			public ListEntry(int x, int y, int id) {
-				super(x, y, 53, 14, null, null);
+				super(x, y, 53, 14, Component.empty(), null);
 				this.id = id;
 				addRenderableWidget(this);
 			}

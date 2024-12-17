@@ -53,8 +53,7 @@ public class PaintedBlockEntity extends BlockEntity {
 			BlockState state = getLevel().getBlockState(getBlockPos());
 			getLevel().sendBlockUpdated(getBlockPos(), state, state, 3);
 
-			if(!level.isClientSide) {
-				ServerLevel world = (ServerLevel) getLevel();
+			if(!level.isClientSide && level instanceof ServerLevel world) {
 				world.getChunkSource().chunkMap.getPlayers(new ChunkPos(getBlockPos()), false).forEach(player -> {
 					player.connection.send(getUpdatePacket());
 				});

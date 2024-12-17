@@ -207,7 +207,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	public class GuiButtonClear extends ButtonExt {
 
 		public GuiButtonClear(int x, int y, OnPress pressable) {
-			super(x, y, 11, 11, null, pressable);
+			super(x, y, 11, 11, Component.empty(), pressable);
 		}
 
 		/**
