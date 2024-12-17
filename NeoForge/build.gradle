@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.142'
+    id 'net.neoforged.gradle.userdev' version '7.0.168'
 }
 
 version = mod_version
@@ -196,6 +196,8 @@ publishing {
     publications {
         register('mavenJava', MavenPublication) {
             from components.java
+            
+            artifactId "TomsStorage-121" // Old naming scheme
         }
     }
     repositories {

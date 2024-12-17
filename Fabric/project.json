@@ -4,9 +4,10 @@
   "mcVer": "1.21",
   "verId": "1.21",
   "display": "Tom's Storage 1.21",
-  "git": "Toms-Storage/Toms-Storage-Fabric-1.21",
+  "onGit": true,
   "subver": [
-    "1.21"
+    "1.21",
+    "1.21.1"
   ],
    "versionType": "release",
   "j21": true,

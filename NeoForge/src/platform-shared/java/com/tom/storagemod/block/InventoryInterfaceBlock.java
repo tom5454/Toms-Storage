@@ -30,7 +30,7 @@ import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.TickerUtil;
 
 public class InventoryInterfaceBlock extends BaseEntityBlock implements IInventoryCable, IInventoryNode, NeoForgeBlock {
-	public static final MapCodec<OpenCrateBlock> CODEC = ChestBlock.simpleCodec(properties -> new OpenCrateBlock());
+	public static final MapCodec<InventoryInterfaceBlock> CODEC = ChestBlock.simpleCodec(properties -> new InventoryInterfaceBlock());
 
 	public InventoryInterfaceBlock() {
 		super(Block.Properties.of().mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3));
