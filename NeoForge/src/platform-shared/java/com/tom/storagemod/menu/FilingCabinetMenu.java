@@ -6,11 +6,8 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-
-import com.mojang.datafixers.util.Pair;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
@@ -74,9 +71,9 @@ public class FilingCabinetMenu extends AbstractContainerMenu {
 					}
 
 					@Override
-					public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+					public ResourceLocation getNoItemIcon() {
 						if (!isValid())
-							return Pair.of(InventoryMenu.BLOCK_ATLAS, LOCKED_SLOT);
+							return LOCKED_SLOT;
 						else
 							return null;
 					}

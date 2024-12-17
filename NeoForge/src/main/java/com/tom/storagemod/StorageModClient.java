@@ -110,7 +110,8 @@ public class StorageModClient {
 		ResourceLocation baseLoc = block.getId();
 		block.get().getStateDefinition().getPossibleStates().forEach(st -> {
 			ModelResourceLocation resLoc = BlockModelShaper.stateToModelLocation(baseLoc, st);
-			event.getModels().put(resLoc, new BakedPaintedModel(block.get(), event.getModels().get(resLoc)));
+			var models = event.getBakingResult().blockStateModels();
+			models.put(resLoc, new BakedPaintedModel(block.get(), models.get(resLoc)));
 		});
 	}
 

@@ -20,8 +20,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
-import com.mojang.datafixers.util.Pair;
-
 import com.google.common.collect.Lists;
 
 import com.tom.storagemod.Content;
@@ -106,10 +104,9 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 			}
 
 			@Override
-			public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-				return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD);
+			public ResourceLocation getNoItemIcon() {
+				return InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
 			}
-
 		});
 	}
 

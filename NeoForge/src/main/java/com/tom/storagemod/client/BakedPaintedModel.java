@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -49,11 +50,6 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	}
 
 	@Override
-	public boolean isCustomRenderer() {
-		return false;
-	}
-
-	@Override
 	public TextureAtlasSprite getParticleIcon() {
 		return parent.getParticleIcon(ModelData.EMPTY);
 	}
@@ -85,5 +81,10 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand,
 			@NotNull ModelData data) {
 		return ChunkRenderTypeSet.all();
+	}
+
+	@Override
+	public ItemTransforms getTransforms() {
+		return ItemTransforms.NO_TRANSFORMS;
 	}
 }

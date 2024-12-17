@@ -1,16 +1,15 @@
 {
   "type": "neoforge",
-  "name": "toms_storage-1.21.3",
+  "name": "toms_storage-1.21.4",
   "mcVer": "1.21",
-  "verId": "1.21.3",
-  "display": "[NeoForge] Tom's Storage 1.21.3",
+  "verId": "1.21.4",
+  "display": "[NeoForge] Tom's Storage 1.21.4",
   "onGit": true,
   "subver": [
-	"1.21.2",
-    "1.21.3"
+	"1.21.4"
   ],
   "versionType": "release",
-  "j17": true,
+  "j21": true,
   "depProjects": [
     {
       "slug": "jei",

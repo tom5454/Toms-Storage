@@ -1,11 +1,13 @@
 package com.tom.storagemod.client;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -14,7 +16,6 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,8 +36,8 @@ public class BakedPaintedModel implements BakedModel {
 	}
 
 	@Override
-	public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos,
-			Supplier<RandomSource> randomSupplier, RenderContext context) {
+	public void emitBlockQuads(QuadEmitter emitter, BlockAndTintGetter blockView, BlockState state, BlockPos pos,
+			Supplier<RandomSource> randomSupplier, Predicate<@Nullable Direction> cullTest) {
 		BlockEntity tile = blockView.getBlockEntity(pos);
 		if(tile instanceof PaintedBlockEntity) {
 			BakedModel model = null;
@@ -49,14 +50,12 @@ public class BakedPaintedModel implements BakedModel {
 				if(model == null)
 					model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockstate);
 				if (!(model instanceof BakedPaintedModel)) {
-					model.emitBlockQuads(blockView, state, pos, randomSupplier, context);
+					model.emitBlockQuads(emitter, blockView, blockstate, pos, randomSupplier, cullTest);
 					return;
 				}
 			} catch (Exception e) {
 			}
 		}
-
-		QuadEmitter emitter = context.getEmitter();
 
 		for(Direction direction : Direction.values()) {
 			// Add a new face to the mesh
@@ -72,8 +71,7 @@ public class BakedPaintedModel implements BakedModel {
 	}
 
 	@Override
-	public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
-
+	public void emitItemQuads(QuadEmitter emitter, Supplier<RandomSource> randomSupplier) {
 	}
 
 	@Override
@@ -93,11 +91,6 @@ public class BakedPaintedModel implements BakedModel {
 
 	@Override
 	public boolean isGui3d() {
-		return false;
-	}
-
-	@Override
-	public boolean isCustomRenderer() {
 		return false;
 	}
 

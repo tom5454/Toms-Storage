@@ -54,7 +54,8 @@ public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
+	protected ItemStack getCloneItemStack(LevelReader p_382795_, BlockPos p_383120_, BlockState p_382830_,
+			boolean p_388788_) {
 		return new ItemStack(Content.inventoryTrim.get());
 	}
 

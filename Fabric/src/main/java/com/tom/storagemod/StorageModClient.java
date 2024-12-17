@@ -30,8 +30,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
-import com.tom.storagemod.client.BakedPaintedModel;
 import com.tom.storagemod.client.ClientUtil;
+import com.tom.storagemod.client.UnbakedPaintedModel;
 import com.tom.storagemod.network.DataPacket;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
@@ -77,9 +77,9 @@ public class StorageModClient implements ClientModInitializer {
 			@Override
 			public void initialize(Context ctx) {
 				bakeModels(locs);
-				ctx.modifyModelAfterBake().register((p, c) -> {
-					if (locs.contains(c.topLevelId()) && !(p instanceof BakedPaintedModel)) {
-						return new BakedPaintedModel(p);
+				ctx.modifyBlockModelOnLoad().register((p, c) -> {
+					if (locs.contains(c.id()) && !(p instanceof UnbakedPaintedModel)) {
+						return new UnbakedPaintedModel(p);
 					}
 					return p;
 				});
