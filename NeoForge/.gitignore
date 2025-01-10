@@ -1,6 +1,7 @@
 .gradle
 .classpath
 .settings
+.eclipse
 bin
 build
 codes
