@@ -151,7 +151,7 @@ dependencies {
 		implementation "me.shedaniel.cloth:cloth-config-neoforge:13.0.121"
     	implementation "dev.architectury:architectury-neoforge:11.0.9"
     	
-    	compileOnly "curse.maven:vivecraft-667903:5753747"
+    	compileOnly "curse.maven:vivecraft-667903:6060497"
     	
     	compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"
 		runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"

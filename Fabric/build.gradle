@@ -86,7 +86,7 @@ dependencies {
     	modCompileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
 		modLocalRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
 		
-		modCompileOnly "curse.maven:vivecraft-667903:5753745"
+		modCompileOnly "curse.maven:vivecraft-667903:6063971"
 	} else {
 		compileOnly files("../NeoForge/libs/vc_dummy.jar")
 		compileOnly files("../NeoForge/libs/polymorph_dummy.jar")
