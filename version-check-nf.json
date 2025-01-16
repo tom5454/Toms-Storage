@@ -8,9 +8,10 @@
 		"1.21-latest": "2.0.12",
 		"1.21.1-latest": "2.1.0",
 		"1.21.3-latest": "2.1.1",
-		"1.21.4-latest": "2.1.3"
+		"1.21.4-latest": "2.2.0"
 	},
 	"1.21.4": {
+		"2.2.0": "Add config option to blacklist certain blocks/mods (Closes #507)\nRewritten JEI/REI/EMI recipe integrations (Closes #466)\nFixed crash with 0 size inventories (Closes #516)\nFixed Inventory Cable Connector (Framed) xraying on 1.21.4 (Closes #518)\nFixed Paint Kit item name breaking (Closes #517)\nFixed missing texture warnings",		
 		"2.1.3": "Updated ViveCraft support to 1.2.0",
 		"2.1.2": "1.21.4 port"
 	},
