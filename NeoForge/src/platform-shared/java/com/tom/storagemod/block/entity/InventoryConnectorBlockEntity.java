@@ -30,6 +30,7 @@ import com.tom.storagemod.inventory.PlatformMultiInventoryAccess;
 import com.tom.storagemod.inventory.VanillaMultiblockInventories;
 import com.tom.storagemod.platform.PlatformBlockEntity;
 import com.tom.storagemod.util.BlockFace;
+import com.tom.storagemod.util.InventoryConnectorConfigUtil;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
 
 public class InventoryConnectorBlockEntity extends PlatformBlockEntity implements TickableServer, IInventoryConnector, IInventory, IInventoryConnectorReference {
@@ -103,7 +104,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 					} else if(state.getBlock() instanceof IInventoryNode) {
 						interfaces.add(new BlockFace(p, Direction.DOWN));
 						toCheck.add(p);
-					} else if(!state.is(StorageTags.INV_CONNECTOR_SKIP) && !onlyTrims && BlockInventoryAccess.hasInventoryAt(level, p, state, d.getOpposite())) {
+					} else if(InventoryConnectorConfigUtil.canConnect(state) && !onlyTrims && BlockInventoryAccess.hasInventoryAt(level, p, state, d.getOpposite())) {
 						BlockFilter f = BlockFilter.getFilterAt(level, p);
 						if (f != null)blockFilters.add(f);
 						connected.put(p, d.getOpposite());

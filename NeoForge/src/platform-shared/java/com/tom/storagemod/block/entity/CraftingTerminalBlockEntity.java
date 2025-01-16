@@ -197,54 +197,20 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
 	}
 
-	public void clear() {
+	public void clear(Player player) {
 		for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
 			ItemStack st = craftMatrix.removeItemNoUpdate(i);
 			if(!st.isEmpty()) {
-				pushOrDrop(st);
-			}
-		}
-		onCraftingMatrixChanged();
-	}
-
-	public void handlerItemTransfer(Player player, ItemStack[][] items) {
-		clear();
-		for (int i = 0;i < 9;i++) {
-			if (items[i] != null) {
-				ItemStack stack = ItemStack.EMPTY;
-				for (int j = 0;j < items[i].length;j++) {
-					ItemStack pulled = pullStack(items[i][j]);
-					if (!pulled.isEmpty()) {
-						stack = pulled;
-						break;
-					}
-				}
-				if (stack.isEmpty()) {
-					for (int j = 0;j < items[i].length;j++) {
-						boolean br = false;
-						for (int k = 0;k < player.getInventory().getContainerSize();k++) {
-							if(ItemStack.isSameItemSameComponents(player.getInventory().getItem(k), items[i][j])) {
-								stack = player.getInventory().removeItem(k, 1);
-								br = true;
-								break;
-							}
-						}
-						if (br)
-							break;
-					}
-				}
-				if (!stack.isEmpty()) {
-					craftMatrix.setItem(i, stack);
+				StoredItemStack st0 = pushStack(new StoredItemStack(st));
+				if (st0 != null) {
+					var is = st0.getActualStack();
+					player.getInventory().add(is);
+					if (!is.isEmpty())
+						dropItem(is);
 				}
 			}
 		}
 		onCraftingMatrixChanged();
-	}
-
-	private ItemStack pullStack(ItemStack itemStack) {
-		StoredItemStack is = pullStack(new StoredItemStack(itemStack), 1);
-		if(is == null)return ItemStack.EMPTY;
-		else return is.getActualStack();
 	}
 
 	@Override
@@ -261,5 +227,9 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		polymorphPlayer = new WeakReference<>(playerIn);
 		currentRecipe = Optional.empty();
 		onCraftingMatrixChanged();
+	}
+
+	public void setCraftSlot(int x, int y, ItemStack actualStack) {
+		craftMatrix.setItem(x + y * 3, actualStack);
 	}
 }

@@ -110,8 +110,12 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		if(st.isEmpty())return;
 		StoredItemStack st0 = pushStack(new StoredItemStack(st));
 		if(st0 != null) {
-			Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, st0.getActualStack());
+			dropItem(st0.getActualStack());
 		}
+	}
+
+	public void dropItem(ItemStack stack) {
+		Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, stack);
 	}
 
 	@Override

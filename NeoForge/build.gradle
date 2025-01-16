@@ -133,10 +133,10 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
-    compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.21.0.247"
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.21.0.247"
     // at runtime, use the full JEI jar
-  	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.19.0.219"
+  	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.247"
   		
     if(useLib) {
     	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"
@@ -148,8 +148,8 @@ dependencies {
     
     compileOnly "curse.maven:vivecraft-667903:6060487"
     
-    compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"
-	runtimeOnly "dev.emi:emi-neoforge:1.1.7+1.21"
+    compileOnly "dev.emi:emi-neoforge:1.1.19+1.21.1:api"
+	runtimeOnly "dev.emi:emi-neoforge:1.1.19+1.21.1"
 	
 	implementation "curse.maven:polymorph-388800:5480541"
 	
