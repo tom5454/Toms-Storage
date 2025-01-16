@@ -1,7 +1,8 @@
 {
     "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
     "textures": {
-        "0": "toms_storage:block/inventory_cable"
+        "0": "toms_storage:block/inventory_cable",
+        "particle": "toms_storage:block/inventory_cable"
     },
     "parent": "block/block",
     "elements": [

@@ -2,9 +2,12 @@ package com.tom.storagemod.menu;
 
 import java.util.List;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.recipebook.ServerPlaceRecipe;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -187,13 +190,13 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	public void receive(CompoundTag message) {
 		super.receive(message);
 		if(message.contains("fill")) {
-			/*var id = ResourceLocation.tryParse(message.getString("fill"));
+			var id = ResourceLocation.tryParse(message.getString("fill"));
 			if (id != null) {
-				var recipe = pinv.player.level().getServer().getRecipeManager().byKey(id).orElse(null);
+				var recipe = pinv.player.level().getServer().getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id)).orElse(null);
 				if (recipe != null) {
 					new TerminalCraftingFiller((CraftingTerminalBlockEntity) te, pinv.player, sync).placeRecipe(recipe.value());
 				}
-			}*/
+			}
 		}
 	}
 

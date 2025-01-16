@@ -173,7 +173,7 @@ public class Config {
 			blockedMods = new HashSet<>(COMMON.blockedMods.get());
 
 			blockedBlocks = COMMON.blockedBlocks.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).
-					map(BuiltInRegistries.BLOCK::get).filter(e -> e != null && e != Blocks.AIR).
+					map(BuiltInRegistries.BLOCK::getValue).filter(e -> e != null && e != Blocks.AIR).
 					collect(Collectors.toSet());
 		}
 	}

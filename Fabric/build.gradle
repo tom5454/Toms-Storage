@@ -52,6 +52,23 @@ dependencies {
     modImplementation("com.terraformersmc:modmenu:12.0.0-beta.1") {
         exclude(group: "net.fabricmc.fabric-api")
     }
+    
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
+		exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
+	   exclude(group: "net.fabricmc.fabric-api")
+	   exclude(group: "me.shedaniel.cloth")
+	   exclude(group: "dev.architectury")
+	}
+	modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
+	    exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modImplementation("dev.architectury:architectury-fabric:15.0.1")
 	
     if(useLib) {
 		// compile against the JEI API but do not include it at runtime
@@ -66,23 +83,6 @@ dependencies {
 		
 		modImplementation "dev.emi:trinkets:3.10.0"
 		
-		modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
-			exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
-		   exclude(group: "net.fabricmc.fabric-api")
-		   exclude(group: "me.shedaniel.cloth")
-		   exclude(group: "dev.architectury")
-		}
-		modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
-		    exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modImplementation("dev.architectury:architectury-fabric:13.0.6")
-	
     	modCompileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
 		modLocalRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
 		
@@ -99,7 +99,7 @@ sourceSets {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"

@@ -5,11 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
@@ -18,7 +15,6 @@ import com.tom.storagemod.util.IAutoFillTerminal;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
-import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.transfer.TransferHandler;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
@@ -74,10 +70,10 @@ public class ReiTransferHandler implements TransferHandler {
 				}
 			}
 			if (context.isActuallyCrafting()) {
-				var recipeId = getRecipe(recipe);
-				if (recipeId != null && !Minecraft.getInstance().level.getRecipeManager().byKey(recipeId).isEmpty()) {
+				var recipeId = recipe.getDisplayLocation();
+				if (recipeId.isPresent()) {
 					CompoundTag compound = new CompoundTag();
-					compound.putString("fill", recipeId.toString());
+					compound.putString("fill", recipeId.get().toString());
 					term.sendMessage(compound);
 					return Result.createSuccessful().blocksFurtherHandling();
 				}
@@ -102,12 +98,5 @@ public class ReiTransferHandler implements TransferHandler {
 			return Result.createSuccessful().blocksFurtherHandling();
 		}
 		return Result.createNotApplicable();
-	}
-
-	private ResourceLocation getRecipe(Display display) {
-		// Displays can be based on completely custom objects, or on actual Vanilla recipes
-		var origin = DisplayRegistry.getInstance().getDisplayOrigin(display);
-
-		return origin instanceof RecipeHolder<?> holder ? holder.id() : null;
 	}
 }

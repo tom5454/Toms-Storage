@@ -36,7 +36,7 @@ public class Config implements ConfigData {
 	public Set<Block> getBlockedBlocks() {
 		if (StorageMod.blockedBlocks == null) {
 			StorageMod.blockedBlocks = blockedBlocks.stream().map(ResourceLocation::tryParse).filter(e -> e != null).
-					map(id -> BuiltInRegistries.BLOCK.get(id)).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
+					map(id -> BuiltInRegistries.BLOCK.getValue(id)).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 		}
 		return StorageMod.blockedBlocks;
 	}

@@ -133,12 +133,10 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 		}
 
 		if(!simulate) {
-			var recipeId = recipe.getId();
-			if (recipeId != null && !Minecraft.getInstance().level.getRecipeManager().byKey(recipeId).isEmpty()) {
-				CompoundTag compound = new CompoundTag();
-				compound.putString("fill", recipeId.toString());
-				term.sendMessage(compound);
-			}
+			/*var recipeId = recipe.getId();
+			CompoundTag compound = new CompoundTag();
+			compound.putString("fill", recipeId.location().toString());
+			term.sendMessage(compound);*/
 		}
 		return missing;
 	}

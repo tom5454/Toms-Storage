@@ -1,6 +1,7 @@
 package com.tom.storagemod.platform;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Function;
@@ -9,6 +10,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +23,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
@@ -111,5 +114,10 @@ public class Platform {
 
 	public static RegistryFriendlyByteBuf makeRegByteBuf(ByteBuf buffer, RegistryAccess reg) {
 		return new RegistryFriendlyByteBuf(buffer, reg, ConnectionType.NEOFORGE);
+	}
+
+	public static Iterable<Holder<Item>> getIngredientItems(Ingredient ingr) {
+		if (ingr.isCustom())return Collections.emptyList();
+		return ingr.getValues();
 	}
 }

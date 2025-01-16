@@ -4,7 +4,8 @@
         "0": "toms_storage:block/inventory_block",
         "1": "toms_storage:block/inv_cable_connector",
         "2": "toms_storage:block/inventory_cable",
-        "3": "block/white_wool"
+        "3": "block/white_wool",
+        "particle": "toms_storage:block/inventory_cable"
     },
     "parent": "block/block",
     "elements": [
