@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.menu.TerminalCraftingFiller;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
 
@@ -241,5 +242,9 @@ public class TerminalSyncManager {
 	public static enum SlotAction {
 		PULL_OR_PUSH_STACK, PULL_ONE, SPACE_CLICK, SHIFT_PULL, GET_HALF, GET_QUARTER, CRAFT;
 		public static final SlotAction[] VALUES = values();
+	}
+
+	public void fillCraftingFiller(TerminalCraftingFiller terminalCraftingFiller) {
+		items.forEach((s, c) -> terminalCraftingFiller.accountStack(c.getActualStack()));
 	}
 }

@@ -2,6 +2,7 @@ package com.tom.storagemod;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -65,6 +67,7 @@ public class StorageMod implements ModInitializer {
 	public static final AttachmentType<BlockFilter> BLOCK_FILTER = AttachmentRegistry.createPersistent(ResourceLocation.tryBuild(StorageMod.modid, "block_filter"), BlockFilter.CODEC);
 
 	public static boolean polymorph;
+	public static Set<Block> blockedBlocks;
 
 	public StorageMod() {
 	}
@@ -114,6 +117,7 @@ public class StorageMod implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			CONFIG = LOADED_CONFIG;
+			blockedBlocks = null;
 		});
 
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.connectorBE.get());
@@ -159,5 +163,10 @@ public class StorageMod implements ModInitializer {
 		});
 
 		polymorph = FabricLoader.getInstance().isModLoaded("polymorph");
+
+		configHolder.registerSaveListener((a, b) -> {
+			blockedBlocks = null;
+			return InteractionResult.PASS;
+		});
 	}
 }

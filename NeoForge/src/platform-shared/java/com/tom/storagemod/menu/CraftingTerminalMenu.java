@@ -3,7 +3,6 @@ package com.tom.storagemod.menu;
 import java.util.List;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.server.level.ServerLevel;
@@ -177,122 +176,24 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public boolean clickMenuButton(Player playerIn, int id) {
 		if(te != null && id == 0)
-			((CraftingTerminalBlockEntity) te).clear();
+			((CraftingTerminalBlockEntity) te).clear(playerIn);
 		else if(te != null && id == 1)
 			((CraftingTerminalBlockEntity) te).polymorphUpdate(playerIn);
 		else super.clickMenuButton(playerIn, id);
 		return false;
 	}
 
-	/*@Override
-	public void fillCraftSlotsStackedContents(StackedContents itemHelperIn) {
-		this.craftMatrix.fillStackedContents(itemHelperIn);
-		if(te != null)sync.fillStackedContents(itemHelperIn);
-		else itemList.forEach(e -> {
-			itemHelperIn.accountSimpleStack(e.getActualStack());
-		});
-	}
-
-	@Override
-	public void clearCraftingContent() {
-		this.craftMatrix.clearContent();
-		this.craftResult.clearContent();
-	}
-
-	@Override
-	public boolean recipeMatches(RecipeHolder<CraftingRecipe> recipeHolder) {
-		return recipeHolder.value().matches(this.craftMatrix.asCraftInput(), this.pinv.player.level());
-	}
-
-	@Override
-	public int getResultSlotIndex() {
-		return 0;
-	}
-
-	@Override
-	public int getGridWidth() {
-		return this.craftMatrix.getWidth();
-	}
-
-	@Override
-	public int getGridHeight() {
-		return this.craftMatrix.getHeight();
-	}
-
-	@Override
-	public int getSize() {
-		return 10;
-	}*/
-
-	/*@SuppressWarnings("unchecked")
-	@Override
-	public void handlePlacement(boolean p_40119_, RecipeHolder<?> p_300860_, ServerPlayer p_40121_) {
-		new RecipePlacer().recipeClicked(p_40121_, (RecipeHolder<CraftingRecipe>) p_300860_, p_40119_);
-	}
-
-	private class RecipePlacer extends ServerPlaceRecipe<CraftingRecipe> {
-
-		public RecipePlacer() {
-			super(CraftingTerminalMenu.this);
-		}
-
-		@Override
-		protected int moveItemToGrid(Slot slotToFill, ItemStack ingredientIn, int count) {
-			int inInv = this.inventory.findSlotMatchingUnusedItem(ingredientIn);
-			if (inInv != -1) {
-				final ItemStack itemStack2 = this.inventory.getItem(inInv);
-				int k;
-				if (count < itemStack2.getCount()) {
-					this.inventory.removeItem(inInv, count);
-					k = count;
-				} else {
-					this.inventory.removeItemNoUpdate(inInv);
-					k = itemStack2.getCount();
-				}
-				if (slotToFill.getItem().isEmpty()) {
-					slotToFill.set(itemStack2.copyWithCount(k));
-				} else {
-					slotToFill.getItem().grow(k);
-				}
-				return count - k;
-			} else if(te != null) {
-				StoredItemStack st = te.pullStack(new StoredItemStack(ingredientIn), 1);
-				if(st != null) {
-					if (slotToFill.getItem().isEmpty()) {
-						slotToFill.set(st.getActualStack());
-					} else {
-						slotToFill.getItem().grow(1);
-					}
-					return -1;
-				}
-			}
-			return -1;
-		}
-
-		@Override
-		protected void clearGrid() {
-			((CraftingTerminalBlockEntity) te).clear();
-			this.menu.clearCraftingContent();
-		}
-	}*/
-
 	@Override
 	public void receive(CompoundTag message) {
 		super.receive(message);
-		if(message.contains("i")) {
-			ItemStack[][] stacks = new ItemStack[9][];
-			ListTag list = message.getList("i", 10);
-			for (int i = 0;i < list.size();i++) {
-				CompoundTag nbttagcompound = list.getCompound(i);
-				byte slot = nbttagcompound.getByte("s");
-				byte l = nbttagcompound.getByte("l");
-				stacks[slot] = new ItemStack[l];
-				for (int j = 0;j < l;j++) {
-					CompoundTag tag = nbttagcompound.getCompound("i" + j);
-					stacks[slot][j] = ItemStack.parseOptional(pinv.player.registryAccess(), tag);
+		if(message.contains("fill")) {
+			/*var id = ResourceLocation.tryParse(message.getString("fill"));
+			if (id != null) {
+				var recipe = pinv.player.level().getServer().getRecipeManager().byKey(id).orElse(null);
+				if (recipe != null) {
+					new TerminalCraftingFiller((CraftingTerminalBlockEntity) te, pinv.player, sync).placeRecipe(recipe.value());
 				}
-			}
-			((CraftingTerminalBlockEntity) te).handlerItemTransfer(pinv.player, stacks);
+			}*/
 		}
 	}
 

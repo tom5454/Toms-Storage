@@ -1,13 +1,24 @@
 package com.tom.storagemod;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.tuple.Pair;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfig.Type;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
 public class Config {
@@ -21,6 +32,8 @@ public class Config {
 	public int wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 	public int invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 	//public int inventoryConnectorMaxSlots;
+	private Set<String> blockedMods = new HashSet<>();
+	private Set<Block> blockedBlocks = new HashSet<>();
 
 	public static Config get() {
 		return INSTANCE;
@@ -103,6 +116,8 @@ public class Config {
 	}
 
 	public static class Common {
+		public ConfigValue<List<? extends String>> blockedMods;
+		public ConfigValue<List<? extends String>> blockedBlocks;
 
 		public Common(ModConfigSpec.Builder builder) {
 			builder.comment("IMPORTANT NOTICE:",
@@ -112,6 +127,14 @@ public class Config {
 					"You can then take that config file and put it in the 'defaultconfigs' folder to make it apply automatically to all NEW worlds you generate FROM THERE ON.",
 					"This may appear confusing to many of you, but it is a new sensible way to handle configuration, because the server configuration is synced when playing multiplayer.").
 			define("importantInfo", true);
+
+			blockedMods = builder.comment("List of mod ids whose blocks is ignored by the inventory connector").
+					translation("config.toms_storage.inv_blocked_mods").
+					defineList("blockedMods", Collections.emptyList(), () -> "", s -> true);
+
+			blockedBlocks = builder.comment("List of block ids ignored by the inventory connector").
+					translation("config.toms_storage.inv_blocked_blocks").
+					defineList("blockedBlocks", Collections.emptyList(), () -> "", s -> true);
 		}
 	}
 
@@ -147,6 +170,11 @@ public class Config {
 			runMultithreaded = SERVER.runMultithreaded.getAsBoolean();
 			//inventoryConnectorMaxSlots = SERVER.inventoryConnectorMaxSlots.getAsInt();
 		} else if(modConfig.getType() == Type.COMMON) {
+			blockedMods = new HashSet<>(COMMON.blockedMods.get());
+
+			blockedBlocks = COMMON.blockedBlocks.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).
+					map(BuiltInRegistries.BLOCK::get).filter(e -> e != null && e != Blocks.AIR).
+					collect(Collectors.toSet());
 		}
 	}
 
@@ -160,5 +188,13 @@ public class Config {
 	public void onFileChange(final ModConfigEvent.Reloading configEvent) {
 		StorageMod.LOGGER.info("Tom's Simple Storage config just got changed on the file system!");
 		load(configEvent.getConfig());
+	}
+
+	public Set<Block> getBlockedBlocks() {
+		return blockedBlocks;
+	}
+
+	public Set<String> getBlockedMods() {
+		return blockedMods;
 	}
 }

@@ -31,8 +31,9 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		calling = true;
 
 		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
 
-		boolean r = getHandler(arrayIndex).isItemValid(slot - offsets[arrayIndex], stack);
+		boolean r = getHandler(arrayIndex, invSlot).isItemValid(invSlot, stack);
 		calling = false;
 		return r;
 	}
@@ -44,8 +45,9 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		calling = true;
 
 		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
 
-		ItemStack s = getHandler(arrayIndex).insertItem(slot - offsets[arrayIndex], stack, simulate);
+		ItemStack s = getHandler(arrayIndex, invSlot).insertItem(invSlot, stack, simulate);
 		calling = false;
 		return s;
 	}
@@ -57,8 +59,9 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		calling = true;
 
 		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
 
-		ItemStack s = getHandler(arrayIndex).getStackInSlot(slot - offsets[arrayIndex]);
+		ItemStack s = getHandler(arrayIndex, invSlot).getStackInSlot(invSlot);
 		calling = false;
 		return s;
 	}
@@ -75,8 +78,9 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		calling = true;
 
 		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
 
-		int r = getHandler(arrayIndex).getSlotLimit(slot - offsets[arrayIndex]);
+		int r = getHandler(arrayIndex, invSlot).getSlotLimit(invSlot);
 		calling = false;
 		return r;
 	}
@@ -88,8 +92,9 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		calling = true;
 
 		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
 
-		ItemStack s = getHandler(arrayIndex).extractItem(slot - offsets[arrayIndex], amount, simulate);
+		ItemStack s = getHandler(arrayIndex, invSlot).extractItem(invSlot, amount, simulate);
 		calling = false;
 		return s;
 	}
@@ -106,11 +111,11 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		invSize = 0;
 		int hOff = 0;
 		for (int i = 0; i < offsets.length; i++) {
-			IItemHandler ih = getHandler(i);
-			if(ih == null) {
+			IItemHandler ih = getHandler(i, 0);
+			int s = ih.getSlots();
+			if (s == 0) {
 				hOff++;
 			} else {
-				int s = ih.getSlots();
 				offsets[i - hOff] = invSize;
 				invSize += s;
 			}
@@ -118,9 +123,11 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		offsetsSize = offsets.length - hOff;
 	}
 
-	private IItemHandler getHandler(int i) {
+	private IItemHandler getHandler(int i, int invSlot) {
 		IItemHandler h = connected.get(i).getPlatformHandler();
 		if (h == null)return EmptyItemHandler.INSTANCE;
-		return h;
+		if (invSlot < h.getSlots())
+			return h;
+		return EmptyItemHandler.INSTANCE;
 	}
 }
