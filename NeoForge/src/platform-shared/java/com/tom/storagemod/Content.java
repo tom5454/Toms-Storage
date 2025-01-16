@@ -84,7 +84,7 @@ public class Content {
 	public static final GameObject<InventoryInterfaceBlock> invInterface = blockWithItem("inventory_interface", InventoryInterfaceBlock::new, p -> wooden(p));
 	public static final GameObject<FilingCabinetBlock> filingCabinet = blockWithItem("filing_cabinet", FilingCabinetBlock::new, p -> p.mapColor(MapColor.STONE).sound(SoundType.STONE).strength(3));
 	public static final GameObject<InventoryCableConnectorBlock> invCableConnector = blockWithItem("inventory_cable_connector", InventoryCableConnectorBlock::new, p -> wooden(p).noOcclusion());
-	public static final GameObject<FramedInventoryCableConnectorBlock> invCableConnectorFramed = blockWithItem("inventory_cable_connector_framed", FramedInventoryCableConnectorBlock::new, p -> wooden(p));
+	public static final GameObject<FramedInventoryCableConnectorBlock> invCableConnectorFramed = blockWithItem("inventory_cable_connector_framed", FramedInventoryCableConnectorBlock::new, p -> wooden(p).noOcclusion());
 	public static final GameObject<InventoryProxyBlock> invProxy = blockWithItem("inventory_proxy", InventoryProxyBlock::new, p -> wooden(p));
 
 	public static final GameObject<PaintKitItem> paintingKit = item("paint_kit", PaintKitItem::new, p -> p.durability(100));

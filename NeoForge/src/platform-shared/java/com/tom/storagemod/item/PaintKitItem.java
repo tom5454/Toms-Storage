@@ -80,7 +80,7 @@ public class PaintKitItem extends Item {
 
 	@Override
 	public Component getName(ItemStack is) {
-		MutableComponent tc = (MutableComponent) super.getName(is);
+		MutableComponent tc = super.getName(is).copy();
 		BlockState st = is.get(Content.paintComponent.get());
 		if (st != null) {
 			tc.append(" (");
