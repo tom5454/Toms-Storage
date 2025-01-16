@@ -125,6 +125,8 @@
 	"tomsstorage.config.inv_link_beacon_lvl": "Inventory Cable Connector requied beacon level for inventory linking\nValue of -1 disables this feature entirely",
 	"tomsstorage.config.inv_link_beacon_lvl_dim": "Inventory Cable Connector requied beacon level for cross dimensional access\nValue of -1 disables this feature entirely",
 	"tomsstorage.config.inv_dup_scan_size": "Inventory Connector duplicate finder max slot count",
+	"tomsstorage.config.inv_blocked_blocks": "List of block ids ignored by the inventory connector",
+	"tomsstorage.config.inv_blocked_mods": "List of mod ids whose blocks is ignored by the inventory connector",
 	
 	"text.autoconfig.toms_storage.title": "Tom's Simple Storage Configuration",
 	"text.autoconfig.toms_storage.option.invRange": "Inventory Connector Range",
@@ -142,6 +144,8 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvl.@Tooltip": "Value of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlDim.@Tooltip": "Value of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.invDupScanSize": "Inventory Connector duplicate finder max slot count",
+	"text.autoconfig.toms_storage.option.blockedBlocks": "List of block ids ignored by the inventory connector",
+	"text.autoconfig.toms_storage.option.blockedMods": "List of mod ids whose blocks is ignored by the inventory connector",
 	
 	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal",
 	

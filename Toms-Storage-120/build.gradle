@@ -148,6 +148,12 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
     maven { url "https://maven.terraformersmc.com/releases/"}
+    maven {
+        url 'https://www.cursemaven.com'
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
@@ -179,11 +185,13 @@ dependencies {
     
     compileOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1:api")
 	runtimeOnly fg.deobf("dev.emi:emi-forge:1.0.21+1.20.1")
+	
+	implementation fg.deobf("curse.maven:polymorph-388800:5995253")
     
     if(useLib) {
-    	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:12.0.624")
-		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:12.0.624")
-		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.0.624")
+    	compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:12.1.785")
+		compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:12.1.785")
+		implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:12.1.785")
 		implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.0.99")
     	implementation fg.deobf("dev.architectury:architectury-forge:9.0.8")
     }

@@ -1,6 +1,7 @@
 package com.tom.storagemod;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ public class Config implements ConfigData {
 	@Tooltip
 	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlDim = 4;
 	public int invLinkBeaconLvl = 1, invLinkBeaconLvlDim = 2;
+	public List<String> blockedBlocks = new ArrayList<>(Arrays.asList("create:belt"));
+	public List<String> blockedMods = new ArrayList<>();
 
 	@Override
 	public void validatePostLoad() throws ValidationException {
@@ -63,12 +66,22 @@ public class Config implements ConfigData {
 	}
 
 	private void reloadConfig() {
-		StorageMod.multiblockInvs = multiblockInv.stream().map(ResourceLocation::new).map(id -> BuiltInRegistries.BLOCK.get(id)).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
+		StorageMod.multiblockInvs = multiblockInv.stream().map(ResourceLocation::tryParse).filter(e -> e != null).map(id -> BuiltInRegistries.BLOCK.get(id)).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
+		StorageMod.blockedBlocks = blockedBlocks.stream().map(ResourceLocation::tryParse).filter(e -> e != null).map(id -> BuiltInRegistries.BLOCK.get(id)).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 	}
 
 	public static Set<Block> getMultiblockInvs() {
 		if(StorageMod.multiblockInvs == null)StorageMod.CONFIG.reloadConfig();
 		return StorageMod.multiblockInvs;
+	}
+
+	public Set<Block> getBlockedBlocks() {
+		if(StorageMod.blockedBlocks == null)StorageMod.CONFIG.reloadConfig();
+		return StorageMod.blockedBlocks;
+	}
+
+	public List<String> getBlockedMods() {
+		return blockedMods;
 	}
 
 	public static Config get() {

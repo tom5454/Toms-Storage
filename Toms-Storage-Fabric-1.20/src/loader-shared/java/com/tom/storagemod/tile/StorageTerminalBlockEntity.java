@@ -82,6 +82,10 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 		return null;
 	}
 
+	public StoredItemStack pullStackFuzzy(StoredItemStack stack, long max) {
+		return pullStack(stack, max);
+	}
+
 	public StoredItemStack pushStack(StoredItemStack stack) {
 		if(stack != null && itemHandler != null) {
 			try (Transaction transaction = Transaction.openOuter()) {
@@ -104,8 +108,12 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 		if(st.isEmpty())return;
 		StoredItemStack st0 = pushStack(new StoredItemStack(st));
 		if(st0 != null) {
-			Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, st0.getActualStack());
+			dropItem(st0.getActualStack());
 		}
+	}
+
+	public void dropItem(ItemStack stack) {
+		Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, stack);
 	}
 
 	@Override

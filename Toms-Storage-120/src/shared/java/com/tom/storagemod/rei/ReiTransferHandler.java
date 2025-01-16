@@ -5,9 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.StoredItemStack;
@@ -15,6 +16,7 @@ import com.tom.storagemod.util.StoredItemStack;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
+import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.transfer.TransferHandler;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
@@ -67,29 +69,16 @@ public class ReiTransferHandler implements TransferHandler {
 				}
 			}
 			if (context.isActuallyCrafting()) {
-				CompoundTag compound = new CompoundTag();
-				ListTag list = new ListTag();
-				for (int i = 0;i < stacks.length;++i) {
-					if (stacks[i] != null) {
-						CompoundTag CompoundTag = new CompoundTag();
-						CompoundTag.putByte("s", (byte) (width == 1 ? i * 3 : width == 2 ? ((i % 2) + i / 2 * 3) : i));
-						int k = 0;
-						for (int j = 0;j < stacks[i].length && k < 9;j++) {
-							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-								StoredItemStack s = new StoredItemStack(stacks[i][j]);
-								if(stored.contains(s) || context.getMinecraft().player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
-									CompoundTag tag = new CompoundTag();
-									stacks[i][j].save(tag);
-									CompoundTag.put("i" + (k++), tag);
-								}
-							}
-						}
-						CompoundTag.putByte("l", (byte) Math.min(9, k));
-						list.add(CompoundTag);
+				var rec = getRecipe(recipe);
+				if (rec != null) {
+					var recipeId = rec.getId();
+					if (recipeId != null && !Minecraft.getInstance().level.getRecipeManager().byKey(recipeId).isEmpty()) {
+						CompoundTag compound = new CompoundTag();
+						compound.putString("fill", recipeId.toString());
+						term.sendMessage(compound);
+						return Result.createSuccessful().blocksFurtherHandling();
 					}
 				}
-				compound.put("i", list);
-				term.sendMessage(compound);
 			}
 			if(!missing.isEmpty()) {
 				return Result.createSuccessful().color(0x67aaaa00).blocksFurtherHandling(false).
@@ -111,5 +100,12 @@ public class ReiTransferHandler implements TransferHandler {
 			return Result.createSuccessful().blocksFurtherHandling();
 		}
 		return Result.createNotApplicable();
+	}
+
+	private Recipe<?> getRecipe(Display display) {
+		// Displays can be based on completely custom objects, or on actual Vanilla recipes
+		var origin = DisplayRegistry.getInstance().getDisplayOrigin(display);
+
+		return origin instanceof Recipe<?> holder ? holder : null;
 	}
 }

@@ -10,7 +10,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -125,30 +124,12 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 		}
 
 		if(!simulate) {
-			CompoundTag compound = new CompoundTag();
-			ListTag list = new ListTag();
-			for (int i = 0;i < stacks.length;++i) {
-				if (stacks[i] != null) {
-					CompoundTag CompoundTag = new CompoundTag();
-					//CompoundTag.putByte("s", (byte) (width == 1 ? i * 3 : width == 2 ? ((i % 2) + i / 2 * 3) : i));
-					CompoundTag.putByte("s", (byte) (i));
-					int k = 0;
-					for (int j = 0;j < stacks[i].length && k < 9;j++) {
-						if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-							StoredItemStack s = new StoredItemStack(stacks[i][j]);
-							if(stored.contains(s) || Minecraft.getInstance().player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
-								CompoundTag tag = new CompoundTag();
-								stacks[i][j].save(tag);
-								CompoundTag.put("i" + (k++), tag);
-							}
-						}
-					}
-					CompoundTag.putByte("l", (byte) Math.min(9, k));
-					list.add(CompoundTag);
-				}
+			var recipeId = recipe.getId();
+			if (recipeId != null && !Minecraft.getInstance().level.getRecipeManager().byKey(recipeId).isEmpty()) {
+				CompoundTag compound = new CompoundTag();
+				compound.putString("fill", recipeId.toString());
+				term.sendMessage(compound);
 			}
-			compound.put("i", list);
-			term.sendMessage(compound);
 		}
 		return missing;
 	}

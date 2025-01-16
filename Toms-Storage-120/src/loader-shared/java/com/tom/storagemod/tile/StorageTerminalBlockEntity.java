@@ -87,6 +87,27 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 		return null;
 	}
 
+	public StoredItemStack pullStackFuzzy(StoredItemStack stack, long max) {
+		if(stack != null && itemHandler != null && max > 0) {
+			ItemStack st = stack.getStack();
+			StoredItemStack ret = null;
+			for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
+				ItemStack s = itemHandler.getStackInSlot(i);
+				if(ItemStack.isSameItem(s, st) && (ItemStack.isSameItemSameTags(s, st) || !s.isEnchanted())) {
+					ItemStack pulled = itemHandler.extractItem(i, (int) max, false);
+					if(!pulled.isEmpty()) {
+						if(ret == null)ret = new StoredItemStack(pulled);
+						else ret.grow(pulled.getCount());
+						max -= pulled.getCount();
+						if(max < 1)break;
+					}
+				}
+			}
+			return ret;
+		}
+		return null;
+	}
+
 	public StoredItemStack pushStack(StoredItemStack stack) {
 		if(stack != null && itemHandler != null) {
 			ItemStack is = ItemHandlerHelper.insertItemStacked(itemHandler, stack.getActualStack(), false);
@@ -107,8 +128,12 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 		if(st.isEmpty())return;
 		StoredItemStack st0 = pushStack(new StoredItemStack(st));
 		if(st0 != null) {
-			Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, st0.getActualStack());
+			dropItem(st0.getActualStack());
 		}
+	}
+
+	public void dropItem(ItemStack stack) {
+		Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, stack);
 	}
 
 	@Override

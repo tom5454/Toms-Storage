@@ -1,23 +1,22 @@
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
 repositories {
-maven { url 'https://jitpack.io' }
-jcenter()
-maven { url "https://maven.shedaniel.me/" }
-maven { url "https://maven.terraformersmc.com/releases/"}
-maven { url "https://maven.architectury.dev/" }
-maven {
+	maven { url 'https://jitpack.io' }
+	maven { url "https://maven.shedaniel.me/" }
+	maven { url "https://maven.terraformersmc.com/releases/"}
+	maven { url "https://maven.architectury.dev/" }
+	maven {
 		name = "Ladysnake Libs"
 		url = 'https://maven.ladysnake.org/releases'
 	}
-maven {
-    // location of the maven that hosts JEI files since January 2023
-    name = "Jared's maven"
-    url = "https://maven.blamejared.com/"
-  }
+	maven {
+		// location of the maven that hosts JEI files since January 2023
+		name = "Jared's maven"
+		url = "https://maven.blamejared.com/"
+	}
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -47,7 +46,9 @@ dependencies {
     
     modImplementation "dev.emi:trinkets:3.7.0"
     modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.2.0"
 	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0"
+	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.2.0"
 	
 	modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 		exclude(group: "net.fabricmc.fabric-api")
@@ -64,15 +65,15 @@ dependencies {
         exclude(group: "me.shedaniel.cloth")
         exclude(group: "dev.architectury")
     }
-    modImplementation("dev.architectury:architectury-fabric:9.0.7")
-    modCompileOnly "dev.emi:emi-fabric:1.0.5+1.20.1:api"
-	//modLocalRuntime "dev.emi:emi-fabric:1.0.5+1.20.1"
+    modImplementation("dev.architectury:architectury-fabric:9.2.14")
+    modCompileOnly "dev.emi:emi-fabric:1.1.19+1.20.1:api"
+	modLocalRuntime "dev.emi:emi-fabric:1.1.19+1.20.1"
     
 	// compile against the JEI API but do not include it at runtime
-	modCompileOnlyApi("mezz.jei:jei-1.20.1-common-api:15.2.0.22")
-	modCompileOnlyApi("mezz.jei:jei-1.20.1-fabric-api:15.2.0.22")
+	modCompileOnlyApi("mezz.jei:jei-1.20.1-common-api:15.20.0.106")
+	modCompileOnlyApi("mezz.jei:jei-1.20.1-fabric-api:15.20.0.106")
 	// at runtime, use the full JEI jar for Fabric
-	modRuntimeOnly("mezz.jei:jei-1.20.1-fabric:15.2.0.22")
+	modRuntimeOnly("mezz.jei:jei-1.20.1-fabric:15.20.0.106")
 }
 
 sourceSets {

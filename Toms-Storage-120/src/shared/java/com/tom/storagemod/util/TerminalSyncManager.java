@@ -234,4 +234,12 @@ public class TerminalSyncManager {
 	public static interface InteractHandler {
 		void onInteract(StoredItemStack intStack, SlotAction action, boolean mod);
 	}
+
+	public void fillCraftingFiller(TerminalCraftingFiller terminalCraftingFiller) {
+		items.forEach((s, c) -> {
+			ItemStack st = s.getActualStack();
+			st.setCount(c.intValue());
+			terminalCraftingFiller.accountStack(st);
+		});
+	}
 }

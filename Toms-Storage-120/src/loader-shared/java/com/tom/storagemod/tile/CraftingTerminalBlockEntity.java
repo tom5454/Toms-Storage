@@ -7,42 +7,24 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.tom.storagemod.Content;
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.gui.CraftingTerminalMenu;
 import com.tom.storagemod.platform.PlatformRecipe;
+import com.tom.storagemod.polymorph.PolymorphHelper;
 import com.tom.storagemod.util.CraftingMatrix;
 import com.tom.storagemod.util.StoredItemStack;
 
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
-	private AbstractContainerMenu craftingContainer = new AbstractContainerMenu(MenuType.CRAFTING, 0) {
-		@Override
-		public boolean stillValid(Player player) {
-			return false;
-		}
-
-		@Override
-		public void slotsChanged(Container inventory) {
-			if (level != null && !level.isClientSide) {
-				onCraftingMatrixChanged();
-			}
-		}
-
-		@Override
-		public ItemStack quickMoveStack(Player p_38941_, int p_38942_) {
-			return ItemStack.EMPTY;
-		}
-	};
 	private PlatformRecipe currentRecipe;
 	private final CraftingContainer craftMatrix = new CraftingMatrix(3, 3, () -> {
 		if (level != null && !level.isClientSide) {
@@ -177,7 +159,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	protected void onCraftingMatrixChanged() {
 		if(refillingGrid)return;
 		if (currentRecipe == null || !currentRecipe.matches(craftMatrix, level)) {
-			currentRecipe = PlatformRecipe.of(level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix, level).orElse(null));
+			currentRecipe = getRecipe();
 		}
 
 		if (currentRecipe == null) {
@@ -194,54 +176,27 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		}
 	}
 
-	public void clear() {
+	private PlatformRecipe getRecipe() {
+		if (StorageMod.polymorph) {
+			return PlatformRecipe.of(PolymorphHelper.getRecipe(this, RecipeType.CRAFTING, craftMatrix, level).orElse(null));
+		}
+		return PlatformRecipe.of(level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftMatrix, level).orElse(null));
+	}
+
+	public void clear(Player player) {
 		for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
 			ItemStack st = craftMatrix.removeItemNoUpdate(i);
 			if(!st.isEmpty()) {
-				pushOrDrop(st);
-			}
-		}
-		onCraftingMatrixChanged();
-	}
-
-	public void handlerItemTransfer(Player player, ItemStack[][] items) {
-		clear();
-		for (int i = 0;i < 9;i++) {
-			if (items[i] != null) {
-				ItemStack stack = ItemStack.EMPTY;
-				for (int j = 0;j < items[i].length;j++) {
-					ItemStack pulled = pullStack(items[i][j]);
-					if (!pulled.isEmpty()) {
-						stack = pulled;
-						break;
-					}
-				}
-				if (stack.isEmpty()) {
-					for (int j = 0;j < items[i].length;j++) {
-						boolean br = false;
-						for (int k = 0;k < player.getInventory().getContainerSize();k++) {
-							if(ItemStack.isSameItemSameTags(player.getInventory().getItem(k), items[i][j])) {
-								stack = player.getInventory().removeItem(k, 1);
-								br = true;
-								break;
-							}
-						}
-						if (br)
-							break;
-					}
-				}
-				if (!stack.isEmpty()) {
-					craftMatrix.setItem(i, stack);
+				StoredItemStack st0 = pushStack(new StoredItemStack(st));
+				if (st0 != null) {
+					var is = st0.getActualStack();
+					player.getInventory().add(is);
+					if (!is.isEmpty())
+						dropItem(is);
 				}
 			}
 		}
 		onCraftingMatrixChanged();
-	}
-
-	private ItemStack pullStack(ItemStack itemStack) {
-		StoredItemStack is = pullStack(new StoredItemStack(itemStack), 1);
-		if(is == null)return ItemStack.EMPTY;
-		else return is.getActualStack();
 	}
 
 	@Override
@@ -252,5 +207,14 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 
 	public boolean canCraft() {
 		return craftingCooldown + craftResult.getItem(0).getCount() <= craftResult.getItem(0).getMaxStackSize();
+	}
+
+	public void polymorphUpdate() {
+		currentRecipe = null;
+		onCraftingMatrixChanged();
+	}
+
+	public void setCraftSlot(int x, int y, ItemStack actualStack) {
+		craftMatrix.setItem(x + y * 3, actualStack);
 	}
 }

@@ -55,6 +55,7 @@ public class StorageMod implements ModInitializer {
 	public static Config CONFIG = new Config();
 
 	public static Set<Block> multiblockInvs;
+	public static Set<Block> blockedBlocks;
 
 	public StorageMod() {
 	}
@@ -107,12 +108,15 @@ public class StorageMod implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
 			CONFIG = LOADED_CONFIG;
+			multiblockInvs = null;
+			blockedBlocks = null;
 		});
 
 		StorageTags.init();
 
 		configHolder.registerSaveListener((a, b) -> {
 			multiblockInvs = null;
+			blockedBlocks = null;
 			return InteractionResult.PASS;
 		});
 	}

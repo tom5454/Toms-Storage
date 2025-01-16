@@ -406,4 +406,8 @@ public class StorageTerminalMenu extends PlatformRecipeMenu implements IDataRece
 			slot.y = this.y + y;
 		}
 	}
+
+	public StorageTerminalBlockEntity getTerminal() {
+		return te;
+	}
 }

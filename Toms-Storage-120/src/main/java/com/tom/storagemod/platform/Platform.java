@@ -15,11 +15,13 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.IShapedRecipe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -92,5 +94,11 @@ public class Platform {
 			if(!s.isEmpty())return map.apply(s.get(0).stack());
 		}
 		return def;
+	}
+
+	public static int getRecipeWidth(Recipe<?> recipe) {
+		if (recipe instanceof IShapedRecipe sr)
+			return sr.getRecipeWidth();
+		return -1;
 	}
 }

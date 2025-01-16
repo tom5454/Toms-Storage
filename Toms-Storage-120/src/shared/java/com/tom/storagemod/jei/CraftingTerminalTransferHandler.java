@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,13 +34,9 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & IAutoFillTerminal> implements PlatformRecipeTransferHandler<C> {
 	private final Class<C> containerClass;
 	private final IRecipeTransferHandlerHelper helper;
-	private static final List<Class<? extends AbstractContainerMenu>> containerClasses = new ArrayList<>();
 	private static final IRecipeTransferError ERROR_INSTANCE = new IRecipeTransferError() {
 		@Override public IRecipeTransferError.Type getType() { return IRecipeTransferError.Type.INTERNAL; }
 	};
-	static {
-		containerClasses.add(CraftingTerminalMenu.class);
-	}
 
 	public CraftingTerminalTransferHandler(Class<C> containerClass, IRecipeTransferHandlerHelper helper) {
 		this.containerClass = containerClass;
@@ -94,30 +89,12 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 				}
 			}
 			if (doTransfer) {
-				ItemStack[][] stacks = inputs.toArray(new ItemStack[][]{});
-				CompoundTag compound = new CompoundTag();
-				ListTag list = new ListTag();
-				for (int i = 0;i < stacks.length;++i) {
-					if (stacks[i] != null) {
-						CompoundTag CompoundNBT = new CompoundTag();
-						CompoundNBT.putByte("s", (byte) i);
-						int k = 0;
-						for (int j = 0;j < stacks[i].length && k < 9;j++) {
-							if (stacks[i][j] != null && !stacks[i][j].isEmpty()) {
-								StoredItemStack s = new StoredItemStack(stacks[i][j]);
-								if(stored.contains(s) || player.getInventory().findSlotMatchingItem(stacks[i][j]) != -1) {
-									CompoundTag tag = new CompoundTag();
-									stacks[i][j].save(tag);
-									CompoundNBT.put("i" + (k++), tag);
-								}
-							}
-						}
-						CompoundNBT.putByte("l", (byte) Math.min(9, k));
-						list.add(CompoundNBT);
-					}
+				var recipeId = recipe.getId();
+				if (recipeId != null && !player.level().getRecipeManager().byKey(recipeId).isEmpty()) {
+					CompoundTag compound = new CompoundTag();
+					compound.putString("fill", recipeId.toString());
+					term.sendMessage(compound);
 				}
-				compound.put("i", list);
-				term.sendMessage(compound);
 			}
 
 			if(!missing.isEmpty()) {
@@ -130,8 +107,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 	}
 
 	public static void registerTransferHandlers(IRecipeTransferRegistration recipeTransferRegistry) {
-		for (int i = 0;i < containerClasses.size();i++)
-			recipeTransferRegistry.addRecipeTransferHandler(new CraftingTerminalTransferHandler(containerClasses.get(i), recipeTransferRegistry.getTransferHelper()), RecipeTypes.CRAFTING);
+		recipeTransferRegistry.addRecipeTransferHandler(new CraftingTerminalTransferHandler<>(CraftingTerminalMenu.class, recipeTransferRegistry.getTransferHelper()), RecipeTypes.CRAFTING);
 	}
 
 	private static class TransferWarning implements IRecipeTransferError {

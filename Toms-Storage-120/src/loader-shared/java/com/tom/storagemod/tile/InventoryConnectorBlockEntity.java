@@ -30,6 +30,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.block.ITrim;
 import com.tom.storagemod.util.IProxy;
 import com.tom.storagemod.util.InfoHandler;
+import com.tom.storagemod.util.InventoryConnectorConfigUtil;
 import com.tom.storagemod.util.MultiItemHandler;
 import com.tom.storagemod.util.Priority;
 import com.tom.storagemod.util.TickerUtil.TickableServer;
@@ -84,6 +85,8 @@ public class InventoryConnectorBlockEntity extends BlockEntity implements Tickab
 						if(state.getBlock() instanceof ITrim) {
 							toCheck.add(p);
 						} else {
+							if (!InventoryConnectorConfigUtil.canConnect(state.getBlock()))
+								continue;
 							BlockEntity te = level.getBlockEntity(p);
 							if (te instanceof InventoryConnectorBlockEntity || te instanceof InventoryProxyBlockEntity || te instanceof AbstractInventoryCableConnectorBlockEntity) {
 								continue;

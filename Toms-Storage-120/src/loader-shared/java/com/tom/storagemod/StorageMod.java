@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -15,6 +16,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
+import com.tom.storagemod.polymorph.PolymorphHelper;
+import com.tom.storagemod.polymorph.PolymorphTerminalWidget;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(StorageMod.modid)
@@ -23,6 +26,8 @@ public class StorageMod {
 
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
+
+	public static boolean polymorph;
 
 	public StorageMod() {
 		// Register the setup method for modloading
@@ -38,6 +43,8 @@ public class StorageMod {
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 
+		polymorph = ModList.get().isLoaded("polymorph");
+
 		Content.init();
 
 		Platform.register();
@@ -46,9 +53,11 @@ public class StorageMod {
 	private void setup(final FMLCommonSetupEvent event) {
 		LOGGER.info("Tom's Storage Setup starting");
 		NetworkHandler.init();
+		if (polymorph)PolymorphHelper.init();
 	}
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
 		StorageModClient.clientSetup();
+		if (polymorph)PolymorphTerminalWidget.register();
 	}
 }

@@ -24,6 +24,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class Config {
 	public static final List<String> defaultMultiblocks = Arrays.asList("");
+	public static final List<String> defaultBlockedMods = Arrays.asList("");
+	public static final List<String> defaultBlockedBlocks = Arrays.asList("");
 	private static final Config INSTANCE = new Config();
 
 	public boolean onlyTrims;
@@ -35,6 +37,8 @@ public class Config {
 	public int wirelessTermBeaconLvl, wirelessTermBeaconLvlDim;
 	public int invLinkBeaconLvl, invLinkBeaconLvlDim;
 	public int invDupScanSize;
+	private Set<String> blockedMods = new HashSet<>();
+	private Set<Block> blockedBlocks = new HashSet<>();
 
 	public static Config get() {
 		return INSTANCE;
@@ -104,6 +108,8 @@ public class Config {
 
 	public static class Common {
 		public ConfigValue<List<? extends String>> multiblockInvs;
+		public ConfigValue<List<? extends String>> blockedMods;
+		public ConfigValue<List<? extends String>> blockedBlocks;
 
 		public Common(ForgeConfigSpec.Builder builder) {
 			builder.comment("IMPORTANT NOTICE:",
@@ -117,6 +123,14 @@ public class Config {
 			multiblockInvs = builder.comment("List of multiblock inventory blocks").
 					translation("tomsstorage.config.multiblock_inv").
 					defineList("multiblockInv", defaultMultiblocks, s -> true);
+
+			blockedMods = builder.comment("List of mod ids whose blocks is ignored by the inventory connector").
+					translation("tomsstorage.config.inv_blocked_mods").
+					defineList("blockedMods", defaultBlockedMods, s -> true);
+
+			blockedBlocks = builder.comment("List of block ids ignored by the inventory connector").
+					translation("tomsstorage.config.inv_blocked_blocks").
+					defineList("blockedBlocks", defaultBlockedBlocks, s -> true);
 		}
 	}
 
@@ -149,7 +163,12 @@ public class Config {
 			invLinkBeaconLvlDim = SERVER.invLinkBeaconLvlDim.get();
 			invDupScanSize = SERVER.invDupScanSize.get();
 		} else if(modConfig.getType() == Type.COMMON) {
-			multiblockInvs = COMMON.multiblockInvs.get().stream().map(ResourceLocation::new).map(ForgeRegistries.BLOCKS::getValue).
+			multiblockInvs = COMMON.multiblockInvs.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).map(ForgeRegistries.BLOCKS::getValue).
+					filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
+
+			blockedMods = new HashSet<>(COMMON.blockedMods.get());
+
+			blockedBlocks = COMMON.blockedBlocks.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).map(ForgeRegistries.BLOCKS::getValue).
 					filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 		}
 	}
@@ -164,5 +183,13 @@ public class Config {
 	public void onFileChange(final ModConfigEvent.Reloading configEvent) {
 		StorageMod.LOGGER.info("Tom's Simple Storage config just got changed on the file system!");
 		load(configEvent.getConfig());
+	}
+
+	public Set<Block> getBlockedBlocks() {
+		return blockedBlocks;
+	}
+
+	public Set<String> getBlockedMods() {
+		return blockedMods;
 	}
 }

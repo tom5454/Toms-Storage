@@ -4,9 +4,8 @@ import java.util.List;
 
 import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.recipebook.ServerPlaceRecipe;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,6 +27,8 @@ import com.tom.storagemod.tile.CraftingTerminalBlockEntity;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
 import com.tom.storagemod.util.StoredItemStack;
+import com.tom.storagemod.util.TerminalCraftingFiller;
+import com.tom.storagemod.util.TerminalRecipePlacer;
 
 public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFillTerminal, IDataReceiver, IForgeMenu {
 	public static class SlotCrafting extends Slot {
@@ -175,7 +176,9 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public boolean clickMenuButton(Player playerIn, int id) {
 		if(te != null && id == 0)
-			((CraftingTerminalBlockEntity) te).clear();
+			((CraftingTerminalBlockEntity) te).clear(playerIn);
+		else if(te != null && id == 1)
+			((CraftingTerminalBlockEntity) te).polymorphUpdate();
 		else super.clickMenuButton(playerIn, id);
 		return false;
 	}
@@ -226,71 +229,34 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	}
 
 	@Override
-	public ServerPlaceRecipe<CraftingContainer> getRecipePlacer() {
-		return new ServerPlaceRecipe<>(this) {
-
-			@Override
-			protected void moveItemToGrid(Slot slotToFill, ItemStack ingredientIn) {
-				int i = this.inventory.findSlotMatchingUnusedItem(ingredientIn);
-				if (i != -1) {
-					ItemStack itemstack = this.inventory.getItem(i).copy();
-					if (!itemstack.isEmpty()) {
-						if (itemstack.getCount() > 1) {
-							this.inventory.removeItem(i, 1);
-						} else {
-							this.inventory.removeItemNoUpdate(i);
-						}
-
-						itemstack.setCount(1);
-						if (slotToFill.getItem().isEmpty()) {
-							slotToFill.set(itemstack);
-						} else {
-							slotToFill.getItem().grow(1);
-						}
-
-					}
-				} else if(te != null) {
-					StoredItemStack st = te.pullStack(new StoredItemStack(ingredientIn), 1);
-					if(st != null) {
-						if (slotToFill.getItem().isEmpty()) {
-							slotToFill.set(st.getActualStack());
-						} else {
-							slotToFill.getItem().grow(1);
-						}
-					}
-				}
-			}
-
-			@Override
-			protected void clearGrid() {
-				((CraftingTerminalBlockEntity) te).clear();
-				this.menu.clearCraftingContent();
-			}
-		};
+	public TerminalRecipePlacer getRecipePlacer() {
+		return new TerminalRecipePlacer(this, (CraftingTerminalBlockEntity) te, pinv.player);
 	}
 
 	@Override
 	public void receive(CompoundTag message) {
 		super.receive(message);
-		if(message.contains("i")) {
-			ItemStack[][] stacks = new ItemStack[9][];
-			ListTag list = message.getList("i", 10);
-			for (int i = 0;i < list.size();i++) {
-				CompoundTag nbttagcompound = list.getCompound(i);
-				byte slot = nbttagcompound.getByte("s");
-				byte l = nbttagcompound.getByte("l");
-				stacks[slot] = new ItemStack[l];
-				for (int j = 0;j < l;j++) {
-					CompoundTag tag = nbttagcompound.getCompound("i" + j);
-					stacks[slot][j] = ItemStack.of(tag);
+		if(message.contains("fill")) {
+			var id = ResourceLocation.tryParse(message.getString("fill"));
+			if (id != null) {
+				var recipe = pinv.player.level().getRecipeManager().byKey(id).orElse(null);
+				if (recipe != null) {
+					new TerminalCraftingFiller((CraftingTerminalBlockEntity) te, pinv.player, sync).placeRecipe(recipe);
 				}
 			}
-			((CraftingTerminalBlockEntity) te).handlerItemTransfer(pinv.player, stacks);
 		}
 	}
 
 	@Override
 	public List<StoredItemStack> getStoredItems() {
 		return itemList;
+	}
+
+	public Slot getCraftingResultSlot() {
+		return craftingResultSlot;
+	}
+
+	public Player getPlayer() {
+		return pinv.player;
 	}
 }
