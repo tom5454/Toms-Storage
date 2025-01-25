@@ -122,7 +122,7 @@ public class PlatformProxyInventoryAccess implements PlatformInventoryAccess, St
 
 	@Override
 	public IInventoryAccess getRootHandler() {
-		return access;
+		return access.getRootHandler();
 	}
 
 	@Override

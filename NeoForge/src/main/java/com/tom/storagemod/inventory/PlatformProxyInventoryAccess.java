@@ -76,7 +76,7 @@ public class PlatformProxyInventoryAccess implements PlatformInventoryAccess, II
 
 	@Override
 	public IInventoryAccess getRootHandler() {
-		return access;
+		return access.getRootHandler();
 	}
 
 	@Override

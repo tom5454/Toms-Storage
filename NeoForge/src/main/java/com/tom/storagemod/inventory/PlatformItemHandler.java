@@ -48,6 +48,6 @@ public class PlatformItemHandler implements IItemHandler, IProxy {
 
 	@Override
 	public IInventoryAccess getRootHandler() {
-		return access.getInventoryAccess();
+		return access.getInventoryAccess().getRootHandler();
 	}
 }
