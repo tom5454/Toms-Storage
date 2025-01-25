@@ -1,58 +1,6 @@
 {
-    "__comment": "Model generated using MrCrayfish's Model Creator (https://mrcrayfish.com/tools?id=mc)",
-    "textures": {
-        "particle": "toms_storage:block/inventory_hopper_basic",
-        "0": "block/redstone_torch",
-        "1": "toms_storage:block/inventory_hopper_basic"
-    },
-    "parent": "block/block",
-	"render_type": "cutout",
-    "display": {
-    	"gui": {
-            "rotation": [ 30, 225, 90 ],
-            "translation": [ 0, 0, 0],
-            "scale":[ 0.625, 0.625, 0.625 ]
-        }
-    },
-    "elements": [
-        {
-            "name": "bottom",
-            "from": [ 0.00, -6.00, 7.00 ], 
-            "to": [ 16.00, 10.00, 9.00 ], 
-            "faces": {
-                "north": { "texture": "#0", "uv": [ 0.00, 0.00, 16.00, 16.00 ], "rotation": 180 },
-                "south": { "texture": "#0", "uv": [ 0.00, 0.00, 16.00, 16.00 ], "rotation": 180 }
-            }
-        },
-        {
-            "name": "top",
-            "from": [ 3.00, 6.00, 3.00 ], 
-            "to": [ 13.00, 16.00, 13.00 ], 
-            "faces": {
-                "north": { "texture": "#1", "uv": [ 6.00, 0.00, 16.00, 10.00 ] },
-                "east": { "texture": "#1", "uv": [ 6.00, 0.00, 16.00, 10.00 ] },
-                "south": { "texture": "#1", "uv": [ 6.00, 0.00, 16.00, 10.00 ] },
-                "west": { "texture": "#1", "uv": [ 6.00, 0.00, 16.00, 10.00 ] },
-                "up": { "texture": "#1", "uv": [ 6.00, 0.00, 16.00, 10.00 ] },
-                "down": { "texture": "#1", "uv": [ 6.00, 0.00, 16.00, 10.00 ] }
-            }
-        },
-        {
-            "name": "bottom2",
-            "from": [ 7.00, -6.00, 0.00 ], 
-            "to": [ 9.00, 10.00, 16.00 ], 
-            "faces": {
-                "east": { "texture": "#0", "uv": [ 0.00, 0.00, 16.00, 16.00 ], "rotation": 180 },
-                "west": { "texture": "#0", "uv": [ 0.00, 0.00, 16.00, 16.00 ], "rotation": 180 }
-            }
-        },
-        {
-            "name": "bottom3",
-            "from": [ 7.00, 0.00, 7.00 ], 
-            "to": [ 9.00, 6.00, 9.00 ], 
-            "faces": {
-                "down": { "texture": "#0", "uv": [ 7.00, 6.00, 9.00, 8.00 ] }
-            }
-        }
-    ]
+  "parent": "toms_storage:block/level_emitter_template",
+  "textures": {
+    "torch": "minecraft:block/redstone_torch"
+  }
 }
