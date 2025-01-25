@@ -1,7 +1,9 @@
 package com.tom.storagemod.inventory;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -20,11 +22,13 @@ public class InventorySlot implements Storage<ItemVariant> {
 	private StorageView<ItemVariant> view;
 	private Storage<ItemVariant> parent;
 	private IChangeNotifier ch;
+	private Set<StorageView<ItemVariant>> seen;
 
-	public InventorySlot(Storage<ItemVariant> parent, StorageView<ItemVariant> h, IChangeNotifier notif) {
+	public InventorySlot(Storage<ItemVariant> parent, StorageView<ItemVariant> h, IChangeNotifier notif, Set<StorageView<ItemVariant>> seen) {
 		this.parent = parent;
 		this.ch = notif;
 		this.view = h;
+		this.seen = seen;
 	}
 
 	public ItemStack getStack() {
@@ -99,5 +103,15 @@ public class InventorySlot implements Storage<ItemVariant> {
 
 	private void notifyChange() {
 		ch.onSlotChanged(this);
+	}
+
+	public Set<StorageView<ItemVariant>> getSeen() {
+		return seen;
+	}
+
+	public Set<StorageView<ItemVariant>> nextSlot() {
+		if (seen == Collections.EMPTY_SET)seen = new HashSet<>();
+		seen.add(view.getUnderlyingView());
+		return seen;
 	}
 }

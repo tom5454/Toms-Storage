@@ -3,6 +3,7 @@ package com.tom.storagemod.inventory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -111,18 +112,27 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 
 	@Override
 	public InventorySlot findSlot(ItemPredicate filter, boolean findEmpty) {
+		return findSlot(filter, findEmpty, Collections.emptySet());
+	}
+
+	private InventorySlot findSlot(ItemPredicate filter, boolean findEmpty, Set<StorageView<ItemVariant>> seen) {
 		Storage<ItemVariant> h = storage;
 		if (h == null)return null;
 		for (var slot : h) {
 			if (slot.isResourceBlank()) {
-				if (findEmpty)return new InventorySlot(getSlotHandler(h), getSlotHandler(slot), this);
+				if (findEmpty) {
+					if (seen.contains(slot.getUnderlyingView()))continue;
+					return new InventorySlot(getSlotHandler(h), getSlotHandler(slot), this, seen);
+				}
 				continue;
 			}
+			if (getCount(slot) < 1)continue;
+			if (seen.contains(slot.getUnderlyingView()))continue;
 			ItemVariant iv = slot.getResource();
 			if(filter.test(new StoredItemStack(iv.toStack(), slot.getAmount(), slot.hashCode()))) {
 				try (Transaction tr = Transaction.openOuter()) {
 					if (slot.extract(iv, 1, tr) == 1)
-						return new InventorySlot(getSlotHandler(h), getSlotHandler(slot), this);
+						return new InventorySlot(getSlotHandler(h), getSlotHandler(slot), this, seen);
 				}
 			}
 			continue;
@@ -133,12 +143,19 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 	@Override
 	public InventorySlot findSlotAfter(InventorySlot slotIn, ItemPredicate filter, boolean findEmpty, boolean loop) {
 		if (slotIn == null)return findSlot(filter, findEmpty);
-		var s = findSlot(filter, findEmpty);
-		return s == slotIn ? null : s;
+		var sl = findSlot(filter, findEmpty, slotIn.nextSlot());
+		if (sl == null && loop) {
+			return findSlot(filter, findEmpty);
+		}
+		return sl;
 	}
 
 	@Override
 	public InventorySlot findSlotDest(StoredItemStack forStack) {
+		return findSlotDest(forStack, Collections.emptySet());
+	}
+
+	private InventorySlot findSlotDest(StoredItemStack forStack, Set<StorageView<ItemVariant>> seen) {
 		Storage<ItemVariant> h = storage;
 		if (h == null)return null;
 		if (!checkFilter(forStack))return null;
@@ -146,7 +163,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 		try (Transaction tr = Transaction.openOuter()) {
 			long c = h.insert(iv, forStack.getQuantity(), tr);
 			if (c > 0)
-				return new InventorySlot(getSlotHandler(h), null, this);
+				return new InventorySlot(getSlotHandler(h), null, this, seen);
 		}
 		return null;
 	}
@@ -154,8 +171,11 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 	@Override
 	public InventorySlot findSlotDestAfter(InventorySlot slotIn, StoredItemStack forStack, boolean loop) {
 		if (slotIn == null)return findSlotDest(forStack);
-		var s = findSlotDest(forStack);
-		return s == slotIn ? null : s;
+		var sl = findSlotDest(forStack, slotIn.nextSlot());
+		if (sl == null && loop) {
+			return findSlotDest(forStack);
+		}
+		return sl;
 	}
 
 	@Override

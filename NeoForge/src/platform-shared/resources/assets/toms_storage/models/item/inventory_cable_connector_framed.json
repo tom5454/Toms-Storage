@@ -1,3 +1,3 @@
 {
-	"parent": "toms_storage:block/cable_connector/item"
+	"parent": "toms_storage:block/cable_connector/item_framed"
 }

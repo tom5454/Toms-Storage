@@ -82,6 +82,6 @@ public class PlatformItemHandler implements Storage<ItemVariant>, IProxy {
 
 	@Override
 	public IInventoryAccess getRootHandler() {
-		return access.getInventoryAccess();
+		return access.getInventoryAccess().getRootHandler();
 	}
 }

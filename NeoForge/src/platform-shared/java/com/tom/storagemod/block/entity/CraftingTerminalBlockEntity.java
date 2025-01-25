@@ -67,8 +67,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 			if (!itemstack.isEmpty()) {
 				CompoundTag tag = new CompoundTag();
 				tag.putByte("Slot", (byte)i);
-				itemstack.save(provider, tag);
-				listnbt.add(tag);
+				listnbt.add(itemstack.save(provider, tag));
 			}
 		}
 

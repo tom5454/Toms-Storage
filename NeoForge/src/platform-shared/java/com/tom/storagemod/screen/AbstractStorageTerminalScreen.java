@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
 
+import net.minecraft.CrashReport;
+import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -467,13 +469,22 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	protected boolean drawSlot(GuiGraphics st, SlotStorage slot, int mouseX, int mouseY) {
 		if (slot.stack != null) {
-			ItemStack stack = slot.stack.getStack().copy().split(1);
-			int i = slot.xDisplayPosition, j = slot.yDisplayPosition;
+			try {
+				ItemStack stack = slot.stack.getStack().copyWithCount(1);
+				int i = slot.xDisplayPosition, j = slot.yDisplayPosition;
 
-			st.renderItem(stack, i, j);
-			st.renderItemDecorations(font, stack, i, j);
+				st.renderItem(stack, i, j);
+				st.renderItemDecorations(font, stack, i, j);
 
-			drawStackSize(st, getFont(), slot.stack.getQuantity(), i, j);
+				drawStackSize(st, getFont(), slot.stack.getQuantity(), i, j);
+			} catch (Exception e) {
+				CrashReport report = CrashReport.forThrowable(e, "Rendering item stack in terminal");
+				report.addCategory("Item details:").
+				setDetail("Item Id", () -> BuiltInRegistries.ITEM.getKey(slot.stack.getStack().getItem()).toString()).
+				setDetail("Item Count", slot.stack.getQuantity()).
+				setDetail("Item Components", () -> componentCache.get(slot.stack));
+				throw new ReportedException(report);
+			}
 		}
 
 		if (mouseX >= getGuiLeft() + slot.xDisplayPosition - 1 && mouseY >= getGuiTop() + slot.yDisplayPosition - 1 && mouseX < getGuiLeft() + slot.xDisplayPosition + 17 && mouseY < getGuiTop() + slot.yDisplayPosition + 17) {
