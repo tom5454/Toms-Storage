@@ -171,6 +171,10 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 	@Override
 	public InventorySlot findSlotDestAfter(InventorySlot slotIn, StoredItemStack forStack, boolean loop) {
 		if (slotIn == null)return findSlotDest(forStack);
+		if (slotIn.getView() == null) {
+			if (loop)return findSlotDest(forStack);
+			else return null;
+		}
 		var sl = findSlotDest(forStack, slotIn.nextSlot());
 		if (sl == null && loop) {
 			return findSlotDest(forStack);
