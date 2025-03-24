@@ -151,7 +151,7 @@ dependencies {
     compileOnly "dev.emi:emi-neoforge:1.1.19+1.21.1:api"
 	runtimeOnly "dev.emi:emi-neoforge:1.1.19+1.21.1"
 	
-	implementation "curse.maven:polymorph-388800:5480541"
+	implementation "curse.maven:polymorph-388800:5995380"
 	
 	implementation "curse.maven:the-one-probe-245211:5502323"
     implementation "curse.maven:jade-324717:5529595"
