@@ -26,6 +26,13 @@ public class PolymorphTerminalWidget extends PlayerRecipesWidget {
 		});*/
 	}
 
+	@Override
+	public void initChildWidgets() {
+		var mc = Minecraft.getInstance();
+		mc.gameMode.handleInventoryButtonClick((this.menu).containerId, 1);
+		super.initChildWidgets();
+	}
+
 	public static void register() {
 		PolymorphWidgets.getInstance().registerWidget(screen -> {
 			if (screen instanceof CraftingTerminalScreen s) {

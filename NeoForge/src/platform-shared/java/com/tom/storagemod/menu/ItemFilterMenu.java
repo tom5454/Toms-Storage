@@ -25,6 +25,7 @@ public class ItemFilterMenu extends AbstractFilteredMenu {
 		this(wid, pinv, new SimpleContainer(9));
 		addDataSlot(DataSlots.set(v -> matchNBT = v == 1));
 		addDataSlot(DataSlots.set(v -> allowList = v == 1));
+		this.isValid = () -> true;
 	}
 
 	public ItemFilterMenu(int wid, Inventory pinv, SimpleItemFilter filter, BooleanSupplier isValid, Runnable refresh) {

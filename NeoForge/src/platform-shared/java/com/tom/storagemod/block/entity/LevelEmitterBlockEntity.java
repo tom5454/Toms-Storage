@@ -93,6 +93,7 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 
 	public void setFilter(ItemStack filter) {
 		this.filter = new StoredItemStack(filter);
+		changeTracker = 0L;
 	}
 
 	public StoredItemStack getFilter() {
@@ -101,6 +102,7 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 
 	public void setCount(int count) {
 		this.count = count;
+		changeTracker = 0L;
 	}
 
 	public int getCount() {
@@ -109,6 +111,7 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 
 	public void setLessThan(boolean lessThan) {
 		this.lessThan = lessThan;
+		changeTracker = 0L;
 	}
 
 	public boolean isLessThan() {

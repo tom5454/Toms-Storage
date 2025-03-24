@@ -34,6 +34,7 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 		this.filter = filter;
 		this.isValid = isValid;
 		this.refresh = refresh;
+		this.isValid = () -> true;
 	}
 
 	public TagItemFilterMenu(int wid, Inventory pinv) {
