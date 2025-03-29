@@ -2,6 +2,7 @@ package com.tom.storagemod.block;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +49,7 @@ import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
-public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock {
+public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock, BlockWithTooltip {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 	public static final MapCodec<LevelEmitterBlock> CODEC = simpleCodec(LevelEmitterBlock::new);
@@ -60,7 +61,7 @@ public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCabl
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("level_emitter", tooltip);
 	}

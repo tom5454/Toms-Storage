@@ -2,6 +2,7 @@ package com.tom.storagemod.block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +38,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
 
-public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable, NeoForgeBlock {
+public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedBlock, IInventoryCable, NeoForgeBlock, BlockWithTooltip {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -49,7 +50,7 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 	public static final MapCodec<InventoryCableBlock> CODEC = simpleCodec(InventoryCableBlock::new);
 
 	public InventoryCableBlock(Block.Properties pr) {
-		super(0.125f, pr);
+		super(4f, pr);
 		registerDefaultState(defaultBlockState()
 				.setValue(DOWN, false)
 				.setValue(UP, false)
@@ -61,7 +62,7 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("inventory_cable", tooltip);
 	}

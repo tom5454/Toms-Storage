@@ -31,7 +31,7 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-1.21.4'
+    archivesName = 'toms_storage-1.21.5'
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -97,7 +97,7 @@ sourceSets {
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/top/**"
-			if(!useLib)exclude "com/tom/storagemod/jade/**"
+			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -136,6 +136,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
+    implementation "curse.maven:jade-324717:6353729"
+    
     if(useLib) {
      	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
     	compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
@@ -158,14 +160,14 @@ dependencies {
 	
 		implementation "curse.maven:polymorph-388800:5995380"
 	
-    	implementation "curse.maven:jade-324717:5529595"
-    	
     	implementation "curse.maven:the-one-probe-245211:5502323"
     } else {
     	compileOnly files("libs/curios_dummy.jar")
     	compileOnly files("libs/vc_dummy.jar")
     	compileOnly files("libs/polymorph_dummy.jar")
     }
+    
+    compileOnly files("libs/iris.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

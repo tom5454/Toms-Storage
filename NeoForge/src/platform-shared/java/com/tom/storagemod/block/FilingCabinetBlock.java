@@ -1,10 +1,11 @@
 package com.tom.storagemod.block;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +31,7 @@ import com.mojang.serialization.MapCodec;
 import com.tom.storagemod.block.entity.FilingCabinetBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
-public class FilingCabinetBlock extends BaseEntityBlock {
+public class FilingCabinetBlock extends BaseEntityBlock implements BlockWithTooltip {
 	public static final MapCodec<FilingCabinetBlock> CODEC = simpleCodec(FilingCabinetBlock::new);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -39,7 +40,7 @@ public class FilingCabinetBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("filing_cabinet", tooltip);
 	}
@@ -94,15 +95,8 @@ public class FilingCabinetBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState state2, boolean flag) {
-		if (!state.is(state2.getBlock())) {
-			BlockEntity blockentity = world.getBlockEntity(pos);
-			if (blockentity instanceof FilingCabinetBlockEntity te) {
-				Containers.dropContents(world, pos, te.getInv());
-				world.updateNeighbourForOutputSignal(pos, this);
-			}
-
-			super.onRemove(state, world, pos, state2, flag);
-		}
+	protected void affectNeighborsAfterRemoval(BlockState p_394424_, ServerLevel p_394241_, BlockPos p_393520_,
+			boolean p_394545_) {
+		Containers.updateNeighboursAfterDestroy(p_394424_, p_394241_, p_393520_);
 	}
 }

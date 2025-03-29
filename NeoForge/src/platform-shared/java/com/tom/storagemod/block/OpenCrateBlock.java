@@ -1,6 +1,6 @@
 package com.tom.storagemod.block;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +28,7 @@ import com.tom.storagemod.block.entity.OpenCrateBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.util.TickerUtil;
 
-public class OpenCrateBlock extends BaseEntityBlock {
+public class OpenCrateBlock extends BaseEntityBlock implements BlockWithTooltip {
 	public static final MapCodec<OpenCrateBlock> CODEC = simpleCodec(OpenCrateBlock::new);
 
 	public OpenCrateBlock(Block.Properties pr) {
@@ -48,7 +48,7 @@ public class OpenCrateBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("open_crate", tooltip);
 	}

@@ -19,9 +19,9 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -55,10 +55,9 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 
 	@Override
 	public void receive(CompoundTag tag) {
-		ListTag list = tag.getList("list", Tag.TAG_COMPOUND);
+		ListTag list = tag.getListOrEmpty("list");
 		LinkChannel.loadAll(list, connections);
-		if(tag.contains("selected")) {
-			var sel = tag.getUUID("selected");
+		tag.read("selected", UUIDUtil.CODEC).ifPresentOrElse(sel -> {
 			var selC = connections.get(sel);
 			if (selC != null) {
 				channelsList.setSelected(selC);
@@ -66,9 +65,9 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 			} else {
 				channelsList.setSelected(null);
 			}
-		} else {
+		}, () -> {
 			channelsList.setSelected(null);
-		}
+		});
 		Comparator<LinkChannel> cmp = Comparator.comparing(e -> e.publicChannel);
 		cmp = cmp.thenComparing(e -> e.displayName);
 		sortedList = connections.values().stream().sorted(cmp).collect(Collectors.toList());
@@ -136,14 +135,14 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 
 	private void sendEdit(LinkChannel id, LinkChannel ch) {
 		CompoundTag tag = new CompoundTag();
-		if(id != null)tag.putUUID("id", id.id);
+		if(id != null)tag.store("id", UUIDUtil.CODEC, id.id);
 		if(ch != null)ch.saveToServer(tag);
 		NetworkHandler.sendDataToServer(tag);
 	}
 
 	private void sendSelect(UUID id) {
 		CompoundTag tag = new CompoundTag();
-		tag.putUUID("id", id);
+		tag.store("id", UUIDUtil.CODEC, id);
 		tag.putBoolean("select", true);
 		NetworkHandler.sendDataToServer(tag);
 	}

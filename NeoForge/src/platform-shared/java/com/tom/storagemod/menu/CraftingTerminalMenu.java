@@ -189,15 +189,15 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public void receive(CompoundTag message) {
 		super.receive(message);
-		if(message.contains("fill")) {
-			var id = ResourceLocation.tryParse(message.getString("fill"));
+		message.getString("fill").ifPresent(s -> {
+			var id = ResourceLocation.tryParse(s);
 			if (id != null) {
 				var recipe = pinv.player.level().getServer().getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id)).orElse(null);
 				if (recipe != null) {
 					new TerminalCraftingFiller((CraftingTerminalBlockEntity) te, pinv.player, sync).placeRecipe(recipe.value());
 				}
 			}
-		}
+		});
 	}
 
 	@Override

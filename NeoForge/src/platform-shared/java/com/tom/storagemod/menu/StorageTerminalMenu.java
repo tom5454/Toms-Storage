@@ -94,8 +94,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 		for (int i = 0;i < 9;++i) {
 			addSlot(new Slot(playerInventory, i, x + i * 18, y + 58));
 		}
-
-		offhand = addSlot(new Slot(playerInventory, playerInventory.items.size() + playerInventory.armor.size(), 0, y + 58) {
+		offhand = addSlot(new Slot(playerInventory, 40, 0, y + 58) {
 
 			@Override
 			public void setByPlayer(ItemStack p_270479_, ItemStack p_299920_) {
@@ -233,7 +232,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 			pinv.setChanged();
 		}
 		if(message.contains("s"))
-			search = message.getString("s");
+			search = message.getStringOr("s", "");
 		if(onPacket != null)onPacket.run();
 	}
 
@@ -269,14 +268,14 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 	public void receive(CompoundTag message) {
 		if(pinv.player.isSpectator())return;
 		if(message.contains("s")) {
-			te.setLastSearch(message.getString("s"));
+			te.setLastSearch(message.getStringOr("s", ""));
 		}
 		sync.receiveInteract(message, this);
 		if(message.contains("c")) {
-			CompoundTag d = message.getCompound("c");
-			te.setSorting(d.getInt("s"));
-			te.setSearchType(d.getInt("st"));
-			te.setModes(d.getInt("m"));
+			CompoundTag d = message.getCompoundOrEmpty("c");
+			te.setSorting(d.getIntOr("s", 0));
+			te.setSearchType(d.getIntOr("st", 0));
+			te.setModes(d.getIntOr("m", 0));
 		}
 	}
 

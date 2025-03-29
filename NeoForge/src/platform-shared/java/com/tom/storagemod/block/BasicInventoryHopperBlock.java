@@ -2,7 +2,6 @@ package com.tom.storagemod.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -72,18 +71,6 @@ public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
 			}
 		}
 		return InteractionResult.SUCCESS;
-	}
-
-	@Override
-	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState state2, boolean flag) {
-		if (!state.is(state2.getBlock())) {
-			BlockEntity blockentity = world.getBlockEntity(pos);
-			if (blockentity instanceof BasicInventoryHopperBlockEntity te && !te.getFilter().isEmpty() && te.getFilter().getItem() instanceof IItemFilter) {
-				Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), te.getFilter());
-			}
-
-			super.onRemove(state, world, pos, state2, flag);
-		}
 	}
 
 	@Override

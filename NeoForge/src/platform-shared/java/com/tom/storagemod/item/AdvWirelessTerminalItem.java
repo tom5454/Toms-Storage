@@ -1,6 +1,6 @@
 package com.tom.storagemod.item;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,8 +33,8 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, TooltipContext tooltipContext, List<Component> tooltip,
-			TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, TooltipDisplay p_399753_,
+			Consumer<Component> tooltip, TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("adv_wireless_terminal", tooltip, Config.get().advWirelessRange);
 		if (Config.get().wirelessTermBeaconLvl != -1) {
 			ClientUtil.tooltip("adv_wireless_terminal.beacon", false, tooltip);
@@ -42,15 +43,15 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 				ClientUtil.tooltip("adv_wireless_terminal.beacon2", false, tooltip, Config.get().wirelessTermBeaconLvlCrossDim);
 			}
 		}
-		WorldPos pos = stack.get(Content.boundPosComponent.get());
+		WorldPos pos = itemStack.get(Content.boundPosComponent.get());
 		if(pos != null) {
 			int x = pos.pos().getX();
 			int y = pos.pos().getY();
 			int z = pos.pos().getZ();
 			String dim = pos.dim().location().toString();
-			tooltip.add(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
+			tooltip.accept(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
-		tooltip.add(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind", Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind.outline", Component.keybind("key.toms_storage.open_terminal")).withStyle(ChatFormatting.GREEN)));
+		tooltip.accept(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind", Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind.outline", Component.keybind("key.toms_storage.open_terminal")).withStyle(ChatFormatting.GREEN)));
 	}
 
 	@Override

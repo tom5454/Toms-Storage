@@ -1,14 +1,13 @@
 package com.tom.storagemod.client;
 
-import net.minecraft.client.renderer.block.model.UnbakedBlockStateModel;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class UnbakedPaintedModel implements UnbakedBlockStateModel {
-	private UnbakedBlockStateModel parent;
+public class UnbakedPaintedModel implements BlockStateModel.UnbakedRoot {
+	private BlockStateModel.UnbakedRoot parent;
 
-	public UnbakedPaintedModel(UnbakedBlockStateModel parent) {
+	public UnbakedPaintedModel(BlockStateModel.UnbakedRoot parent) {
 		this.parent = parent;
 	}
 
@@ -18,12 +17,12 @@ public class UnbakedPaintedModel implements UnbakedBlockStateModel {
 	}
 
 	@Override
-	public BakedModel bake(ModelBaker modelBaker) {
-		return new BakedPaintedModel(parent.bake(modelBaker));
+	public Object visualEqualityGroup(BlockState blockState) {
+		return parent.visualEqualityGroup(blockState);
 	}
 
 	@Override
-	public Object visualEqualityGroup(BlockState blockState) {
-		return parent.visualEqualityGroup(blockState);
+	public BlockStateModel bake(BlockState blockState, ModelBaker modelBaker) {
+		return new BakedPaintedModel(parent.bake(blockState, modelBaker));
 	}
 }

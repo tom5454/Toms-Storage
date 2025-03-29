@@ -165,10 +165,11 @@ public class TerminalSyncManager {
 	}
 
 	public boolean receiveUpdate(RegistryAccess registryAccess, CompoundTag tag) {
-		if(tag.contains("d")) {
-			RegistryFriendlyByteBuf buf = Platform.makeRegByteBuf(Unpooled.wrappedBuffer(tag.getByteArray("d")), registryAccess);
+		var d = tag.getByteArray("d");
+		d.ifPresent(b -> {
+			RegistryFriendlyByteBuf buf = Platform.makeRegByteBuf(Unpooled.wrappedBuffer(b), registryAccess);
 			List<StoredItemStack> in = new ArrayList<>();
-			short len = tag.getShort("l");
+			short len = tag.getShortOr("l", (short) 0);
 			for (int i = 0; i < len; i++) {
 				in.add(read(buf));
 			}
@@ -179,9 +180,8 @@ public class TerminalSyncManager {
 					this.itemList.put(s, s);
 				}
 			});
-			return true;
-		}
-		return false;
+		});
+		return d.isPresent();
 	}
 
 	public void sendInteract(StoredItemStack intStack, SlotAction action, boolean mod) {
@@ -207,8 +207,8 @@ public class TerminalSyncManager {
 	}
 
 	public void receiveInteract(CompoundTag tag, InteractHandler handler) {
-		if(tag.contains("a")) {
-			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray("a")));
+		tag.getByteArray("a").ifPresent(b -> {
+			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(b));
 			byte flags = buf.readByte();
 			StoredItemStack stack;
 			if((flags & 2) != 0) {
@@ -219,7 +219,7 @@ public class TerminalSyncManager {
 				stack.setCount(count);
 			}
 			handler.onInteract(stack, buf.readEnum(SlotAction.class), (flags & 1) != 0);
-		}
+		});
 	}
 
 	public List<StoredItemStack> getAsList() {

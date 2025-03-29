@@ -7,120 +7,120 @@
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "x": 90,
         "model": "toms_storage:block/cable_closed"
       },
       "when": {
-        "down": "false"
+        "down": false
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "x": 90,
         "model": "toms_storage:block/cable_open"
       },
       "when": {
-        "down": "true"
+        "down": true
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "x": -90,
         "model": "toms_storage:block/cable_closed"
       },
       "when": {
-        "up": "false"
+        "up": false
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "x": -90,
         "model": "toms_storage:block/cable_open"
       },
       "when": {
-        "up": "true"
+        "up": true
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "model": "toms_storage:block/cable_closed"
       },
       "when": {
-        "north": "false"
+        "north": false
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "model": "toms_storage:block/cable_open"
       },
       "when": {
-        "north": "true"
+        "north": true
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "y": 180,
         "model": "toms_storage:block/cable_closed"
       },
       "when": {
-        "south": "false"
+        "south": false
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "y": 180,
         "model": "toms_storage:block/cable_open"
       },
       "when": {
-        "south": "true"
+        "south": true
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "y": 270,
         "model": "toms_storage:block/cable_closed"
       },
       "when": {
-        "west": "false"
+        "west": false
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "y": 270,
         "model": "toms_storage:block/cable_open"
       },
       "when": {
-        "west": "true"
+        "west": true
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "y": 90,
         "model": "toms_storage:block/cable_closed"
       },
       "when": {
-        "east": "false"
+        "east": false
       }
     },
     {
       "apply": {
-        "uvlock": "true",
+        "uvlock": true,
         "y": 90,
         "model": "toms_storage:block/cable_open"
       },
       "when": {
-        "east": "true"
+        "east": true
       }
     },
     {
@@ -139,7 +139,7 @@
       },
       "when": {
         "facing": "down",
-        "down": "true"
+        "down": true
       }
     },
     {
@@ -158,7 +158,7 @@
       },
       "when": {
         "facing": "up",
-        "up": "true"
+        "up": true
       }
     },
     {
@@ -174,7 +174,7 @@
         "model": "toms_storage:block/cable_connector/ext"
       },
       "when": {
-        "north": "true",
+        "north": true,
         "facing": "north"
       }
     },
@@ -193,7 +193,7 @@
         "model": "toms_storage:block/cable_connector/ext"
       },
       "when": {
-        "south": "true",
+        "south": true,
         "facing": "south"
       }
     },
@@ -212,7 +212,7 @@
         "model": "toms_storage:block/cable_connector/ext"
       },
       "when": {
-        "west": "true",
+        "west": true,
         "facing": "west"
       }
     },
@@ -231,7 +231,7 @@
         "model": "toms_storage:block/cable_connector/ext"
       },
       "when": {
-        "east": "true",
+        "east": true,
         "facing": "east"
       }
     }

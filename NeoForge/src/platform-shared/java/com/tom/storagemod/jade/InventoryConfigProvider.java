@@ -46,12 +46,12 @@ public enum InventoryConfigProvider implements IBlockComponentProvider, IServerD
 
 	@Override
 	public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
-		if (accessor.getServerData().getBoolean("bf")) {
+		if (accessor.getServerData().getBooleanOr("bf", false)) {
 			IElementHelper elements = IElementHelper.get();
-			boolean skip = accessor.getServerData().getBoolean("skip");
-			var f = ItemStack.parseOptional(accessor.getLevel().registryAccess(), accessor.getServerData().getCompound("filter"));
+			boolean skip = accessor.getServerData().getBooleanOr("skip", false);
+			var f = ItemStack.parse(accessor.getLevel().registryAccess(), accessor.getServerData().getCompoundOrEmpty("filter")).orElse(ItemStack.EMPTY);
 			tooltip.add(Component.translatable("tooltip.toms_storage.block_filter"));
-			Priority pr = Priority.VALUES[Math.abs(accessor.getServerData().getByte("pr")) % Priority.VALUES.length];
+			Priority pr = Priority.VALUES[Math.abs(accessor.getServerData().getByteOr("pr", (byte) 0)) % Priority.VALUES.length];
 			if (skip) {
 				tooltip.add(Component.translatable("tooltip.toms_storage.block_filter.skip"));
 			} else {

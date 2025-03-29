@@ -20,9 +20,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
 import com.tom.storagemod.screen.widget.CraftingTerminalRecipeBookWidget;
@@ -230,9 +227,6 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				int x = getX();
 				int y = getY();
 				this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 				st.blitSprite(RenderType::guiTextured, SPRITES.get(this.active, this.isHoveredOrFocused()), x, y, this.width, this.height);
 			}
 		}

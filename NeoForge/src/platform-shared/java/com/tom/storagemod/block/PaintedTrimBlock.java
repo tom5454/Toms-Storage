@@ -1,6 +1,6 @@
 package com.tom.storagemod.block;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -21,7 +21,7 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
-public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable {
+public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable, BlockWithTooltip {
 	public static final MapCodec<PaintedTrimBlock> CODEC = simpleCodec(PaintedTrimBlock::new);
 
 	public PaintedTrimBlock(Block.Properties pr) {
@@ -29,9 +29,9 @@ public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
-		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
+		tooltip.accept(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientUtil.tooltip("trim", tooltip);
 	}
 

@@ -78,10 +78,10 @@ public abstract class AbstractFilteredMenu extends AbstractContainerMenu impleme
 	@Override
 	public void receive(CompoundTag tag) {
 		if(pinv.player.isSpectator())return;
-		if(tag.contains("setPhantom")) {
-			CompoundTag t = tag.getCompound("setPhantom");
-			int slotId = t.getInt("id");
-			ItemStack item = ItemStack.parseOptional(pinv.player.registryAccess(), t.getCompound("item"));
+		tag.getCompound("setPhantom").ifPresent(t -> {
+			int slotId = t.getIntOr("id", -1);
+
+			ItemStack item = ItemStack.parse(pinv.player.registryAccess(), t.getCompoundOrEmpty("item")).orElse(ItemStack.EMPTY);
 			Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 			if (slot instanceof PhantomSlot) {
 				if(!item.isEmpty()) {
@@ -96,6 +96,6 @@ public abstract class AbstractFilteredMenu extends AbstractContainerMenu impleme
 					slot.set(item);
 				}
 			}
-		}
+		});
 	}
 }

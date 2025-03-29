@@ -10,6 +10,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -78,13 +79,13 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		super.loadAdditional(compound, provider);
 		reading = true;
-		ListTag listnbt = compound.getList("CraftingTable", 10);
+		ListTag listnbt = compound.getListOrEmpty("CraftingTable");
 
 		for(int i = 0; i < listnbt.size(); ++i) {
-			CompoundTag tag = listnbt.getCompound(i);
-			int j = tag.getByte("Slot") & 255;
+			CompoundTag tag = listnbt.getCompoundOrEmpty(i);
+			int j = tag.getByteOr("Slot", (byte) 0) & 255;
 			if (j >= 0 && j < craftMatrix.getContainerSize()) {
-				craftMatrix.setItem(j, ItemStack.parseOptional(provider, tag));
+				craftMatrix.setItem(j, ItemStack.parse(provider, tag).orElse(ItemStack.EMPTY));
 			}
 		}
 		reading = false;
@@ -230,5 +231,10 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 
 	public void setCraftSlot(int x, int y, ItemStack actualStack) {
 		craftMatrix.setItem(x + y * 3, actualStack);
+	}
+
+	@Override
+	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+		Containers.dropContents(level, pos, craftMatrix);
 	}
 }

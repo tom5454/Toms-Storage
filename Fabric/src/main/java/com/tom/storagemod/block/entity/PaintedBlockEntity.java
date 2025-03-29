@@ -2,6 +2,7 @@ package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap.Builder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -38,7 +39,7 @@ public class PaintedBlockEntity extends PlatformBlockEntity {
 	@Override
 	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		super.loadAdditional(compound, provider);
-		blockState = NbtUtils.readBlockState(provider.lookupOrThrow(Registries.BLOCK), compound.getCompound("block"));
+		blockState = NbtUtils.readBlockState(provider.lookupOrThrow(Registries.BLOCK), compound.getCompoundOrEmpty("block"));
 		markDirtyClient();
 	}
 
@@ -79,7 +80,7 @@ public class PaintedBlockEntity extends PlatformBlockEntity {
 	}
 
 	@Override
-	protected void applyImplicitComponents(DataComponentInput dataComponentInput) {
+	protected void applyImplicitComponents(DataComponentGetter dataComponentInput) {
 		super.applyImplicitComponents(dataComponentInput);
 		blockState = dataComponentInput.get(Content.paintComponent.get());
 	}

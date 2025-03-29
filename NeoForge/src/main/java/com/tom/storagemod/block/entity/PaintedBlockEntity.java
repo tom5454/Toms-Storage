@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap.Builder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -12,8 +13,8 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.platform.PlatformBlockEntity;
@@ -46,7 +47,7 @@ public class PaintedBlockEntity extends PlatformBlockEntity {
 	@Override
 	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		super.loadAdditional(compound, provider);
-		blockState = NbtUtils.readBlockState(provider.lookupOrThrow(Registries.BLOCK), compound.getCompound("block"));
+		blockState = NbtUtils.readBlockState(provider.lookupOrThrow(Registries.BLOCK), compound.getCompoundOrEmpty("block"));
 		markDirtyClient();
 	}
 
@@ -82,9 +83,9 @@ public class PaintedBlockEntity extends PlatformBlockEntity {
 	}
 
 	@Override
-	protected void applyImplicitComponents(DataComponentInput dataComponentInput) {
-		super.applyImplicitComponents(dataComponentInput);
-		blockState = dataComponentInput.get(Content.paintComponent.get());
+	protected void applyImplicitComponents(DataComponentGetter data) {
+		super.applyImplicitComponents(data);
+		blockState = data.get(Content.paintComponent.get());
 	}
 
 	@Override

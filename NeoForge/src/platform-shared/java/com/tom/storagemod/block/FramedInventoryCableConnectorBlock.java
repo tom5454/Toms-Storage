@@ -1,6 +1,6 @@
 package com.tom.storagemod.block;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -25,9 +25,9 @@ public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorB
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
-		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
+		tooltip.accept(Component.translatable("tooltip.toms_storage.paintable"));
 		super.appendHoverText(itemStack, tooltipContext, tooltip, tooltipFlag);
 	}
 

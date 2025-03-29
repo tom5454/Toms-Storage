@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -39,7 +40,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	@Override
 	public void loadAdditional(CompoundTag nbtIn, HolderLookup.Provider provider) {
 		super.loadAdditional(nbtIn, provider);
-		this.filter = ItemStack.parseOptional(provider, nbtIn.getCompound("Filter"));
+		this.filter = ItemStack.parse(provider, nbtIn.getCompoundOrEmpty("Filter")).orElse(ItemStack.EMPTY);
 	}
 
 	public void setFilter(ItemStack filter) {
@@ -134,5 +135,10 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 			waiting = 3;
 			cooldown = 10;
 		}
+	}
+
+	@Override
+	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+		Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter);
 	}
 }

@@ -36,9 +36,9 @@ public enum InventoryConnectorProvider implements IBlockComponentProvider, IServ
 	@Override
 	public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
 		if (accessor.getServerData().contains("free")) {
-			int free = accessor.getServerData().getInt("free");
-			int all = accessor.getServerData().getInt("all");
-			int blocks = accessor.getServerData().getInt("blocks");
+			int free = accessor.getServerData().getIntOr("free", 0);
+			int all = accessor.getServerData().getIntOr("all", 0);
+			int blocks = accessor.getServerData().getIntOr("blocks", 0);
 			IElementHelper elements = IElementHelper.get();
 			final ProgressStyle progressStyle = elements.progressStyle().color(0xFF8e691d, 0xFF342f26);
 			tooltip.add(Component.translatable("tooltip.toms_storage.connector_info.size", free, all));

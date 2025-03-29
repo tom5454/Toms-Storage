@@ -13,8 +13,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
 import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
@@ -74,7 +72,6 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	public void render(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context, List<Widget> widgets,
 			GuiGraphics matrices) {
 		if (context.getScreen() instanceof AbstractStorageTerminalScreen scr && scr.isSmartItemSearchOn()) {
-			RenderSystem.enableDepthTest();
 			List<Integer> missing = handleRecipe(recipe, context.getScreen(), true);
 			int i = 0;
 			for (Widget w : widgets) {

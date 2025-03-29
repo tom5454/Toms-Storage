@@ -1,17 +1,19 @@
 package com.tom.storagemod;
 
+import java.util.Collections;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MenuType.MenuSupplier;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 
 import com.tom.storagemod.block.BasicInventoryHopperBlock;
+import com.tom.storagemod.block.BlockWithTooltip;
 import com.tom.storagemod.block.CraftingTerminalBlock;
 import com.tom.storagemod.block.FilingCabinetBlock;
 import com.tom.storagemod.block.FramedInventoryCableBlock;
@@ -50,6 +53,7 @@ import com.tom.storagemod.components.SimpleItemFilterComponent;
 import com.tom.storagemod.components.TagFilterComponent;
 import com.tom.storagemod.components.WorldPos;
 import com.tom.storagemod.item.AdvWirelessTerminalItem;
+import com.tom.storagemod.item.BlockItemTSS;
 import com.tom.storagemod.item.FilterItem;
 import com.tom.storagemod.item.InventoryConfiguratorItem;
 import com.tom.storagemod.item.PaintKitItem;
@@ -93,7 +97,9 @@ public class Content {
 	public static final GameObject<FilterItem> itemFilter = item("item_filter", FilterItem::new, p -> p.stacksTo(1));
 	public static final GameObject<PolyFilterItem> polyItemFilter = item("polymorphic_item_filter", PolyFilterItem::new, p -> p.stacksTo(1));
 	public static final GameObject<TagFilterItem> tagItemFilter = item("tag_item_filter", TagFilterItem::new, p -> p.stacksTo(1));
-	public static final GameObject<InventoryConfiguratorItem> invConfig = item("inventory_configurator", InventoryConfiguratorItem::new, p -> p.stacksTo(1).component(Content.configuratorComponent.get(), ConfiguratorComponent.empty()));
+	public static final GameObject<InventoryConfiguratorItem> invConfig = item("inventory_configurator", InventoryConfiguratorItem::new, p -> p.stacksTo(1)
+			.component(Content.configuratorComponent.get(), ConfiguratorComponent.empty())
+			.component(DataComponents.TOOL, new Tool(Collections.emptyList(), 0, 0, false)));
 
 	public static final GameObjectBlockEntity<InventoryConnectorBlockEntity> connectorBE = blockEntity("inventory_connector", InventoryConnectorBlockEntity::new, connector);
 	public static final GameObjectBlockEntity<OpenCrateBlockEntity> openCrateBE = blockEntity("open_crate", OpenCrateBlockEntity::new, openCrate);
@@ -126,8 +132,8 @@ public class Content {
 		return p.mapColor(MapColor.WOOD).sound(SoundType.WOOD).strength(3);
 	}
 
-	private static <B extends Block> GameObject<B> blockWithItem(String name, Function<BlockBehaviour.Properties, B> create, UnaryOperator<BlockBehaviour.Properties> defaultProps) {
-		return blockWithItem(name, create, BlockItem::new, defaultProps, UnaryOperator.identity());
+	private static <B extends Block & BlockWithTooltip> GameObject<B> blockWithItem(String name, Function<BlockBehaviour.Properties, B> create, UnaryOperator<BlockBehaviour.Properties> defaultProps) {
+		return blockWithItem(name, create, BlockItemTSS::new, defaultProps, UnaryOperator.identity());
 	}
 
 	private static <B extends Block, I extends Item> GameObject<B> blockWithItem(String name, Function<BlockBehaviour.Properties, B> create, BiFunction<Block, Item.Properties, I> createItem, UnaryOperator<BlockBehaviour.Properties> defaultProps, UnaryOperator<Item.Properties> defaultItemProps) {

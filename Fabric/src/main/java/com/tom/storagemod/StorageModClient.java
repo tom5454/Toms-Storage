@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -16,16 +17,18 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.loader.api.FabricLoader;
+import net.irisshaders.iris.pipeline.IrisPipelines;
+import net.irisshaders.iris.pipeline.programs.ShaderKey;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -72,13 +75,13 @@ public class StorageModClient implements ClientModInitializer {
 		});
 
 		ModelLoadingPlugin.register(new ModelLoadingPlugin() {
-			private Set<ModelResourceLocation> locs = new HashSet<>();
+			private Set<BlockState> states = new HashSet<>();
 
 			@Override
 			public void initialize(Context ctx) {
-				bakeModels(locs);
+				bakeModels(states);
 				ctx.modifyBlockModelOnLoad().register((p, c) -> {
-					if (locs.contains(c.id()) && !(p instanceof UnbakedPaintedModel)) {
+					if (states.contains(c.state()) && !(p instanceof UnbakedPaintedModel)) {
 						return new UnbakedPaintedModel(p);
 					}
 					return p;
@@ -139,18 +142,22 @@ public class StorageModClient implements ClientModInitializer {
 		//if (StorageMod.polymorph)PolymorphTerminalWidget.register();
 	}
 
-	private static void bakeModels(Set<ModelResourceLocation> locs) {
-		bindPaintedModel(locs, Content.paintedTrim);
-		bindPaintedModel(locs, Content.invCableFramed);
-		bindPaintedModel(locs, Content.invProxy);
-		bindPaintedModel(locs, Content.invCableConnectorFramed);
+	private static void bakeModels(Set<BlockState> states) {
+		bindPaintedModel(states, Content.paintedTrim);
+		bindPaintedModel(states, Content.invCableFramed);
+		bindPaintedModel(states, Content.invProxy);
+		bindPaintedModel(states, Content.invCableConnectorFramed);
 	}
 
-	private static void bindPaintedModel(Set<ModelResourceLocation> locs, GameObject<? extends Block> block) {
-		ResourceLocation baseLoc = block.getId();
-		block.get().getStateDefinition().getPossibleStates().forEach(st -> {
-			ModelResourceLocation resLoc = BlockModelShaper.stateToModelLocation(baseLoc, st);
-			locs.add(resLoc);
-		});
+	private static void bindPaintedModel(Set<BlockState> states, GameObject<? extends Block> block) {
+		states.addAll(block.get().getStateDefinition().getPossibleStates());
+	}
+
+	public static Supplier<RenderPipeline> registerPipeline(Supplier<RenderPipeline> factory) {
+		var p = factory.get();
+		RenderPipelines.register(p);
+		if (FabricLoader.getInstance().isModLoaded("iris"))
+			IrisPipelines.assignPipeline(p, ShaderKey.LINES);
+		return () -> p;
 	}
 }

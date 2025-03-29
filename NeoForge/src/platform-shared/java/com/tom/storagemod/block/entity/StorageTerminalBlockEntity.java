@@ -203,7 +203,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
 		if (compound.contains("sort")) {
 			// Convert old format
-			int s = compound.getInt("sort");
+			int s = compound.getIntOr("sort", 0);
 			int controllMode = (s & 0b000_00_0_11);
 			boolean rev = (s & 0b000_00_1_00) > 0;
 			int type = (s & 0b000_11_0_00) >> 3;
@@ -215,9 +215,9 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 			modes = controllMode | (tallMode ? 0x10 : 0) | (pullFromInv ? 0x20 : 0);
 			sort = type | (rev ? 0x100 : 0) | (ghostItems ? 0x200 : 0);
 		} else {
-			sort = compound.getInt("sorting");
-			modes = compound.getInt("modes");
-			searchType = compound.getInt("searchType");
+			sort = compound.getIntOr("sorting", 0);
+			modes = compound.getIntOr("modes", 0);
+			searchType = compound.getIntOr("searchType", 0);
 		}
 		super.loadAdditional(compound, provider);
 	}

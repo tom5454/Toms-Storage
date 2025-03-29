@@ -1,6 +1,7 @@
 package com.tom.storagemod.block;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,7 @@ import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
-public class InventoryConnectorBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock {
+public class InventoryConnectorBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock, BlockWithTooltip {
 	public static final MapCodec<InventoryConnectorBlock> CODEC = simpleCodec(InventoryConnectorBlock::new);
 
 	public InventoryConnectorBlock(Block.Properties pr) {
@@ -59,7 +60,7 @@ public class InventoryConnectorBlock extends BaseEntityBlock implements IInvento
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("inventory_connector", tooltip);
 	}

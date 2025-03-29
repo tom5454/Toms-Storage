@@ -18,8 +18,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.tom.storagemod.StorageMod;
 
 public abstract class ListWidget<T> extends AbstractWidget {
@@ -138,9 +136,6 @@ public abstract class ListWidget<T> extends AbstractWidget {
 				if(id != null) {
 					int x = getX();
 					int y = getY();
-					//st.setColor(1.0f, 1.0f, 1.0f, this.alpha);
-					RenderSystem.enableBlend();
-					RenderSystem.enableDepthTest();
 					this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
 					var spr = (id.equals(selected) ? LIST_BUTTON_SPRITES_S : LIST_BUTTON_SPRITES).get(this.active, this.isHoveredOrFocused());
 					st.blitSprite(RenderType::guiTextured, spr, this.getX(), this.getY(), this.getWidth(), this.getHeight());

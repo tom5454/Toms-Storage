@@ -1,6 +1,6 @@
 package com.tom.storagemod.block;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +27,7 @@ import com.tom.storagemod.block.entity.InventoryProxyBlockEntity;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
-public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable {
+public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable, BlockWithTooltip {
 	public static final MapCodec<InventoryProxyBlock> CODEC = simpleCodec(InventoryProxyBlock::new);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
@@ -37,9 +37,9 @@ public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
-		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
+		tooltip.accept(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientUtil.tooltip("inventory_proxy", tooltip);
 	}
 

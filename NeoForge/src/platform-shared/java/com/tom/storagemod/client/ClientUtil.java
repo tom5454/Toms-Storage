@@ -3,6 +3,7 @@ package com.tom.storagemod.client;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -33,18 +34,18 @@ import com.tom.storagemod.util.ComponentJoiner;
 
 public class ClientUtil {
 
-	public static void tooltip(String key, List<Component> tooltip, Object... args) {
+	public static void tooltip(String key, Consumer<Component> tooltip, Object... args) {
 		tooltip(key, true, tooltip, args);
 	}
 
-	public static void tooltip(String key, boolean addShift, List<Component> tooltip, Object... args) {
+	public static void tooltip(String key, boolean addShift, Consumer<Component> tooltip, Object... args) {
 		if(Screen.hasShiftDown()) {
 			String[] sp = I18n.get("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
-				tooltip.add(Component.literal(sp[i]));
+				tooltip.accept(Component.literal(sp[i]));
 			}
 		} else if(addShift) {
-			tooltip.add(Component.translatable("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("tooltip.toms_storage.hold_shift_for_info").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		}
 	}
 

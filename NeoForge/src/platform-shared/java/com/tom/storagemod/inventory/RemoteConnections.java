@@ -3,6 +3,7 @@ package com.tom.storagemod.inventory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -10,58 +11,65 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import com.tom.storagemod.components.WorldPos;
 
 public class RemoteConnections extends SavedData {
-	private static final String CONNECTIONS_TAG = "connections";
-	public static final String CHANNEL_ID = "id";
-	public static final String OWNER_ID = "owner";
-	public static final String PUBLIC_TAG = "public";
-	public static final String DISPLAY_NAME = "name";
 	private static final String ID = "toms_storage_rc";
-	private static final SavedData.Factory<RemoteConnections> FACTORY = new SavedData.Factory<>(RemoteConnections::new, RemoteConnections::new, DataFixTypes.LEVEL);
-	public static final String OWNER_NAME = "owner_name";
+
+	public static final Codec<RemoteConnections> CODEC = RecordCodecBuilder.<RemoteConnections>mapCodec(b -> {
+		return b.group(
+				Codec.list(Connection.CODEC).fieldOf("connections").forGetter(RemoteConnections::connections)
+				).apply(b, RemoteConnections::new);
+	}).codec();
+
+	private static final SavedDataType<RemoteConnections> FACTORY = new SavedDataType<>(ID, RemoteConnections::new, __ -> CODEC, DataFixTypes.LEVEL);
 	private Map<UUID, Channel> connections = new HashMap<>();
 
-	private RemoteConnections() {
+	private RemoteConnections(SavedData.Context ctx) {
 	}
 
-	private RemoteConnections(CompoundTag tag, HolderLookup.Provider provider) {
-		var list = tag.getList(CONNECTIONS_TAG, Tag.TAG_COMPOUND);
-		for (int i = 0; i < list.size(); i++) {
-			CompoundTag t = list.getCompound(i);
-			UUID channel = t.getUUID(CHANNEL_ID);
-			connections.put(channel, new Channel(t));
+	private RemoteConnections(List<Connection> conns) {
+		for (Connection connection : conns) {
+			connections.put(connection.channelId(), new Channel(connection));
+		}
+	}
+
+	private List<Connection> connections() {
+		return connections.entrySet().stream().map(Connection::new).toList();
+	}
+
+	private static record Connection(UUID channelId, UUID owner, String ownerName, String displayName, boolean isPublic) {
+
+		public static final Codec<Connection> CODEC = RecordCodecBuilder.<Connection>mapCodec(b -> {
+			return b.group(
+					UUIDUtil.CODEC.fieldOf("id").forGetter(Connection::channelId),
+					UUIDUtil.CODEC.fieldOf("owner").forGetter(Connection::owner),
+					Codec.STRING.fieldOf("owner_name").forGetter(Connection::ownerName),
+					Codec.STRING.fieldOf("name").forGetter(Connection::displayName),
+					Codec.BOOL.fieldOf("public").forGetter(Connection::isPublic)
+					).apply(b, Connection::new);
+		}).codec();
+
+		public Connection(Entry<UUID, Channel> e) {
+			this(e.getKey(), e.getValue().owner, e.getValue().ownerName, e.getValue().displayName, e.getValue().publicChannel);
 		}
 	}
 
 	public static RemoteConnections get(Level world) {
 		ServerLevel sw = (ServerLevel) world;
-		return sw.getServer().overworld().getDataStorage().computeIfAbsent(FACTORY, ID);
-	}
-
-	@Override
-	public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
-		ListTag list = new ListTag();
-		connections.forEach((k, v) -> {
-			CompoundTag t = new CompoundTag();
-			t.putUUID(CHANNEL_ID, k);
-			v.save(t);
-			list.add(t);
-		});
-		tag.put(CONNECTIONS_TAG, list);
-		return tag;
+		return sw.getServer().overworld().getDataStorage().computeIfAbsent(FACTORY);
 	}
 
 	public static class Channel {
@@ -78,8 +86,8 @@ public class RemoteConnections extends SavedData {
 			this.displayName = displayName;
 		}
 
-		private Channel(CompoundTag t) {
-			this(t.getUUID(OWNER_ID), t.getString(OWNER_NAME), t.getBoolean(PUBLIC_TAG), t.getString(DISPLAY_NAME));
+		private Channel(Connection t) {
+			this(t.owner(), t.ownerName(), t.isPublic(), t.displayName());
 		}
 
 		public void register(ServerLevel world, BlockPos blockPos) {
@@ -105,13 +113,6 @@ public class RemoteConnections extends SavedData {
 				}
 			}
 			return found;
-		}
-
-		public void save(CompoundTag t) {
-			t.putUUID(OWNER_ID, owner);
-			t.putBoolean(PUBLIC_TAG, publicChannel);
-			t.putString(DISPLAY_NAME, displayName);
-			t.putString(OWNER_NAME, ownerName);
 		}
 
 		public boolean canAccess(Player player) {

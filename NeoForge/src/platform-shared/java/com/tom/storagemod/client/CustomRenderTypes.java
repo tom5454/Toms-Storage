@@ -1,23 +1,39 @@
 package com.tom.storagemod.client;
 
-import java.util.OptionalDouble;
+import static net.minecraft.client.renderer.RenderStateShard.*;
+import static net.minecraft.client.renderer.RenderType.create;
 
+import java.util.OptionalDouble;
+import java.util.function.Supplier;
+
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
 
-public class CustomRenderTypes extends RenderType {
-	private static final RenderType LINES_NO_DEPTH = create("toms_storage:lines_no_depth", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 256, false, false, RenderType.CompositeState.builder().setShaderState(RENDERTYPE_LINES_SHADER).setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty())).setLayeringState(VIEW_OFFSET_Z_LAYERING).setTransparencyState(TRANSLUCENT_TRANSPARENCY).setOutputState(ITEM_ENTITY_TARGET).setWriteMaskState(COLOR_DEPTH_WRITE).setCullState(NO_CULL).setDepthTestState(NO_DEPTH_TEST).createCompositeState(false));
+import com.tom.storagemod.StorageMod;
+import com.tom.storagemod.StorageModClient;
 
-	private CustomRenderTypes(String nameIn, VertexFormat formatIn, Mode drawModeIn, int bufferSizeIn,
-			boolean useDelegateIn, boolean needsSortingIn, Runnable setupTaskIn, Runnable clearTaskIn) {
-		super(nameIn, formatIn, drawModeIn, bufferSizeIn, useDelegateIn, needsSortingIn, setupTaskIn, clearTaskIn);
-	}
+public class CustomRenderTypes {
+	public static final Supplier<RenderPipeline> LINES = StorageModClient.registerPipeline(() -> {
+		return RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+				.withLocation(ResourceLocation.tryBuild(StorageMod.modid, "pipeline/lines"))
+				.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+				.build();
+	});
 
 	public static RenderType linesNoDepth() {
-		return LINES_NO_DEPTH;
+		return create(
+				StorageMod.modid + ":lines_no_depth",
+				1536,
+				LINES.get(),
+				RenderType.CompositeState.builder().
+				setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty())).
+				setLayeringState(VIEW_OFFSET_Z_LAYERING).
+				setOutputState(ITEM_ENTITY_TARGET).
+				createCompositeState(false));
 	}
 }

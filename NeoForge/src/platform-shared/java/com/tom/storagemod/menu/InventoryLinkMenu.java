@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,17 +41,16 @@ public class InventoryLinkMenu extends AbstractContainerMenu implements IDataRec
 	@Override
 	public void receive(CompoundTag tag) {
 		if(pinv.player.isSpectator() || te == null)return;
-		UUID id = null;
-		if(tag.contains("id"))id = tag.getUUID("id");
+		UUID id = tag.read("id", UUIDUtil.CODEC).orElse(null);
 		if(id == null) {
-			UUID chn = RemoteConnections.get(pinv.player.level()).makeChannel(tag.getString("d"), tag.getBoolean("p"), pinv.player);
+			UUID chn = RemoteConnections.get(pinv.player.level()).makeChannel(tag.getStringOr("d", "No Name"), tag.getBooleanOr("p", false), pinv.player);
 			te.setChannel(chn);
-		} else if(tag.getBoolean("select")) {
+		} else if(tag.getBooleanOr("select", false)) {
 			var c = RemoteConnections.get(pinv.player.level()).getChannel(id);
 			if (c != null && c.canAccess(pinv.player))
 				te.setChannel(id);
 		} else if(tag.contains("p")) {
-			RemoteConnections.get(pinv.player.level()).editChannel(id, tag.getBoolean("p"), pinv.player.getUUID());
+			RemoteConnections.get(pinv.player.level()).editChannel(id, tag.getBooleanOr("p", false), pinv.player.getUUID());
 		} else {
 			RemoteConnections.get(pinv.player.level()).removeChannel(id, pinv.player.getUUID());
 		}
@@ -69,7 +69,7 @@ public class InventoryLinkMenu extends AbstractContainerMenu implements IDataRec
 			CompoundTag mainTag = new CompoundTag();
 			UUID chn = te.getChannel();
 			if(chn != null)
-				mainTag.putUUID("selected", chn);
+				mainTag.store("selected", UUIDUtil.CODEC, chn);
 
 			ListTag list = new ListTag();
 			RemoteConnections.get(pinv.player.level()).streamChannels(pinv.player).map(LinkChannel::new).forEach(c -> {
@@ -107,11 +107,11 @@ public class InventoryLinkMenu extends AbstractContainerMenu implements IDataRec
 		}
 
 		public LinkChannel(CompoundTag tag) {
-			this.id = tag.getUUID("id");
-			this.displayName = tag.getString("d");
-			this.publicChannel = tag.getBoolean("p");
-			this.owner = tag.getUUID("o");
-			this.ownerName = tag.getString("on");
+			this.id = tag.read("id", UUIDUtil.CODEC).orElse(null);
+			this.displayName = tag.getStringOr("d", "");
+			this.publicChannel = tag.getBooleanOr("p", false);
+			this.owner = tag.read("o", UUIDUtil.CODEC).orElse(null);
+			this.ownerName = tag.getStringOr("on", "");
 		}
 
 		public LinkChannel(boolean isPublic, String name) {
@@ -120,10 +120,10 @@ public class InventoryLinkMenu extends AbstractContainerMenu implements IDataRec
 		}
 
 		public void saveToClient(CompoundTag t) {
-			t.putUUID("id", id);
+			t.store("id", UUIDUtil.CODEC, id);
 			t.putString("d", displayName);
 			t.putBoolean("p", publicChannel);
-			t.putUUID("o", owner);
+			t.store("o", UUIDUtil.CODEC, owner);
 			t.putString("on", ownerName == null ? "" : ownerName);
 		}
 
@@ -134,8 +134,8 @@ public class InventoryLinkMenu extends AbstractContainerMenu implements IDataRec
 
 		public static void loadAll(ListTag list, Map<UUID, LinkChannel> connections) {
 			for (int i = 0; i < list.size(); i++) {
-				CompoundTag t = list.getCompound(i);
-				UUID channel = t.getUUID("id");
+				CompoundTag t = list.getCompoundOrEmpty(i);
+				UUID channel = t.read("id", UUIDUtil.CODEC).orElse(null);
 				connections.put(channel, new LinkChannel(t));
 			}
 		}

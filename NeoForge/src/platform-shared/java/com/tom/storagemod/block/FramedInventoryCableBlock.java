@@ -2,6 +2,7 @@ package com.tom.storagemod.block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +39,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
 
-public class FramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable, NeoForgeBlock {
+public class FramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable, NeoForgeBlock, BlockWithTooltip {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -59,9 +60,9 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
-		tooltip.add(Component.translatable("tooltip.toms_storage.paintable"));
+		tooltip.accept(Component.translatable("tooltip.toms_storage.paintable"));
 		ClientUtil.tooltip("inventory_cable", tooltip);
 	}
 

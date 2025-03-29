@@ -86,9 +86,9 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 	@Override
 	public void loadAdditional(CompoundTag nbtIn, HolderLookup.Provider provider) {
 		super.loadAdditional(nbtIn, provider);
-		setFilter(ItemStack.parseOptional(provider, nbtIn.getCompound("Filter")));
-		count = nbtIn.getInt("Count");
-		lessThan = nbtIn.getBoolean("lessThan");
+		setFilter(ItemStack.parse(provider, nbtIn.getCompoundOrEmpty("Filter")).orElse(ItemStack.EMPTY));
+		count = nbtIn.getIntOr("Count", 0);
+		lessThan = nbtIn.getBooleanOr("lessThan", false);
 	}
 
 	public void setFilter(ItemStack filter) {

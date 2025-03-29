@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -121,10 +120,10 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 
 	@Override
 	public void receive(CompoundTag tag) {
-		ListTag list = tag.getList("l", Tag.TAG_STRING);
+		ListTag list = tag.getListOrEmpty("l");
 		filterTags.clear();
 		for (int i = 0; i < list.size(); i++) {
-			filterTags.add(list.getString(i));
+			list.getString(i).ifPresent(filterTags::add);
 		}
 		filterList.setSelected(null);
 		filterList.setCurrentScroll(0f);

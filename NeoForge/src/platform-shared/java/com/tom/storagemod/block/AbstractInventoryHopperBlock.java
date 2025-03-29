@@ -2,6 +2,7 @@ package com.tom.storagemod.block;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,7 +35,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
-public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock implements IInventoryCable {
+public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock implements IInventoryCable, BlockWithTooltip {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 
@@ -44,7 +45,7 @@ public abstract class AbstractInventoryHopperBlock extends BaseEntityBlock imple
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, Consumer<Component> tooltip,
 			TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("inventory_hopper", tooltip);
 	}

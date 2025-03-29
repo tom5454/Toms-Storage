@@ -93,8 +93,8 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 
 	@Override
 	public void receive(CompoundTag tag) {
-		count = tag.getInt("count");
-		boolean lt = tag.getBoolean("lessThan");
+		count = tag.getIntOr("count", 0);
+		boolean lt = tag.getBooleanOr("lessThan", false);
 		lessThanBtn.setState(lt);
 		this.lt = lt;
 		textF.setValue(Integer.toString(count));

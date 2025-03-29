@@ -7,9 +7,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import com.tom.storagemod.StorageMod;
 
 public class IconButton extends Button {
@@ -36,14 +33,9 @@ public class IconButton extends Button {
 		if (this.visible) {
 			int x = getX();
 			int y = getY();
-			//st.setColor(1.0f, 1.0f, 1.0f, this.alpha);
-			RenderSystem.enableBlend();
-			RenderSystem.defaultBlendFunc();
-			RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 			this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
 			st.blitSprite(RenderType::guiTextured, SPRITES.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
 			drawIcon(st, mouseX, mouseY, pt);
-			//st.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		}
 	}
 

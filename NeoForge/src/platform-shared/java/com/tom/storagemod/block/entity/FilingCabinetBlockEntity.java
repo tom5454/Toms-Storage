@@ -3,9 +3,9 @@ package com.tom.storagemod.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,10 +38,8 @@ public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvide
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
 		super.loadAdditional(tag, provider);
-		inv.fromTag(tag.getList("inventory", Tag.TAG_COMPOUND), provider);
-		if (tag.contains("CustomName", 8)) {
-			this.name = parseCustomNameSafe(tag.getString("CustomName"), provider);
-		}
+		inv.fromTag(tag.getListOrEmpty("inventory"), provider);
+		this.name = parseCustomNameSafe(tag.get("CustomName"), provider);
 	}
 
 	@Override
@@ -75,5 +73,10 @@ public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvide
 	@Override
 	public Component getCustomName() {
 		return this.name;
+	}
+
+	@Override
+	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+		Containers.dropContents(level, pos, inv);
 	}
 }

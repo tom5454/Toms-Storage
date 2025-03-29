@@ -2,12 +2,12 @@ package com.tom.storagemod.menu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
@@ -122,14 +122,12 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 	@Override
 	public void receive(CompoundTag tag) {
 		super.receive(tag);
-		if(tag.contains("l")) {
-			ListTag list = tag.getList("l", Tag.TAG_STRING);
+		tag.getList("l").ifPresent(list -> {
 			List<ResourceLocation> tags = new ArrayList<>();
 			for (int i = 0; i < list.size(); i++) {
-				var loc = ResourceLocation.tryParse(list.getString(i));
-				if(loc != null)tags.add(loc);
+				list.getString(i).flatMap(e -> Optional.ofNullable(ResourceLocation.tryParse(e))).ifPresent(tags::add);
 			}
 			filter.setTags(tags);
-		}
+		});
 	}
 }

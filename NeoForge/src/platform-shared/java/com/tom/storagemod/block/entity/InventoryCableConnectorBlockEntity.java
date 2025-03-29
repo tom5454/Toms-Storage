@@ -11,6 +11,7 @@ import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -171,18 +172,14 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 	@Override
 	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
 		super.loadAdditional(nbt, provider);
-		if(nbt.contains(CHANNEL_TAG)) {
-			channel = nbt.getUUID(CHANNEL_TAG);
-		} else {
-			channel = null;
-		}
+		channel = nbt.read(CHANNEL_TAG, UUIDUtil.CODEC).orElse(null);
 	}
 
 	@Override
 	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
 		super.saveAdditional(nbt, provider);
 		if(channel != null) {
-			nbt.putUUID(CHANNEL_TAG, channel);
+			nbt.store(CHANNEL_TAG, UUIDUtil.CODEC, channel);
 		}
 	}
 

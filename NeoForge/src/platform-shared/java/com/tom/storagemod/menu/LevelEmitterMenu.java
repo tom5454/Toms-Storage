@@ -134,12 +134,8 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 	public void receive(CompoundTag tag) {
 		if(pinv.player.isSpectator() || te == null)return;
 		super.receive(tag);
-		if(tag.contains("count")) {
-			int count = tag.getInt("count");
-			boolean lt = tag.getBoolean("lessThan");
-			te.setCount(count);
-			te.setLessThan(lt);
-		}
+		tag.getInt("count").ifPresent(te::setCount);
+		tag.getBoolean("lessThan").ifPresent(te::setLessThan);
 	}
 
 	@Override

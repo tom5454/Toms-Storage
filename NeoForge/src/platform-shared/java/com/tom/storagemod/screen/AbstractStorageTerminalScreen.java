@@ -39,7 +39,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.serialization.JsonOps;
 
 import com.google.common.base.Predicates;
@@ -500,8 +499,6 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	private void drawStackSize(GuiGraphics st, Font fr, long size, int x, int y) {
 		float scaleFactor = 0.6f;
-		RenderSystem.disableDepthTest();
-		RenderSystem.disableBlend();
 		String stackSize = NumberFormatUtil.formatNumber(size);
 		st.pose().pushPose();
 		st.pose().scale(scaleFactor, scaleFactor, scaleFactor);
@@ -511,7 +508,6 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
 		st.drawString(fr, stackSize, X, Y, size == 0 ? 0xFFFF00 : 16777215, true);
 		st.pose().popPose();
-		RenderSystem.enableDepthTest();
 	}
 
 	protected boolean needsScrollBars() {

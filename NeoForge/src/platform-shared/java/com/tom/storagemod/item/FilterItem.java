@@ -3,6 +3,7 @@ package com.tom.storagemod.item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import com.tom.storagemod.Content;
@@ -32,11 +34,11 @@ public class FilterItem extends Item implements IItemFilter {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> tooltip,
-			TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, TooltipDisplay p_399753_,
+			Consumer<Component> tooltip, TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("item_filter", tooltip);
 		if(Screen.hasControlDown()) {
-			tooltip.add(Component.translatable("tooltip.toms_storage.item_filter.contents"));
+			tooltip.accept(Component.translatable("tooltip.toms_storage.item_filter.contents"));
 			SimpleItemFilterComponent c = itemStack.get(Content.simpleItemFilterComponent.get());
 			boolean allow = false;
 			List<Component> elems = new ArrayList<>();
@@ -49,13 +51,13 @@ public class FilterItem extends Item implements IItemFilter {
 				allow = c.allowList();
 			}
 			if (elems.isEmpty()) {
-				tooltip.add(Component.translatable("tooltip.toms_storage.item_filter.no_items"));
+				tooltip.accept(Component.translatable("tooltip.toms_storage.item_filter.no_items"));
 			} else {
-				tooltip.addAll(elems);
+				elems.forEach(tooltip);
 			}
-			tooltip.add(Component.translatable(allow ? "tooltip.toms_storage.allowList" : "tooltip.toms_storage.denyList"));
+			tooltip.accept(Component.translatable(allow ? "tooltip.toms_storage.allowList" : "tooltip.toms_storage.denyList"));
 		} else {
-			tooltip.add(Component.translatable("tooltip.toms_storage.hold_control_for_details", Minecraft.ON_OSX ? "CMD" : "CTRL").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("tooltip.toms_storage.hold_control_for_details", Minecraft.ON_OSX ? "CMD" : "CTRL").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		}
 	}
 

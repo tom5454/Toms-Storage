@@ -39,7 +39,7 @@ import com.tom.storagemod.block.entity.StorageTerminalBlockEntity;
 import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
-public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, IInventoryCable {
+public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, IInventoryCable, BlockWithTooltip {
 	public static final EnumProperty<TerminalPos> TERMINAL_POS = EnumProperty.create("pos", TerminalPos.class);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
