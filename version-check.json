@@ -14,8 +14,8 @@
 		"1.19.2-latest": "1.5.11",
 		"1.19.3-latest": "1.5.11",
 		"1.19.4-latest": "1.5.12",
-		"1.20-latest": "1.7.0",
-		"1.20.1-latest": "1.6.9",
+		"1.20-latest": "1.7.1",
+		"1.20.1-latest": "1.7.1",
 		"1.20.2-latest": "1.6.10",
 		"1.20.4-latest": "1.6.11"
 	},
@@ -35,6 +35,7 @@
 		"1.6.5": "1.20.2 port"
 	},
 	"1.20.1": {
+		"1.7.1": "Added level emitters allow > 0 check (Closes #326)\nFixed terminals deleting items if storage block is broken behind (Closes #431)\nFixed filtered basic inventory hopper getting stuck (Closes #451)\nFixed level emitter redstone on fabric (Closes #294)\nFixed beacon indicator not showing if beacon level 0 is required (Closes #546)\nFixed tall terminal UI overlapping with jei search bar (Closes #479)\nFixed polymorph button breaking with tall terminal",
 		"1.7.0": "Add config option to blacklist certain blocks/mods (Closes #507)\nRewritten JEI/REI/EMI recipe integrations (Fixes #466)\nAdded polymorph support on 1.20.1 Forge",
 		"1.6.9": "Fixed crash with the terminal and some menu QoL mods",
 		"1.6.8": "Added NBT/component and tag search",

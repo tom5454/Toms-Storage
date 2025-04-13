@@ -162,7 +162,6 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 				.setValue(WEST, canConnect(state, block_6, Direction.WEST));
 	}
 
-	@SuppressWarnings("deprecation")
 	private boolean canConnect(BlockState state, BlockState block, Direction dir) {
 		Direction f = state.getValue(FACING);
 		return (dir != f && IInventoryCable.canConnect(block, dir)) || (dir == f && !block.isAir());
@@ -183,7 +182,6 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 		return blockState_1;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {

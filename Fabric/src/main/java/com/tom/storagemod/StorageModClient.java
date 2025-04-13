@@ -36,6 +36,7 @@ import com.tom.storagemod.network.DataPacket;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
+import com.tom.storagemod.screen.FilingCabinetScreen;
 import com.tom.storagemod.screen.InventoryConfiguratorScreen;
 import com.tom.storagemod.screen.InventoryLinkScreen;
 import com.tom.storagemod.screen.ItemFilterScreen;
@@ -58,6 +59,7 @@ public class StorageModClient implements ClientModInitializer {
 		MenuScreens.register(Content.inventoryLink.get(), InventoryLinkScreen::new);
 		MenuScreens.register(Content.itemFilterMenu.get(), ItemFilterScreen::new);
 		MenuScreens.register(Content.tagItemFilterMenu.get(), TagItemFilterScreen::new);
+		MenuScreens.register(Content.filingCabinetMenu.get(), FilingCabinetScreen::new);
 
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.paintedTrim.get(), RenderType.translucent());
 		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableFramed.get(), RenderType.translucent());

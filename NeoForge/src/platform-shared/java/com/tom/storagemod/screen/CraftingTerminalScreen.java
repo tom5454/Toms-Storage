@@ -135,12 +135,17 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		} else {
 			super.render(st, mouseX, mouseY, partialTicks);
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
-			this.recipeBookGui.renderGhostRecipe(st, true);
 		}
 
 		this.renderTooltip(st, mouseX, mouseY);
 		this.recipeBookGui.renderTooltip(st, mouseX, mouseY, hoveredSlot);
 		this.setInitialFocus(this.recipeBookGui);
+	}
+
+	@Override
+	protected void renderSlots(GuiGraphics p_376566_) {
+		super.renderSlots(p_376566_);
+		this.recipeBookGui.renderGhostRecipe(p_376566_, true);
 	}
 
 	@Override

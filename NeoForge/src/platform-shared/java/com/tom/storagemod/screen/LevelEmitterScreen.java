@@ -18,18 +18,16 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.menu.LevelEmitterMenu;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.screen.widget.ToggleButton;
-import com.tom.storagemod.util.IDataReceiver;
 
-public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu> implements IDataReceiver {
+public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu> {
 	private static final ResourceLocation gui = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/level_emitter.png");
 	private ToggleButton lessThanBtn;
 	private EditBox textF;
-	private boolean lt;
-	private int count = 1;
 	private List<AmountBtn> amountBtns = new ArrayList<>();
 
 	public LevelEmitterScreen(LevelEmitterMenu screenContainer, Inventory inv, Component titleIn) {
 		super(screenContainer, inv, titleIn);
+		menu.onPacket = this::receive;
 	}
 
 	@Override
@@ -57,12 +55,12 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		textF.setBordered(false);
 		textF.setVisible(true);
 		textF.setTextColor(16777215);
-		textF.setValue(Integer.toString(count));
+		textF.setValue(Integer.toString(menu.count));
 		textF.setResponder(t -> {
 			try {
 				int c = Integer.parseInt(t);
 				if(c >= 0) {
-					count = c;
+					menu.count = c;
 					send();
 				}
 			} catch (NumberFormatException e) {
@@ -74,11 +72,11 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/less_than")).
 				build(s -> {
 					lessThanBtn.setState(s);
-					lt = s;
+					menu.lessThan = s;
 					send();
 				});
 		lessThanBtn.setTooltip(Tooltip.create(ClientUtil.multilineTooltip("tooltip.toms_storage.level_emitter.greater_than")), Tooltip.create(ClientUtil.multilineTooltip("tooltip.toms_storage.level_emitter.less_than")));
-		lessThanBtn.setState(lt);
+		lessThanBtn.setState(menu.lessThan);
 		addRenderableWidget(lessThanBtn);
 		amountBtns.add(new AmountBtn( 20, 0,    1,  1, 20));
 		amountBtns.add(new AmountBtn( 45, 0,   10, 16, 25));
@@ -91,19 +89,15 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		amountBtns.add(new AmountBtn(110, 40, -1000, -64, 35));
 	}
 
-	@Override
-	public void receive(CompoundTag tag) {
-		count = tag.getInt("count");
-		boolean lt = tag.getBoolean("lessThan");
-		lessThanBtn.setState(lt);
-		this.lt = lt;
-		textF.setValue(Integer.toString(count));
+	private void receive() {
+		lessThanBtn.setState(menu.lessThan);
+		textF.setValue(Integer.toString(menu.count));
 	}
 
 	private void send() {
 		CompoundTag mainTag = new CompoundTag();
-		mainTag.putInt("count", count);
-		mainTag.putBoolean("lessThan", lt);
+		mainTag.putInt("count", menu.count);
+		mainTag.putBoolean("lessThan", menu.lessThan);
 		NetworkHandler.sendDataToServer(mainTag);
 	}
 
@@ -118,9 +112,9 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		}
 
 		private void evt(Button b) {
-			count += hasShiftDown() ? sv : v;
-			if(count < 0)count = 0;
-			textF.setValue(Integer.toString(count));
+			menu.count += hasShiftDown() ? sv : v;
+			if(menu.count < 0)menu.count = 0;
+			textF.setValue(Integer.toString(menu.count));
 			send();
 		}
 

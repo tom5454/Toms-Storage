@@ -27,7 +27,7 @@ import com.tom.storagemod.util.TickerUtil.TickableServer;
 
 public class LevelEmitterBlockEntity extends PlatformBlockEntity implements TickableServer, MenuProvider {
 	private StoredItemStack filter;
-	private int count;
+	private int count = 1;
 	private NetworkInventory topCache = new NetworkInventory();
 	private boolean lessThan;
 	private long changeTracker;
