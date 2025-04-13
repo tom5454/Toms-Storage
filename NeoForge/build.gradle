@@ -144,8 +144,8 @@ dependencies {
     	// at runtime, use the full JEI jar
   		runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.19.0.219"
   	
-    	runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.6+1.20.6"
-    	compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.6+1.20.6:api"
+    	runtimeOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1"
+    	compileOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1:api"
   	
     	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"
 		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:14.0.688"

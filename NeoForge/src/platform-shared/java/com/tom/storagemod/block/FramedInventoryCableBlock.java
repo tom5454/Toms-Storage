@@ -2,7 +2,10 @@ package com.tom.storagemod.block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +18,7 @@ import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -31,6 +35,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.mojang.serialization.MapCodec;
 
@@ -39,7 +45,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
 
-public class FramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable, NeoForgeBlock, BlockWithTooltip {
+public class FramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable, NeoForgeBlock, BlockWithTooltip, IConfiguratorHighlight {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -47,6 +53,7 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	public static final MapCodec<FramedInventoryCableBlock> CODEC = simpleCodec(FramedInventoryCableBlock::new);
+	private final Function<BlockState, VoxelShape> highlightShapes;
 
 	public FramedInventoryCableBlock(Block.Properties pr) {
 		super(pr);
@@ -57,6 +64,7 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 				.setValue(EAST, false)
 				.setValue(SOUTH, false)
 				.setValue(WEST, false));
+		highlightShapes = makeShapes(4f);
 	}
 
 	@Override
@@ -129,9 +137,6 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 		return blockState_1;
 	}
 
-
-
-	@SuppressWarnings("deprecation")
 	@Override
 	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {
@@ -202,5 +207,31 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 			n.markNodeInvalid(pos);
 			n.markNodeInvalid(neighbor);
 		}
+	}
+
+	@Override
+	public int getHighlightColor() {
+		return 0xFF0000;
+	}
+
+	private Function<BlockState, VoxelShape> makeShapes(float p_55162_) {
+		VoxelShape voxelshape = Block.cube(p_55162_);
+		Map<Direction, VoxelShape> map = Shapes.rotateAll(Block.boxZ(p_55162_, 0.0, 8.0));
+		return this.getShapeForEachState(p_393372_ -> {
+			VoxelShape voxelshape1 = voxelshape;
+
+			for (Entry<Direction, BooleanProperty> entry : PipeBlock.PROPERTY_BY_DIRECTION.entrySet()) {
+				if (p_393372_.getValue(entry.getValue())) {
+					voxelshape1 = Shapes.or(map.get(entry.getKey()), voxelshape1);
+				}
+			}
+
+			return voxelshape1;
+		});
+	}
+
+	@Override
+	public VoxelShape getHighlightShape(BlockState state, BlockGetter level, BlockPos pos) {
+		return highlightShapes.apply(state);
 	}
 }

@@ -12,6 +12,7 @@
 	"toms_storage:storage_terminal",
 	"toms_storage:trim",
 	"toms_storage:inventory_interface",
-	"toms_storage:inventory_cable_connector"
+	"toms_storage:inventory_cable_connector",
+	"toms_storage:inventory_cable_connector_framed"
   ]
 }

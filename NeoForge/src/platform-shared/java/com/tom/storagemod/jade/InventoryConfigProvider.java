@@ -49,7 +49,7 @@ public enum InventoryConfigProvider implements IBlockComponentProvider, IServerD
 		if (accessor.getServerData().getBooleanOr("bf", false)) {
 			IElementHelper elements = IElementHelper.get();
 			boolean skip = accessor.getServerData().getBooleanOr("skip", false);
-			var f = ItemStack.parse(accessor.getLevel().registryAccess(), accessor.getServerData().getCompoundOrEmpty("filter")).orElse(ItemStack.EMPTY);
+			var f = accessor.getServerData().getCompound("filter").flatMap(c -> ItemStack.parse(accessor.getLevel().registryAccess(), c)).orElse(ItemStack.EMPTY);
 			tooltip.add(Component.translatable("tooltip.toms_storage.block_filter"));
 			Priority pr = Priority.VALUES[Math.abs(accessor.getServerData().getByteOr("pr", (byte) 0)) % Priority.VALUES.length];
 			if (skip) {

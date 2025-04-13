@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageTags;
+import com.tom.storagemod.block.IConfiguratorHighlight;
 import com.tom.storagemod.item.WirelessTerminalItem;
 import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.util.ComponentJoiner;
@@ -97,7 +99,10 @@ public class ClientUtil {
 		if (!is.is(Content.invConfig.get()))return;
 
 		var c = is.get(Content.configuratorComponent.get());
-		if(!c.selecting() && !c.showInvBox())return;
+		if(!c.selecting() && !c.showInvBox()) {
+			drawPaintedHighlights(ps);
+			return;
+		}
 
 		Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
 		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
@@ -122,14 +127,42 @@ public class ClientUtil {
 			renderLineBox(ps, bufNd, bb, 1, 1, 0, 0.4f);
 		}
 
-		if (!c.isBound())return;
-		double x = c.bound().getX() - renderPos.x;
-		double y = c.bound().getY() - renderPos.y;
-		double z = c.bound().getZ() - renderPos.z;
+		if (c.isBound()) {
+			double x = c.bound().getX() - renderPos.x;
+			double y = c.bound().getY() - renderPos.y;
+			double z = c.bound().getZ() - renderPos.z;
 
-		renderLineBox(ps, bufNd, x, y, z, x + 1, y + 1, z + 1, 1f, 0, 0, 1f);
+			renderLineBox(ps, bufNd, x, y, z, x + 1, y + 1, z + 1, 1f, 0, 0, 1f);
+		}
 
 		mc.renderBuffers().bufferSource().endBatch();
+	}
+
+	private static void drawPaintedHighlights(PoseStack ps) {
+		Minecraft mc = Minecraft.getInstance();
+		Player player = mc.player;
+		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(CustomRenderTypes.linesNoDepth());
+		Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
+
+		BlockPos.betweenClosedStream(new AABB(player.blockPosition()).inflate(7)).forEach(pos -> {
+			double dist = renderPos.distanceToSqr(pos.getX(), pos.getY(), pos.getZ());
+			if (dist > 49)return;
+
+			var state = mc.level.getBlockState(pos);
+			if (state.getBlock() instanceof IConfiguratorHighlight h) {
+				var shape = h.getHighlightShape(state, mc.level, pos);
+				int color = h.getHighlightColor();
+				float a = 1f;
+				if (dist > 25) {
+					a = 1f - ((float) ((dist - 25) / 24f));
+				}
+
+				drawShape(ps, buf, shape,
+						pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z,
+						ARGB.red(color) / 255f, ARGB.green(color) / 255f, ARGB.blue(color) / 255f,
+						a);
+			}
+		});
 	}
 
 	private static void drawShape(PoseStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {

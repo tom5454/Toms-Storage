@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.mojang.serialization.MapCodec;
 
@@ -27,7 +30,7 @@ import com.tom.storagemod.block.entity.InventoryProxyBlockEntity;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
-public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable, BlockWithTooltip {
+public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable, BlockWithTooltip, IConfiguratorHighlight {
 	public static final MapCodec<InventoryProxyBlock> CODEC = simpleCodec(InventoryProxyBlock::new);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
@@ -84,5 +87,31 @@ public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable, 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite());
+	}
+
+	@Override
+	public int getHighlightColor() {
+		return 0x880088;
+	}
+
+	@Override
+	public VoxelShape getHighlightShape(BlockState state, BlockGetter level, BlockPos pos) {
+		switch (state.getValue(FACING)) {
+		case DOWN:
+			return Shapes.or(box(4, 2, 4, 12, 12, 12), box(2, 0, 2, 14, 2, 14));
+		case EAST:
+			return Shapes.or(box(4, 4, 4, 14, 12, 12), box(14, 2, 2, 16, 14, 14));
+		case NORTH:
+			return Shapes.or(box(4, 4, 2, 12, 12, 12), box(2, 2, 0, 14, 14, 2));
+		case SOUTH:
+			return Shapes.or(box(4, 4, 4, 12, 12, 14), box(2, 2, 14, 14, 14, 16));
+		case UP:
+			return Shapes.or(box(4, 4, 4, 12, 14, 12), box(2, 14, 2, 14, 16, 14));
+		case WEST:
+			return Shapes.or(box(2, 4, 4, 12, 12, 12), box(0, 2, 2, 2, 14, 14));
+		default:
+			break;
+		}
+		return Shapes.block();
 	}
 }

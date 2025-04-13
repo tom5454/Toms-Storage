@@ -18,7 +18,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 
-public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorBlock implements IPaintable {
+public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorBlock implements IPaintable, IConfiguratorHighlight {
 
 	public FramedInventoryCableConnectorBlock(Block.Properties pr) {
 		super(pr);
@@ -42,5 +42,15 @@ public class FramedInventoryCableConnectorBlock extends InventoryCableConnectorB
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return Shapes.block();
+	}
+
+	@Override
+	public int getHighlightColor() {
+		return 0xFFFF00;
+	}
+
+	@Override
+	public VoxelShape getHighlightShape(BlockState state, BlockGetter level, BlockPos pos) {
+		return super.getShape(state, level, pos, null);
 	}
 }

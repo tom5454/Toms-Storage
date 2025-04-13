@@ -6,11 +6,17 @@
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.17",
 		"1.21-latest": "2.0.12",
-		"1.21.1-latest": "2.1.2",
+		"1.21.1-latest": "2.1.3",
 		"1.21.3-latest": "2.1.1",
-		"1.21.4-latest": "2.2.2"
+		"1.21.4-latest": "2.2.3",
+		"1.21.5-latest": "2.3.1"
+	},
+	"1.21.5": {
+		"2.3.1": "Added: inventory configurators highlight painted blocks (Closes #496)\nAdded storage system information to the terminal UI (Closes #435)\nImproved inventory configurator in-game description\nFixed framed inventory cable connectors missing tool tags\nFixed filing cabinets on fabric (#566, Closes #547)\nFixed beacon indicator not showing if beacon level 0 is required (Closes #546)\nFixed recipe book ghost items rendering in the wrong place\nFixed painted inventory trim name breaking (Closes #565)\nFixed REI not working on NeoForge (Closes #473)\nFixed terminal settings buttons not cycling in reverse with shift held (Closes #313)\nFixed tall terminal UI overlapping with jei search bar (Closes #479)\nFixed polymorph button breaking with tall terminal",
+		"2.3.0": "1.21.5 port"
 	},
 	"1.21.4": {
+		"2.2.3": "Added: inventory configurators highlight painted blocks (Closes #496)\nAdded storage system information to the terminal UI (Closes #435)\nImproved inventory configurator in-game description\nFixed framed inventory cable connectors missing tool tags\nFixed filing cabinets on fabric (#566, Closes #547)\nFixed beacon indicator not showing if beacon level 0 is required (Closes #546)\nFixed recipe book ghost items rendering in the wrong place\nFixed painted inventory trim name breaking (Closes #565)\nFixed REI not working on NeoForge (Closes #473)\nFixed terminal settings buttons not cycling in reverse with shift held (Closes #313)\nFixed tall terminal UI overlapping with jei search bar (Closes #479)\nFixed polymorph button breaking with tall terminal",
 		"2.2.2": "Fixed crash with Inventory Sorter (Closes #487)\nFixed polymorph compat not working (Closes #542)\nFixed level emitter not updating on configuration change",
 		"2.2.1": "Updated Chinese translations (#519)\nReplaced the framed inventory cable connector item model (#523)\nFixed world hang on Fabric (Closes #524)\nFixed inventory proxy causing crashes in some cases (#520)\nFixed crafting terminal losing items (Closes #498)\nFixed the level emitter model on 1.21.4",
 		"2.2.0": "Add config option to blacklist certain blocks/mods (Closes #507)\nRewritten JEI/REI/EMI recipe integrations (Closes #466)\nFixed crash with 0 size inventories (Closes #516)\nFixed Inventory Cable Connector (Framed) xraying on 1.21.4 (Closes #518)\nFixed Paint Kit item name breaking (Closes #517)\nFixed missing texture warnings",		
@@ -22,6 +28,7 @@
 		"2.1.0": "1.21.3 port"
 	},
 	"1.21.1": {
+		"2.1.3": "Added: inventory configurators highlight painted blocks (Closes #496)\nAdded storage system information to the terminal UI (Closes #435)\nImproved inventory configurator in-game description\nFixed framed inventory cable connectors missing tool tags\nFixed filing cabinets on fabric (#566, Closes #547)\nFixed beacon indicator not showing if beacon level 0 is required (Closes #546)\nFixed inventory interface not working in some cases (Closes #478)\nFixed REI not working on NeoForge (Closes #473)\nFixed terminal settings buttons not cycling in reverse with shift held (Closes #313)\nFixed tall terminal UI overlapping with jei search bar (Closes #479)\nFixed polymorph button breaking with tall terminal",
 		"2.1.2": "Fixed crash with Inventory Sorter (Closes #487)\nFixed polymorph compat not working (Closes #542)\nFixed level emitter not updating on configuration change",
 		"2.1.1": "Updated Chinese translations (#519)\nReplaced the framed inventory cable connector item model (#523)\nFixed world hang on Fabric (Closes #524)\nFixed inventory proxy causing crashes in some cases (#520)\nFixed crafting terminal losing items (Closes #498)",
 		"2.1.0": "Add config option to blacklist certain blocks/mods (Closes #507)\nRewritten JEI/REI/EMI recipe integrations (Closes #466)\nFixed crash with 0 size inventories (Closes #516)",
