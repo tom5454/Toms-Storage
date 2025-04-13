@@ -40,7 +40,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		if(lastItemSlot != -1 && lastItemSlot < top.getSlots()) {
 			if(hasFilter) {
 				ItemStack inSlot = top.getStackInSlot(lastItemSlot);
-				if(!filterPred.test(inSlot)) {
+				if(inSlot.isEmpty() || !filterPred.test(inSlot)) {
 					lastItemSlot = -1;
 				}
 			} else {

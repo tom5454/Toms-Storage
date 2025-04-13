@@ -155,7 +155,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		clearWidgets();
 		if (tallMode) {
 			int guiSize = guiHeight - textureSlotCount * 18;
-			rowCount = (height - 20 - guiSize) / 18;
+			rowCount = (height - 30 - guiSize) / 18;
 			imageHeight = guiSize + rowCount * 18;
 			menu.setOffset(0, (rowCount - textureSlotCount) * 18);
 			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
@@ -371,7 +371,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 		searchField.render(st, mouseX, mouseY, partialTicks);
 
-		if(menu.beaconLvl > 0) {
+		if(menu.beaconLvl >= 0) {
 			int x = 176;
 			int y = 24 + rowCount * 18;
 			st.renderItem(new ItemStack(Items.BEACON), leftPos + x, topPos + y);

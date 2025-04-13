@@ -28,7 +28,7 @@ import com.tom.storagemod.util.TickerUtil.TickableServer;
 
 public class LevelEmitterBlockEntity extends BlockEntity implements TickableServer, MenuProvider {
 	private ItemStack filter = ItemStack.EMPTY;
-	private int count;
+	private int count = 1;
 	private Storage<ItemVariant> top;
 	private boolean lessThan;
 
@@ -92,10 +92,10 @@ public class LevelEmitterBlockEntity extends BlockEntity implements TickableServ
 				level.setBlock(worldPosition, state.setValue(LevelEmitterBlock.POWERED, Boolean.valueOf(currState)), 3);
 
 				Direction direction = state.getValue(LevelEmitterBlock.FACING);
-				BlockPos blockPos = worldPosition.relative(direction.getOpposite());
+				BlockPos blockPos = worldPosition.relative(direction);
 
 				level.neighborChanged(blockPos, state.getBlock(), worldPosition);
-				level.updateNeighborsAtExceptFromFacing(blockPos, state.getBlock(), direction);
+				level.updateNeighborsAtExceptFromFacing(blockPos, state.getBlock(), direction.getOpposite());
 			}
 		}
 	}

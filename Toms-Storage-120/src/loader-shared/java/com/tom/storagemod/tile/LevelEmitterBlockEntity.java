@@ -33,7 +33,7 @@ import com.tom.storagemod.util.TickerUtil.TickableServer;
 
 public class LevelEmitterBlockEntity extends BlockEntity implements TickableServer, MenuProvider {
 	private ItemStack filter = ItemStack.EMPTY;
-	private int count;
+	private int count = 1;
 	private LazyOptional<IItemHandler> top;
 	private boolean lessThan;
 

@@ -153,6 +153,8 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 					IntStream.range(0, itemHandler.getSlots()).mapToObj(itemHandler::getStackInSlot).filter(s -> !s.isEmpty()).
 					map(StoredItemStack::new).forEach(s -> items.merge(s, s.getQuantity(), (a, b) -> a + b));
 				}
+			} else {
+				itemHandler = null;
 			}
 			updateItems = false;
 		}
@@ -164,8 +166,8 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 						return InventoryCableConnectorBlockEntity.calcBeaconLevel(level, p.getX(), p.getY(), p.getZ());
 					}
 				}
-				return 0;
-			}).max().orElse(0);
+				return -1;
+			}).max().orElse(-1);
 		}
 	}
 

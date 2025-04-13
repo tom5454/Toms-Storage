@@ -59,7 +59,7 @@ public class StorageTerminalMenu extends PlatformRecipeMenu implements IDataRece
 			if(onPacket != null)
 				onPacket.run();
 		}, () -> te != null ? te.getSorting() : 0));
-		addDataSlot(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : 0));
+		addDataSlot(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : -1));
 	}
 
 	public StorageTerminalMenu(MenuType<?> type, int id, Inventory inv) {

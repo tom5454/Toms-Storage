@@ -126,7 +126,7 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 		this.inv.stopOpen(playerIn);
 	}
 
-	private int lastCount = 0;
+	private int lastCount = -1;
 	private boolean lessThan = false;
 
 	@Override

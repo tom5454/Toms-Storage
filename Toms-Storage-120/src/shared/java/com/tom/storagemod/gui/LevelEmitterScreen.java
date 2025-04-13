@@ -59,7 +59,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		textF.setResponder(t -> {
 			try {
 				int c = Integer.parseInt(t);
-				if(c >= 1) {
+				if(c >= 0) {
 					count = c;
 					send();
 				}
@@ -117,7 +117,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 
 		private void evt(Button b) {
 			count += hasShiftDown() ? sv : v;
-			if(count < 1)count = 1;
+			if(count < 0)count = 0;
 			textF.setValue(Integer.toString(count));
 			send();
 		}
