@@ -29,15 +29,17 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.mojang.serialization.MapCodec;
 
+import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
 
-public class FramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable, NeoForgeBlock {
+public class FramedInventoryCableBlock extends BaseEntityBlock implements IInventoryCable, IPaintable, NeoForgeBlock, IConfiguratorHighlight {
 	public static final BooleanProperty UP = BlockStateProperties.UP;
 	public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
 	public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
@@ -125,9 +127,6 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 		return blockState_1;
 	}
 
-
-
-	@SuppressWarnings("deprecation")
 	@Override
 	public BlockState mirror(BlockState blockState_1, Mirror blockMirror_1) {
 		switch (blockMirror_1) {
@@ -195,5 +194,15 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 			n.markNodeInvalid(pos);
 			n.markNodeInvalid(neighbor);
 		}
+	}
+
+	@Override
+	public int getHighlightColor() {
+		return 0xFF0000;
+	}
+
+	@Override
+	public VoxelShape getHighlightShape(BlockState state, BlockGetter level, BlockPos pos) {
+		return Content.invCable.get().getCableShape(state, level, pos);
 	}
 }

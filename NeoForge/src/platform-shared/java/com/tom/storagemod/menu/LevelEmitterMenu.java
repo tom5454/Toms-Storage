@@ -1,7 +1,6 @@
 package com.tom.storagemod.menu;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,11 +11,14 @@ import net.minecraft.world.item.ItemStack;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.LevelEmitterBlockEntity;
 import com.tom.storagemod.menu.slot.PhantomSlot;
-import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.util.DataSlots;
 
 public class LevelEmitterMenu extends AbstractFilteredMenu {
 	private final Container inv;
 	private LevelEmitterBlockEntity te;
+	public Runnable onPacket;
+	public boolean lessThan;
+	public int count = 1;
 
 	public LevelEmitterMenu(int wid, Inventory pinv) {
 		this(wid, pinv, null);
@@ -84,6 +86,12 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 			this.addSlot(new Slot(pinv, l, 8 + l * 18, 142));
 		}
 
+		addDataSlot(DataSlots.create(v -> count = v, () -> te != null ? te.getCount() : 0).onUpdate(this::updateGui));
+		addDataSlot(DataSlots.create(v -> lessThan = v > 0, () -> te != null && te.isLessThan() ? 1 : 0).onUpdate(this::updateGui));
+	}
+
+	private void updateGui() {
+		if(onPacket != null)onPacket.run();
 	}
 
 	/**
@@ -127,9 +135,6 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 		this.inv.stopOpen(playerIn);
 	}
 
-	private int lastCount = 0;
-	private boolean lessThan = false;
-
 	@Override
 	public void receive(CompoundTag tag) {
 		if(pinv.player.isSpectator() || te == null)return;
@@ -140,19 +145,5 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 			te.setCount(count);
 			te.setLessThan(lt);
 		}
-	}
-
-	@Override
-	public void broadcastChanges() {
-		if(te == null)return;
-		if(lastCount != te.getCount() || lessThan != te.isLessThan()) {
-			CompoundTag mainTag = new CompoundTag();
-			mainTag.putInt("count", te.getCount());
-			mainTag.putBoolean("lessThan", te.isLessThan());
-			lastCount = te.getCount();
-			lessThan = te.isLessThan();
-			NetworkHandler.sendTo((ServerPlayer) pinv.player, mainTag);
-		}
-		super.broadcastChanges();
 	}
 }

@@ -1,6 +1,7 @@
 package com.tom.storagemod.polymorph;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import com.illusivesoulworks.polymorph.api.client.PolymorphWidgets;
@@ -31,6 +32,13 @@ public class PolymorphTerminalWidget extends PlayerRecipesWidget {
 		var mc = Minecraft.getInstance();
 		mc.gameMode.handleInventoryButtonClick((this.menu).containerId, 1);
 		super.initChildWidgets();
+	}
+
+	@Override
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float renderPartialTicks) {
+		resetWidgetOffsets();
+
+		super.render(guiGraphics, mouseX, mouseY, renderPartialTicks);
 	}
 
 	public static void register() {

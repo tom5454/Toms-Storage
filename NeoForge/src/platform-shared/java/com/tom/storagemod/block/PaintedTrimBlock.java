@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -17,6 +18,8 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.mojang.serialization.MapCodec;
 
@@ -24,7 +27,7 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
-public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable {
+public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable, IConfiguratorHighlight {
 	public static final MapCodec<PaintedTrimBlock> CODEC = ChestBlock.simpleCodec(properties -> new PaintedTrimBlock());
 
 	public PaintedTrimBlock() {
@@ -64,5 +67,15 @@ public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable {
 	@Override
 	protected MapCodec<? extends BaseEntityBlock> codec() {
 		return CODEC;
+	}
+
+	@Override
+	public int getHighlightColor() {
+		return 0x888888;
+	}
+
+	@Override
+	public VoxelShape getHighlightShape(BlockState state, BlockGetter level, BlockPos pos) {
+		return Shapes.block();
 	}
 }

@@ -93,7 +93,7 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			//if(!useLib)exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/top/**"
@@ -138,13 +138,11 @@ dependencies {
     // at runtime, use the full JEI jar
   	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.247"
   		
-    if(useLib) {
-    	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"
-		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:14.0.688"
-		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:14.0.688"
-		implementation "me.shedaniel.cloth:cloth-config-neoforge:13.0.121"
-    	implementation "dev.architectury:architectury-neoforge:11.0.9"
-    }
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:16.0.799"
+	compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:16.0.799"
+	implementation "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.799"
+	implementation "me.shedaniel.cloth:cloth-config-neoforge:15.0.140"
+    implementation "dev.architectury:architectury-neoforge:13.0.8"
     
     compileOnly "curse.maven:vivecraft-667903:6060487"
     
@@ -156,7 +154,8 @@ dependencies {
 	implementation "curse.maven:the-one-probe-245211:5502323"
     implementation "curse.maven:jade-324717:5529595"
     
-    implementation "curse.maven:adorned-1036809:5546365"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1:api"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

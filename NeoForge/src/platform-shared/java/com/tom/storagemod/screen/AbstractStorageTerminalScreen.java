@@ -182,7 +182,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		clearWidgets();
 		if (tallMode) {
 			int guiSize = guiHeight - textureSlotCount * 18;
-			rowCount = (height - 20 - guiSize) / 18;
+			rowCount = (height - 30 - guiSize) / 18;
 			imageHeight = guiSize + rowCount * 18;
 			menu.setOffset(0, (rowCount - textureSlotCount) * 18);
 			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
@@ -421,7 +421,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 		searchField.render(st, mouseX, mouseY, partialTicks);
 
-		if(menu.beaconLvl > 0) {
+		if(menu.beaconLvl >= 0) {
 			int x = 176;
 			int y = 24 + rowCount * 18;
 			st.renderItem(new ItemStack(Items.BEACON), leftPos + x, topPos + y);
@@ -433,6 +433,21 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				else info = "";
 				st.renderComponentTooltip(font, Arrays.stream(I18n.get("tooltip.toms_storage.terminal_beacon", menu.beaconLvl, info).split("\\\\")).map(Component::literal).collect(Collectors.toList()), mouseX, mouseY);
 			}
+		}
+		if(isHovering(176, 4, 16, 10, mouseX, mouseY)) {
+			st.renderComponentTooltip(font, List.of(
+					Component.translatable("tooltip.toms_storage.terminal_stat.slots",
+							menu.slotCount == Short.MAX_VALUE ?
+									Component.translatable("tooltip.toms_storage.terminal_stat.alot") : menu.slotCount
+							),
+					Component.translatable("tooltip.toms_storage.terminal_stat.free",
+							menu.freeCount == Short.MAX_VALUE ?
+									Component.translatable("tooltip.toms_storage.terminal_stat.alot") : menu.freeCount,
+									menu.freeCount == Short.MAX_VALUE || menu.slotCount == Short.MAX_VALUE ?
+											"?" : Math.round(menu.freeCount / (float) menu.slotCount * 100)
+							),
+					Component.translatable("tooltip.toms_storage.terminal_stat.unique", menu.itemList.size())
+					), mouseX, mouseY);
 		}
 		if (popup.render(st, font, mouseX, mouseY)) {
 			if (this.menu.getCarried().isEmpty() && slotIDUnderMouse != -1) {
@@ -453,6 +468,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	@Override
 	protected void renderLabels(GuiGraphics st, int mouseX, int mouseY) {
 		super.renderLabels(st, mouseX, mouseY);
+		st.drawString(font, "i", 180, 6, 4210752, false);
 		st.pose().pushPose();
 		slotIDUnderMouse = drawSlots(st, mouseX, mouseY);
 		st.pose().popPose();

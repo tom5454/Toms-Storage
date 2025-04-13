@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -48,6 +49,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	private int changeCount;
 	private int beaconLevel;
 	private long changeTracker;
+	private int slotCount, freeCount;
 
 	public StorageTerminalBlockEntity(BlockPos pos, BlockState state) {
 		super(Content.terminalBE.get(), pos, state);
@@ -134,6 +136,8 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 					tr.streamWrappedStacks(false).forEach(s -> items.merge(s, s, StoredItemStack::merge));
 					items.replaceAll((k, v) -> new StoredItemStack(v));
 				}
+				slotCount = Mth.clamp(ii.getSlotCount(), 0, Short.MAX_VALUE);
+				freeCount = Mth.clamp(ii.getFreeSlotCount(), 0, Short.MAX_VALUE);
 				changeCount++;
 			}
 			updateItems = false;
@@ -146,8 +150,8 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 						return BeaconLevelCalc.calcBeaconLevel(level, p.getX(), p.getY(), p.getZ());
 					}
 				}
-				return 0;
-			}).max().orElse(0);
+				return -1;
+			}).max().orElse(-1);
 		}
 	}
 
@@ -236,5 +240,13 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 
 	public int getChangeCount() {
 		return changeCount;
+	}
+
+	public int getFreeCount() {
+		return freeCount;
+	}
+
+	public int getSlotCount() {
+		return slotCount;
 	}
 }

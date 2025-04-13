@@ -48,6 +48,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	protected Inventory pinv;
 	public Runnable onPacket;
 	public int sorting, modes, searchType = -1, beaconLvl, changeCount;
+	public int slotCount, freeCount;
 	public String search;
 	public boolean noSort;
 	public Slot offhand;
@@ -66,7 +67,9 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 		addDataSlot(DataSlots.create(v -> sorting = v, () -> te != null ? te.getSorting() : 0).onUpdate(this::updateGui));
 		addDataSlot(DataSlots.create(v -> modes = v, () -> te != null ? te.getModes() : 0).onUpdate(this::updateGui));
 		addDataSlot(DataSlots.create(v -> searchType = v, () -> te != null ? te.getSearchType() : 0).onUpdate(this::updateGui));
-		addDataSlot(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : 0));
+		addDataSlot(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : -1));
+		addDataSlot(DataSlots.create(v -> slotCount = v, () -> te != null ? te.getSlotCount() : -1));
+		addDataSlot(DataSlots.create(v -> freeCount = v, () -> te != null ? te.getFreeCount() : -1));
 	}
 
 	private void updateGui() {

@@ -43,7 +43,7 @@ public class InventoryInterfaceBlockEntity extends PlatformBlockEntity implement
 					if (!level.isLoaded(p))continue;
 
 					BlockEntity be = level.getBlockEntity(p);
-					if (be instanceof IInventoryConnector te) {
+					if (be instanceof IInventoryConnector te && te.hasConnectedInventories()) {
 						networkAccess = new WeakReference<>(te);
 						break;
 					}

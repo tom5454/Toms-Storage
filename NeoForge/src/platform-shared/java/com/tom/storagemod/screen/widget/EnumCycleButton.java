@@ -43,6 +43,6 @@ public class EnumCycleButton<T extends Enum<T>> extends IconButton {
 
 	@SuppressWarnings("unchecked")
 	private static <T extends Enum<T>> OnPress onPress(T[] el, Consumer<T> stateUpdate) {
-		return b -> stateUpdate.accept(el[(((EnumCycleButton<T>) b).getState().ordinal() + el.length + (Screen.hasAltDown() ? -1 : 1)) % el.length]);
+		return b -> stateUpdate.accept(el[(((EnumCycleButton<T>) b).getState().ordinal() + el.length + (Screen.hasShiftDown() ? -1 : 1)) % el.length]);
 	}
 }
