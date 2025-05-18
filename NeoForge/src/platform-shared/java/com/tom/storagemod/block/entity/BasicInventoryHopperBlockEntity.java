@@ -139,6 +139,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 
 	@Override
 	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
-		Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter);
+		if (!filter.isEmpty() && filter.getItem() instanceof IItemFilter)
+			Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter);
 	}
 }

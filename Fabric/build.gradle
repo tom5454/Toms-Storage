@@ -65,7 +65,7 @@ dependencies {
     
 	modCompileOnly('maven.modrinth:sodium:mc1.21.5-0.6.12-fabric')
 	modCompileOnly('maven.modrinth:iris:1.8.10+1.21.5-fabric')
-	modCompileOnly('maven.modrinth:vivecraft:1.21.5-1.2.5-b3-fabric')
+	modCompileOnly('maven.modrinth:vivecraft:1.21.5-1.2.5-fabric')
 	implementation "com.electronwill.night-config:core:3.6.6"
     implementation "com.electronwill.night-config:toml:3.6.6"
     implementation("org.lwjgl:lwjgl-openvr:3.3.3")
