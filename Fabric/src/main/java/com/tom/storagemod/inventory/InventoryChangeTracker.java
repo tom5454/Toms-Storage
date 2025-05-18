@@ -216,12 +216,11 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 
 	private boolean updateChangeM(FabricStack st, Map<StorageView<ItemVariant>, StoredItemStack> mod) {
 		StorageView<ItemVariant> uv = st.uv();
-		StorageView<ItemVariant> iv = st.view();
 		StoredItemStack li = lastItems.get(uv);
 		if (!st.item().isBlank()) {
 			ItemStack is = st.item().toStack();
 			if (checkFilter(new StoredItemStack(is, st.count(), st.item().hashCode()))) {
-				int cnt = getCount(iv);
+				int cnt = getCount(st);
 				if (li == null || !ItemStack.isSameItemSameComponents(li.getStack(), is)) {
 					mod.put(uv, new StoredItemStack(is, cnt, st.item().hashCode()));
 					return true;
