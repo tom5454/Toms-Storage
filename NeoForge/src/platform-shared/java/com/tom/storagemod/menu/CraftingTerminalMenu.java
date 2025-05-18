@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.recipebook.ServerPlaceRecipe;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
@@ -218,33 +216,9 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	public PostPlaceAction handlePlacement(boolean bl, boolean bl2, RecipeHolder<?> recipeHolder,
 			ServerLevel serverLevel, Inventory inventory) {
 		RecipeHolder<CraftingRecipe> recipeholder = (RecipeHolder<CraftingRecipe>)recipeHolder;
-		//this.beginPlacingRecipe();
+		new TerminalCraftingFiller((CraftingTerminalBlockEntity) te, pinv.player, sync).placeRecipe(recipeholder.value());
 
-		RecipeBookMenu.PostPlaceAction recipebookmenu$postplaceaction;
-		try {
-			List<Slot> list = getInputGridSlots();
-			recipebookmenu$postplaceaction = ServerPlaceRecipe.placeRecipe(new ServerPlaceRecipe.CraftingMenuAccess<CraftingRecipe>() {
-				@Override
-				public void fillCraftSlotsStackedContents(StackedItemContents p_363395_) {
-					CraftingTerminalMenu.this.fillCraftSlotsStackedContents(p_363395_);
-				}
-
-				@Override
-				public void clearCraftingContent() {
-					CraftingTerminalMenu.this.craftResult.clearContent();
-					CraftingTerminalMenu.this.craftMatrix.clearContent();
-				}
-
-				@Override
-				public boolean recipeMatches(RecipeHolder<CraftingRecipe> p_365206_) {
-					return p_365206_.value().matches(CraftingTerminalMenu.this.craftMatrix.asCraftInput(), CraftingTerminalMenu.this.pinv.player.level());
-				}
-			}, 3, 3, list, list, inventory, recipeholder, bl, bl2);
-		} finally {
-			//this.finishPlacingRecipe(p_379885_, (RecipeHolder<CraftingRecipe>)p_364981_);
-		}
-
-		return recipebookmenu$postplaceaction;
+		return PostPlaceAction.NOTHING;
 	}
 
 	@Override

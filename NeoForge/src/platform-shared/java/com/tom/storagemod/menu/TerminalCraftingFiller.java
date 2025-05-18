@@ -7,12 +7,12 @@ import java.util.Map;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.recipebook.PlaceRecipeHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import com.tom.storagemod.block.entity.CraftingTerminalBlockEntity;
 import com.tom.storagemod.inventory.StoredItemStack;
@@ -37,25 +37,10 @@ public class TerminalCraftingFiller {
 		for (var i : player.getInventory().items) {
 			accountStack(i);
 		}
-		int rw;
-		if (recipe instanceof ShapedRecipe sr) {
-			rw = sr.getWidth();
-		} else {
-			int cnt = recipe.placementInfo().ingredients().size();
-			if (cnt == 1) {
-				rw = 1;
-			} else if (cnt <= 4) {
-				rw = 2;
-			} else {
-				rw = 3;
-			}
-		}
 		var ings = recipe.placementInfo().ingredients();
-		for (int i = 0; i < ings.size(); i++) {
-			Ingredient ingr = ings.get(i);
-			if (ingr.isEmpty())continue;
-			int x = i % rw;
-			int y = i / rw;
+		PlaceRecipeHelper.placeRecipe(3, 3, recipe, recipe.placementInfo().slotsToIngredientIndex(), (idx, slotId, _1, _2) -> {
+			if (idx == -1)return;
+			Ingredient ingr = ings.get(idx);
 			boolean filled = false;
 			for (Holder<Item> v : Platform.getIngredientItems(ingr)) {
 				var lst = allItems.get(v);
@@ -65,12 +50,12 @@ public class TerminalCraftingFiller {
 							var pull = te.pullStack(new StoredItemStack(item), 1);
 							if (pull != null) {
 								filled = true;
-								te.setCraftSlot(x, y, pull.getActualStack());
+								te.setCraftSlot(slotId, pull.getActualStack());
 								break;
 							} else {
 								int id = player.getInventory().findSlotMatchingItem(item);
 								if (id != -1) {
-									te.setCraftSlot(x, y, player.getInventory().removeItem(id, 1));
+									te.setCraftSlot(slotId, player.getInventory().removeItem(id, 1));
 									filled = true;
 									break;
 								}
@@ -80,7 +65,7 @@ public class TerminalCraftingFiller {
 					if (filled)break;
 				}
 			}
-		}
+		});
 	}
 
 	public void accountStack(ItemStack st) {

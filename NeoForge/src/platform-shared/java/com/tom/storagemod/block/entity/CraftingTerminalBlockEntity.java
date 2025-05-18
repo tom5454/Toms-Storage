@@ -228,7 +228,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		onCraftingMatrixChanged();
 	}
 
-	public void setCraftSlot(int x, int y, ItemStack actualStack) {
-		craftMatrix.setItem(x + y * 3, actualStack);
+	public void setCraftSlot(int slot, ItemStack actualStack) {
+		craftMatrix.setItem(slot, actualStack);
 	}
 }
