@@ -34,12 +34,12 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 		this.filter = filter;
 		this.isValid = isValid;
 		this.refresh = refresh;
-		this.isValid = () -> true;
 	}
 
 	public TagItemFilterMenu(int wid, Inventory pinv) {
 		super(Content.tagItemFilterMenu.get(), wid, pinv);
 		this.addSlot(new PhantomSlot(new SimpleContainer(1), 0, 8, 15));
+		this.isValid = () -> true;
 
 		for(int k = 0; k < 3; ++k) {
 			for(int i1 = 0; i1 < 9; ++i1) {
