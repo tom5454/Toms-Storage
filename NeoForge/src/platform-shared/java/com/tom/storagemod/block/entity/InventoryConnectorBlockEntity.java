@@ -12,6 +12,7 @@ import java.util.function.UnaryOperator;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -111,6 +112,9 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 						toCheck.add(p);
 
 						VanillaMultiblockInventories.checkChest(level, p, state, mbCheck);
+						if(Config.get().getMultiblockInvs().contains(state.getBlock())) {
+							skipBlocks(p, checkedBlocks, toCheck, state.getBlock(), maxRange);
+						}
 					}
 				}
 			}
@@ -154,6 +158,27 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		for (BlockFace blockFace : this.interfaces) {
 			if (level.getBlockEntity(blockFace.pos()) instanceof InventoryInterfaceBlockEntity ii)
 				ii.setConnectorAccess(this);
+		}
+	}
+
+	private void skipBlocks(BlockPos pos, Set<BlockPos> checkedBlocks, Stack<BlockPos> edges, Block block, int maxRange) {
+		Stack<BlockPos> toCheck = new Stack<>();
+		toCheck.add(pos);
+		edges.add(pos);
+
+		while(!toCheck.isEmpty()) {
+			BlockPos cp = toCheck.pop();
+			for (Direction d : Direction.values()) {
+				BlockPos p = cp.relative(d);
+				if(!checkedBlocks.contains(p) && p.distSqr(worldPosition) < maxRange) {
+					BlockState state = level.getBlockState(p);
+					if(state.getBlock() == block) {
+						checkedBlocks.add(p);
+						edges.add(p);
+						toCheck.add(p);
+					}
+				}
+			}
 		}
 	}
 
