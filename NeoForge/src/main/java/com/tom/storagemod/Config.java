@@ -1,9 +1,6 @@
 package com.tom.storagemod;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,7 +20,7 @@ import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
 public class Config {
 	private static final Config INSTANCE = new Config();
-
+	public static final List<String> defaultMultiblocks = Arrays.asList("create:item_vault");
 	public boolean onlyTrims, runMultithreaded;
 	public int invConnectorScanRange;
 	public int invConnectorCableRange = 0;
@@ -34,6 +31,7 @@ public class Config {
 	//public int inventoryConnectorMaxSlots;
 	private Set<String> blockedMods = new HashSet<>();
 	private Set<Block> blockedBlocks = new HashSet<>();
+	private Set<Block> multiblockInvs = new HashSet<>();
 
 	public static Config get() {
 		return INSTANCE;
@@ -118,6 +116,7 @@ public class Config {
 	public static class Common {
 		public ConfigValue<List<? extends String>> blockedMods;
 		public ConfigValue<List<? extends String>> blockedBlocks;
+		public ConfigValue<List<? extends String>> multiblockInvs;
 
 		public Common(ModConfigSpec.Builder builder) {
 			builder.comment("IMPORTANT NOTICE:",
@@ -135,6 +134,10 @@ public class Config {
 			blockedBlocks = builder.comment("List of block ids ignored by the inventory connector").
 					translation("config.toms_storage.inv_blocked_blocks").
 					defineList("blockedBlocks", Collections.emptyList(), () -> "", s -> true);
+
+			multiblockInvs = builder.comment("List of multiblock inventory blocks").
+					translation("config.toms_storage.multiblock_inv").
+					defineList("multiblockInv", defaultMultiblocks, () -> "", s -> true);
 		}
 	}
 
@@ -175,6 +178,10 @@ public class Config {
 			blockedBlocks = COMMON.blockedBlocks.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).
 					map(BuiltInRegistries.BLOCK::get).filter(e -> e != null && e != Blocks.AIR).
 					collect(Collectors.toSet());
+
+			multiblockInvs = COMMON.multiblockInvs.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).
+					map(BuiltInRegistries.BLOCK::get).filter(e -> e != null && e != Blocks.AIR).
+					collect(Collectors.toSet());
 		}
 	}
 
@@ -197,4 +204,6 @@ public class Config {
 	public Set<String> getBlockedMods() {
 		return blockedMods;
 	}
+
+	public Set<Block> getMultiblockInvs() { return multiblockInvs; }
 }
