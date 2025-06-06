@@ -29,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
@@ -88,5 +89,10 @@ public class Platform {
 
 	public static RegistryFriendlyByteBuf makeRegByteBuf(ByteBuf buffer, RegistryAccess reg) {
 		return new RegistryFriendlyByteBuf(buffer, reg);
+	}
+
+	public static ItemStack getCloneItemStack(Level level, HitResult hitResult, BlockPos pos, Player player) {
+		var st = level.getBlockState(pos);
+		return st.getBlock().getCloneItemStack(level, pos, st);
 	}
 }

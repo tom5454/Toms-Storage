@@ -34,7 +34,9 @@ import net.minecraft.world.level.block.Block;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import com.tom.storagemod.api.MultiblockInventoryAPI;
 import com.tom.storagemod.inventory.PlatformItemHandler;
+import com.tom.storagemod.inventory.VanillaMultiblockInventories;
 import com.tom.storagemod.item.ILeftClickListener;
 import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.network.DataPacket;
@@ -159,5 +161,7 @@ public class StorageMod implements ModInitializer {
 			blockedBlocks = null;
 			return InteractionResult.PASS;
 		});
+
+		MultiblockInventoryAPI.EVENT.register(VanillaMultiblockInventories::checkChest);
 	}
 }

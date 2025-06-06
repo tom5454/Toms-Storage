@@ -2,8 +2,10 @@ package com.tom.storagemod;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
@@ -17,6 +19,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -45,12 +48,14 @@ import com.tom.storagemod.screen.TagItemFilterScreen;
 
 public class StorageModClient {
 	public static KeyMapping openTerm;
+	public static final ResourceLocation CONFIGURATOR_OVERLAY_ID = ResourceLocation.tryBuild(StorageMod.modid, "configurator_info");
 
 	public static void preInit(ModContainer mc, IEventBus bus) {
 		bus.addListener(StorageModClient::registerColors);
 		bus.addListener(StorageModClient::initKeybinds);
 		bus.addListener(StorageModClient::bakeModels);
 		bus.addListener(StorageModClient::registerScreens);
+		bus.addListener(StorageModClient::registerOverlays);
 
 		try {
 			mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
@@ -71,6 +76,14 @@ public class StorageModClient {
 
 	public static void clientSetup() {
 		NeoForge.EVENT_BUS.register(StorageModClient.class);
+	}
+
+	public static void registerOverlays(RegisterGuiLayersEvent event) {
+		event.registerAboveAll(CONFIGURATOR_OVERLAY_ID, StorageModClient::renderConfiguratorOverlay);
+	}
+
+	public static void renderConfiguratorOverlay(GuiGraphics gr, DeltaTracker p_348559_) {
+		ClientUtil.drawConfiguratorOverlay(gr);
 	}
 
 	@SubscribeEvent

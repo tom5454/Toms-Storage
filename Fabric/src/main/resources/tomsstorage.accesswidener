@@ -4,3 +4,5 @@ accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent
 
 mutable field net/minecraft/world/inventory/Slot x I
 mutable field net/minecraft/world/inventory/Slot y I
+
+accessible field net/minecraft/client/gui/Gui layers Lnet/minecraft/client/gui/LayeredDraw;

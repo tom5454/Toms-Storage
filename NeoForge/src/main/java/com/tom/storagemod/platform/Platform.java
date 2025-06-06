@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -111,5 +112,9 @@ public class Platform {
 
 	public static RegistryFriendlyByteBuf makeRegByteBuf(ByteBuf buffer, RegistryAccess reg) {
 		return new RegistryFriendlyByteBuf(buffer, reg, ConnectionType.NEOFORGE);
+	}
+
+	public static ItemStack getCloneItemStack(Level level, HitResult hitResult, BlockPos pos, Player player) {
+		return level.getBlockState(pos).getCloneItemStack(hitResult, level, pos, player);
 	}
 }

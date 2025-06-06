@@ -18,7 +18,9 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
+import com.tom.storagemod.api.MultiblockInventoryAPI;
 import com.tom.storagemod.inventory.PlatformItemHandler;
+import com.tom.storagemod.inventory.VanillaMultiblockInventories;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.polymorph.PolymorphTerminalWidget;
@@ -57,6 +59,7 @@ public class StorageMod {
 
 	private void setup(final FMLCommonSetupEvent event) {
 		LOGGER.info("Tom's Storage Setup starting");
+		MultiblockInventoryAPI.EVENT.register(VanillaMultiblockInventories::checkChest);
 	}
 
 	private void doClientStuff(final FMLClientSetupEvent event) {

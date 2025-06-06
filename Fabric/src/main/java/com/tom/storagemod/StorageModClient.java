@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -137,6 +138,10 @@ public class StorageModClient implements ClientModInitializer {
 
 		ItemTooltipCallback.EVENT.register((s, t, c, l) -> {
 			ClientUtil.collectExtraTooltips(s, l);
+		});
+
+		ClientLifecycleEvents.CLIENT_STARTED.register(mc -> {
+			mc.gui.layers.add((gr, tr) -> ClientUtil.drawConfiguratorOverlay(gr));
 		});
 
 		if (StorageMod.polymorph)PolymorphTerminalWidget.register();
