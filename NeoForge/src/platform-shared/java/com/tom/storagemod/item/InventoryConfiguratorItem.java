@@ -65,14 +65,17 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 			if (stack != player.getItemInHand(InteractionHand.MAIN_HAND) && stack != player.getItemInHand(InteractionHand.OFF_HAND)) {
 				ConfiguratorComponent c = stack.get(Content.configuratorComponent.get());
 				if (c.showInvBox() || c.massSelect()) {
-					stack.set(Content.configuratorComponent.get(), c.hiddenItem());
+					stack.set(Content.configuratorComponent.get(), c.hiddenItem(level.getGameTime()));
 				}
 			}
 		}
 	}
 
 	private void action(Level level, Player player, ItemStack stack, boolean rclk, BlockPos useOn, InteractionHand hand) {
-		var c = new ConfiguratorComponent.Configurator(stack);
+		var c = new ConfiguratorComponent.Configurator(stack, level.getGameTime());
+		if (c.debounce()) {
+			return;
+		}
 		if (c.isBound()) {
 			int x = c.bound().getX();
 			int y = c.bound().getY();
@@ -108,15 +111,12 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 								player.displayClientMessage(Component.translatable("chat.toms_storage.area_too_big"), true);
 								c.massSelectEnd();
 							}
-							player.displayClientMessage(Component.translatable("tooltip.toms_storage.inventory_configurator.selection"), true);
 						} else {
 							c.massSelectStart(useOn);
-							player.displayClientMessage(Component.translatable("tooltip.toms_storage.inventory_configurator.mass_selection"), true);
 						}
 						return;
 					} else {
 						c.massSelectEnd();
-						player.displayClientMessage(Component.translatable("tooltip.toms_storage.inventory_configurator.selection"), true);
 						return;
 					}
 					c.clear();

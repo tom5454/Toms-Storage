@@ -76,7 +76,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 		@Override
 		public IItemHandler get() {
-			return itemCache == null ? null : itemCache.getCapability();
+			return itemCache == null || !valid ? null : itemCache.getCapability();
 		}
 
 		public static boolean hasInventoryAt(Level level, BlockPos pos, BlockState state, Direction direction) {

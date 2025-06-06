@@ -96,4 +96,8 @@ public class Platform {
 	public static Iterable<Holder<Item>> getIngredientItems(Ingredient ingr) {
 		return ingr.items().toList();
 	}
+
+	public static ItemStack getCloneItemStack(Level level, BlockPos pos, Player player) {
+		return level.getBlockState(pos).getCloneItemStack(level, pos, false);
+	}
 }

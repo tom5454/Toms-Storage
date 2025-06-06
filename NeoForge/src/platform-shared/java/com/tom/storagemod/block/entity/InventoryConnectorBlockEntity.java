@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageTags;
+import com.tom.storagemod.api.MultiblockInventoryAPI;
 import com.tom.storagemod.block.IInventoryNode;
 import com.tom.storagemod.inventory.BlockFilter;
 import com.tom.storagemod.inventory.IInventoryAccess;
@@ -27,7 +28,6 @@ import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.inventory.MultiInventoryAccess;
 import com.tom.storagemod.inventory.PlatformInventoryAccess.BlockInventoryAccess;
 import com.tom.storagemod.inventory.PlatformMultiInventoryAccess;
-import com.tom.storagemod.inventory.VanillaMultiblockInventories;
 import com.tom.storagemod.platform.PlatformBlockEntity;
 import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.InventoryConnectorConfigUtil;
@@ -110,7 +110,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 						connected.put(p, d.getOpposite());
 						toCheck.add(p);
 
-						VanillaMultiblockInventories.checkChest(level, p, state, mbCheck);
+						MultiblockInventoryAPI.EVENT.invoker().detectMultiblocks(level, p, state, mbCheck);
 					}
 				}
 			}
