@@ -126,9 +126,6 @@
 	"tooltip.toms_storage.inv_config.skip": "Exclude from Inventory Connectors",
 	"tooltip.toms_storage.content_stored": "Contains items",
 	"tooltip.toms_storage.filing_cabinet": "Store multiple variants of the same item",
-	"tooltip.toms_storage.inventory_configurator": "Configure how each inventory\\interacts with the Inventory Connector.\\Highlights painted blocks.\\While selecting multiblock inventories:\\  Right click to add/remove a single inventory.\\  Left click to start/stop area select.\\  Right click in the air to finish selection.",
-	"tooltip.toms_storage.inventory_configurator.selection": "Right click to add/remove a single inventory. Left click to start area select. Right click in the air to finish.",
-	"tooltip.toms_storage.inventory_configurator.mass_selection": "Left click to stop area select. Sneak+Left click to abort current selection.",
 	"tooltip.toms_storage.inventory_connector.channel.owner": "Owner: %s",
 	"tooltip.toms_storage.inventory_connector.channel.owner.self": "Owner: %s (You)",
 	"tooltip.toms_storage.inventory_connector.channel.owner.unknown": "Owner: Unknown",
@@ -146,6 +143,18 @@
 	"tooltip.toms_storage.terminal_stat.free": "Free slots: %s (%s%%)",
 	"tooltip.toms_storage.terminal_stat.unique": "Unique items: %s",
 	"tooltip.toms_storage.terminal_stat.alot": "Alot (>32k)",
+	"tooltip.toms_storage.config_overlay.block": "Configuring Block: %d, %d, %d",
+	"tooltip.toms_storage.config_overlay.block_alt": "Configuring Block: %s",
+	"tooltip.toms_storage.config_overlay.mass_select": "Multiblock Area Mass Selecting",
+	"tooltip.toms_storage.config_overlay.select": "Multiblock Area Single Selecting",
+	"tooltip.toms_storage.config_overlay.mass_select.finish": "%s to finish area select",
+	"tooltip.toms_storage.config_overlay.mass_select.abort": "%s + %s to abort current selection",
+	"tooltip.toms_storage.config_overlay.select.single": "%s to add/remove a single inventory",
+	"tooltip.toms_storage.config_overlay.select.finish": "%s in the air to finish selection",
+	"tooltip.toms_storage.config_overlay.select.start_mass": "%s to start area select",
+	"tooltip.toms_storage.config_overlay.configure": "%s to configure block",
+	"tooltip.toms_storage.config_overlay.show": "%s to see connected blocks",
+	"tooltip.toms_storage.config_overlay.too_far": "Configuring block too far",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
@@ -208,5 +217,7 @@
 	"tag.toms_storage.trims": "Inventory Trims",
 	
 	"config.jade.plugin_toms_storage.inventory_connector": "Inventory Connector Info",
-	"config.jade.plugin_toms_storage.inventory_config": "Inventory Configurator Info"
+	"config.jade.plugin_toms_storage.inventory_config": "Inventory Configurator Info",
+	
+	"overlay.toms_storage.configurator_info": "Tom's Simple Storage: Configurator Overlay"
 }

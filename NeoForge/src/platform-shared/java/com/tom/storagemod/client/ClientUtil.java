@@ -1,11 +1,14 @@
 package com.tom.storagemod.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
@@ -229,5 +232,66 @@ public class ClientUtil {
 		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
 		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
 		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+	}
+
+	public static void drawConfiguratorOverlay(GuiGraphics gr) {
+		Minecraft mc = Minecraft.getInstance();
+		Player player = mc.player;
+		if (player == null || mc.screen != null)
+			return;
+
+		ItemStack is = player.getItemInHand(InteractionHand.MAIN_HAND);
+		if (!is.is(Content.invConfig.get()))is = player.getItemInHand(InteractionHand.OFF_HAND);
+		if (!is.is(Content.invConfig.get()))return;
+
+		List<Component> messages = new ArrayList<>();
+		Component leftClk = Component.keybind("key.attack").withStyle(ChatFormatting.GREEN);
+		Component rightClk = Component.keybind("key.use").withStyle(ChatFormatting.GREEN);
+		Component shift = Component.keybind("key.sneak").withStyle(ChatFormatting.GREEN);
+
+		var c = is.get(Content.configuratorComponent.get());
+		if (c.isBound()) {
+			int x = c.bound().getX();
+			int y = c.bound().getY();
+			int z = c.bound().getZ();
+			BlockPos pos = new BlockPos(x, y, z);
+			if (mc.player.distanceToSqr(x, y, z) < 64*64) {
+				Component lookingAt = null;
+				if (mc.hitResult != null) {
+					var item = Platform.getCloneItemStack(mc.level, pos, player);
+					if (!item.isEmpty()) {
+						lookingAt = item.getHoverName();
+					}
+				}
+				if (lookingAt == null)lookingAt = Component.literal("?");
+				if (mc.showOnlyReducedInfo()) {
+					messages.add(Component.translatable("tooltip.toms_storage.config_overlay.block_alt", lookingAt));
+				} else {
+					messages.add(Component.translatable("tooltip.toms_storage.config_overlay.block", x, y, z));
+					messages.add(lookingAt);
+				}
+				if (c.selecting()) {
+					if (c.massSelect()) {
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.mass_select").withStyle(ChatFormatting.GOLD));
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.mass_select.finish", leftClk));
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.mass_select.abort", shift, leftClk));
+					} else {
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.select").withStyle(ChatFormatting.GOLD));
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.select.single", rightClk));
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.select.finish", rightClk));
+						messages.add(Component.translatable("tooltip.toms_storage.config_overlay.select.start_mass", leftClk));
+					}
+				}
+			} else {
+				messages.add(Component.translatable("tooltip.toms_storage.config_overlay.too_far"));
+			}
+		} else {
+			messages.add(Component.translatable("tooltip.toms_storage.config_overlay.configure", rightClk));
+			messages.add(Component.translatable("tooltip.toms_storage.config_overlay.show", leftClk));
+		}
+
+		if (!messages.isEmpty()) {
+			gr.renderTooltip(mc.font, messages, Optional.empty(), 5, 25);
+		}
 	}
 }

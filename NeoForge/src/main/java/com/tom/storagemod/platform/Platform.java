@@ -120,4 +120,8 @@ public class Platform {
 		if (ingr.isCustom())return Collections.emptyList();
 		return ingr.getValues();
 	}
+
+	public static ItemStack getCloneItemStack(Level level, BlockPos pos, Player player) {
+		return level.getBlockState(pos).getCloneItemStack(pos, level, false, player);
+	}
 }

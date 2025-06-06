@@ -2,7 +2,6 @@ package com.tom.storagemod.menu;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
@@ -83,10 +82,9 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 		{
 			ItemStack is = player.getItemInHand(hand);
 			if (is.is(Content.invConfig.get())) {
-				var c = new ConfiguratorComponent.Configurator(is);
+				var c = new ConfiguratorComponent.Configurator(is, player.level().getGameTime());
 				c.startSelection(pos, filter.getConnectedBlocks());
 				isClosed = true;
-				player.displayClientMessage(Component.translatable("tooltip.toms_storage.inventory_configurator.selection"), true);
 			}
 		}
 		break;
@@ -97,7 +95,7 @@ public class InventoryConfiguratorMenu extends AbstractContainerMenu {
 			filter.getConnectedBlocks().add(filter.getMainPos());
 			ItemStack is = player.getItemInHand(hand);
 			if (is.is(Content.invConfig.get())) {
-				var c = new ConfiguratorComponent.Configurator(is);
+				var c = new ConfiguratorComponent.Configurator(is, player.level().getGameTime());
 				c.setSelection(filter.getConnectedBlocks());
 			}
 		}
