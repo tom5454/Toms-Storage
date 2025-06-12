@@ -20,9 +20,10 @@ public class Config implements ConfigData {
 	public int invConnectorScanRange = 16;
 	public int wirelessRange = 16;
 	public int invConnectorMaxCables = 2048;
-	public int advWirelessRange = 64;
-	@Tooltip
-	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlCrossDim = 4;
+        public int advWirelessRange = 64;
+        public int basicHopperCooldown = 10;
+        @Tooltip
+        public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlCrossDim = 4;
 	@Tooltip
 	public int invLinkBeaconLvl = 0, invLinkBeaconRange = 4096, invLinkBeaconLvlSameDim = 1, invLinkBeaconLvlCrossDim = 2;
 	//public int inventoryConnectorMaxSlots = Integer.MAX_VALUE;
