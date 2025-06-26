@@ -1,12 +1,14 @@
 package com.tom.storagemod.menu;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+
+import com.mojang.serialization.Codec;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.LevelEmitterBlockEntity;
@@ -136,10 +138,10 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(ValueInput tag) {
 		if(pinv.player.isSpectator() || te == null)return;
 		super.receive(tag);
 		tag.getInt("count").ifPresent(te::setCount);
-		tag.getBoolean("lessThan").ifPresent(te::setLessThan);
+		tag.read("lessThan", Codec.BOOL).ifPresent(te::setLessThan);
 	}
 }

@@ -2,8 +2,6 @@ package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,6 +12,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.redstone.ExperimentalRedstoneUtils;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.LevelEmitterBlock;
@@ -72,21 +72,22 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+	public void saveAdditional(ValueOutput compound) {
+		super.saveAdditional(compound);
 		StoredItemStack f = getFilter();
 		if (f != null) {
 			ItemStack is = f.getStack();
 			if (!is.isEmpty())
-				compound.put("Filter", is.save(provider, new CompoundTag()));
+				compound.store("Filter", ItemStack.CODEC, is);
 		}
 		compound.putInt("Count", count);
 		compound.putBoolean("lessThan", lessThan);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag nbtIn, HolderLookup.Provider provider) {
-		super.loadAdditional(nbtIn, provider);
-		setFilter(nbtIn.getCompound("Filter").flatMap(f -> ItemStack.parse(provider, f)).orElse(ItemStack.EMPTY));
+	public void loadAdditional(ValueInput nbtIn) {
+		super.loadAdditional(nbtIn);
+		setFilter(nbtIn.read("Filter", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY));
 		count = nbtIn.getIntOr("Count", 0);
 		lessThan = nbtIn.getBooleanOr("lessThan", false);
 	}

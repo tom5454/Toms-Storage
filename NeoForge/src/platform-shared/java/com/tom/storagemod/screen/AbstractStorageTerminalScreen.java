@@ -20,7 +20,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -38,6 +38,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.storage.ValueInput;
 
 import com.mojang.serialization.JsonOps;
 
@@ -203,7 +204,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		this.searchField.setMaxLength(100);
 		this.searchField.setBordered(false);
 		this.searchField.setVisible(true);
-		this.searchField.setTextColor(16777215);
+		this.searchField.setTextColor(0xFFFFFFFF);
 		this.searchField.setValue(searchLast);
 		searchLast = "";
 		addWidget(searchField);
@@ -417,7 +418,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		i = k;
 		j = l;
 		k = j1;
-		st.blitSprite(RenderType::guiTextured, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
+		st.blitSprite(RenderPipelines.GUI_TEXTURED, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
 
 		searchField.render(st, mouseX, mouseY, partialTicks);
 
@@ -431,11 +432,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				if(Config.get().wirelessTermBeaconLvlCrossDim != -1 && menu.beaconLvl >= Config.get().wirelessTermBeaconLvlCrossDim)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.anywhere");
 				else if(Config.get().wirelessTermBeaconLvl != -1 && menu.beaconLvl >= Config.get().wirelessTermBeaconLvl)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.sameDim");
 				else info = "";
-				st.renderComponentTooltip(font, Arrays.stream(I18n.get("tooltip.toms_storage.terminal_beacon", menu.beaconLvl, info).split("\\\\")).map(Component::literal).collect(Collectors.toList()), mouseX, mouseY);
+				st.setComponentTooltipForNextFrame(font,
+						Arrays.stream(I18n.get("tooltip.toms_storage.terminal_beacon", menu.beaconLvl, info).split("\\\\")).
+						map(s -> (Component) Component.literal(s)).toList(), mouseX, mouseY);
 			}
 		}
 		if(isHovering(176, 4, 16, 10, mouseX, mouseY)) {
-			st.renderComponentTooltip(font, List.of(
+			st.setComponentTooltipForNextFrame(font, List.of(
 					Component.translatable("tooltip.toms_storage.terminal_stat.slots",
 							menu.slotCount == Short.MAX_VALUE ?
 									Component.translatable("tooltip.toms_storage.terminal_stat.alot") : menu.slotCount
@@ -447,7 +450,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 											"?" : Math.round(menu.freeCount / (float) menu.slotCount * 100)
 							),
 					Component.translatable("tooltip.toms_storage.terminal_stat.unique", menu.itemList.size())
-					), mouseX, mouseY);
+					),
+					mouseX, mouseY);
 		}
 		if (popup.render(st, font, mouseX, mouseY)) {
 			if (this.menu.getCarried().isEmpty() && slotIDUnderMouse != -1) {
@@ -456,22 +460,23 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					if (slot.stack.getQuantity() > 9999) {
 						ClientUtil.setTooltip(Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()));
 					}
-					st.renderTooltip(font, slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack(), mouseX, mouseY);
+					ItemStack is = slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack();
+					st.setTooltipForNextFrame(font, is, mouseX, mouseY);
 					ClientUtil.setTooltip();
 				}
 			} else {
 				this.renderTooltip(st, mouseX, mouseY);
 			}
-		} else clearTooltipForNextRenderPass();
+		} else {
+			st.setTooltipForNextFrame(Component.empty(), 0, 0);
+		}
 	}
 
 	@Override
 	protected void renderLabels(GuiGraphics st, int mouseX, int mouseY) {
 		super.renderLabels(st, mouseX, mouseY);
-		st.drawString(font, "i", 180, 6, 4210752, false);
-		st.pose().pushPose();
+		st.drawString(font, "i", 180, 6, 0xFF404040, false);
 		slotIDUnderMouse = drawSlots(st, mouseX, mouseY);
-		st.pose().popPose();
 	}
 
 	protected int drawSlots(GuiGraphics st, int mouseX, int mouseY) {
@@ -516,14 +521,14 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	private void drawStackSize(GuiGraphics st, Font fr, long size, int x, int y) {
 		float scaleFactor = 0.6f;
 		String stackSize = NumberFormatUtil.formatNumber(size);
-		st.pose().pushPose();
-		st.pose().scale(scaleFactor, scaleFactor, scaleFactor);
-		st.pose().translate(0, 0, 450);
+		st.pose().pushMatrix();
+		st.pose().scale(scaleFactor, scaleFactor);
+		st.pose().translate(0, 0);
 		float inverseScaleFactor = 1.0f / scaleFactor;
 		int X = (int) (((float) x + 0 + 16.0f - fr.width(stackSize) * scaleFactor) * inverseScaleFactor);
 		int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-		st.drawString(fr, stackSize, X, Y, size == 0 ? 0xFFFF00 : 16777215, true);
-		st.pose().popPose();
+		st.drawString(fr, stackSize, X, Y, size == 0 ? 0xFFFFFF00 : 0xFFFFFFFF, true);
+		st.pose().popMatrix();
 	}
 
 	protected boolean needsScrollBars() {
@@ -679,28 +684,28 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	@Override
 	protected void renderBg(GuiGraphics st, float partialTicks, int mouseX, int mouseY) {
 		if(tallMode) {
-			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY, 256, 256);
+			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY, 256, 256);
 			int guiStart = textureSlotCount * 18 + slotStartY;
 			int guiRStart = rowCount * 18 + slotStartY;
 			int guiSize = guiHeight - textureSlotCount * 18 - slotStartY;
-			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize, 256, 256);
+			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize, 256, 256);
 			int scrollbarW = 25;
-			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
+			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 			for (int i = 1;i < rowCount - 1;i++) {
-				st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
+				st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 			}
-			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
+			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 		} else
-			st.blit(RenderType::guiTextured, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 
 		Slot offh = getMenu().offhand;
-		st.blitSprite(RenderType::guiTextured, FLOATING_SLOT, this.leftPos + offh.x - 8, this.topPos + offh.y - 8, 32, 32);
+		st.blitSprite(RenderPipelines.GUI_TEXTURED, FLOATING_SLOT, this.leftPos + offh.x - 8, this.topPos + offh.y - 8, 32, 32);
 	}
 
 	protected void onUpdateSearch(String text) {}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(ValueInput tag) {
 		menu.receiveClientNBTPacket(tag);
 		refreshItemList = true;
 	}

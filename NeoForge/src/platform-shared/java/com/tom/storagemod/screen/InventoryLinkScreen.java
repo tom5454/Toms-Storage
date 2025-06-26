@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,14 +16,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.storage.ValueInput;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.InventoryLinkMenu;
@@ -54,22 +53,24 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
-		ListTag list = tag.getListOrEmpty("list");
-		LinkChannel.loadAll(list, connections);
+	public void receive(ValueInput tag) {
+		connections.clear();
+		tag.listOrEmpty("list", LinkChannel.CODEC.codec()).stream().forEach(l -> {
+			connections.put(l.id(), l);
+		});
 		tag.read("selected", UUIDUtil.CODEC).ifPresentOrElse(sel -> {
 			var selC = connections.get(sel);
 			if (selC != null) {
 				channelsList.setSelected(selC);
-				textF.setValue(selC.displayName);
+				textF.setValue(selC.displayName());
 			} else {
 				channelsList.setSelected(null);
 			}
 		}, () -> {
 			channelsList.setSelected(null);
 		});
-		Comparator<LinkChannel> cmp = Comparator.comparing(e -> e.publicChannel);
-		cmp = cmp.thenComparing(e -> e.displayName);
+		Comparator<LinkChannel> cmp = Comparator.comparing(LinkChannel::publicChannel);
+		cmp = cmp.thenComparing(LinkChannel::displayName);
 		sortedList = connections.values().stream().sorted(cmp).collect(Collectors.toList());
 		update();
 	}
@@ -78,13 +79,13 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderType::guiTextured, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		matrixStack.blit(RenderPipelines.GUI_TEXTURED, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
 	protected void renderLabels(GuiGraphics st, int p_97809_, int p_97810_) {
-		st.drawString(font, this.title, this.titleLabelX, this.titleLabelY, 4210752, false);
-		st.drawString(font, I18n.get("label.toms_storage.inventory_connector.beacon_level", menu.beaconLvl), this.titleLabelX, this.titleLabelY + 10, 4210752, false);
+		st.drawString(font, this.title, this.titleLabelX, this.titleLabelY, 0xFF404040, false);
+		st.drawString(font, I18n.get("label.toms_storage.inventory_connector.beacon_level", menu.beaconLvl), this.titleLabelX, this.titleLabelY + 10, 0xFF404040, false);
 	}
 
 	@Override
@@ -102,9 +103,8 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 				iconOn(publicChannel).
 				build(s -> {
 					var sel = channelsList.getSelected();
-					if(sel != null && sel.owner.equals(minecraft.player.getUUID())) {
-						sel.publicChannel = s;
-						sendEdit(sel, sel);
+					if(sel != null && sel.owner().equals(minecraft.player.getUUID())) {
+						sendEdit(sel, new LinkChannel(s, sel.displayName()));
 					}
 				}));
 		publicBtn.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.inv_link.private")), Tooltip.create(Component.translatable("tooltip.toms_storage.inv_link.public")));
@@ -117,12 +117,12 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 		textF.setMaxLength(50);
 		textF.setBordered(false);
 		textF.setVisible(true);
-		textF.setTextColor(16777215);
+		textF.setTextColor(0xFFFFFFFF);
 		textF.setValue("");
 		textF.setResponder(t -> {
 			channelsList.setSelected(null);
 			for (Entry<UUID, LinkChannel> e : connections.entrySet()) {
-				if(e.getValue().displayName.equals(t)) {
+				if(e.getValue().displayName().equals(t)) {
 					channelsList.setSelected(e.getValue());
 					break;
 				}
@@ -135,7 +135,7 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 
 	private void sendEdit(LinkChannel id, LinkChannel ch) {
 		CompoundTag tag = new CompoundTag();
-		if(id != null)tag.store("id", UUIDUtil.CODEC, id.id);
+		if(id != null)tag.store("id", UUIDUtil.CODEC, id.id());
 		if(ch != null)ch.saveToServer(tag);
 		NetworkHandler.sendDataToServer(tag);
 	}
@@ -151,8 +151,8 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 		var sel = channelsList.getSelected();
 		if(sel != null) {
 			deleteBtn.active = true;
-			publicBtn.setState(sel.publicChannel);
-			boolean owner = sel.owner.equals(minecraft.player.getUUID());
+			publicBtn.setState(sel.publicChannel());
+			boolean owner = sel.owner().equals(minecraft.player.getUUID());
 			publicBtn.active = owner;
 			createBtn.active = false;
 		} else {
@@ -204,32 +204,32 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 
 		@Override
 		protected Component toComponent(LinkChannel data) {
-			return Component.literal(data.displayName);
+			return Component.literal(data.displayName());
 		}
 
 		@Override
 		protected void renderTooltip(GuiGraphics graphics, LinkChannel data, int mouseX, int mouseY) {
 			List<Component> tt = new ArrayList<>();
-			if (!data.ownerName.isEmpty()) {
-				boolean owner = data.owner.equals(minecraft.player.getUUID());
-				tt.add(Component.translatable("tooltip.toms_storage.inventory_connector.channel.owner" + (owner ? ".self" : ""), data.ownerName));
+			if (!data.ownerName().isEmpty()) {
+				boolean owner = data.owner().equals(minecraft.player.getUUID());
+				tt.add(Component.translatable("tooltip.toms_storage.inventory_connector.channel.owner" + (owner ? ".self" : ""), data.ownerName()));
 			} else {
 				tt.add(Component.translatable("tooltip.toms_storage.inventory_connector.channel.owner.unknown"));
 			}
-			tt.add(Component.translatable("tooltip.toms_storage.inv_link." + (data.publicChannel ? "public" : "private")));
+			tt.add(Component.translatable("tooltip.toms_storage.inv_link." + (data.publicChannel() ? "public" : "private")));
 
-			graphics.renderTooltip(font, tt, Optional.empty(), mouseX, mouseY);
+			graphics.setComponentTooltipForNextFrame(font, tt, mouseX, mouseY);
 		}
 
 		@Override
 		protected void renderEntry(GuiGraphics st, int x, int y, int width, int height, LinkChannel id, int mouseX,
 				int mouseY, float pt) {
-			st.blitSprite(RenderType::guiTextured, id.publicChannel ? publicChannel : privateChannel, x + width - 16, y, 16, 16);
+			st.blitSprite(RenderPipelines.GUI_TEXTURED, id.publicChannel() ? publicChannel : privateChannel, x + width - 16, y, 16, 16);
 		}
 
 		@Override
 		protected void selectionChanged(LinkChannel to) {
-			sendSelect(to.id);
+			sendSelect(to.id());
 			update();
 		}
 	}

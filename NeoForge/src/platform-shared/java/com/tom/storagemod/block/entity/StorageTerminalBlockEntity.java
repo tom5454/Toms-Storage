@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
@@ -20,6 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
 import com.tom.storagemod.Config;
@@ -196,34 +196,19 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-		super.saveAdditional(compound, provider);
+	public void saveAdditional(ValueOutput compound) {
+		super.saveAdditional(compound);
 		compound.putInt("sorting", sort);
 		compound.putInt("modes", modes);
 		compound.putInt("searchType", searchType);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-		if (compound.contains("sort")) {
-			// Convert old format
-			int s = compound.getIntOr("sort", 0);
-			int controllMode = (s & 0b000_00_0_11);
-			boolean rev = (s & 0b000_00_1_00) > 0;
-			int type = (s & 0b000_11_0_00) >> 3;
-			searchType = (s & 0b111_00_0_00) >> 5;
-			boolean ghostItems = (s & 0b1_0_000_00_0_00) != 0;
-			boolean tallMode  =  (s & 0b1_0_0_000_00_0_00) != 0;
-			boolean pullFromInv = (s & (1 << 8)) != 0;//Crafting Terminal
-
-			modes = controllMode | (tallMode ? 0x10 : 0) | (pullFromInv ? 0x20 : 0);
-			sort = type | (rev ? 0x100 : 0) | (ghostItems ? 0x200 : 0);
-		} else {
-			sort = compound.getIntOr("sorting", 0);
-			modes = compound.getIntOr("modes", 0);
-			searchType = compound.getIntOr("searchType", 0);
-		}
-		super.loadAdditional(compound, provider);
+	public void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
+		sort = compound.getIntOr("sorting", 0);
+		modes = compound.getIntOr("modes", 0);
+		searchType = compound.getIntOr("searchType", 0);
 	}
 
 	public String getLastSearch() {

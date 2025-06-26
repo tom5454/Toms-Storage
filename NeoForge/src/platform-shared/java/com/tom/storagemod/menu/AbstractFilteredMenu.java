@@ -1,6 +1,6 @@
 package com.tom.storagemod.menu;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -8,6 +8,9 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import com.tom.storagemod.item.IItemFilter;
 import com.tom.storagemod.menu.slot.FilterSlot;
@@ -67,21 +70,20 @@ public abstract class AbstractFilteredMenu extends AbstractContainerMenu impleme
 	}
 
 	public void setPhantom(Slot slot, ItemStack ingredient) {
-		CompoundTag tag = new CompoundTag();
-		CompoundTag t = new CompoundTag();
-		tag.put("setPhantom", t);
+		TagValueOutput tag = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, pinv.player.registryAccess());
+		ValueOutput t = tag.child("setPhantom");
 		t.putInt("id", slot.index);
-		t.put("item", ingredient.save(pinv.player.registryAccess()));
-		NetworkHandler.sendDataToServer(tag);
+		t.store("item", ItemStack.CODEC, ingredient);
+		NetworkHandler.sendDataToServer(tag.buildResult());
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(ValueInput tag) {
 		if(pinv.player.isSpectator())return;
-		tag.getCompound("setPhantom").ifPresent(t -> {
+		tag.child("setPhantom").ifPresent(t -> {
 			int slotId = t.getIntOr("id", -1);
 
-			ItemStack item = ItemStack.parse(pinv.player.registryAccess(), t.getCompoundOrEmpty("item")).orElse(ItemStack.EMPTY);
+			ItemStack item = t.read("item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
 			Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 			if (slot instanceof PhantomSlot) {
 				if(!item.isEmpty()) {

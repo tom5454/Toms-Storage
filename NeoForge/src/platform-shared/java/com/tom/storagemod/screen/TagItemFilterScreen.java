@@ -7,7 +7,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -15,6 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+
+import com.mojang.serialization.Codec;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.TagItemFilterMenu;
@@ -115,16 +118,13 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderType::guiTextured, GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		matrixStack.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
-		ListTag list = tag.getListOrEmpty("l");
+	public void receive(ValueInput tag) {
 		filterTags.clear();
-		for (int i = 0; i < list.size(); i++) {
-			list.getString(i).ifPresent(filterTags::add);
-		}
+		filterTags.addAll(tag.listOrEmpty("l", Codec.string(0, 256)).stream().toList());
 		filterList.setSelected(null);
 		filterList.setCurrentScroll(0f);
 	}
@@ -152,7 +152,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 
 		@Override
 		protected void renderTooltip(GuiGraphics graphics, String data, int mouseX, int mouseY) {
-			graphics.renderTooltip(font, Component.literal(data), mouseX, mouseY);
+			graphics.setTooltipForNextFrame(font, Component.literal(data), mouseX, mouseY);
 		}
 	}
 }

@@ -1,8 +1,5 @@
 package com.tom.storagemod.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.inventory.filter.TagFilter;
@@ -120,14 +118,10 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 	}
 
 	@Override
-	public void receive(CompoundTag tag) {
+	public void receive(ValueInput tag) {
 		super.receive(tag);
-		tag.getList("l").ifPresent(list -> {
-			List<ResourceLocation> tags = new ArrayList<>();
-			for (int i = 0; i < list.size(); i++) {
-				list.getString(i).flatMap(e -> Optional.ofNullable(ResourceLocation.tryParse(e))).ifPresent(tags::add);
-			}
-			filter.setTags(tags);
+		tag.list("l", ResourceLocation.CODEC).ifPresent(list -> {
+			filter.setTags(list.stream().toList());
 		});
 	}
 }

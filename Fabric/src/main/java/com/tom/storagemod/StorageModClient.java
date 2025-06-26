@@ -7,14 +7,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -25,9 +24,11 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -65,15 +66,15 @@ public class StorageModClient implements ClientModInitializer {
 		MenuScreens.register(Content.tagItemFilterMenu.get(), TagItemFilterScreen::new);
 		MenuScreens.register(Content.filingCabinetMenu.get(), FilingCabinetScreen::new);
 
-		BlockRenderLayerMap.INSTANCE.putBlock(Content.paintedTrim.get(), RenderType.translucent());
-		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableFramed.get(), RenderType.translucent());
-		BlockRenderLayerMap.INSTANCE.putBlock(Content.levelEmitter.get(), RenderType.cutout());
-		BlockRenderLayerMap.INSTANCE.putBlock(Content.invCableConnectorFramed.get(), RenderType.translucent());
-		BlockRenderLayerMap.INSTANCE.putBlock(Content.invProxy.get(), RenderType.translucent());
+		BlockRenderLayerMap.putBlock(Content.paintedTrim.get(), ChunkSectionLayer.TRANSLUCENT);
+		BlockRenderLayerMap.putBlock(Content.invCableFramed.get(), ChunkSectionLayer.TRANSLUCENT);
+		BlockRenderLayerMap.putBlock(Content.levelEmitter.get(), ChunkSectionLayer.CUTOUT);
+		BlockRenderLayerMap.putBlock(Content.invCableConnectorFramed.get(), ChunkSectionLayer.TRANSLUCENT);
+		BlockRenderLayerMap.putBlock(Content.invProxy.get(), ChunkSectionLayer.TRANSLUCENT);
 
 		ClientPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
 			if(Minecraft.getInstance().screen instanceof IDataReceiver d) {
-				d.receive(p.tag());
+				d.receive(TagValueInput.create(ProblemReporter.DISCARDING, c.player().registryAccess(), p.tag()));
 			}
 		});
 
@@ -142,9 +143,9 @@ public class StorageModClient implements ClientModInitializer {
 			ClientUtil.collectExtraTooltips(s, l);
 		});
 
-		ClientLifecycleEvents.CLIENT_STARTED.register(mc -> {
+		/*ClientLifecycleEvents.CLIENT_STARTED.register(mc -> {
 			mc.gui.layers.add((gr, tr) -> ClientUtil.drawConfiguratorOverlay(gr));
-		});
+		});*/
 
 		//if (StorageMod.polymorph)PolymorphTerminalWidget.register();
 	}

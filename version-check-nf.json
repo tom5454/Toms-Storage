@@ -9,7 +9,11 @@
 		"1.21.1-latest": "2.2.0",
 		"1.21.3-latest": "2.1.1",
 		"1.21.4-latest": "2.3.0",
-		"1.21.5-latest": "2.4.0"
+		"1.21.5-latest": "2.4.0",
+		"1.21.6-latest": "2.4.0"
+	},
+	"1.21.6": {
+		"2.4.0": "1.21.6 port"
 	},
 	"1.21.5": {
 		"2.4.0": "Fixed occasional crash on NeoForge (Closes #571)\nAdded HUD information to the configurator (#306)\nAdded Multiblock Inventory API (#306)\nAdded debounce to the Inventory Configurator actions (#306)",

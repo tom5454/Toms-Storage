@@ -31,7 +31,7 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-1.21.5'
+    archivesName = 'toms_storage-1.21.6'
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -93,7 +93,7 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/top/**"
@@ -136,7 +136,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    implementation "curse.maven:jade-324717:6353729"
+    implementation "curse.maven:jade-324717:6669809"
     
     if(useLib) {
      	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"

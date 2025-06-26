@@ -5,10 +5,7 @@ import java.util.HashSet;
 import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,6 +19,8 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
@@ -29,6 +28,7 @@ import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
 import com.tom.storagemod.polymorph.PolymorphHelper;
 import com.tom.storagemod.util.CraftingMatrix;
+import com.tom.storagemod.util.Util;
 
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	private Optional<RecipeHolder<CraftingRecipe>> currentRecipe = Optional.empty();
@@ -59,35 +59,17 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-		super.saveAdditional(compound, provider);
-		ListTag listnbt = new ListTag();
-
-		for(int i = 0; i < craftMatrix.getContainerSize(); ++i) {
-			ItemStack itemstack = craftMatrix.getItem(i);
-			if (!itemstack.isEmpty()) {
-				CompoundTag tag = new CompoundTag();
-				tag.putByte("Slot", (byte)i);
-				listnbt.add(itemstack.save(provider, tag));
-			}
-		}
-
-		compound.put("CraftingTable", listnbt);
+	public void saveAdditional(ValueOutput compound) {
+		super.saveAdditional(compound);
+		Util.storeItems(craftMatrix, "CraftingTable", compound);
 	}
+
 	private boolean reading;
 	@Override
-	public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-		super.loadAdditional(compound, provider);
+	public void loadAdditional(ValueInput compound) {
+		super.loadAdditional(compound);
 		reading = true;
-		ListTag listnbt = compound.getListOrEmpty("CraftingTable");
-
-		for(int i = 0; i < listnbt.size(); ++i) {
-			CompoundTag tag = listnbt.getCompoundOrEmpty(i);
-			int j = tag.getByteOr("Slot", (byte) 0) & 255;
-			if (j >= 0 && j < craftMatrix.getContainerSize()) {
-				craftMatrix.setItem(j, ItemStack.parse(provider, tag).orElse(ItemStack.EMPTY));
-			}
-		}
+		Util.loadItems(craftMatrix, "CraftingTable", compound);
 		reading = false;
 	}
 

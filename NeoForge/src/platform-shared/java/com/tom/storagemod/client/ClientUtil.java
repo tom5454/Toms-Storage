@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -292,7 +293,7 @@ public class ClientUtil {
 		}
 
 		if (!messages.isEmpty()) {
-			gr.renderTooltip(mc.font, messages, Optional.empty(), 5, 25);
+			gr.renderTooltip(mc.font, messages.stream().map(e -> ClientTooltipComponent.create(e.getVisualOrderText())).toList(), 5, 25, DefaultTooltipPositioner.INSTANCE, null);
 		}
 	}
 }

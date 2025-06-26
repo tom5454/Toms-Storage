@@ -20,13 +20,13 @@ public class JadePlugin implements IWailaPlugin {
 
 	@Override
 	public void register(IWailaCommonRegistration registration) {
-		registration.registerBlockDataProvider(InventoryConnectorProvider.INSTANCE, InventoryConnectorBlockEntity.class);
-		registration.registerBlockDataProvider(InventoryConfigProvider.INSTANCE, BlockEntity.class);
+		registration.registerBlockDataProvider(InventoryConnectorDataProvider.INSTANCE, InventoryConnectorBlockEntity.class);
+		registration.registerBlockDataProvider(InventoryConfigDataProvider.INSTANCE, BlockEntity.class);
 	}
 
 	@Override
 	public void registerClient(IWailaClientRegistration registration) {
-		registration.registerBlockComponent(InventoryConnectorProvider.INSTANCE, InventoryConnectorBlock.class);
-		registration.registerBlockComponent(InventoryConfigProvider.INSTANCE, Block.class);
+		registration.registerBlockComponent(InventoryConnectorComponentProvider.INSTANCE, InventoryConnectorBlock.class);
+		registration.registerBlockComponent(InventoryConfigComponentProvider.INSTANCE, Block.class);
 	}
 }

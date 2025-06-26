@@ -1,32 +1,31 @@
 package com.tom.storagemod.block.entity;
 
-import net.minecraft.core.HolderLookup.Provider;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 
 import com.tom.storagemod.inventory.BlockFilter;
 
-public class BlockFilterAttachment implements INBTSerializable<CompoundTag> {
+public class BlockFilterAttachment implements ValueIOSerializable {
 	private final BlockFilter filter;
 
 	public BlockFilterAttachment(IAttachmentHolder holder) {
 		filter = new BlockFilter(((BlockEntity) holder).getBlockPos());
 	}
 
-	@Override
-	public CompoundTag serializeNBT(Provider provider) {
-		return (CompoundTag) BlockFilter.STATE_CODEC.encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), filter.storeState()).getOrThrow();
-	}
-
-	@Override
-	public void deserializeNBT(Provider provider, CompoundTag nbt) {
-		BlockFilter.STATE_CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), nbt).ifSuccess(filter::loadFromState);
-	}
-
 	public BlockFilter getFilter() {
 		return filter;
+	}
+
+	@Override
+	public void serialize(ValueOutput output) {
+		output.store(BlockFilter.STATE_CODEC, filter.storeState());
+	}
+
+	@Override
+	public void deserialize(ValueInput input) {
+		input.read(BlockFilter.STATE_CODEC).ifPresent(filter::loadFromState);
 	}
 }

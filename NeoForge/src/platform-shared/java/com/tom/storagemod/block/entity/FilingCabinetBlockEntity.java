@@ -1,9 +1,8 @@
 package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -13,6 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.menu.FilingCabinetMenu;
@@ -27,19 +28,17 @@ public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvide
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-		super.saveAdditional(tag, provider);
-		tag.put("inventory", inv.createTag(provider));
-		if (this.name != null) {
-			tag.putString("CustomName", Component.Serializer.toJson(this.name, provider));
-		}
+	protected void saveAdditional(ValueOutput tag) {
+		super.saveAdditional(tag);
+		inv.storeTag(tag, "inventory");
+		tag.storeNullable("CustomName", ComponentSerialization.CODEC, this.name);
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-		super.loadAdditional(tag, provider);
-		inv.fromTag(tag.getListOrEmpty("inventory"), provider);
-		this.name = parseCustomNameSafe(tag.get("CustomName"), provider);
+	protected void loadAdditional(ValueInput tag) {
+		super.loadAdditional(tag);
+		inv.fromTag(tag, "inventory");
+		this.name = parseCustomNameSafe(tag, "CustomName");
 	}
 
 	@Override

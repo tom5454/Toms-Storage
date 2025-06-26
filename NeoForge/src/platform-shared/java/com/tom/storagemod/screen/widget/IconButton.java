@@ -3,7 +3,7 @@ package com.tom.storagemod.screen.widget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -34,13 +34,13 @@ public class IconButton extends Button {
 			int x = getX();
 			int y = getY();
 			this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
-			st.blitSprite(RenderType::guiTextured, SPRITES.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+			st.blitSprite(RenderPipelines.GUI_TEXTURED, SPRITES.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
 			drawIcon(st, mouseX, mouseY, pt);
 		}
 	}
 
 	protected void drawIcon(GuiGraphics st, int mouseX, int mouseY, float pt) {
-		st.blitSprite(RenderType::guiTextured, getIcon(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+		st.blitSprite(RenderPipelines.GUI_TEXTURED, getIcon(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
 	}
 
 	public ResourceLocation getIcon() {

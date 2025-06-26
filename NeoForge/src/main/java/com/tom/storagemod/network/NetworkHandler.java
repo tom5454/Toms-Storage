@@ -5,7 +5,9 @@ import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -30,7 +32,7 @@ public class NetworkHandler {
 		context.enqueueWork(() -> {
 			ServerPlayer sender = (ServerPlayer) context.player();
 			if(sender.containerMenu instanceof IDataReceiver) {
-				((IDataReceiver)sender.containerMenu).receive(packet.tag());
+				((IDataReceiver)sender.containerMenu).receive(TagValueInput.create(ProblemReporter.DISCARDING, sender.registryAccess(), packet.tag()));
 			}
 		});
 	}
@@ -38,7 +40,7 @@ public class NetworkHandler {
 	public static void handleDataClient(DataPacket packet, IPayloadContext context) {
 		context.enqueueWork(() -> {
 			if(Minecraft.getInstance().screen instanceof IDataReceiver) {
-				((IDataReceiver)Minecraft.getInstance().screen).receive(packet.tag());
+				((IDataReceiver)Minecraft.getInstance().screen).receive(TagValueInput.create(ProblemReporter.DISCARDING, context.player().registryAccess(), packet.tag()));
 			}
 		});
 	}

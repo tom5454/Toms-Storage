@@ -2,14 +2,14 @@ package com.tom.storagemod.util;
 
 import java.util.function.Predicate;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class FilingCabinetContainer implements Container {
 	private SimpleContainer inv;
@@ -87,18 +87,18 @@ public class FilingCabinetContainer implements Container {
 			onChange.run();
 	}
 
-	public ListTag createTag(HolderLookup.Provider reg) {
-		return inv.createTag(reg);
+	public NonNullList<ItemStack> getItems() {
+		return inv.getItems();
 	}
 
-	public void fromTag(ListTag list, HolderLookup.Provider reg) {
-		inv.fromTag(list, reg);
+	public void fromTag(ValueInput tag, String id) {
+		inv.fromItemList(tag.listOrEmpty(id, ItemStack.CODEC));
 		ItemStack is = inv.getItem(0);
 		if (is.isEmpty())item = null;
 		else item = is.getItem();
 	}
 
-	public NonNullList<ItemStack> getItems() {
-		return inv.getItems();
+	public void storeTag(ValueOutput tag, String id) {
+		inv.storeAsItemList(tag.list(id, ItemStack.CODEC));
 	}
 }

@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import com.tom.storagemod.StorageTags;
@@ -38,7 +39,7 @@ public class BlockFilter implements IFilter {
 
 	public static record BlockFilterState(BlockPos pos, List<BlockPos> connected, boolean skip, Direction side, ItemStack filter, Priority priority, boolean keepLast) {}
 
-	public static final Codec<BlockFilterState> STATE_CODEC = RecordCodecBuilder.<BlockFilterState>mapCodec(b -> {
+	public static final MapCodec<BlockFilterState> STATE_CODEC = RecordCodecBuilder.<BlockFilterState>mapCodec(b -> {
 		return b.group(
 				BlockPos.CODEC.fieldOf("pos").forGetter(BlockFilterState::pos),
 				Codec.list(BlockPos.CODEC).fieldOf("connected").forGetter(BlockFilterState::connected),
@@ -48,8 +49,8 @@ public class BlockFilter implements IFilter {
 				Priority.CODEC.fieldOf("priority").forGetter(BlockFilterState::priority),
 				Codec.BOOL.fieldOf("keep_last").forGetter(BlockFilterState::keepLast)
 				).apply(b, BlockFilterState::new);
-	}).codec();
-	public static final Codec<BlockFilter> CODEC = STATE_CODEC.xmap(BlockFilter::new, BlockFilter::storeState);
+	});
+	public static final Codec<BlockFilter> CODEC = STATE_CODEC.codec().xmap(BlockFilter::new, BlockFilter::storeState);
 
 	public BlockFilter(BlockPos pos) {
 		this.pos = pos;

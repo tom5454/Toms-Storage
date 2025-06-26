@@ -10,9 +10,7 @@ import java.util.UUID;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
@@ -22,6 +20,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
@@ -170,14 +170,14 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-		super.loadAdditional(nbt, provider);
+	public void loadAdditional(ValueInput nbt) {
+		super.loadAdditional(nbt);
 		channel = nbt.read(CHANNEL_TAG, UUIDUtil.CODEC).orElse(null);
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-		super.saveAdditional(nbt, provider);
+	public void saveAdditional(ValueOutput nbt) {
+		super.saveAdditional(nbt);
 		if(channel != null) {
 			nbt.store(CHANNEL_TAG, UUIDUtil.CODEC, channel);
 		}

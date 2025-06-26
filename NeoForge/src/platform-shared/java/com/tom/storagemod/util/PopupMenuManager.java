@@ -40,10 +40,10 @@ public class PopupMenuManager {
 
 	public boolean render(GuiGraphics g, Font font, int pMouseX, int pMouseY) {
 		if(menu != null) {
-			g.renderTooltip(font,
+			g.setComponentTooltipForNextFrame(font,
 					IntStream.range(0, menu.size())
 					.mapToObj(i -> menu.get(i).getHoveredText(pMouseX - x, pMouseY - y - i * 10, selected == i))
-					.map(Component::getVisualOrderText).toList(),
+					.toList(),
 					x - 12, y + 12);
 		}
 		return menu == null;
@@ -109,7 +109,7 @@ public class PopupMenuManager {
 			return false;
 		}
 
-		default MutableComponent getHoveredText(int pMouseX, int pMouseY, boolean selected) {
+		default Component getHoveredText(int pMouseX, int pMouseY, boolean selected) {
 			return getText().withStyle(isHovering(0, 0, 100, 8, pMouseX, pMouseY) || selected ? ChatFormatting.AQUA : ChatFormatting.GRAY);
 		}
 	}

@@ -2,11 +2,11 @@ package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.AbstractInventoryHopperBlock;
@@ -31,16 +31,17 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	}
 
 	@Override
-	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+	public void saveAdditional(ValueOutput compound) {
+		super.saveAdditional(compound);
 		ItemStack is = getFilter();
 		if (!is.isEmpty())
-			compound.put("Filter", is.save(provider, new CompoundTag()));
+			compound.store("Filter", ItemStack.CODEC, is);
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag nbtIn, HolderLookup.Provider provider) {
-		super.loadAdditional(nbtIn, provider);
-		this.filter = ItemStack.parse(provider, nbtIn.getCompoundOrEmpty("Filter")).orElse(ItemStack.EMPTY);
+	public void loadAdditional(ValueInput nbtIn) {
+		super.loadAdditional(nbtIn);
+		this.filter = nbtIn.read("Filter", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
 	}
 
 	public void setFilter(ItemStack filter) {

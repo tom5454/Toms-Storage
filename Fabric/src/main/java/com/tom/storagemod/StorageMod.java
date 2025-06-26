@@ -29,9 +29,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.TagValueInput;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -93,7 +95,7 @@ public class StorageMod implements ModInitializer {
 		PayloadTypeRegistry.playC2S().register(DataPacket.ID, DataPacket.STREAM_CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
 			if(c.player().containerMenu instanceof IDataReceiver d) {
-				d.receive(p.tag());
+				d.receive(TagValueInput.create(ProblemReporter.DISCARDING, c.player().registryAccess(), p.tag()));
 			}
 		});
 

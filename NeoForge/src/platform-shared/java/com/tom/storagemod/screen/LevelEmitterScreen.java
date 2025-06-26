@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -42,7 +42,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderType::guiTextured, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		matrixStack.blit(RenderPipelines.GUI_TEXTURED, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		textF.setMaxLength(100);
 		textF.setBordered(false);
 		textF.setVisible(true);
-		textF.setTextColor(16777215);
+		textF.setTextColor(0xFFFFFFFF);
 		textF.setValue(Integer.toString(menu.count));
 		textF.setResponder(t -> {
 			try {

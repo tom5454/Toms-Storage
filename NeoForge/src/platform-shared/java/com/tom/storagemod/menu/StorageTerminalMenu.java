@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.storage.ValueInput;
 
 import com.google.common.collect.Lists;
 
@@ -224,7 +225,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 		super.broadcastChanges();
 	}
 
-	public final void receiveClientNBTPacket(CompoundTag message) {
+	public final void receiveClientNBTPacket(ValueInput message) {
 		if(sync.receiveUpdate(pinv.player.registryAccess(), message)) {
 			itemList = sync.getAsList();
 			if(noSort) {
@@ -234,8 +235,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 			}
 			pinv.setChanged();
 		}
-		if(message.contains("s"))
-			search = message.getStringOr("s", "");
+		message.getString("s").ifPresent(s -> this.search = s);
 		if(onPacket != null)onPacket.run();
 	}
 
@@ -268,18 +268,15 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 	}
 
 	@Override
-	public void receive(CompoundTag message) {
+	public void receive(ValueInput message) {
 		if(pinv.player.isSpectator())return;
-		if(message.contains("s")) {
-			te.setLastSearch(message.getStringOr("s", ""));
-		}
+		message.getString("s").ifPresent(te::setLastSearch);
 		sync.receiveInteract(message, this);
-		if(message.contains("c")) {
-			CompoundTag d = message.getCompoundOrEmpty("c");
+		message.child("c").ifPresent(d -> {
 			te.setSorting(d.getIntOr("s", 0));
 			te.setSearchType(d.getIntOr("st", 0));
 			te.setModes(d.getIntOr("m", 0));
-		}
+		});
 	}
 
 	@Override

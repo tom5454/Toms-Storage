@@ -3,7 +3,6 @@ package com.tom.storagemod.menu;
 import java.util.List;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +21,7 @@ import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.storage.ValueInput;
 
 import com.google.common.collect.Lists;
 
@@ -100,7 +100,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		@Override
 		public void onTake(Player thePlayer, ItemStack stack) {
 			this.checkTakeAchievements(stack);
-			if (!pinv.player.getCommandSenderWorld().isClientSide) {
+			if (!pinv.player.level().isClientSide) {
 				((CraftingTerminalBlockEntity) te).craft(thePlayer);
 			}
 		}
@@ -185,7 +185,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	}
 
 	@Override
-	public void receive(CompoundTag message) {
+	public void receive(ValueInput message) {
 		super.receive(message);
 		message.getString("fill").ifPresent(s -> {
 			var id = ResourceLocation.tryParse(s);

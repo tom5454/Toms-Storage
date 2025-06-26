@@ -22,6 +22,9 @@ import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.level.storage.ValueInput;
+
+import com.mojang.serialization.Codec;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.menu.TerminalCraftingFiller;
@@ -164,12 +167,12 @@ public class TerminalSyncManager {
 		}
 	}
 
-	public boolean receiveUpdate(RegistryAccess registryAccess, CompoundTag tag) {
-		var d = tag.getByteArray("d");
+	public boolean receiveUpdate(RegistryAccess registryAccess, ValueInput tag) {
+		var d = tag.read("d", Codec.BYTE_BUFFER);
 		d.ifPresent(b -> {
 			RegistryFriendlyByteBuf buf = Platform.makeRegByteBuf(Unpooled.wrappedBuffer(b), registryAccess);
 			List<StoredItemStack> in = new ArrayList<>();
-			short len = tag.getShortOr("l", (short) 0);
+			short len = (short) tag.getShortOr("l", (short) 0);
 			for (int i = 0; i < len; i++) {
 				in.add(read(buf));
 			}
@@ -206,8 +209,8 @@ public class TerminalSyncManager {
 		return tag;
 	}
 
-	public void receiveInteract(CompoundTag tag, InteractHandler handler) {
-		tag.getByteArray("a").ifPresent(b -> {
+	public void receiveInteract(ValueInput tag, InteractHandler handler) {
+		tag.read("a", Codec.BYTE_BUFFER).ifPresent(b -> {
 			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(b));
 			byte flags = buf.readByte();
 			StoredItemStack stack;

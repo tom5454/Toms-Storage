@@ -13,7 +13,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -83,7 +83,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 		int x = this.getX() + getWidth() - 6;
 		int y = this.getY() - 1 + (int) ((getHeight() - 9) * this.currentScroll);
 		boolean isHovered = mouseX >= x && mouseY >= y && mouseX < x + 5 && mouseY < y + 9;
-		st.blitSprite(RenderType::guiTextured, SCROLL_SPRITES.get(this.needsScrollBars(), isHovered), x, y, 5, 9);
+		st.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_SPRITES.get(this.needsScrollBars(), isHovered), x, y, 5, 9);
 	}
 
 	public void tooltip(GuiGraphics matrixStack, int mouseX, int mouseY) {
@@ -138,7 +138,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 					int y = getY();
 					this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
 					var spr = (id.equals(selected) ? LIST_BUTTON_SPRITES_S : LIST_BUTTON_SPRITES).get(this.active, this.isHoveredOrFocused());
-					st.blitSprite(RenderType::guiTextured, spr, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+					st.blitSprite(RenderPipelines.GUI_TEXTURED, spr, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 					renderEntry(st, this.getX(), this.getY(), this.getWidth(), this.getHeight(), id, mouseX, mouseY, pt);
 					int c = this.active ? 0xFFFFFF : 0xA0A0A0;
 					int v = c | Mth.ceil(this.alpha * 255.0f) << 24;

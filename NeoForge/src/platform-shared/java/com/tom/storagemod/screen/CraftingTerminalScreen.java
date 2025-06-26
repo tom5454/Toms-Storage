@@ -11,7 +11,7 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -124,10 +124,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-			st.pose().pushPose();
-			st.pose().translate(0, 0, -1000);
 			super.render(st, -1, -1, partialTicks);
-			st.pose().popPose();
 			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
 		} else {
 			super.render(st, mouseX, mouseY, partialTicks);
@@ -232,7 +229,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				int x = getX();
 				int y = getY();
 				this.isHovered = mouseX >= x && mouseY >= y && mouseX < x + this.width && mouseY < y + this.height;
-				st.blitSprite(RenderType::guiTextured, SPRITES.get(this.active, this.isHoveredOrFocused()), x, y, this.width, this.height);
+				st.blitSprite(RenderPipelines.GUI_TEXTURED, SPRITES.get(this.active, this.isHoveredOrFocused()), x, y, this.width, this.height);
 			}
 		}
 	}
