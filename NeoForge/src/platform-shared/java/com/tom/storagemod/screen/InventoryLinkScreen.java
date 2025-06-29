@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
@@ -235,5 +236,9 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 			sendSelect(to.id());
 			update();
 		}
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
 	}
 }

@@ -2,6 +2,7 @@ package com.tom.storagemod.screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -154,5 +155,10 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		protected void renderTooltip(GuiGraphics graphics, String data, int mouseX, int mouseY) {
 			graphics.setTooltipForNextFrame(font, Component.literal(data), mouseX, mouseY);
 		}
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
+		consumer.accept(new Box(leftPos - 20, topPos, 25, 25));
 	}
 }
