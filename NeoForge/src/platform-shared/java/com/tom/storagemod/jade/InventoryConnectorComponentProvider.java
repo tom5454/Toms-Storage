@@ -7,7 +7,10 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.BoxStyle;
 import snownee.jade.api.ui.JadeUI;
+import snownee.jade.api.view.ProgressView;
+import snownee.jade.api.view.ProgressView.Part;
 
 public enum InventoryConnectorComponentProvider implements IBlockComponentProvider {
 	INSTANCE;
@@ -23,9 +26,8 @@ public enum InventoryConnectorComponentProvider implements IBlockComponentProvid
 			int free = accessor.getServerData().getIntOr("free", 0);
 			int all = accessor.getServerData().getIntOr("all", 0);
 			int blocks = accessor.getServerData().getIntOr("blocks", 0);
-			//final ProgressStyle progressStyle = JadeUI.progressStyle().color(0xFF8e691d, 0xFF342f26);
 			tooltip.add(Component.translatable("tooltip.toms_storage.connector_info.size", free, all));
-			tooltip.add(JadeUI.progressArrow((all - free) / (float) all));//, null, progressStyle, BoxStyle.nestedBox(), true
+			tooltip.add(JadeUI.progress(new ProgressView(Part.of((all - free) / (float) all), null, JadeUI.progressStyle(), BoxStyle.nestedBox())));
 			tooltip.add(Component.translatable("tooltip.toms_storage.connector_info.inv", blocks));
 		}
 	}

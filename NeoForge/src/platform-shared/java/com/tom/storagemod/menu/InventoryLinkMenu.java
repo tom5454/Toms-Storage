@@ -50,12 +50,13 @@ public class InventoryLinkMenu extends AbstractContainerMenu implements IDataRec
 				var c = RemoteConnections.get(pinv.player.level()).getChannel(id);
 				if (c != null && c.canAccess(pinv.player))
 					te.setChannel(id);
+			} else {
+				tag.read("p", Codec.BOOL).ifPresentOrElse(p -> {
+					RemoteConnections.get(pinv.player.level()).editChannel(id, p, pinv.player.getUUID());
+				}, () -> {
+					RemoteConnections.get(pinv.player.level()).removeChannel(id, pinv.player.getUUID());
+				});
 			}
-			tag.read("p", Codec.BOOL).ifPresentOrElse(p -> {
-				RemoteConnections.get(pinv.player.level()).editChannel(id, p, pinv.player.getUUID());
-			}, () -> {
-				RemoteConnections.get(pinv.player.level()).removeChannel(id, pinv.player.getUUID());
-			});
 		}, () -> {
 			UUID chn = RemoteConnections.get(pinv.player.level()).makeChannel(tag.getStringOr("d", "No Name"), tag.getBooleanOr("p", false), pinv.player);
 			te.setChannel(chn);

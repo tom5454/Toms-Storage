@@ -29,7 +29,6 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
@@ -137,11 +136,9 @@ public class StorageModClient {
 	}
 
 	@SubscribeEvent
-	public static void renderWorldOutline(RenderLevelStageEvent evt) {
-		if(evt.getStage() == Stage.AFTER_PARTICLES) {
-			ClientUtil.drawTerminalOutline(evt.getPoseStack());
-			ClientUtil.drawConfiguratorOutline(evt.getPoseStack());
-		}
+	public static void renderWorldOutline(RenderLevelStageEvent.AfterParticles evt) {
+		ClientUtil.drawTerminalOutline(evt.getPoseStack());
+		ClientUtil.drawConfiguratorOutline(evt.getPoseStack());
 	}
 
 	@SubscribeEvent
