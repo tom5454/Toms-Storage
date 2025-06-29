@@ -73,6 +73,7 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.saveAdditional(compound, provider);
 		StoredItemStack f = getFilter();
 		if (f != null) {
 			ItemStack is = f.getStack();

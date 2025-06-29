@@ -31,6 +31,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.saveAdditional(compound, provider);
 		ItemStack is = getFilter();
 		if (!is.isEmpty())
 			compound.put("Filter", is.save(provider, new CompoundTag()));

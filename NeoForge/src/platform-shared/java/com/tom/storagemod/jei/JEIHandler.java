@@ -1,14 +1,17 @@
 package com.tom.storagemod.jei;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.screen.AbstractFilteredScreen;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
+import com.tom.storagemod.screen.PlatformContainerScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IAutoFillTerminal.ISearchHandler;
 
@@ -44,6 +47,15 @@ public class JEIHandler implements IModPlugin {
 			}
 		});
 		registration.addGhostIngredientHandler(AbstractFilteredScreen.class, new JeiGhostIngredientHandler());
+		registration.addGenericGuiContainerHandler(PlatformContainerScreen.class, new IGuiContainerHandler<PlatformContainerScreen<?>>() {
+
+			@Override
+			public List<Rect2i> getGuiExtraAreas(PlatformContainerScreen<?> s) {
+				List<Rect2i> rects = new ArrayList<>();
+				s.getExclusionAreas(b -> rects.add(new Rect2i(b.x(), b.y(), b.width(), b.height())));
+				return rects;
+			}
+		});
 	}
 
 	@Override

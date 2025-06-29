@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -754,5 +755,10 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	public boolean isSmartItemSearchOn() {
 		return (buttonSearchType.getSearchType() & 8) == 0;
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
+		consumer.accept(new Box(leftPos - 30, topPos, 30, imageHeight));
 	}
 }
