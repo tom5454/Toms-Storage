@@ -2,6 +2,7 @@ package com.tom.storagemod.emi;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
+import com.tom.storagemod.screen.IScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IAutoFillTerminal.ISearchHandler;
 
@@ -12,6 +13,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
+import dev.emi.emi.api.widget.Bounds;
 
 @EmiEntrypoint
 public class EMIPlugin implements EmiPlugin {
@@ -27,6 +29,11 @@ public class EMIPlugin implements EmiPlugin {
 				if(sl != null)return new EmiStackInteraction(EmiStack.of(sl.getItem()), null, false);
 			}
 			return EmiStackInteraction.EMPTY;
+		});
+		registry.addGenericExclusionArea((s, r) -> {
+			if (s instanceof IScreen sc) {
+				sc.getExclusionAreas(b -> r.accept(new Bounds(b.x(), b.y(), b.width(), b.height())));
+			}
 		});
 	}
 

@@ -50,6 +50,6 @@ Simple vanilla style storage mod.
 [[dependencies.toms_storage]]
     modId="minecraft"
     type="required"
-    versionRange="[1.21.0,1.22)"
+    versionRange="[1.21.0,1.21.2)"
     ordering="NONE"
     side="BOTH"
