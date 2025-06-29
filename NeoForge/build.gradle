@@ -93,8 +93,8 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			if(!useLib)exclude "com/tom/storagemod/jei/**"
+			//if(!useLib)exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/top/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
@@ -135,24 +135,23 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    compileOnly "mezz.jei:jei-1.21.5-neoforge-api:21.3.2.22"
+    compileOnly "mezz.jei:jei-1.21.5-common-api:21.3.2.22"
+    // at runtime, use the full JEI jar
+  	runtimeOnly "mezz.jei:jei-1.21.5-neoforge:21.3.2.22"
+  	
+  	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:19.0.806"
+	compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:19.0.806"
+	implementation "me.shedaniel:RoughlyEnoughItems-neoforge:19.0.806"
+	implementation "me.shedaniel.cloth:cloth-config-neoforge:18.0.145"
+    implementation "dev.architectury:architectury-neoforge:16.1.4"
     
-    implementation "curse.maven:jade-324717:6353729"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:11.0.1+1.21.5"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:11.0.1+1.21.5:api"
+    
+    implementation "curse.maven:jade-324717:6524708"
     
     if(useLib) {
-     	compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.19.0.219"
-    	compileOnly "mezz.jei:jei-1.21.1-common-api:19.19.0.219"
-    	// at runtime, use the full JEI jar
-  		runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.19.0.219"
-  	
-    	runtimeOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1"
-    	compileOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1:api"
-  	
-    	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:14.0.688"
-		compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:14.0.688"
-		implementation "me.shedaniel:RoughlyEnoughItems-neoforge:14.0.688"
-		implementation "me.shedaniel.cloth:cloth-config-neoforge:13.0.121"
-    	implementation "dev.architectury:architectury-neoforge:11.0.9"
-    	
     	compileOnly "curse.maven:vivecraft-667903:6060497"
     	
     	compileOnly "dev.emi:emi-neoforge:1.1.7+1.21:api"
@@ -162,7 +161,7 @@ dependencies {
 	
     	implementation "curse.maven:the-one-probe-245211:5502323"
     } else {
-    	compileOnly files("libs/curios_dummy.jar")
+    	//compileOnly files("libs/curios_dummy.jar")
     	compileOnly files("libs/vc_dummy.jar")
     	compileOnly files("libs/polymorph_dummy.jar")
     }

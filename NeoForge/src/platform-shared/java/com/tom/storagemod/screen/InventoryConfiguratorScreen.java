@@ -1,6 +1,7 @@
 package com.tom.storagemod.screen;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
@@ -114,5 +115,10 @@ public class InventoryConfiguratorScreen extends TSContainerScreen<InventoryConf
 			return true;
 		}
 		return super.mouseClicked(x, y, btn);
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
+		consumer.accept(new Box(leftPos - 20, topPos, 25, 110));
 	}
 }

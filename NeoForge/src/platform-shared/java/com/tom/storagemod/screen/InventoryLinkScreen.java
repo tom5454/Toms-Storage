@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.lwjgl.glfw.GLFW;
@@ -92,7 +93,10 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 		clearWidgets();
 		super.init();
 		createBtn = addRenderableWidget(new IconButton(leftPos + 121, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), b -> {
-			sendEdit(null, new LinkChannel(publicBtn.getState(), textF.getValue()));
+			String name = textF.getValue().trim();
+			if (!name.isEmpty()) {
+				sendEdit(null, new LinkChannel(publicBtn.getState(), name));
+			}
 		}));
 		deleteBtn = addRenderableWidget(new IconButton(leftPos + 138, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
 			sendEdit(channelsList.getSelected(), null);
@@ -158,7 +162,7 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 		} else {
 			deleteBtn.active = false;
 			publicBtn.setState(false);
-			createBtn.active = true;
+			createBtn.active = !textF.getValue().trim().isEmpty();
 		}
 	}
 
@@ -232,5 +236,9 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 			sendSelect(to.id);
 			update();
 		}
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
 	}
 }
