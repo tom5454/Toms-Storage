@@ -32,6 +32,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 
 	@Override
 	public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+		super.saveAdditional(compound, provider);
 		ItemStack is = getFilter();
 		if (!is.isEmpty())
 			compound.put("Filter", is.save(provider, new CompoundTag()));
@@ -60,22 +61,22 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	}
 
 	@Override
-        public void updateServer() {
-                if(!filter.isEmpty() && filterPred == null)setFilter(filter);//update predicate
-                BlockState state = level.getBlockState(worldPosition);
+	public void updateServer() {
+		if(!filter.isEmpty() && filterPred == null)setFilter(filter);//update predicate
+		BlockState state = level.getBlockState(worldPosition);
 		Direction facing = state.getValue(AbstractInventoryHopperBlock.FACING);
 		IInventoryAccess top = topCache.getAccess(level, worldPosition.relative(facing.getOpposite()));
 		IInventoryAccess bottom = bottomCache.getAccess(level, worldPosition.relative(facing));
 		boolean topNet = topCache.isNetwork();
 		if (!topCache.isValid() || !bottomCache.isValid())return;
 		if (!topNet && !bottomCache.isNetwork())return;
-                int baseCd = Math.max(1, Config.get().basicHopperCooldown);
-                int midCd = Math.max(1, baseCd * 4 / 10);
-                int fastCd = Math.max(1, baseCd / 10);
-                if (cooldown > 0) {
-                        cooldown--;
-                        return;
-                }
+		int baseCd = Math.max(1, Config.get().basicHopperCooldown);
+		int midCd = Math.max(1, baseCd * 4 / 10);
+		int fastCd = Math.max(1, baseCd / 10);
+		if (cooldown > 0) {
+			cooldown--;
+			return;
+		}
 		boolean hasFilter = filterPred != null;
 		if (topNet && !hasFilter)return;
 		if (!isEnabled())return;
@@ -86,16 +87,16 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 			topChange = t;
 			waiting = 0;
 			topSlot = null;
-                } else cooldown = midCd;
-                if (waiting == 1)return;
+		} else cooldown = midCd;
+		if (waiting == 1)return;
 
 		IInventoryChangeTracker bt = bottom.tracker();
 		long b = bt.getChangeTracker(level);
 		if (bottomChange != b) {
 			bottomChange = b;
 			waiting = 0;
-                } else cooldown = midCd;
-                if (waiting == 2)return;
+		} else cooldown = midCd;
+		if (waiting == 2)return;
 
 		boolean topWasNull = topSlot == null;
 		if(hasFilter)filterPred.updateState();
@@ -104,39 +105,39 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 
 		if (topSlot == null) {
 			if(topWasNull) {
-                                waiting = 1;
-                                cooldown = baseCd;
-                        } else {
-                                cooldown = midCd;
-                        }
-                        return;
-                }
+				waiting = 1;
+				cooldown = baseCd;
+			} else {
+				cooldown = midCd;
+			}
+			return;
+		}
 
 		ItemStack is = topSlot.getStack();
 		if (is.isEmpty()) {
-                        waiting = 3;
-                        cooldown = fastCd;
-                        return;
-                }
-                StoredItemStack st = new StoredItemStack(is);
-                if(hasFilter && !filterPred.test(st)) {
-                        waiting = 3;
-                        cooldown = fastCd;
-                        return;
-                }
+			waiting = 3;
+			cooldown = fastCd;
+			return;
+		}
+		StoredItemStack st = new StoredItemStack(is);
+		if(hasFilter && !filterPred.test(st)) {
+			waiting = 3;
+			cooldown = fastCd;
+			return;
+		}
 
 		InventorySlot bottomSlot = bt.findSlotDest(st);
 		if (bottomSlot == null) {
-                        waiting = 3;
-                        cooldown = baseCd;
-                        return;
-                }
+			waiting = 3;
+			cooldown = baseCd;
+			return;
+		}
 
-                if (topSlot.transferTo(1, bottomSlot)) {
-                        cooldown = baseCd;
-                } else {
-                        waiting = 3;
-                        cooldown = baseCd;
-                }
-        }
+		if (topSlot.transferTo(1, bottomSlot)) {
+			cooldown = baseCd;
+		} else {
+			waiting = 3;
+			cooldown = baseCd;
+		}
+	}
 }
