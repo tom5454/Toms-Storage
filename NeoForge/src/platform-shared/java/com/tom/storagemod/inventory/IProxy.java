@@ -1,5 +1,7 @@
 package com.tom.storagemod.inventory;
 
+import java.util.Set;
+
 public interface IProxy {
-	IInventoryAccess getRootHandler();
+	IInventoryAccess getRootHandler(Set<IProxy> dejaVu);
 }

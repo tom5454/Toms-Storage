@@ -118,7 +118,7 @@ public class Config {
 			/*inventoryConnectorMaxSlots = builder.comment("Inventory Connector maximum slots").
 					translation("config.toms_storage.inv_connector_max_slots").
 					defineInRange("inventoryConnectorMaxSlots", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);*/
-                }
+		}
 	}
 
 	public static class Common {
