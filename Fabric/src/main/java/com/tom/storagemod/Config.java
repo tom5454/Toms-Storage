@@ -21,6 +21,7 @@ public class Config implements ConfigData {
 	public int wirelessRange = 16;
 	public int invConnectorMaxCables = 2048;
 	public int advWirelessRange = 64;
+	public int basicHopperCooldown = 10;
 	@Tooltip
 	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlCrossDim = 4;
 	@Tooltip
