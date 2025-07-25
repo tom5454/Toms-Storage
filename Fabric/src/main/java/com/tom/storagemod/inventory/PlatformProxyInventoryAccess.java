@@ -2,6 +2,7 @@ package com.tom.storagemod.inventory;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
@@ -121,8 +122,11 @@ public class PlatformProxyInventoryAccess implements PlatformInventoryAccess, St
 	}
 
 	@Override
-	public IInventoryAccess getRootHandler() {
-		return access.getRootHandler();
+	public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
+		if (dejaVu.add(access))
+			return access.getRootHandler(dejaVu);
+		else
+			return this;
 	}
 
 	@Override

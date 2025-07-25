@@ -6,21 +6,23 @@
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.17",
 		"1.21-latest": "2.0.12",
-		"1.21.1-latest": "2.2.1",
+		"1.21.1-latest": "2.2.2",
 		"1.21.3-latest": "2.1.1",
-		"1.21.4-latest": "2.3.1",
-		"1.21.5-latest": "2.4.1",
+		"1.21.4-latest": "2.3.2",
+		"1.21.5-latest": "2.4.2",
 		"1.21.6-latest": "2.4.1",
-		"1.21.7-latest": "2.5.0"
+		"1.21.7-latest": "2.4.1",
+		"1.21.8-latest": "2.4.2"
 	},
-	"1.21.7": {
-		"2.5.0": "1.21.7 port"
+	"1.21.8": {
+		"2.4.2": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)"
 	},
 	"1.21.6": {
 		"2.4.1": "Fixed JEI/REI/EMI overlapping with some parts of the menus in the mod (Closes #594)\nFixed missing lang entry for inventory configurator (Closes #596)\nFixed JEI integration on 1.21.4 (Closes #599)\nFixed inventory cable connector linking menu not working on 1.21.6 (Closes #600)\nFixed crash with NeoForge 21.6.16-beta\nUpdated Russian translations (#598)",
 		"2.4.0": "1.21.6 port"
 	},
 	"1.21.5": {
+		"2.4.2": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)",
 		"2.4.1": "Fixed JEI/REI/EMI overlapping with some parts of the menus in the mod (Closes #594)\nFixed missing lang entry for inventory configurator (Closes #596)\nFixed JEI integration on 1.21.4 (Closes #599)\nUpdated Russian translations (#598)",
 		"2.4.0": "Fixed occasional crash on NeoForge (Closes #571)\nAdded HUD information to the configurator (#306)\nAdded Multiblock Inventory API (#306)\nAdded debounce to the Inventory Configurator actions (#306)",
 		"2.3.2": "Updated Chinese translations (#576)\nFixed inventory hopper drops filter item on 1.21.5 (Closes #582)\nFixed crash with tag filter and Inventory Sorter (Closes #578)\nFixed recipe book on 1.21.4+ (Closes #564)\nFixed crafting placer breaking the recipe (Closes #581)",
@@ -28,6 +30,7 @@
 		"2.3.0": "1.21.5 port"
 	},
 	"1.21.4": {
+		"2.3.2": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)",
 		"2.3.1": "Fixed JEI/REI/EMI overlapping with some parts of the menus in the mod (Closes #594)\nFixed missing lang entry for inventory configurator (Closes #596)\nFixed JEI integration on 1.21.4 (Closes #599)\nUpdated Russian translations (#598)",
 		"2.3.0": "Fixed occasional crash on NeoForge (Closes #571)\nAdded HUD information to the configurator (#306)\nAdded Multiblock Inventory API (#306)\nAdded debounce to the Inventory Configurator actions (#306)",
 		"2.2.4": "Updated Chinese translations (#576)\nFixed crash with tag filter and Inventory Sorter (Closes #578)\nFixed recipe book on 1.21.4+ (Closes #564)\nFixed crafting placer breaking the recipe (Closes #581)",
@@ -43,6 +46,7 @@
 		"2.1.0": "1.21.3 port"
 	},
 	"1.21.1": {
+		"2.2.2": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)",
 		"2.2.1": "Fixed JEI/REI/EMI overlapping with some parts of the menus in the mod (Closes #594)\nFixed missing lang entry for inventory configurator (Closes #596)\nUpdated Russian translations (#598)",
 		"2.2.0": "Fixed occasional crash on NeoForge (Closes #571)\nAdded HUD information to the configurator (#306)\nAdded Multiblock Inventory API (#306)\nAdded debounce to the Inventory Configurator actions (#306)",
 		"2.1.4": "Updated Chinese translations (#576)\nFixed crash with tag filter and Inventory Sorter (Closes #578)",

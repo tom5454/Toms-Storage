@@ -2,6 +2,7 @@ package com.tom.storagemod.inventory;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
@@ -81,7 +82,7 @@ public class PlatformItemHandler implements Storage<ItemVariant>, IProxy {
 	}
 
 	@Override
-	public IInventoryAccess getRootHandler() {
-		return access.getInventoryAccess().getRootHandler();
+	public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
+		return access.getInventoryAccess().getRootHandler(dejaVu);
 	}
 }

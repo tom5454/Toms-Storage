@@ -1,5 +1,7 @@
 package com.tom.storagemod.inventory;
 
+import java.util.Set;
+
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -46,7 +48,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		@Override
-		public IInventoryAccess getRootHandler() {
+		public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
 			return this;
 		}
 	};
@@ -100,8 +102,15 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		@Override
-		public IInventoryAccess getRootHandler() {
-			return get() instanceof IProxy p ? p.getRootHandler() : this;
+		public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
+			if (get() instanceof IProxy p) {
+				if (dejaVu.add(p)) {
+					return p.getRootHandler(dejaVu);
+				} else {
+					return this;
+				}
+			}
+			return this;
 		}
 
 		protected void onInvalid() {

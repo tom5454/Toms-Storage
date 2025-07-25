@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.AbstractInventoryHopperBlock;
 import com.tom.storagemod.inventory.IInventoryAccess;
@@ -70,6 +71,9 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		boolean topNet = topCache.isNetwork();
 		if (!topCache.isValid() || !bottomCache.isValid())return;
 		if (!topNet && !bottomCache.isNetwork())return;
+		int baseCd = Math.max(1, Config.get().basicHopperCooldown);
+		int midCd = Math.max(1, baseCd * 4 / 10);
+		int fastCd = Math.max(1, baseCd / 10);
 		if (cooldown > 0) {
 			cooldown--;
 			return;
@@ -84,7 +88,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 			topChange = t;
 			waiting = 0;
 			topSlot = null;
-		} else cooldown = 4;
+		} else cooldown = midCd;
 		if (waiting == 1)return;
 
 		IInventoryChangeTracker bt = bottom.tracker();
@@ -92,7 +96,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		if (bottomChange != b) {
 			bottomChange = b;
 			waiting = 0;
-		} else cooldown = 4;
+		} else cooldown = midCd;
 		if (waiting == 2)return;
 
 		boolean topWasNull = topSlot == null;
@@ -103,9 +107,9 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		if (topSlot == null) {
 			if(topWasNull) {
 				waiting = 1;
-				cooldown = 10;
+				cooldown = baseCd;
 			} else {
-				cooldown = 4;
+				cooldown = midCd;
 			}
 			return;
 		}
@@ -113,28 +117,28 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		ItemStack is = topSlot.getStack();
 		if (is.isEmpty()) {
 			waiting = 3;
-			cooldown = 1;
+			cooldown = fastCd;
 			return;
 		}
 		StoredItemStack st = new StoredItemStack(is);
 		if(hasFilter && !filterPred.test(st)) {
 			waiting = 3;
-			cooldown = 1;
+			cooldown = fastCd;
 			return;
 		}
 
 		InventorySlot bottomSlot = bt.findSlotDest(st);
 		if (bottomSlot == null) {
 			waiting = 3;
-			cooldown = 10;
+			cooldown = baseCd;
 			return;
 		}
 
 		if (topSlot.transferTo(1, bottomSlot)) {
-			cooldown = 10;
+			cooldown = baseCd;
 		} else {
 			waiting = 3;
-			cooldown = 10;
+			cooldown = baseCd;
 		}
 	}
 
