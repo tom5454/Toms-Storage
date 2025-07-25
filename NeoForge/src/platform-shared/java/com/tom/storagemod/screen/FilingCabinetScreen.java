@@ -1,5 +1,7 @@
 package com.tom.storagemod.screen;
 
+import java.util.function.Consumer;
+
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
@@ -91,5 +93,9 @@ public class FilingCabinetScreen extends PlatformContainerScreen<FilingCabinetMe
 		this.currentScroll = (float)(this.currentScroll - p_mouseScrolled_5_ / i);
 		this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
 		return true;
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
 	}
 }

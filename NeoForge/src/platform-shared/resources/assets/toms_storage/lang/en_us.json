@@ -126,6 +126,7 @@
 	"tooltip.toms_storage.inv_config.skip": "Exclude from Inventory Connectors",
 	"tooltip.toms_storage.content_stored": "Contains items",
 	"tooltip.toms_storage.filing_cabinet": "Store multiple variants of the same item",
+	"tooltip.toms_storage.inventory_configurator": "Configure how each inventory\\interacts with the Inventory Connector.\\Highlights painted blocks.",
 	"tooltip.toms_storage.inventory_connector.channel.owner": "Owner: %s",
 	"tooltip.toms_storage.inventory_connector.channel.owner.self": "Owner: %s (You)",
 	"tooltip.toms_storage.inventory_connector.channel.owner.unknown": "Owner: Unknown",

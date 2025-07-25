@@ -2,6 +2,7 @@ package com.tom.storagemod.screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -124,5 +125,10 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 				btn.setMessage(Component.literal((v > 0 ? "+" : "") + v));
 			}
 		}
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
+		consumer.accept(new Box(leftPos - 20, topPos, 25, 25));
 	}
 }

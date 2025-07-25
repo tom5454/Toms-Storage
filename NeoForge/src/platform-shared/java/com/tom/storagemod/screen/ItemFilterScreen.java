@@ -1,5 +1,7 @@
 package com.tom.storagemod.screen;
 
+import java.util.function.Consumer;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -55,5 +57,10 @@ public class ItemFilterScreen extends AbstractFilteredScreen<ItemFilterMenu> {
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
 		matrixStack.blit(DISPENSER_GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight);
+	}
+
+	@Override
+	public void getExclusionAreas(Consumer<Box> consumer) {
+		consumer.accept(new Box(leftPos - 20, topPos, 25, 40));
 	}
 }

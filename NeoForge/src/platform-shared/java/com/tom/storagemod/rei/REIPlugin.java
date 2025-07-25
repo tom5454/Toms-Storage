@@ -1,11 +1,16 @@
 package com.tom.storagemod.rei;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.tom.storagemod.Content;
 import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
+import com.tom.storagemod.screen.IScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IAutoFillTerminal.ISearchHandler;
 
 import dev.architectury.event.CompoundEventResult;
+import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -42,6 +47,11 @@ public class REIPlugin implements REIClientPlugin {
 			return CompoundEventResult.pass();
 		});
 		registry.registerDraggableStackVisitor(new ReiGhostIngredientHandler());
+		registry.exclusionZones().register(IScreen.class, s -> {
+			List<Rectangle> rects = new ArrayList<>();
+			s.getExclusionAreas(b -> rects.add(new Rectangle(b.x(), b.y(), b.width(), b.height())));
+			return rects;
+		});
 	}
 
 	static {
