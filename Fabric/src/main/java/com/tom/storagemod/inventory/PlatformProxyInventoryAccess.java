@@ -122,6 +122,14 @@ public class PlatformProxyInventoryAccess implements PlatformInventoryAccess, St
 
 	@Override
 	public IInventoryAccess getRootHandler() {
+		return getRootHandler(new java.util.HashSet<>());
+	}
+
+	public IInventoryAccess getRootHandler(java.util.Set<IInventoryAccess> visited) {
+		if (!visited.add(this)) return this; // cycle detected
+		if (access instanceof PlatformInventoryAccess pia) {
+			return pia.getRootHandler(visited);
+		}
 		return access.getRootHandler();
 	}
 

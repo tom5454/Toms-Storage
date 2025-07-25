@@ -101,7 +101,19 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 		@Override
 		public IInventoryAccess getRootHandler() {
-			return get() instanceof IProxy p ? p.getRootHandler() : this;
+			return getRootHandler(new java.util.HashSet<>());
+		}
+
+		private IInventoryAccess getRootHandler(java.util.Set<IInventoryAccess> visited) {
+			if (!visited.add(this)) return this; // cycle detected
+			var g = get();
+			if (g instanceof IProxy p) {
+				if (p instanceof PlatformProxyInventoryAccess proxy) {
+					return proxy.getRootHandler(visited);
+				}
+				return p.getRootHandler(); // fallback, but may recurse
+			}
+			return this;
 		}
 
 		protected void onInvalid() {
