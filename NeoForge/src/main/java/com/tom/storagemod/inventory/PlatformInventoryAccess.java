@@ -49,6 +49,11 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		public IInventoryAccess getRootHandler() {
 			return this;
 		}
+
+		@Override
+		public IInventoryAccess getRootHandler(java.util.Set<IInventoryAccess> visited) {
+			return this;
+		}
 	};
 
 	public static class BlockInventoryAccess implements PlatformInventoryAccess {
@@ -94,7 +99,19 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 		@Override
 		public IInventoryAccess getRootHandler() {
-			return get() instanceof IProxy p ? p.getRootHandler() : this;
+			return getRootHandler(new java.util.HashSet<>());
+		}
+
+		public IInventoryAccess getRootHandler(java.util.Set<IInventoryAccess> visited) {
+			if (!visited.add(this)) return this; // cycle detected
+			var g = get();
+			if (g instanceof IProxy p) {
+				if (p instanceof PlatformProxyInventoryAccess proxy) {
+					return proxy.getRootHandler(visited);
+				}
+				return p.getRootHandler(); // fallback, but may recurse
+			}
+			return this;
 		}
 
 		@Override
@@ -122,6 +139,10 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		IItemHandler itemHandler = get();
 		if (itemHandler == null)return 0;
 		return itemHandler.getSlots();
+	}
+
+	default IInventoryAccess getRootHandler(java.util.Set<IInventoryAccess> visited) {
+		return getRootHandler(); // fallback to normal implementation
 	}
 
 	public static BlockFilter getBlockFilterAt(Level level, BlockPos p, boolean make) {
