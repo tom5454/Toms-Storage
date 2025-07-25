@@ -85,11 +85,8 @@ public class ReiTransferHandler implements TransferHandler {
 							for (Widget widget : widgets) {
 								if (widget instanceof Slot && ((Slot) widget).getNoticeMark() == Slot.INPUT) {
 									if (missing.contains(i++)) {
-										gr.pose().pushPose();
-										gr.pose().translate(0, 0, 400);
 										Rectangle innerBounds = ((Slot) widget).getInnerBounds();
 										gr.fill(innerBounds.x, innerBounds.y, innerBounds.getMaxX(), innerBounds.getMaxY(), 0x40ff0000);
-										gr.pose().popPose();
 									}
 								}
 							}

@@ -65,6 +65,23 @@ dependencies {
     
     modImplementation ("curse.maven:jade-324717:6674245")
     
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
+		exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
+	   exclude(group: "net.fabricmc.fabric-api")
+	   exclude(group: "me.shedaniel.cloth")
+	   exclude(group: "dev.architectury")
+	}
+	modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
+	    exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modImplementation("dev.architectury:architectury-fabric:17.0.8")
+    
     if(useLib) {
     	modCompileOnly('maven.modrinth:sodium:mc1.21.5-0.6.12-fabric')
 		modCompileOnly('maven.modrinth:iris:1.8.10+1.21.5-fabric')
@@ -80,23 +97,6 @@ dependencies {
     	modImplementation("io.github.douira:glsl-transformer:2.0.1")
     	modImplementation("org.anarres:jcpp:1.4.14")
     
-	    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
-			exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
-		   exclude(group: "net.fabricmc.fabric-api")
-		   exclude(group: "me.shedaniel.cloth")
-		   exclude(group: "dev.architectury")
-		}
-		modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
-		    exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modImplementation("dev.architectury:architectury-fabric:15.0.1")
-		
 		// compile against the JEI API but do not include it at runtime
 		modCompileOnlyApi("mezz.jei:jei-1.21.5-common-api:${project.jei_version}")
 		//modCompileOnlyApi("mezz.jei:jei-1.21.4-fabric-api:${project.jei_version}")
@@ -123,7 +123,7 @@ sourceSets {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"

@@ -8,4 +8,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = "TomsStorageFabric-1.21.7"
+rootProject.name = "TomsStorageFabric-1.21.8"
