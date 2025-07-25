@@ -1,5 +1,7 @@
 package com.tom.storagemod.inventory;
 
+import java.util.Set;
+
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -75,8 +77,11 @@ public class PlatformProxyInventoryAccess implements PlatformInventoryAccess, II
 	}
 
 	@Override
-	public IInventoryAccess getRootHandler() {
-		return access.getRootHandler();
+	public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
+		if (dejaVu.add(access))
+			return access.getRootHandler(dejaVu);
+		else
+			return this;
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -47,9 +48,10 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 				collect(Collectors.groupingBy(IPriority.GETTER, () -> new EnumMap<>(Priority.class), Collectors.toList()));
 		Set<IInventoryAccess> allRoots = new HashSet<>();
 		allRoots.add(this);
+		Set<IProxy> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
 		for (int i = Priority.VALUES.length - 1; i >= 0; i--) {
 			for (IInventoryAccess a : map.getOrDefault(Priority.VALUES[i], Collections.emptyList())) {
-				IInventoryAccess root = a.getRootHandler();
+				IInventoryAccess root = a.getRootHandler(dejaVu);
 				if (root instanceof MultiInventoryAccess)continue;//skip
 				if (allRoots.add(root))
 					connected.add(a);
@@ -117,7 +119,7 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 	}
 
 	@Override
-	public IInventoryAccess getRootHandler() {
+	public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
 		return this;
 	}
 

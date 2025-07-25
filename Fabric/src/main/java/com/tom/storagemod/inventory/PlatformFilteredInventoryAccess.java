@@ -1,6 +1,7 @@
 package com.tom.storagemod.inventory;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -201,8 +202,8 @@ public class PlatformFilteredInventoryAccess extends FilteringStorage<ItemVarian
 	}
 
 	@Override
-	public IInventoryAccess getRootHandler() {
-		return acc.getRootHandler();
+	public IInventoryAccess getRootHandler(Set<IProxy> dejaVu) {
+		return acc.getRootHandler(dejaVu);
 	}
 
 	@Override

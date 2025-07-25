@@ -1,5 +1,6 @@
 package com.tom.storagemod.inventory;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +44,7 @@ public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 	Object get();
 
 	@Override
-	IInventoryAccess getRootHandler();
+	IInventoryAccess getRootHandler(Set<IProxy> dejaVu);
 
 	@SuppressWarnings("unchecked")
 	default <T> T getPlatformHandler() {
