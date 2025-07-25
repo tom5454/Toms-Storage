@@ -457,7 +457,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					if (slot.stack.getQuantity() > 9999) {
 						ClientUtil.setTooltip(Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()));
 					}
-					st.renderTooltip(font, slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack(), mouseX, mouseY);
+					try {
+						st.renderTooltip(font, slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack(), mouseX, mouseY);
+					} catch (IllegalStateException e) {
+						ClientUtil.setTooltip(Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()));
+						st.renderTooltip(font, slot.stack.getStack(), mouseX, mouseY);//Render with stack size 1
+					}
 					ClientUtil.setTooltip();
 				}
 			} else {

@@ -2,6 +2,9 @@ package com.tom.storagemod.inventory;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,7 +42,8 @@ public class NetworkInventory {
 	public IInventoryAccess getAccess(Level level, BlockPos worldPosition) {
 		if (block.exists()) {
 			if (block.get() instanceof PlatformItemHandler h) {
-				return h.getRootHandler();
+				Set<IProxy> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
+				return h.getRootHandler(dejaVu);
 			}
 			return block;
 		}

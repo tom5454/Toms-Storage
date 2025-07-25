@@ -31,6 +31,7 @@ public class Config {
 	public int advWirelessRange;
 	public int wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 	public int invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
+	public int basicHopperCooldown;
 	//public int inventoryConnectorMaxSlots;
 	private Set<String> blockedMods = new HashSet<>();
 	private Set<Block> blockedBlocks = new HashSet<>();
@@ -47,6 +48,7 @@ public class Config {
 		public IntValue advWirelessRange;
 		public IntValue wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 		public IntValue invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
+		public IntValue basicHopperCooldown;
 		//public IntValue inventoryConnectorMaxSlots;
 
 		private Server(ModConfigSpec.Builder builder) {
@@ -109,6 +111,10 @@ public class Config {
 					translation("config.toms_storage.run_multithreaded").
 					define("runMultithreaded", true);
 
+			basicHopperCooldown = builder.comment("Base tick cooldown for Basic Inventory Hopper item transfer").
+					translation("config.toms_storage.basic_hopper_cooldown").
+					defineInRange("basicHopperCooldown", 10, 1, 200);
+
 			/*inventoryConnectorMaxSlots = builder.comment("Inventory Connector maximum slots").
 					translation("config.toms_storage.inv_connector_max_slots").
 					defineInRange("inventoryConnectorMaxSlots", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);*/
@@ -168,6 +174,7 @@ public class Config {
 			invLinkBeaconLvlSameDim = SERVER.invLinkBeaconLvlSameDim.get();
 			invLinkBeaconLvlCrossDim = SERVER.invLinkBeaconLvlCrossDim.get();
 			runMultithreaded = SERVER.runMultithreaded.getAsBoolean();
+			basicHopperCooldown = SERVER.basicHopperCooldown.get();
 			//inventoryConnectorMaxSlots = SERVER.inventoryConnectorMaxSlots.getAsInt();
 		} else if(modConfig.getType() == Type.COMMON) {
 			blockedMods = new HashSet<>(COMMON.blockedMods.get());
