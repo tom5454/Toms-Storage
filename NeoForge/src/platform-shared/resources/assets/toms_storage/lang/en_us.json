@@ -58,6 +58,7 @@
 	"tooltip.toms_storage.sorting_amount": "Sort by Item Amount",
 	"tooltip.toms_storage.sorting_name": "Sort by Item Name",
 	"tooltip.toms_storage.sorting_by_mod": "Sort by Mod",
+	"tooltip.toms_storage.sorting_space_efficiency": "Sort by Space Efficiency",
 	"tooltip.toms_storage.search": "Standard Search",
 	"tooltip.toms_storage.search_auto": "Auto Search",
 	"tooltip.toms_storage.search_keep": "Standard Search Keep",

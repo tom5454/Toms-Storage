@@ -3,6 +3,8 @@ package com.tom.storagemod.inventory;
 import java.util.Comparator;
 import java.util.function.Function;
 
+import com.tom.storagemod.StorageMod;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
@@ -142,6 +144,47 @@ public class StoredItemStack {
 		}
 	}
 
+  /**
+   * Space efficiency is defined as the ability to store more items in the same number of slots.
+   * 
+   * If I'm able to store 256 stone in 4 stacks, but I need 16 stacks for the same number of ender pearls,
+   * then stone is more space-efficient.
+   */
+	public static class ComparatorSpaceEfficiency implements IStoredItemStackComparator {
+		public boolean reversed;
+
+		public ComparatorSpaceEfficiency(boolean reversed) {
+			this.reversed = reversed;
+		}
+
+		@Override
+		public int compare(StoredItemStack in1, StoredItemStack in2) {
+      // Fewer stacks = better
+			int stackCount = -Long.compare(in1.getStackCount(), in2.getStackCount());
+      // More items = better
+			int itemCount = Long.compare(in1.getQuantity(), in2.getQuantity());
+      // Larger stacks = better
+			int stackSize = Long.compare(in1.getMaxStackSize(), in2.getMaxStackSize());
+      int c = Integer.compare(Integer.compare(stackCount, itemCount), stackSize);
+			return this.reversed ? -c : c;
+		}
+
+		@Override
+		public boolean isReversed() {
+			return reversed;
+		}
+
+		@Override
+		public int type() {
+			return 3;
+		}
+
+		@Override
+		public void setReversed(boolean rev) {
+			reversed = rev;
+		}
+	}
+
 	public static interface IStoredItemStackComparator extends Comparator<StoredItemStack> {
 		boolean isReversed();
 		void setReversed(boolean rev);
@@ -152,6 +195,7 @@ public class StoredItemStack {
 		AMOUNT(ComparatorAmount::new),
 		NAME(ComparatorName::new),
 		BY_MOD(ComparatorModName::new),
+		SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
 		;
 		public static final SortingTypes[] VALUES = values();
 		private final Function<Boolean, IStoredItemStackComparator> factory;
@@ -224,6 +268,14 @@ public class StoredItemStack {
 
 	public int getMaxStackSize() {
 		return stack.getMaxStackSize();
+	}
+
+	public long getStackCount() {
+    if (count == 0) {
+      return 0;
+    }
+
+		return (long) Math.ceil((double) count / stack.getMaxStackSize());
 	}
 
 	public static StoredItemStack merge(StoredItemStack a, StoredItemStack b) {
