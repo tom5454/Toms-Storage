@@ -142,7 +142,7 @@ public class StoredItemStack {
 
     @Override
 		public int compare(StoredItemStack in1, StoredItemStack in2) {
-      int c = in1.getStack().getDescriptionId().compareTo(in2.getStack().getDescriptionId());
+      int c = in1.getStack().getDescriptionId().compareToIgnoreCase(in2.getStack().getDescriptionId());
       return reversed ? -c : c;
 		}
 
