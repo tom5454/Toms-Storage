@@ -3,8 +3,6 @@ package com.tom.storagemod.inventory;
 import java.util.Comparator;
 import java.util.function.Function;
 
-import com.tom.storagemod.StorageMod;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
@@ -53,11 +51,9 @@ public class StoredItemStack {
 		return s;
 	}
 
-	public static class ComparatorAmount implements IStoredItemStackComparator {
-		public boolean reversed;
-
+	public static class ComparatorAmount extends StoredItemStackComparator {
 		public ComparatorAmount(boolean reversed) {
-			this.reversed = reversed;
+			super(reversed);
 		}
 
 		@Override
@@ -67,26 +63,14 @@ public class StoredItemStack {
 		}
 
 		@Override
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		@Override
 		public int type() {
 			return 0;
 		}
-
-		@Override
-		public void setReversed(boolean rev) {
-			reversed  = rev;
-		}
 	}
 
-	public static class ComparatorName implements IStoredItemStackComparator {
-		public boolean reversed;
-
+	public static class ComparatorName extends StoredItemStackComparator {
 		public ComparatorName(boolean reversed) {
-			this.reversed = reversed;
+			super(reversed);
 		}
 
 		@Override
@@ -96,26 +80,14 @@ public class StoredItemStack {
 		}
 
 		@Override
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		@Override
 		public int type() {
 			return 1;
 		}
-
-		@Override
-		public void setReversed(boolean rev) {
-			reversed = rev;
-		}
 	}
 
-	public static class ComparatorModName implements IStoredItemStackComparator {
-		public boolean reversed;
-
+	public static class ComparatorModName extends StoredItemStackComparator {
 		public ComparatorModName(boolean reversed) {
-			this.reversed = reversed;
+			super(reversed);
 		}
 
 		@Override
@@ -126,16 +98,6 @@ public class StoredItemStack {
 			int c2 = in1.getDisplayName().compareTo(in2.getDisplayName());
 			int c = c1 == 0 ? c2 : c1;
 			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		@Override
-		public void setReversed(boolean rev) {
-			reversed = rev;
 		}
 
 		@Override
@@ -150,11 +112,9 @@ public class StoredItemStack {
    * If I'm able to store 256 stone in 4 stacks, but I need 16 stacks for the same number of ender pearls,
    * then stone is more space-efficient.
    */
-	public static class ComparatorSpaceEfficiency implements IStoredItemStackComparator {
-		public boolean reversed;
-
+	public static class ComparatorSpaceEfficiency extends StoredItemStackComparator {
 		public ComparatorSpaceEfficiency(boolean reversed) {
-			this.reversed = reversed;
+			super(reversed);
 		}
 
 		@Override
@@ -170,25 +130,27 @@ public class StoredItemStack {
 		}
 
 		@Override
+		public int type() {
+			return 3;
+		}
+	}
+
+	public static abstract class StoredItemStackComparator implements Comparator<StoredItemStack> {
+		public boolean reversed;
+
+    public StoredItemStackComparator(boolean reversed) {
+      this.reversed = reversed;
+    }
+
 		public boolean isReversed() {
 			return reversed;
 		}
 
-		@Override
-		public int type() {
-			return 3;
-		}
-
-		@Override
 		public void setReversed(boolean rev) {
 			reversed = rev;
 		}
-	}
 
-	public static interface IStoredItemStackComparator extends Comparator<StoredItemStack> {
-		boolean isReversed();
-		void setReversed(boolean rev);
-		int type();
+		abstract int type();
 	}
 
 	public static enum SortingTypes {
@@ -198,12 +160,12 @@ public class StoredItemStack {
 		SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
 		;
 		public static final SortingTypes[] VALUES = values();
-		private final Function<Boolean, IStoredItemStackComparator> factory;
-		private SortingTypes(Function<Boolean, IStoredItemStackComparator> factory) {
+		private final Function<Boolean, StoredItemStackComparator> factory;
+		private SortingTypes(Function<Boolean, StoredItemStackComparator> factory) {
 			this.factory = factory;
 		}
 
-		public IStoredItemStackComparator create(boolean rev) {
+		public StoredItemStackComparator create(boolean rev) {
 			return factory.apply(rev);
 		}
 	}

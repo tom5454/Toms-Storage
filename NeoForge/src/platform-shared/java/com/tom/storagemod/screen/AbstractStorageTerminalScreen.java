@@ -53,8 +53,8 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.inventory.StoredItemStack.ComparatorAmount;
-import com.tom.storagemod.inventory.StoredItemStack.IStoredItemStackComparator;
 import com.tom.storagemod.inventory.StoredItemStack.SortingTypes;
+import com.tom.storagemod.inventory.StoredItemStack.StoredItemStackComparator;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;
 import com.tom.storagemod.screen.widget.EnumCycleButton;
@@ -110,7 +110,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	private String searchLast = "";
 	protected boolean loadedSearch = false, ghostItems, tallMode;
 	public final int textureSlotCount, guiHeight, slotStartX, slotStartY;
-	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
+	private StoredItemStackComparator comparator = new ComparatorAmount(false);
 	protected EnumCycleButton<SortingTypes> buttonSortingType;
 	protected EnumCycleButton<ControllMode> buttonCtrlMode;
 	protected TerminalSearchModeButton buttonSearchType;
