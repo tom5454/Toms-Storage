@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
@@ -134,6 +135,23 @@ public class StoredItemStack {
 			return 3;
 		}
 	}
+  
+	public static class ComparatorID extends StoredItemStackComparator {
+		public ComparatorID(boolean reversed) {
+      super(reversed);
+    }
+
+    @Override
+		public int compare(StoredItemStack in1, StoredItemStack in2) {
+      int c = Integer.compare(Item.getId(in1.getStack().getItem()), Item.getId(in2.getStack().getItem()));
+      return reversed ? -c : c;
+		}
+
+		@Override
+		public int type() {
+			return 4;
+		}
+	}
 
 	public static abstract class StoredItemStackComparator implements Comparator<StoredItemStack> {
 		public boolean reversed;
@@ -150,7 +168,7 @@ public class StoredItemStack {
 			reversed = rev;
 		}
 
-		abstract int type();
+		abstract public int type();
 	}
 
 	public static enum SortingTypes {
@@ -158,6 +176,7 @@ public class StoredItemStack {
 		NAME(ComparatorName::new),
 		BY_MOD(ComparatorModName::new),
 		SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
+		ID(ComparatorID::new),
 		;
 		public static final SortingTypes[] VALUES = values();
 		private final Function<Boolean, StoredItemStackComparator> factory;
