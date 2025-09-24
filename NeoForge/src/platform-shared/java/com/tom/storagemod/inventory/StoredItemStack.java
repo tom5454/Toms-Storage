@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
@@ -143,7 +142,7 @@ public class StoredItemStack {
 
     @Override
 		public int compare(StoredItemStack in1, StoredItemStack in2) {
-      int c = Integer.compare(Item.getId(in1.getStack().getItem()), Item.getId(in2.getStack().getItem()));
+      int c = in1.getStack().getDescriptionId().compareTo(in2.getStack().getDescriptionId());
       return reversed ? -c : c;
 		}
 
