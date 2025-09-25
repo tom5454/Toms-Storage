@@ -151,6 +151,36 @@ public class StoredItemStack {
 			return 4;
 		}
 	}
+  
+	public static class ComparatorType extends StoredItemStackComparator {
+		public ComparatorType(boolean reversed) {
+      super(reversed);
+    }
+
+    @Override
+		public int compare(StoredItemStack in1, StoredItemStack in2) {
+        String descriptionId1 = in1.getStack().getDescriptionId();
+        String descriptionId2 = in2.getStack().getDescriptionId();
+
+        String[] parts1 = descriptionId1.split("\\.");
+        String[] parts2 = descriptionId2.split("\\.");
+
+        int c = 0;
+        for (int i = 0; i < 3; i++) {
+            c = parts1[i].compareToIgnoreCase(parts2[i]);
+            if (c != 0) {
+                break;
+            }
+        }
+
+        return reversed ? -c : c;
+		}
+
+		@Override
+		public int type() {
+			return 5;
+		}
+	}
 
 	public static abstract class StoredItemStackComparator implements Comparator<StoredItemStack> {
 		public boolean reversed;
@@ -176,6 +206,7 @@ public class StoredItemStack {
 		BY_MOD(ComparatorModName::new),
 		SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
 		ID(ComparatorID::new),
+		Type(ComparatorType::new),
 		;
 		public static final SortingTypes[] VALUES = values();
 		private final Function<Boolean, StoredItemStackComparator> factory;
