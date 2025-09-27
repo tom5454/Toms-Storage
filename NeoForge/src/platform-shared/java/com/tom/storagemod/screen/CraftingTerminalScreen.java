@@ -11,6 +11,8 @@ import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -148,23 +150,23 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	}
 
 	@Override
-	public boolean mouseClicked(double x, double y, int b) {
-		if (this.recipeBookGui.mouseClicked(x, y, b)) {
+	public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean b) {
+		if (this.recipeBookGui.mouseClicked(mouseButtonEvent, b)) {
 			this.setFocused(this.recipeBookGui);
 			return true;
 		}
 		if (this.widthTooNarrow && this.recipeBookGui.isVisible()) {
-			if (this.recipeBookGui.hasClickedOutside(x, y, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, b))
+			if (this.recipeBookGui.hasClickedOutside(mouseButtonEvent.x(), mouseButtonEvent.y(), this.leftPos, this.topPos, this.imageWidth, this.imageHeight))
 				this.recipeBookGui.toggleVisibility();
 			return false;
 		}
-		return super.mouseClicked(x, y, b);
+		return super.mouseClicked(mouseButtonEvent, b);
 	}
 
 	@Override
-	protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton) {
+	protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn) {
 		boolean flag = mouseX < guiLeftIn || mouseY < guiTopIn || mouseX >= guiLeftIn + this.imageWidth || mouseY >= guiTopIn + this.imageHeight;
-		return this.recipeBookGui.hasClickedOutside(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, mouseButton) && flag;
+		return this.recipeBookGui.hasClickedOutside(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight) && flag;
 	}
 
 	/**
@@ -186,8 +188,8 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	}
 
 	@Override
-	public boolean keyPressed(int code, int p_231046_2_, int p_231046_3_) {
-		if(code == GLFW.GLFW_KEY_S && hoveredSlot != null) {
+	public boolean keyPressed(KeyEvent event) {
+		if(event.key() == GLFW.GLFW_KEY_S && hoveredSlot != null) {
 			ItemStack itemstack = null;
 
 			for (var e : this.recipeBookGui.ghostSlots.ingredients.entrySet()) {
@@ -202,11 +204,11 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				return true;
 			}
 		}
-		if(code == GLFW.GLFW_KEY_ESCAPE && this.recipeBookGui.isVisible() && this.widthTooNarrow) {
+		if(event.key() == GLFW.GLFW_KEY_ESCAPE && this.recipeBookGui.isVisible() && this.widthTooNarrow) {
 			this.recipeBookGui.toggleVisibility();
 			return true;
 		}
-		return super.keyPressed(code, p_231046_2_, p_231046_3_);
+		return super.keyPressed(event);
 	}
 
 	public static class ButtonClear extends Button {

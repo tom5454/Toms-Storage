@@ -33,7 +33,7 @@ import com.tom.storagemod.util.Util;
 public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	private Optional<RecipeHolder<CraftingRecipe>> currentRecipe = Optional.empty();
 	private final CraftingContainer craftMatrix = new CraftingMatrix(3, 3, () -> {
-		if (level != null && !level.isClientSide) {
+		if (level != null && !level.isClientSide()) {
 			onCraftingMatrixChanged();
 		}
 		setChanged();

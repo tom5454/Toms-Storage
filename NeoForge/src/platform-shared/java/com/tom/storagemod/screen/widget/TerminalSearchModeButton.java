@@ -25,8 +25,8 @@ public class TerminalSearchModeButton extends IconButton {
 		super(x, y, Component.translatable(""), ICON, handleClick(menu, canSync, sendUpdate));
 	}
 
-	private static OnPress handleClick(PopupMenuManager menu, boolean canSync, Runnable sendUpdate) {
-		return b0 -> {
+	private static ButtonPressHandler handleClick(PopupMenuManager menu, boolean canSync, Runnable sendUpdate) {
+		return (b0, ev) -> {
 			TerminalSearchModeButton b = (TerminalSearchModeButton) b0;
 			String sh = IAutoFillTerminal.getHandlerNameOr(I18n.get("tooltip.toms_storage.recipe_book"));
 			menu.open(b.getX() + 16, b.getY() + 16,

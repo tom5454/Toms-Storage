@@ -62,7 +62,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 	public static InteractionResult activateTerminal(Level worldIn, ItemStack stack, Player playerIn, InteractionHand handIn) {
 		WorldPos pos = stack.get(Content.boundPosComponent.get());
 		if(pos != null) {
-			if(!worldIn.isClientSide) {
+			if(!worldIn.isClientSide()) {
 				int x = pos.pos().getX();
 				int y = pos.pos().getY();
 				int z = pos.pos().getZ();
@@ -89,7 +89,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 	@Override
 	public InteractionResult useOn(UseOnContext c) {
 		if(c.isSecondaryUseActive()) {
-			if(!c.getLevel().isClientSide) {
+			if(!c.getLevel().isClientSide()) {
 				BlockPos pos = c.getClickedPos();
 				BlockState state = c.getLevel().getBlockState(pos);
 				if(state.is(StorageTags.REMOTE_ACTIVATE)) {

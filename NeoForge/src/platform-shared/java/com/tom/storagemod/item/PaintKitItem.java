@@ -40,7 +40,7 @@ public class PaintKitItem extends Item {
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		if(!context.getLevel().isClientSide) {
+		if(!context.getLevel().isClientSide()) {
 			if(context.isSecondaryUseActive()) {
 				BlockState state = context.getLevel().getBlockState(context.getClickedPos());
 				BlockEntity tile = context.getLevel().getBlockEntity(context.getClickedPos());

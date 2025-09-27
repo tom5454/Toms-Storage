@@ -281,7 +281,7 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 			BlockHitResult hit) {
 		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
 		if (blockEntity_1 instanceof InventoryCableConnectorBlockEntity be && be.hasBeacon()) {
-			if (world.isClientSide) {
+			if (world.isClientSide()) {
 				return InteractionResult.SUCCESS;
 			}
 
@@ -311,7 +311,7 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
 			@Nullable Orientation orientation, boolean bl) {
 		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
 			n.markNodeInvalid(blockPos);
 			if (orientation != null) {

@@ -28,7 +28,7 @@ public class InventoryProxyBlockEntity extends PaintedBlockEntity implements IIn
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(AbstractInventoryHopperBlock.FACING);
 			block.onLoad(level, worldPosition.relative(facing), facing.getOpposite(), this);

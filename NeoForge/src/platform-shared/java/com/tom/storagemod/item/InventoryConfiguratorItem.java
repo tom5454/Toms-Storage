@@ -40,7 +40,7 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 	@Override
 	public InteractionResult onRightClick(Player player, ItemStack stack, BlockPos pos, InteractionHand hand) {
 		//Right click
-		if (!player.level().isClientSide)
+		if (!player.level().isClientSide())
 			action(player.level(), player, stack, true, pos, hand);
 		return InteractionResult.SUCCESS;
 	}
@@ -54,7 +54,7 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 	@Override
 	public boolean onLeftClick(ItemStack itemstack, BlockPos pos, Player player) {
 		//Left Click
-		if (!player.level().isClientSide)
+		if (!player.level().isClientSide())
 			action(player.level(), player, itemstack, false, pos, InteractionHand.MAIN_HAND);
 		return true;
 	}

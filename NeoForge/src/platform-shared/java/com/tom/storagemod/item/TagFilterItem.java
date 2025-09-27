@@ -6,8 +6,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
@@ -27,6 +25,7 @@ import com.tom.storagemod.inventory.filter.ItemFilter;
 import com.tom.storagemod.inventory.filter.TagFilter;
 import com.tom.storagemod.menu.TagItemFilterMenu;
 import com.tom.storagemod.util.BlockFaceReference;
+import com.tom.storagemod.util.KeyUtil;
 
 public class TagFilterItem extends Item implements IItemFilter {
 
@@ -38,7 +37,7 @@ public class TagFilterItem extends Item implements IItemFilter {
 	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, TooltipDisplay p_399753_,
 			Consumer<Component> tooltip, TooltipFlag tooltipFlag) {
 		ClientUtil.tooltip("tag_item_filter", tooltip);
-		if(Screen.hasControlDown()) {
+		if(KeyUtil.hasControlDown()) {
 			tooltip.accept(Component.translatable("tooltip.toms_storage.item_filter.contents"));
 			TagFilterComponent c = itemStack.get(Content.tagFilterComponent.get());
 			boolean allow = false;
@@ -56,7 +55,7 @@ public class TagFilterItem extends Item implements IItemFilter {
 			}
 			tooltip.accept(Component.translatable(allow ? "tooltip.toms_storage.allowList" : "tooltip.toms_storage.denyList"));
 		} else {
-			tooltip.accept(Component.translatable("tooltip.toms_storage.hold_control_for_details", Minecraft.ON_OSX ? "CMD" : "CTRL").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+			tooltip.accept(Component.translatable("tooltip.toms_storage.hold_control_for_details", "CTRL").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
 		}
 	}
 

@@ -58,7 +58,7 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
 			block.onLoad(level, worldPosition.relative(facing), facing.getOpposite(), this);

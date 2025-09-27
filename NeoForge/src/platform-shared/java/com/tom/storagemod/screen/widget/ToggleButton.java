@@ -64,8 +64,8 @@ public class ToggleButton extends IconButton {
 		return state ? iconOn : icon;
 	}
 
-	private static OnPress onPress(BooleanConsumer stateUpdate) {
-		return b -> stateUpdate.accept(!((ToggleButton)b).state);
+	private static ButtonPressHandler onPress(BooleanConsumer stateUpdate) {
+		return (b, ev) -> stateUpdate.accept(!((ToggleButton)b).state);
 	}
 
 	@Override

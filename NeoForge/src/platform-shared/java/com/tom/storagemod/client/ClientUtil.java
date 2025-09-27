@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderType;
@@ -37,6 +36,7 @@ import com.tom.storagemod.block.IConfiguratorHighlight;
 import com.tom.storagemod.item.WirelessTerminalItem;
 import com.tom.storagemod.platform.Platform;
 import com.tom.storagemod.util.ComponentJoiner;
+import com.tom.storagemod.util.KeyUtil;
 
 public class ClientUtil {
 
@@ -45,7 +45,7 @@ public class ClientUtil {
 	}
 
 	public static void tooltip(String key, boolean addShift, Consumer<Component> tooltip, Object... args) {
-		if(Screen.hasShiftDown()) {
+		if(KeyUtil.hasShiftDown()) {
 			String[] sp = I18n.get("tooltip.toms_storage." + key, args).split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
 				tooltip.accept(Component.literal(sp[i]));

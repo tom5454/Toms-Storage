@@ -19,6 +19,7 @@ import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.menu.LevelEmitterMenu;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.screen.widget.ToggleButton;
+import com.tom.storagemod.util.KeyUtil;
 
 public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu> {
 	private static final ResourceLocation gui = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/level_emitter.png");
@@ -113,14 +114,14 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		}
 
 		private void evt(Button b) {
-			menu.count += hasShiftDown() ? sv : v;
+			menu.count += KeyUtil.hasShiftDown() ? sv : v;
 			if(menu.count < 0)menu.count = 0;
 			textF.setValue(Integer.toString(menu.count));
 			send();
 		}
 
 		private void update() {
-			if(hasShiftDown()) {
+			if(KeyUtil.hasShiftDown()) {
 				btn.setMessage(Component.literal((sv > 0 ? "+" : "") + sv));
 			} else {
 				btn.setMessage(Component.literal((v > 0 ? "+" : "") + v));

@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -56,7 +57,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 	}
 
 	public void preRender(int mouseX, int mouseY) {
-		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
+		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 
 		int k = this.getX() + 56;
 		int l = this.getY() - 1;
@@ -155,7 +156,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 		}
 
 		@Override
-		public void onPress() {
+		public void onPress(InputWithModifiers input) {
 			T id = getId();
 			if(id != null) {
 				selected = id;

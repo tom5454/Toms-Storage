@@ -34,7 +34,7 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float p_281873_) {
-		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
+		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 		int i = this.leftPos;
 		int j = this.topPos;
 		int k = i + 174;

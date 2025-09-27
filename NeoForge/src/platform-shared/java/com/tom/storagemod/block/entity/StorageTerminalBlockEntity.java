@@ -62,7 +62,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			BlockState st = level.getBlockState(worldPosition);
 			Direction d = st.getValue(AbstractStorageTerminalBlock.FACING);
 			TerminalPos p = st.getValue(AbstractStorageTerminalBlock.TERMINAL_POS);

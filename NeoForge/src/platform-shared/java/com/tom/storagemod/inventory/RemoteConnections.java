@@ -127,7 +127,7 @@ public class RemoteConnections extends SavedData {
 	public UUID makeChannel(String name, boolean isPublic, Player owner) {
 		UUID id = UUID.randomUUID();
 		if(name.isEmpty() || name.length() > 50)name = "Channel " + System.currentTimeMillis();
-		connections.put(id, new Channel(owner.getGameProfile().getId(), owner.getGameProfile().getName(), isPublic, name));
+		connections.put(id, new Channel(owner.getGameProfile().id(), owner.getGameProfile().name(), isPublic, name));
 		setDirty();
 		return id;
 	}

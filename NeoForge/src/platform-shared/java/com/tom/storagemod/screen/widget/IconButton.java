@@ -3,6 +3,7 @@ package com.tom.storagemod.screen.widget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,11 +19,21 @@ public class IconButton extends Button {
 
 	protected Component name;
 	protected ResourceLocation icon;
+	protected ButtonPressHandler pressable;
 
-	public IconButton(int x, int y, Component name, ResourceLocation icon, OnPress pressable) {
-		super(x, y, 16, 16, Component.empty(), pressable, Button.DEFAULT_NARRATION);
+	public IconButton(int x, int y, Component name, ResourceLocation icon, ButtonPressHandler pressable) {
+		super(x, y, 16, 16, Component.empty(), null, Button.DEFAULT_NARRATION);
 		this.name = name;
 		this.icon = icon;
+		this.pressable = pressable;
+	}
+
+	public IconButton(int x, int y, Component name, ResourceLocation icon, Runnable pressable) {
+		this(x, y, name, icon, onPressRunnable(pressable));
+	}
+
+	private static ButtonPressHandler onPressRunnable(Runnable pressable) {
+		return (b, ev) -> pressable.run();
 	}
 
 	/**
@@ -45,5 +56,15 @@ public class IconButton extends Button {
 
 	public ResourceLocation getIcon() {
 		return icon;
+	}
+
+	@Override
+	public void onPress(InputWithModifiers inputWithModifiers) {
+		pressable.onPress(this, inputWithModifiers);
+	}
+
+	@FunctionalInterface
+	public static interface ButtonPressHandler {
+		void onPress(IconButton button, InputWithModifiers inputWithModifiers);
 	}
 }

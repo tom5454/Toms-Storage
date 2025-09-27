@@ -140,7 +140,7 @@ public class LevelEmitterBlockEntity extends PlatformBlockEntity implements Tick
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(BlockStateProperties.FACING);
 			topCache.onLoad(level, worldPosition.relative(facing.getOpposite()), facing, this);

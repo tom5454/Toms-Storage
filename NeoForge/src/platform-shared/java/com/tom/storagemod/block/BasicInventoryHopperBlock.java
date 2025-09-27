@@ -34,7 +34,7 @@ public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
 	protected InteractionResult useItemOn(ItemStack is, BlockState state, Level world,
 			BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (is.isEmpty())return InteractionResult.TRY_WITH_EMPTY_HAND;
-		if(!world.isClientSide) {
+		if(!world.isClientSide()) {
 			BlockEntity te = world.getBlockEntity(pos);
 			if(te instanceof BasicInventoryHopperBlockEntity h) {
 				if(!h.getFilter().isEmpty() && h.getFilter().getItem() instanceof IItemFilter) {
@@ -54,7 +54,7 @@ public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
 			BlockHitResult hit) {
-		if(!world.isClientSide) {
+		if(!world.isClientSide()) {
 			BlockEntity te = world.getBlockEntity(pos);
 			if(te instanceof BasicInventoryHopperBlockEntity h) {
 				if(player.isShiftKeyDown()) {

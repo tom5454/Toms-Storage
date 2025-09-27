@@ -21,6 +21,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.component.DataComponentPatch;
@@ -64,6 +67,7 @@ import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.ComponentJoiner;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
+import com.tom.storagemod.util.KeyUtil;
 import com.tom.storagemod.util.NumberFormatUtil;
 import com.tom.storagemod.util.PopupMenuManager;
 import com.tom.storagemod.util.TerminalSyncManager.SlotAction;
@@ -374,7 +378,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	@Override
 	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
-		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
+		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 		int i = this.leftPos;
 		int j = this.topPos;
 		int k = i + 174;
@@ -382,7 +386,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		int i1 = k + 14;
 		int j1 = l + rowCount * 18;
 
-		if(ghostItems && hasShiftDown()) {
+		if(ghostItems && KeyUtil.hasShiftDown()) {
 			if(!menu.noSort) {
 				List<StoredItemStack> list = getMenu().itemListClientSorted;
 				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();
@@ -537,47 +541,48 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	}
 
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-		if (popup.mouseClick(mouseX, mouseY, mouseButton))return true;
+	public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
+		if (popup.mouseClick(mouseButtonEvent))return true;
+		int mouseButton = mouseButtonEvent.button();
 		if (slotIDUnderMouse > -1) {
-			if (isPullOne(mouseButton)) {
+			if (isPullOne(mouseButtonEvent)) {
 				if (getMenu().getSlotByID(slotIDUnderMouse).stack != null && getMenu().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
-					storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, SlotAction.PULL_ONE, isTransferOne(mouseButton));
+					storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, SlotAction.PULL_ONE, isTransferOne(mouseButtonEvent));
 					return true;
 				}
 				return true;
-			} else if (pullHalf(mouseButton)) {
+			} else if (pullHalf(mouseButtonEvent)) {
 				if (!menu.getCarried().isEmpty()) {
-					storageSlotClick(null, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, false);
+					storageSlotClick(null, mouseButtonEvent.hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, false);
 				} else {
 					if (getMenu().getSlotByID(slotIDUnderMouse).stack != null && getMenu().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
-						storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, false);
+						storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, mouseButtonEvent.hasControlDown() ? SlotAction.GET_QUARTER : SlotAction.GET_HALF, false);
 						return true;
 					}
 				}
-			} else if (pullNormal(mouseButton)) {
+			} else if (pullNormal(mouseButtonEvent)) {
 				if (!menu.getCarried().isEmpty()) {
 					storageSlotClick(null, SlotAction.PULL_OR_PUSH_STACK, false);
 				} else {
 					if (getMenu().getSlotByID(slotIDUnderMouse).stack != null) {
 						if (getMenu().getSlotByID(slotIDUnderMouse).stack.getQuantity() > 0) {
-							storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK, false);
+							storageSlotClick(getMenu().getSlotByID(slotIDUnderMouse).stack, mouseButtonEvent.hasShiftDown() ? SlotAction.SHIFT_PULL : SlotAction.PULL_OR_PUSH_STACK, false);
 							return true;
 						}
 					}
 				}
 			}
-		} else if (GLFW.glfwGetKey(minecraft.getWindow().getWindow(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
+		} else if (GLFW.glfwGetKey(minecraft.getWindow().handle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
 			storageSlotClick(null, SlotAction.SPACE_CLICK, false);
 		} else {
-			if (isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseX, mouseY)) {
+			if (isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseButtonEvent.x(), mouseButtonEvent.y())) {
 				if(mouseButton == 1)
 					searchField.setValue("");
 				else
-					return super.mouseClicked(mouseX, mouseY, mouseButton);
+					return super.mouseClicked(mouseButtonEvent, bl);
 			} else {
 				searchField.setFocused(false);
-				return super.mouseClicked(mouseX, mouseY, mouseButton);
+				return super.mouseClicked(mouseButtonEvent, bl);
 			}
 		}
 		return true;
@@ -587,51 +592,51 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		menu.sync.sendInteract(slotStack, act, mod);
 	}
 
-	public boolean isPullOne(int mouseButton) {
+	public boolean isPullOne(MouseButtonEvent mouseButtonEvent) {
 		switch (ctrlm()) {
 		case AE:
-			return mouseButton == 1 && hasShiftDown();
+			return mouseButtonEvent.button() == 1 && mouseButtonEvent.hasShiftDown();
 		case RS:
-			return mouseButton == 2;
+			return mouseButtonEvent.button() == 2;
 		case DEF:
-			return mouseButton == 1 && !menu.getCarried().isEmpty();
+			return mouseButtonEvent.button() == 1 && !menu.getCarried().isEmpty();
 		default:
 			return false;
 		}
 	}
 
-	public boolean isTransferOne(int mouseButton) {
+	public boolean isTransferOne(MouseButtonEvent mouseButtonEvent) {
 		switch (ctrlm()) {
 		case AE:
-			return hasShiftDown() && hasControlDown();//not in AE
+			return mouseButtonEvent.hasShiftDown() && mouseButtonEvent.hasControlDown();//not in AE
 		case RS:
-			return hasShiftDown() && mouseButton == 2;
+			return mouseButtonEvent.hasShiftDown() && mouseButtonEvent.button() == 2;
 		case DEF:
-			return mouseButton == 1 && hasShiftDown();
+			return mouseButtonEvent.button() == 1 && mouseButtonEvent.hasShiftDown();
 		default:
 			return false;
 		}
 	}
 
-	public boolean pullHalf(int mouseButton) {
+	public boolean pullHalf(MouseButtonEvent mouseButtonEvent) {
 		switch (ctrlm()) {
 		case AE:
-			return mouseButton == 1;
+			return mouseButtonEvent.button() == 1;
 		case RS:
-			return mouseButton == 1;
+			return mouseButtonEvent.button() == 1;
 		case DEF:
-			return mouseButton == 1 && menu.getCarried().isEmpty();
+			return mouseButtonEvent.button() == 1 && menu.getCarried().isEmpty();
 		default:
 			return false;
 		}
 	}
 
-	public boolean pullNormal(int mouseButton) {
+	public boolean pullNormal(MouseButtonEvent mouseButtonEvent) {
 		switch (ctrlm()) {
 		case AE:
 		case RS:
 		case DEF:
-			return mouseButton == 0;
+			return mouseButtonEvent.button() == 0;
 		default:
 			return false;
 		}
@@ -647,24 +652,24 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	}
 
 	@Override
-	public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-		if (popup.keyPressed(pKeyCode, pScanCode, pModifiers))return true;
-		if (pKeyCode == 256) {
+	public boolean keyPressed(KeyEvent event) {
+		if (popup.keyPressed(event))return true;
+		if (event.key() == 256) {
 			this.onClose();
 			return true;
 		}
-		if(pKeyCode == GLFW.GLFW_KEY_TAB)return super.keyPressed(pKeyCode, pScanCode, pModifiers);
-		if (this.searchField.keyPressed(pKeyCode, pScanCode, pModifiers) || this.searchField.canConsumeInput()) {
+		if(event.key() == GLFW.GLFW_KEY_TAB)return super.keyPressed(event);
+		if (this.searchField.keyPressed(event) || this.searchField.canConsumeInput()) {
 			return true;
 		}
-		return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+		return super.keyPressed(event);
 	}
 
 	@Override
-	public boolean charTyped(char pCodePoint, int pModifiers) {
-		if(popup.charTyped(pCodePoint, pModifiers))return true;
-		if(searchField.charTyped(pCodePoint, pModifiers))return true;
-		return super.charTyped(pCodePoint, pModifiers);
+	public boolean charTyped(CharacterEvent characterEvent) {
+		if(popup.charTyped(characterEvent))return true;
+		if(searchField.charTyped(characterEvent))return true;
+		return super.charTyped(characterEvent);
 	}
 
 	@Override

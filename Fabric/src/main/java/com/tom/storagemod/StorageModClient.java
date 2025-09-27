@@ -15,7 +15,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.pipeline.IrisPipelines;
@@ -32,7 +31,6 @@ import net.minecraft.world.level.storage.TagValueInput;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
@@ -105,14 +103,14 @@ public class StorageModClient implements ClientModInitializer {
 			return -1;
 		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get(), Content.invProxy.get());
 
-		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
+		/*WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
 			PoseStack ps = new PoseStack();
 			ps.pushPose();
 			ClientUtil.drawTerminalOutline(ps);
 			ClientUtil.drawConfiguratorOutline(ps);
 			ps.popPose();
 			return true;
-		});
+		});*/
 
 		ClientLoginNetworking.registerGlobalReceiver(StorageMod.id("config"), (mc, handler, buf, fc) -> {
 			Config read;
@@ -127,7 +125,7 @@ public class StorageModClient implements ClientModInitializer {
 			return CompletableFuture.completedFuture(PacketByteBufs.empty());
 		});
 
-		openTerm = new KeyMapping("key.toms_storage.open_terminal", InputConstants.KEY_B, KeyMapping.CATEGORY_GAMEPLAY);
+		openTerm = new KeyMapping("key.toms_storage.open_terminal", InputConstants.KEY_B, KeyMapping.Category.GAMEPLAY);
 		KeyBindingHelper.registerKeyBinding(openTerm);
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {

@@ -17,6 +17,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.UUIDUtil;
@@ -93,13 +95,13 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	protected void init() {
 		clearWidgets();
 		super.init();
-		createBtn = addRenderableWidget(new IconButton(leftPos + 121, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), b -> {
+		createBtn = addRenderableWidget(new IconButton(leftPos + 121, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), () -> {
 			String name = textF.getValue().trim();
 			if (!name.isEmpty()) {
 				sendEdit(null, new LinkChannel(publicBtn.getState(), name));
 			}
 		}));
-		deleteBtn = addRenderableWidget(new IconButton(leftPos + 138, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
+		deleteBtn = addRenderableWidget(new IconButton(leftPos + 138, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), () -> {
 			sendEdit(channelsList.getSelected(), null);
 		}));
 		publicBtn = addRenderableWidget(ToggleButton.builder(leftPos + 155, topPos + 24).
@@ -175,19 +177,19 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	}
 
 	@Override
-	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-		if (p_keyPressed_1_ == 256) {
+	public boolean keyPressed(KeyEvent keyEvent) {
+		if (keyEvent.key() == 256) {
 			this.onClose();
 			return true;
 		}
-		if(p_keyPressed_1_ == GLFW.GLFW_KEY_TAB)return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-		return !this.textF.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.textF.canConsumeInput() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
+		if(keyEvent.key() == GLFW.GLFW_KEY_TAB)return super.keyPressed(keyEvent);
+		return !this.textF.keyPressed(keyEvent) && !this.textF.canConsumeInput() ? super.keyPressed(keyEvent) : true;
 	}
 
 	@Override
-	public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
-		if(textF.charTyped(p_charTyped_1_, p_charTyped_2_))return true;
-		return super.charTyped(p_charTyped_1_, p_charTyped_2_);
+	public boolean charTyped(CharacterEvent characterEvent) {
+		if(textF.charTyped(characterEvent))return true;
+		return super.charTyped(characterEvent);
 	}
 
 	public class ListHandler extends ListWidget<LinkChannel> {

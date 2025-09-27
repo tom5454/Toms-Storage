@@ -56,7 +56,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		filterList = addRenderableWidget(new ListHandler(leftPos + 109, topPos + 15));
 		filterList.setList(() -> filterTags);
 
-		buttonAdd = addRenderableWidget(new IconButton(leftPos + 90, topPos + 14, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), b -> {
+		buttonAdd = addRenderableWidget(new IconButton(leftPos + 90, topPos + 14, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), () -> {
 			String sel = itemTagList.getSelected();
 			if(sel != null) {
 				if(!filterTags.contains(sel))
@@ -66,7 +66,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 			}
 		}));
 
-		buttonRemove = addRenderableWidget(new IconButton(leftPos + 90, topPos + 32, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
+		buttonRemove = addRenderableWidget(new IconButton(leftPos + 90, topPos + 32, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), () -> {
 			String sel = filterList.getSelected();
 			if(sel != null) {
 				filterTags.remove(sel);

@@ -68,7 +68,7 @@ public class InventoryConnectorBlock extends BaseEntityBlock implements IInvento
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player,
 			BlockHitResult hit) {
-		if(!worldIn.isClientSide) {
+		if(!worldIn.isClientSide()) {
 			BlockEntity tile = worldIn.getBlockEntity(pos);
 			if(tile instanceof InventoryConnectorBlockEntity) {
 				InventoryConnectorBlockEntity te = (InventoryConnectorBlockEntity) tile;
@@ -94,7 +94,7 @@ public class InventoryConnectorBlock extends BaseEntityBlock implements IInvento
 	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
 			@Nullable Orientation orientation, boolean bl) {
 		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
 			n.markNodeInvalid(blockPos);
 			if (orientation != null) {

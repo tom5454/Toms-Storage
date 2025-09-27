@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -69,12 +70,12 @@ public class LimitedContainer implements Container {
 	}
 
 	@Override
-	public void startOpen(Player pPlayer) {
+	public void startOpen(ContainerUser pPlayer) {
 		delegate.startOpen(pPlayer);
 	}
 
 	@Override
-	public void stopOpen(Player pPlayer) {
+	public void stopOpen(ContainerUser pPlayer) {
 		delegate.stopOpen(pPlayer);
 	}
 

@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -42,7 +41,7 @@ public class EnumCycleButton<T extends Enum<T>> extends IconButton {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T extends Enum<T>> OnPress onPress(T[] el, Consumer<T> stateUpdate) {
-		return b -> stateUpdate.accept(el[(((EnumCycleButton<T>) b).getState().ordinal() + el.length + (Screen.hasShiftDown() ? -1 : 1)) % el.length]);
+	private static <T extends Enum<T>> ButtonPressHandler onPress(T[] el, Consumer<T> stateUpdate) {
+		return (b, ev) -> stateUpdate.accept(el[(((EnumCycleButton<T>) b).getState().ordinal() + el.length + (ev.hasShiftDown() ? -1 : 1)) % el.length]);
 	}
 }

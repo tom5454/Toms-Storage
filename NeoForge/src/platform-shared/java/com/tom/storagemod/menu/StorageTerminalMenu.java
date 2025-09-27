@@ -249,7 +249,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 					StoredItemStack c = te.pushStack(new StoredItemStack(slotStack, slotStack.getCount()));
 					ItemStack itemstack = c != null ? c.getActualStack() : ItemStack.EMPTY;
 					slot.set(itemstack);
-					if (!playerIn.level().isClientSide)
+					if (!playerIn.level().isClientSide())
 						broadcastChanges();
 				}
 			} else {

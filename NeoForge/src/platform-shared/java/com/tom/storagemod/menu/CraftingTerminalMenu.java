@@ -100,7 +100,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		@Override
 		public void onTake(Player thePlayer, ItemStack stack) {
 			this.checkTakeAchievements(stack);
-			if (!pinv.player.level().isClientSide) {
+			if (!pinv.player.level().isClientSide()) {
 				((CraftingTerminalBlockEntity) te).craft(thePlayer);
 			}
 		}
@@ -152,7 +152,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 				if(te == null)return ItemStack.EMPTY;
 				ItemStack stack = ((CraftingTerminalBlockEntity) te).pushStack(itemstack);
 				slot.set(stack);
-				if (!playerIn.level().isClientSide)
+				if (!playerIn.level().isClientSide())
 					broadcastChanges();
 			}
 			slot.onTake(playerIn, itemstack1);

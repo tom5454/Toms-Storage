@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -40,12 +41,12 @@ public class InventoryConfiguratorScreen extends TSContainerScreen<InventoryConf
 			click(n.ordinal() << 3);
 		}));
 
-		buttonAddConnected = addRenderableWidget(new IconButton(leftPos - 18, topPos + 5 + 18, Component.translatable("narrator.toms_storage.add"), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), b -> {
+		buttonAddConnected = addRenderableWidget(new IconButton(leftPos - 18, topPos + 5 + 18, Component.translatable("narrator.toms_storage.add"), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), () -> {
 			click(1);
 		}));
 		buttonAddConnected.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.inv_config.add_connected")));
 
-		buttonRemoveAll = addRenderableWidget(new IconButton(leftPos - 18, topPos + 5 + 18 * 2, Component.translatable("narrator.toms_storage.removeAll"), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
+		buttonRemoveAll = addRenderableWidget(new IconButton(leftPos - 18, topPos + 5 + 18 * 2, Component.translatable("narrator.toms_storage.removeAll"), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), () -> {
 			click(2);
 		}));
 		buttonRemoveAll.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.inv_config.remove_all_connected")));
@@ -80,7 +81,7 @@ public class InventoryConfiguratorScreen extends TSContainerScreen<InventoryConf
 		buttonPriority.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.priority_" + s.name().toLowerCase(Locale.ROOT)));
 		buttonSide.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.side_" + s.name().toLowerCase(Locale.ROOT)));
 
-		buttonRemoveFilter = addRenderableWidget(new IconButton(leftPos + imageWidth - 22, topPos - 22, Component.translatable("narrator.toms_storage.removeFilter"), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), b -> {
+		buttonRemoveFilter = addRenderableWidget(new IconButton(leftPos + imageWidth - 22, topPos - 22, Component.translatable("narrator.toms_storage.removeFilter"), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), () -> {
 			click(7);
 		}));
 		buttonRemoveFilter.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.inv_config.remove_filter")));
@@ -109,12 +110,12 @@ public class InventoryConfiguratorScreen extends TSContainerScreen<InventoryConf
 	}
 
 	@Override
-	public boolean mouseClicked(double x, double y, int btn) {
-		if (btn == 1 && hoveredSlot instanceof ItemFilterSlot && hoveredSlot.getItem().getItem() instanceof IItemFilter) {
+	public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
+		if (mouseButtonEvent.button() == 1 && hoveredSlot instanceof ItemFilterSlot && hoveredSlot.getItem().getItem() instanceof IItemFilter) {
 			click((hoveredSlot.index << 3) | 6);
 			return true;
 		}
-		return super.mouseClicked(x, y, btn);
+		return super.mouseClicked(mouseButtonEvent, bl);
 	}
 
 	@Override

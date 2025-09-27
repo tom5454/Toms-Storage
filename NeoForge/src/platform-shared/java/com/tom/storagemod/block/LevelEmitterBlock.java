@@ -181,7 +181,7 @@ public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCabl
 	@Override
 	protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
 			BlockHitResult hit) {
-		if (world.isClientSide) {
+		if (world.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
 
@@ -207,7 +207,7 @@ public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCabl
 	protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block,
 			@Nullable Orientation orientation, boolean bl) {
 		super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			InventoryCableNetwork n = InventoryCableNetwork.getNetwork(level);
 			n.markNodeInvalid(blockPos);
 			if (orientation != null) {

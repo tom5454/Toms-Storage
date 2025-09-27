@@ -22,7 +22,7 @@ public abstract class AbstractInventoryHopperBlockEntity extends PlatformBlockEn
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		if (!level.isClientSide) {
+		if (!level.isClientSide()) {
 			BlockState state = level.getBlockState(worldPosition);
 			Direction facing = state.getValue(AbstractInventoryHopperBlock.FACING);
 			bottomCache.onLoad(level, worldPosition.relative(facing), facing.getOpposite(), this);

@@ -13,6 +13,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -53,11 +56,11 @@ public class PopupMenuManager {
 		return pMouseX >= pX - 1 && pMouseX < pX + pWidth + 1 && pMouseY >= pY - 1 && pMouseY < pY + pHeight + 1;
 	}
 
-	public boolean mouseClick(double pMouseX, double pMouseY, int pButton) {
+	public boolean mouseClick(MouseButtonEvent event) {
 		if(menu != null) {
 			for(int i = 0;i<menu.size();i++) {
-				if (isHovering(x, y + i*10, 100, 8, pMouseX, pMouseY)) {
-					menu.get(i).onClick(pMouseX - x, pMouseY - y - i * 10, pButton);
+				if (isHovering(x, y + i*10, 100, 8, event.x(), event.y())) {
+					menu.get(i).onClick(new MouseButtonEvent(event.x() - x, event.y() - y - i * 10, event.buttonInfo()));
 					selected = i;
 					return true;
 				}
@@ -68,16 +71,16 @@ public class PopupMenuManager {
 		return false;
 	}
 
-	public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+	public boolean keyPressed(KeyEvent event) {
 		if(menu != null) {
 			if (selected != -1) {
-				if(menu.get(selected).keyPressed(pKeyCode, pScanCode, pModifiers))return true;
+				if(menu.get(selected).keyPressed(event))return true;
 			}
-			if (pKeyCode == GLFW.GLFW_KEY_DOWN) {
+			if (event.key() == GLFW.GLFW_KEY_DOWN) {
 				selected = (selected + 1) % menu.size();
-			} else if (pKeyCode == GLFW.GLFW_KEY_UP) {
+			} else if (event.key() == GLFW.GLFW_KEY_UP) {
 				selected = (selected + menu.size() - 1) % menu.size();
-			} else if (pKeyCode == 256) {
+			} else if (event.key() == 256) {
 				menu = null;
 			}
 			return true;
@@ -85,27 +88,27 @@ public class PopupMenuManager {
 		return false;
 	}
 
-	public boolean charTyped(char pCodePoint, int pModifiers) {
-		return menu != null && selected != -1 && menu.get(selected).charTyped(pCodePoint, pModifiers);
+	public boolean charTyped(CharacterEvent characterEvent) {
+		return menu != null && selected != -1 && menu.get(selected).charTyped(characterEvent);
 	}
 
 	public static interface PopupElement {
 		MutableComponent getText();
 		void activate();
 
-		default void onClick(double pMouseX, double pMouseY, int pButton) {
+		default void onClick(MouseButtonEvent event) {
 			activate();
 		}
 
-		default boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-			if(pKeyCode == GLFW.GLFW_KEY_ENTER || pKeyCode == GLFW.GLFW_KEY_KP_ENTER) {
+		default boolean keyPressed(KeyEvent event) {
+			if(event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_KP_ENTER) {
 				activate();
 				return true;
 			}
 			return false;
 		}
 
-		default boolean charTyped(char pCodePoint, int pModifiers) {
+		default boolean charTyped(CharacterEvent characterEvent) {
 			return false;
 		}
 
@@ -171,20 +174,20 @@ public class PopupMenuManager {
 		}
 
 		@Override
-		public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-			if (activated && pKeyCode == 256) {
+		public boolean keyPressed(KeyEvent event) {
+			if (activated && event.key() == 256) {
 				box.setValue(value);
 				activated = false;
 				return true;
 			}
-			if(PopupElement.super.keyPressed(pKeyCode, pScanCode, pModifiers))return true;
-			if(activated)return box.keyPressed(pKeyCode, pScanCode, pModifiers);
+			if(PopupElement.super.keyPressed(event))return true;
+			if(activated)return box.keyPressed(event);
 			return false;
 		}
 
 		@Override
-		public boolean charTyped(char pCodePoint, int pModifiers) {
-			if(activated)return box.charTyped(pCodePoint, pModifiers);
+		public boolean charTyped(CharacterEvent characterEvent) {
+			if(activated)return box.charTyped(characterEvent);
 			return false;
 		}
 	}
