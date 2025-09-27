@@ -87,7 +87,6 @@ public class InventoryConfiguratorScreen extends PlatformContainerScreen<Invento
 
 	@Override
 	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
 		buttonPriority.setState(menu.priority);
 		buttonSide.setState(menu.side);
 		buttonSkip.setState(menu.skip);
