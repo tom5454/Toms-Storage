@@ -1,9 +1,5 @@
 package com.tom.storagemod.inventory;
 
-import java.util.Comparator;
-import java.util.function.Function;
-
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
@@ -11,6 +7,7 @@ public class StoredItemStack {
 	private long count;
 	private int hash;
 	private boolean hashZero;
+	private String displayNameCache;
 
 	public StoredItemStack(ItemStack stack, long count) {
 		this.stack = stack;
@@ -51,119 +48,6 @@ public class StoredItemStack {
 		return s;
 	}
 
-	public static class ComparatorAmount implements IStoredItemStackComparator {
-		public boolean reversed;
-
-		public ComparatorAmount(boolean reversed) {
-			this.reversed = reversed;
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getHoverName().getString().compareTo(in2.getStack().getHoverName().getString()) : -1);
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		@Override
-		public int type() {
-			return 0;
-		}
-
-		@Override
-		public void setReversed(boolean rev) {
-			reversed  = rev;
-		}
-	}
-
-	public static class ComparatorName implements IStoredItemStackComparator {
-		public boolean reversed;
-
-		public ComparatorName(boolean reversed) {
-			this.reversed = reversed;
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			int c = in1.getDisplayName().compareTo(in2.getDisplayName());
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		@Override
-		public int type() {
-			return 1;
-		}
-
-		@Override
-		public void setReversed(boolean rev) {
-			reversed = rev;
-		}
-	}
-
-	public static class ComparatorModName implements IStoredItemStackComparator {
-		public boolean reversed;
-
-		public ComparatorModName(boolean reversed) {
-			this.reversed = reversed;
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			String m1 = BuiltInRegistries.ITEM.getKey(in1.getStack().getItem()).getNamespace();
-			String m2 = BuiltInRegistries.ITEM.getKey(in2.getStack().getItem()).getNamespace();
-			int c1 = m1.compareTo(m2);
-			int c2 = in1.getDisplayName().compareTo(in2.getDisplayName());
-			int c = c1 == 0 ? c2 : c1;
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		@Override
-		public void setReversed(boolean rev) {
-			reversed = rev;
-		}
-
-		@Override
-		public int type() {
-			return 2;
-		}
-	}
-
-	public static interface IStoredItemStackComparator extends Comparator<StoredItemStack> {
-		boolean isReversed();
-		void setReversed(boolean rev);
-		int type();
-	}
-
-	public static enum SortingTypes {
-		AMOUNT(ComparatorAmount::new),
-		NAME(ComparatorName::new),
-		BY_MOD(ComparatorModName::new),
-		;
-		public static final SortingTypes[] VALUES = values();
-		private final Function<Boolean, IStoredItemStackComparator> factory;
-		private SortingTypes(Function<Boolean, IStoredItemStackComparator> factory) {
-			this.factory = factory;
-		}
-
-		public IStoredItemStackComparator create(boolean rev) {
-			return factory.apply(rev);
-		}
-	}
-
 	@Override
 	public int hashCode() {
 		if(hash == 0 && !hashZero) {
@@ -179,7 +63,9 @@ public class StoredItemStack {
 	}
 
 	public String getDisplayName() {
-		return stack.getHoverName().getString();
+		if (displayNameCache == null)
+			displayNameCache = stack.getHoverName().getString();
+		return displayNameCache;
 	}
 
 	@Override
