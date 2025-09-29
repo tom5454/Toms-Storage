@@ -133,10 +133,10 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.21.0.247"
-    compileOnly "mezz.jei:jei-1.21.1-common-api:19.21.0.247"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.22.0.315"
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.22.0.315"
     // at runtime, use the full JEI jar
-  	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.247"
+  	runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.22.0.315"
   		
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:16.0.799"
 	compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:16.0.799"

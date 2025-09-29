@@ -52,9 +52,9 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.StoredItemStack;
-import com.tom.storagemod.inventory.StoredItemStack.ComparatorAmount;
-import com.tom.storagemod.inventory.StoredItemStack.SortingTypes;
-import com.tom.storagemod.inventory.StoredItemStack.StoredItemStackComparator;
+import com.tom.storagemod.inventory.sorting.ComparatorAmount;
+import com.tom.storagemod.inventory.sorting.IStoredItemStackComparator;
+import com.tom.storagemod.inventory.sorting.SortingTypes;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;
 import com.tom.storagemod.screen.widget.EnumCycleButton;
@@ -160,7 +160,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected void sendUpdate() {
 		CompoundTag c = new CompoundTag();
 		int sort = 0;
-		sort |= (comparator.type() & 0xFF);
+		sort |= (comparator.type().ordinal() & 0xFF);
 		sort |= (comparator.isReversed() ? 0x100 : 0);
 		sort |= (ghostItems ? 0 : 0x200);
 		c.putInt("s", sort);
@@ -309,7 +309,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						if (m == null)continue;
 						p = p.and(is -> {
 							try {
-								String dspName = is.getStack().getHoverName().getString();
+								String dspName = is.getDisplayName();
 								if (m.matcher(dspName.toLowerCase()).find()) {
 									return true;
 								}
@@ -381,7 +381,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		int i1 = k + 14;
 		int j1 = l + rowCount * 18;
 
-		if(ghostItems && hasShiftDown()) {
+		if(menu.itemsLoaded && ghostItems && hasShiftDown()) {
 			if(!menu.noSort) {
 				List<StoredItemStack> list = getMenu().itemListClientSorted;
 				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();

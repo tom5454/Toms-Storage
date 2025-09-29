@@ -1,9 +1,5 @@
 package com.tom.storagemod.inventory;
 
-import java.util.Comparator;
-import java.util.function.Function;
-
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
@@ -11,6 +7,7 @@ public class StoredItemStack {
 	private long count;
 	private int hash;
 	private boolean hashZero;
+	private String displayNameCache;
 
 	public StoredItemStack(ItemStack stack, long count) {
 		this.stack = stack;
@@ -51,174 +48,6 @@ public class StoredItemStack {
 		return s;
 	}
 
-	public static class ComparatorAmount extends StoredItemStackComparator {
-		public ComparatorAmount(boolean reversed) {
-			super(reversed);
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			int c = in2.getQuantity() > in1.getQuantity() ? 1 : (in1.getQuantity() == in2.getQuantity() ? in1.getStack().getHoverName().getString().compareTo(in2.getStack().getHoverName().getString()) : -1);
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public int type() {
-			return 0;
-		}
-	}
-
-	public static class ComparatorName extends StoredItemStackComparator {
-		public ComparatorName(boolean reversed) {
-			super(reversed);
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			int c = in1.getDisplayName().compareTo(in2.getDisplayName());
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public int type() {
-			return 1;
-		}
-	}
-
-	public static class ComparatorModName extends StoredItemStackComparator {
-		public ComparatorModName(boolean reversed) {
-			super(reversed);
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-			String m1 = BuiltInRegistries.ITEM.getKey(in1.getStack().getItem()).getNamespace();
-			String m2 = BuiltInRegistries.ITEM.getKey(in2.getStack().getItem()).getNamespace();
-			int c1 = m1.compareTo(m2);
-			int c2 = in1.getDisplayName().compareTo(in2.getDisplayName());
-			int c = c1 == 0 ? c2 : c1;
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public int type() {
-			return 2;
-		}
-	}
-
-  /**
-   * Space efficiency is defined as the ability to store more items in the same number of slots.
-   * 
-   * If I'm able to store 256 stone in 4 stacks, but I need 16 stacks for the same number of ender pearls,
-   * then stone is more space-efficient.
-   */
-	public static class ComparatorSpaceEfficiency extends StoredItemStackComparator {
-		public ComparatorSpaceEfficiency(boolean reversed) {
-			super(reversed);
-		}
-
-		@Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-      // Fewer stacks = better
-			int stackCount = -Long.compare(in1.getStackCount(), in2.getStackCount());
-      // More items = better
-			int itemCount = Long.compare(in1.getQuantity(), in2.getQuantity());
-      // Larger stacks = better
-			int stackSize = Long.compare(in1.getMaxStackSize(), in2.getMaxStackSize());
-      int c = Integer.compare(Integer.compare(stackCount, itemCount), stackSize);
-			return this.reversed ? -c : c;
-		}
-
-		@Override
-		public int type() {
-			return 3;
-		}
-	}
-  
-	public static class ComparatorID extends StoredItemStackComparator {
-		public ComparatorID(boolean reversed) {
-      super(reversed);
-    }
-
-    @Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-      int c = in1.getStack().getDescriptionId().compareToIgnoreCase(in2.getStack().getDescriptionId());
-      return reversed ? -c : c;
-		}
-
-		@Override
-		public int type() {
-			return 4;
-		}
-	}
-  
-	public static class ComparatorType extends StoredItemStackComparator {
-		public ComparatorType(boolean reversed) {
-      super(reversed);
-    }
-
-    @Override
-		public int compare(StoredItemStack in1, StoredItemStack in2) {
-        String descriptionId1 = in1.getStack().getDescriptionId();
-        String descriptionId2 = in2.getStack().getDescriptionId();
-
-        String[] parts1 = descriptionId1.split("\\.");
-        String[] parts2 = descriptionId2.split("\\.");
-
-        int c = 0;
-        for (int i = 0; i < 3; i++) {
-            c = parts1[i].compareToIgnoreCase(parts2[i]);
-            if (c != 0) {
-                break;
-            }
-        }
-
-        return reversed ? -c : c;
-		}
-
-		@Override
-		public int type() {
-			return 5;
-		}
-	}
-
-	public static abstract class StoredItemStackComparator implements Comparator<StoredItemStack> {
-		public boolean reversed;
-
-    public StoredItemStackComparator(boolean reversed) {
-      this.reversed = reversed;
-    }
-
-		public boolean isReversed() {
-			return reversed;
-		}
-
-		public void setReversed(boolean rev) {
-			reversed = rev;
-		}
-
-		abstract public int type();
-	}
-
-	public static enum SortingTypes {
-		AMOUNT(ComparatorAmount::new),
-		NAME(ComparatorName::new),
-		BY_MOD(ComparatorModName::new),
-		SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
-		ID(ComparatorID::new),
-		Type(ComparatorType::new),
-		;
-		public static final SortingTypes[] VALUES = values();
-		private final Function<Boolean, StoredItemStackComparator> factory;
-		private SortingTypes(Function<Boolean, StoredItemStackComparator> factory) {
-			this.factory = factory;
-		}
-
-		public StoredItemStackComparator create(boolean rev) {
-			return factory.apply(rev);
-		}
-	}
-
 	@Override
 	public int hashCode() {
 		if(hash == 0 && !hashZero) {
@@ -234,7 +63,9 @@ public class StoredItemStack {
 	}
 
 	public String getDisplayName() {
-		return stack.getHoverName().getString();
+		if (displayNameCache == null)
+			displayNameCache = stack.getHoverName().getString();
+		return displayNameCache;
 	}
 
 	@Override

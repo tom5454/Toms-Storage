@@ -51,6 +51,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	public int slotCount, freeCount;
 	public String search;
 	public boolean noSort;
+	public boolean itemsLoaded = false;
 	public Slot offhand;
 
 	public StorageTerminalMenu(int id, Inventory inv, StorageTerminalBlockEntity te) {
@@ -237,6 +238,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 			} else {
 				itemListClient = new ArrayList<>(itemList);
 			}
+			itemsLoaded = true;
 			pinv.setChanged();
 		}
 		if(message.contains("s"))

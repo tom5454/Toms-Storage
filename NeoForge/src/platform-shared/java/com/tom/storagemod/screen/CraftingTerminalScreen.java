@@ -58,7 +58,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		imageWidth = 194;
 		imageHeight = 256;
 		super.init();
-		this.widthTooNarrow = this.width < 379 || true;
+		this.widthTooNarrow = this.width < 379;
 		this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
 		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
 		addWidget(recipeBookGui);
