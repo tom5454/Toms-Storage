@@ -6,14 +6,17 @@ public enum SortingTypes {
 	AMOUNT(ComparatorAmount::new),
 	NAME(ComparatorName::new),
 	BY_MOD(ComparatorModName::new),
+	SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
+	ID(ComparatorID::new),
+	TYPE(ComparatorType::new),
 	;
 	public static final SortingTypes[] VALUES = values();
-	private final Function<Boolean, IStoredItemStackComparator> factory;
-	private SortingTypes(Function<Boolean, IStoredItemStackComparator> factory) {
+	private final Function<Boolean, StoredItemStackComparator> factory;
+	private SortingTypes(Function<Boolean, StoredItemStackComparator> factory) {
 		this.factory = factory;
 	}
 
-	public IStoredItemStackComparator create(boolean rev) {
+	public StoredItemStackComparator create(boolean rev) {
 		return factory.apply(rev);
 	}
 }

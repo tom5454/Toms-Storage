@@ -4,11 +4,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 
-public class ComparatorModName implements IStoredItemStackComparator {
-	public boolean reversed;
-
+public class ComparatorModName extends StoredItemStackComparator {
 	public ComparatorModName(boolean reversed) {
-		this.reversed = reversed;
+		super(reversed);
 	}
 
 	@Override
@@ -19,16 +17,6 @@ public class ComparatorModName implements IStoredItemStackComparator {
 		int c2 = in1.getDisplayName().compareTo(in2.getDisplayName());
 		int c = c1 == 0 ? c2 : c1;
 		return this.reversed ? -c : c;
-	}
-
-	@Override
-	public boolean isReversed() {
-		return reversed;
-	}
-
-	@Override
-	public void setReversed(boolean rev) {
-		reversed = rev;
 	}
 
 	@Override

@@ -53,7 +53,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.inventory.sorting.ComparatorAmount;
-import com.tom.storagemod.inventory.sorting.IStoredItemStackComparator;
+import com.tom.storagemod.inventory.sorting.StoredItemStackComparator;
 import com.tom.storagemod.inventory.sorting.SortingTypes;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;

@@ -2,11 +2,9 @@ package com.tom.storagemod.inventory.sorting;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 
-public class ComparatorAmount implements IStoredItemStackComparator {
-	public boolean reversed;
-
+public class ComparatorAmount extends StoredItemStackComparator {
 	public ComparatorAmount(boolean reversed) {
-		this.reversed = reversed;
+		super(reversed);
 	}
 
 	@Override
@@ -16,17 +14,7 @@ public class ComparatorAmount implements IStoredItemStackComparator {
 	}
 
 	@Override
-	public boolean isReversed() {
-		return reversed;
-	}
-
-	@Override
 	public SortingTypes type() {
 		return SortingTypes.AMOUNT;
-	}
-
-	@Override
-	public void setReversed(boolean rev) {
-		reversed  = rev;
 	}
 }
