@@ -1,5 +1,6 @@
 package com.tom.storagemod.inventory;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
@@ -7,7 +8,10 @@ public class StoredItemStack {
 	private long count;
 	private int hash;
 	private boolean hashZero;
+
 	private String displayNameCache;
+	private String descriptionIdCache;
+	private String namespaceCache;
 
 	public StoredItemStack(ItemStack stack, long count) {
 		this.stack = stack;
@@ -66,6 +70,22 @@ public class StoredItemStack {
 		if (displayNameCache == null)
 			displayNameCache = stack.getHoverName().getString();
 		return displayNameCache;
+	}
+
+	public String getDescriptionId() {
+		if (descriptionIdCache == null) {
+			descriptionIdCache = stack.getDescriptionId();
+		}
+
+		return descriptionIdCache;
+	}
+
+	public String getNamespace() {
+		if (namespaceCache == null) {
+			namespaceCache = BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace();
+		}
+
+		return namespaceCache;
 	}
 
 	@Override

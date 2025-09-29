@@ -7,11 +7,8 @@ import com.tom.storagemod.inventory.StoredItemStack;
 public class ComparatorType implements Comparator<StoredItemStack> {
   @Override
   public int compare(StoredItemStack in1, StoredItemStack in2) {
-    String descriptionId1 = in1.getStack().getDescriptionId();
-    String descriptionId2 = in2.getStack().getDescriptionId();
-
-    String[] parts1 = descriptionId1.split("\\.");
-    String[] parts2 = descriptionId2.split("\\.");
+    String[] parts1 = in1.getDescriptionId().split("\\.");
+    String[] parts2 = in2.getDescriptionId().split("\\.");
 
     int c = 0;
     for (int i = 0; i < 3; i++) {
