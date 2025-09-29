@@ -10,16 +10,11 @@ public class ComparatorType implements Comparator<StoredItemStack> {
     String[] parts1 = in1.getDescriptionId().split("\\.");
     String[] parts2 = in2.getDescriptionId().split("\\.");
 
-    int c = 0;
     for (int i = 0; i < 3; i++) {
-      c = parts1[i].compareToIgnoreCase(parts2[i]);
-      if (c == 0) {
-        continue;
-      }
-
-      break;
+      int c = parts1[i].compareToIgnoreCase(parts2[i]);
+      if (c != 0) return c;
     }
 
-    return c;
+    return 0;
   }
 }
