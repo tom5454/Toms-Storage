@@ -1,6 +1,9 @@
 package com.tom.storagemod.inventory.sorting;
 
-import java.util.function.Function;
+import java.util.Comparator;
+import java.util.function.Supplier;
+
+import com.tom.storagemod.inventory.StoredItemStack;
 
 public enum SortingTypes {
 	AMOUNT(ComparatorAmount::new),
@@ -10,13 +13,15 @@ public enum SortingTypes {
 	ID(ComparatorID::new),
 	TYPE(ComparatorType::new),
 	;
+
 	public static final SortingTypes[] VALUES = values();
-	private final Function<Boolean, StoredItemStackComparator> factory;
-	private SortingTypes(Function<Boolean, StoredItemStackComparator> factory) {
+	private final Supplier<Comparator<StoredItemStack>> factory;
+
+	private SortingTypes(Supplier<Comparator<StoredItemStack>> factory) {
 		this.factory = factory;
 	}
 
-	public StoredItemStackComparator create(boolean rev) {
-		return factory.apply(rev);
+	public Comparator<StoredItemStack> create(boolean reversed) {
+		return reversed ? factory.get().reversed() : factory.get();
 	}
 }
