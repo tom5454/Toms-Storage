@@ -5,7 +5,7 @@ import java.util.Comparator;
 import com.tom.storagemod.inventory.StoredItemStack;
 
 /**
- * Space efficiency is defined as the ability to store more items in the same number of slots.
+ * Space efficiency is defined as the ability to store more items in fewer slots.
  * 
  * If I'm able to store 256 stone in 4 stacks, but I need 16 stacks for the same number of ender pearls,
  * then stone is more space-efficient.

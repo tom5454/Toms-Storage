@@ -8,7 +8,7 @@ import com.tom.storagemod.inventory.StoredItemStack;
 public enum SortingTypes {
 	AMOUNT(ComparatorAmount::new),
 	NAME(ComparatorName::new),
-	BY_MOD(ComparatorModName::new),
+	MOD(ComparatorMod::new),
 	SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
 	ID(ComparatorID::new),
 	TYPE(ComparatorType::new),

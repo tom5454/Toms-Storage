@@ -6,7 +6,7 @@ import java.util.Comparator;
 
 import com.tom.storagemod.inventory.StoredItemStack;
 
-public class ComparatorModName implements Comparator<StoredItemStack> {
+public class ComparatorMod implements Comparator<StoredItemStack> {
 	@Override
 	public int compare(StoredItemStack in1, StoredItemStack in2) {
 		String m1 = BuiltInRegistries.ITEM.getKey(in1.getStack().getItem()).getNamespace();
