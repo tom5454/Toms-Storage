@@ -133,9 +133,9 @@ public class StoredItemStack {
 	}
 
 	public long getStackCount() {
-    if (count == 0) {
-      return 0;
-    }
+		if (count == 0) {
+			return 0;
+		}
 
 		return (long) Math.ceil((double) count / stack.getMaxStackSize());
 	}

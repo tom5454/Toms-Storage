@@ -11,15 +11,15 @@ import com.tom.storagemod.inventory.StoredItemStack;
  * then stone is more space-efficient.
  */
 public class ComparatorSpaceEfficiency implements Comparator<StoredItemStack> {
-  @Override
-  public int compare(StoredItemStack in1, StoredItemStack in2) {
-    // Fewer stacks = better
-    int stackCount = -Long.compare(in1.getStackCount(), in2.getStackCount());
-    // More items = better
-    int itemCount = Long.compare(in1.getQuantity(), in2.getQuantity());
-    // Larger stacks = better
-    int stackSize = Long.compare(in1.getMaxStackSize(), in2.getMaxStackSize());
+	@Override
+	public int compare(StoredItemStack in1, StoredItemStack in2) {
+		// Fewer stacks = better
+		int stackCount = -Long.compare(in1.getStackCount(), in2.getStackCount());
+		// More items = better
+		int itemCount = Long.compare(in1.getQuantity(), in2.getQuantity());
+		// Larger stacks = better
+		int stackSize = Long.compare(in1.getMaxStackSize(), in2.getMaxStackSize());
 
-    return Integer.compare(Integer.compare(stackCount, itemCount), stackSize);
-  }
+		return Integer.compare(Integer.compare(stackCount, itemCount), stackSize);
+	}
 }
