@@ -52,8 +52,6 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.StoredItemStack;
-import com.tom.storagemod.inventory.sorting.ComparatorAmount;
-import com.tom.storagemod.inventory.sorting.IStoredItemStackComparator;
 import com.tom.storagemod.inventory.sorting.SortingTypes;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;
@@ -110,7 +108,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	private String searchLast = "";
 	protected boolean loadedSearch = false, ghostItems, tallMode;
 	public final int textureSlotCount, guiHeight, slotStartX, slotStartY;
-	private IStoredItemStackComparator comparator = new ComparatorAmount(false);
+	private SortingTypes sortingType = SortingTypes.AMOUNT;
+	private boolean reverseSort = false;
 	protected EnumCycleButton<SortingTypes> buttonSortingType;
 	protected EnumCycleButton<ControllMode> buttonCtrlMode;
 	protected TerminalSearchModeButton buttonSearchType;
@@ -129,9 +128,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	protected void onPacket() {
 		controllMode = (menu.modes & 0xF) % ControllMode.VALUES.length;
-		boolean rev = (menu.sorting & 0x100) > 0;
 		int type = menu.sorting & 0xFF;
-		comparator = SortingTypes.VALUES[type % SortingTypes.VALUES.length].create(rev);
+		sortingType = SortingTypes.VALUES[type];
+		reverseSort = (menu.sorting & 0x100) > 0;
 		int searchType = menu.searchType;
 		ghostItems = (menu.sorting & 0x200) == 0;
 		boolean tallMode  =  (menu.modes & 0x10) != 0;
@@ -150,8 +149,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					searchField.setValue(menu.search);
 			}
 		}
-		buttonSortingType.setState(SortingTypes.VALUES[type % SortingTypes.VALUES.length]);
-		buttonDirection.setState(rev);
+		buttonSortingType.setState(sortingType);
+		buttonDirection.setState(reverseSort);
 		buttonCtrlMode.setState(ControllMode.VALUES[controllMode]);
 		buttonGhostMode.setState(ghostItems);
 		buttonTallMode.setState(tallMode);
@@ -160,8 +159,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected void sendUpdate() {
 		CompoundTag c = new CompoundTag();
 		int sort = 0;
-		sort |= (comparator.type().ordinal() & 0xFF);
-		sort |= (comparator.isReversed() ? 0x100 : 0);
+		sort |= (sortingType.ordinal() & 0xFF);
+		sort |= (reverseSort ? 0x100 : 0);
 		sort |= (ghostItems ? 0 : 0x200);
 		c.putInt("s", sort);
 		c.putInt("st", buttonSearchType.getSearchType());
@@ -209,7 +208,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		searchLast = "";
 		addWidget(searchField);
 		buttonSortingType = addRenderableWidget(new EnumCycleButton<>(leftPos - 18, topPos + 5, Component.translatable("narrator.toms_storage.terminal_sort"), "sort", SortingTypes.VALUES, n -> {
-			comparator = n.create(comparator.isReversed());
+			sortingType = n;
 			buttonSortingType.setState(n);
 			sendUpdate();
 			refreshItemList = true;
@@ -219,7 +218,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_desc")).
 				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_asc")).
 				build(n -> {
-					comparator.setReversed(n);
+					reverseSort = n;
 					buttonDirection.setState(n);
 					sendUpdate();
 					refreshItemList = true;
@@ -338,7 +337,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				}
 			} catch (Exception e) {
 			}
-			Collections.sort(getMenu().itemListClientSorted, menu.noSort ? sortComp : comparator);
+			Collections.sort(getMenu().itemListClientSorted, menu.noSort ? sortComp : sortingType.create(reverseSort));
 			if(!searchLast.equals(searchString)) {
 				getMenu().scrollTo(0);
 				this.currentScroll = 0;

@@ -57,7 +57,7 @@
 	"tooltip.toms_storage.amount": "Количество предмета: %d",
 	"tooltip.toms_storage.sorting_amount": "Сортировка по количеству",
 	"tooltip.toms_storage.sorting_name": "Сортировка по имени",
-	"tooltip.toms_storage.sorting_by_mod": "Сортировка по моду",
+	"tooltip.toms_storage.sorting_mod": "Сортировка по моду",
 	"tooltip.toms_storage.search": "Стандартный поиск",
 	"tooltip.toms_storage.search_auto": "Автопоиск",
 	"tooltip.toms_storage.search_keep": "Сохранить стандартный поиск",
