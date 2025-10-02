@@ -218,7 +218,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_desc")).
 				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_asc")).
 				build(n -> {
-					reverseSort = true;
+					reverseSort = n;
 					buttonDirection.setState(n);
 					sendUpdate();
 					refreshItemList = true;
