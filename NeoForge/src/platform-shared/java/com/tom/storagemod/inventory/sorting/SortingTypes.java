@@ -1,19 +1,27 @@
 package com.tom.storagemod.inventory.sorting;
 
-import java.util.function.Function;
+import java.util.Comparator;
+import java.util.function.Supplier;
+
+import com.tom.storagemod.inventory.StoredItemStack;
 
 public enum SortingTypes {
 	AMOUNT(ComparatorAmount::new),
 	NAME(ComparatorName::new),
-	BY_MOD(ComparatorModName::new),
+	MOD(ComparatorMod::new),
+	SPACE_EFFICIENCY(ComparatorSpaceEfficiency::new),
+	ID(ComparatorID::new),
+	TYPE(ComparatorType::new),
 	;
+
 	public static final SortingTypes[] VALUES = values();
-	private final Function<Boolean, IStoredItemStackComparator> factory;
-	private SortingTypes(Function<Boolean, IStoredItemStackComparator> factory) {
+	private final Supplier<Comparator<StoredItemStack>> factory;
+
+	private SortingTypes(Supplier<Comparator<StoredItemStack>> factory) {
 		this.factory = factory;
 	}
 
-	public IStoredItemStackComparator create(boolean rev) {
-		return factory.apply(rev);
+	public Comparator<StoredItemStack> create(boolean reversed) {
+		return reversed ? factory.get().reversed() : factory.get();
 	}
 }
