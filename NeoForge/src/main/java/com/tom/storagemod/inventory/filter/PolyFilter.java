@@ -6,7 +6,8 @@ import java.util.stream.IntStream;
 
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.inventory.StoredItemStack;
@@ -28,10 +29,13 @@ public class PolyFilter implements ItemFilter {
 		if(time - lastCheck >= 10) {
 			lastCheck = time;
 			filter.clear();
-			IItemHandler ih = face.level().getCapability(Capabilities.ItemHandler.BLOCK, face.pos(), face.from());
+			ResourceHandler<ItemResource> ih = face.level().getCapability(Capabilities.Item.BLOCK, face.pos(), face.from());
 			if(ih != null) {
-				IntStream.range(0, ih.getSlots()).mapToObj(ih::getStackInSlot).filter(s -> !s.isEmpty()).
-				map(StoredItemStack::new).distinct().map(StoredItemStack::getStack).forEach(filter::add);
+				IntStream.range(0, ih.size()).mapToObj(i -> {
+					var res = ih.getResource(i);
+					return new StoredItemStack(res.toStack(), ih.getAmountAsLong(i));
+				}).filter(s -> s != null).
+				distinct().map(StoredItemStack::getStack).forEach(filter::add);
 			}
 		}
 	}

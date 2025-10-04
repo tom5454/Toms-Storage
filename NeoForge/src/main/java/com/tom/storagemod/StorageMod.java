@@ -16,7 +16,7 @@ import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 
 import com.tom.storagemod.api.MultiblockInventoryAPI;
 import com.tom.storagemod.inventory.PlatformItemHandler;
@@ -39,7 +39,7 @@ public class StorageMod {
 		bus.addListener(this::setup);
 		// Register the doClientStuff method for modloading
 		bus.addListener(this::doClientStuff);
-		if (FMLEnvironment.dist == Dist.CLIENT)StorageModClient.preInit(mc, bus);
+		if (FMLEnvironment.getDist() == Dist.CLIENT)StorageModClient.preInit(mc, bus);
 		bus.addListener(this::registerCapabilities);
 		bus.addListener(this::enqueueIMC);
 
@@ -66,11 +66,11 @@ public class StorageMod {
 	}
 
 	private void registerCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.openCrateBE.get(), (be, side) -> new InvWrapper(be));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.connectorBE.get(), (be, side) -> new PlatformItemHandler(be));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.invInterfaceBE.get(), (be, side) -> new PlatformItemHandler(be));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.filingCabinetBE.get(), (be, side) -> new InvWrapper(be.getInv()));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Content.invProxyBE.get(), (be, side) -> new PlatformItemHandler(be));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, Content.openCrateBE.get(), (be, side) -> VanillaContainerWrapper.of(be));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, Content.connectorBE.get(), (be, side) -> new PlatformItemHandler(be));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, Content.invInterfaceBE.get(), (be, side) -> new PlatformItemHandler(be));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, Content.filingCabinetBE.get(), (be, side) -> VanillaContainerWrapper.of(be.getInv()));
+		event.registerBlockEntity(Capabilities.Item.BLOCK, Content.invProxyBE.get(), (be, side) -> new PlatformItemHandler(be));
 	}
 
 	public void enqueueIMC(InterModEnqueueEvent e) {

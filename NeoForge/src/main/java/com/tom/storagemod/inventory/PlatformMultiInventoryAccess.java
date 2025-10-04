@@ -2,17 +2,18 @@ package com.tom.storagemod.inventory;
 
 import java.util.Arrays;
 
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
+import net.neoforged.neoforge.transfer.EmptyResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-public class PlatformMultiInventoryAccess extends MultiInventoryAccess implements IItemHandler {
+public class PlatformMultiInventoryAccess extends MultiInventoryAccess implements ResourceHandler<ItemResource> {
 	private int[] offsets = new int[0];
 	private int invSize, offsetsSize;
 	private boolean calling;
 
 	@Override
-	public IItemHandler get() {
+	public ResourceHandler<ItemResource> get() {
 		return this;
 	}
 
@@ -25,7 +26,7 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 	}
 
 	@Override
-	public boolean isItemValid(int slot, ItemStack stack) {
+	public boolean isValid(int slot, ItemResource stack) {
 		if(calling)return false;
 		if(slot >= invSize)return false;
 		calling = true;
@@ -33,46 +34,18 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		int arrayIndex = findInventory(slot);
 		int invSlot = slot - offsets[arrayIndex];
 
-		boolean r = getHandler(arrayIndex, invSlot).isItemValid(invSlot, stack);
+		boolean r = getHandler(arrayIndex, invSlot).isValid(invSlot, stack);
 		calling = false;
 		return r;
 	}
 
 	@Override
-	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-		if(calling)return stack;
-		if(slot >= invSize)return stack;
-		calling = true;
-
-		int arrayIndex = findInventory(slot);
-		int invSlot = slot - offsets[arrayIndex];
-
-		ItemStack s = getHandler(arrayIndex, invSlot).insertItem(invSlot, stack, simulate);
-		calling = false;
-		return s;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int slot) {
-		if(calling)return ItemStack.EMPTY;
-		if(slot >= invSize)return ItemStack.EMPTY;
-		calling = true;
-
-		int arrayIndex = findInventory(slot);
-		int invSlot = slot - offsets[arrayIndex];
-
-		ItemStack s = getHandler(arrayIndex, invSlot).getStackInSlot(invSlot);
-		calling = false;
-		return s;
-	}
-
-	@Override
-	public int getSlots() {
+	public int size() {
 		return invSize;
 	}
 
 	@Override
-	public int getSlotLimit(int slot) {
+	public long getCapacityAsLong(int slot, ItemResource resource) {
 		if(calling)return 0;
 		if(slot >= invSize)return 0;
 		calling = true;
@@ -80,23 +53,9 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		int arrayIndex = findInventory(slot);
 		int invSlot = slot - offsets[arrayIndex];
 
-		int r = getHandler(arrayIndex, invSlot).getSlotLimit(invSlot);
+		long r = getHandler(arrayIndex, invSlot).getCapacityAsLong(invSlot, resource);
 		calling = false;
 		return r;
-	}
-
-	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate) {
-		if(calling)return ItemStack.EMPTY;
-		if(slot >= invSize)return ItemStack.EMPTY;
-		calling = true;
-
-		int arrayIndex = findInventory(slot);
-		int invSlot = slot - offsets[arrayIndex];
-
-		ItemStack s = getHandler(arrayIndex, invSlot).extractItem(invSlot, amount, simulate);
-		calling = false;
-		return s;
 	}
 
 	@Override
@@ -111,8 +70,8 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		invSize = 0;
 		int hOff = 0;
 		for (int i = 0; i < offsets.length; i++) {
-			IItemHandler ih = getHandler(i, 0);
-			int s = ih.getSlots();
+			ResourceHandler<ItemResource> ih = getHandler(i, 0);
+			int s = ih.size();
 			if (s == 0) {
 				hOff++;
 			} else {
@@ -123,11 +82,67 @@ public class PlatformMultiInventoryAccess extends MultiInventoryAccess implement
 		offsetsSize = offsets.length - hOff;
 	}
 
-	private IItemHandler getHandler(int i, int invSlot) {
-		IItemHandler h = connected.get(i).getPlatformHandler();
-		if (h == null)return EmptyItemHandler.INSTANCE;
-		if (invSlot < h.getSlots())
+	private ResourceHandler<ItemResource> getHandler(int i, int invSlot) {
+		ResourceHandler<ItemResource> h = connected.get(i).getPlatformHandler();
+		if (h == null)return EmptyResourceHandler.instance();
+		if (invSlot < h.size())
 			return h;
-		return EmptyItemHandler.INSTANCE;
+		return EmptyResourceHandler.instance();
+	}
+
+	@Override
+	public ItemResource getResource(int slot) {
+		if(calling)return ItemResource.EMPTY;
+		if(slot >= invSize)return ItemResource.EMPTY;
+		calling = true;
+
+		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
+
+		ItemResource s = getHandler(arrayIndex, invSlot).getResource(invSlot);
+		calling = false;
+		return s;
+	}
+
+	@Override
+	public long getAmountAsLong(int slot) {
+		if(calling)return 0L;
+		if(slot >= invSize)return 0L;
+		calling = true;
+
+		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
+
+		long s = getHandler(arrayIndex, invSlot).getAmountAsLong(invSlot);
+		calling = false;
+		return s;
+	}
+
+	@Override
+	public int insert(int slot, ItemResource resource, int amount, TransactionContext transaction) {
+		if(calling)return 0;
+		if(slot >= invSize)return 0;
+		calling = true;
+
+		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
+
+		int s = getHandler(arrayIndex, invSlot).insert(invSlot, resource, amount, transaction);
+		calling = false;
+		return s;
+	}
+
+	@Override
+	public int extract(int slot, ItemResource resource, int amount, TransactionContext transaction) {
+		if(calling)return 0;
+		if(slot >= invSize)return 0;
+		calling = true;
+
+		int arrayIndex = findInventory(slot);
+		int invSlot = slot - offsets[arrayIndex];
+
+		int s = getHandler(arrayIndex, invSlot).extract(invSlot, resource, amount, transaction);
+		calling = false;
+		return s;
 	}
 }

@@ -2,6 +2,8 @@ package com.tom.storagemod.inventory;
 
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -11,8 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
+import net.neoforged.neoforge.transfer.EmptyResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import com.tom.storagemod.block.entity.BlockFilterAttachment;
 import com.tom.storagemod.platform.Platform;
@@ -28,8 +31,8 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		@Override
-		public IItemHandler get() {
-			return EmptyItemHandler.INSTANCE;
+		public ResourceHandler<ItemResource> get() {
+			return EmptyResourceHandler.instance();
 		}
 
 		@Override
@@ -55,12 +58,12 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 	public static class BlockInventoryAccess implements PlatformInventoryAccess {
 		private boolean valid;
-		private BlockCapabilityCache<IItemHandler, Direction> itemCache;
+		private BlockCapabilityCache<ResourceHandler<ItemResource>, @Nullable Direction> itemCache;
 		private IInventoryChangeTracker.Delegate tracker = new IInventoryChangeTracker.Delegate();
 
 		public void onLoad(Level level, BlockPos worldPosition, Direction side, IValidInfo isValid) {
 			valid = true;
-			itemCache = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, (ServerLevel) level, worldPosition, side, () -> valid && isValid.isObjectValid(), this::onInvalid);
+			itemCache = BlockCapabilityCache.create(Capabilities.Item.BLOCK, (ServerLevel) level, worldPosition, side, () -> valid && isValid.isObjectValid(), this::onInvalid);
 		}
 
 		protected void onInvalid() {
@@ -68,7 +71,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 		@Override
 		public IInventoryChangeTracker tracker() {
-			IItemHandler itemHandler = itemCache.getCapability();
+			@Nullable ResourceHandler<ItemResource> itemHandler = itemCache.getCapability();
 			if (itemHandler != null)
 				tracker.setDelegate(WorldStates.getTracker(itemHandler));
 			else
@@ -77,12 +80,12 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		@Override
-		public IItemHandler get() {
+		public @Nullable ResourceHandler<ItemResource> get() {
 			return itemCache == null || !valid ? null : itemCache.getCapability();
 		}
 
 		public static boolean hasInventoryAt(Level level, BlockPos pos, BlockState state, Direction direction) {
-			return level.getCapability(Capabilities.ItemHandler.BLOCK, pos, state, null, direction) != null;
+			return level.getCapability(Capabilities.Item.BLOCK, pos, state, null, direction) != null;
 		}
 
 		@Override
@@ -113,24 +116,24 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 	}
 
 	@Override
-	IItemHandler get();
+	ResourceHandler<ItemResource> get();
 
 	@Override
 	public default int getFreeSlotCount() {
-		IItemHandler itemHandler = get();
+		ResourceHandler<ItemResource> itemHandler = get();
 		if (itemHandler == null)return 0;
 		int empty = 0;
-		for(int i = 0;i<itemHandler.getSlots();i++) {
-			if(itemHandler.getStackInSlot(i).isEmpty())empty++;
+		for(int i = 0;i<itemHandler.size();i++) {
+			if(itemHandler.getResource(i).isEmpty())empty++;
 		}
 		return empty;
 	}
 
 	@Override
 	public default int getSlotCount() {
-		IItemHandler itemHandler = get();
+		ResourceHandler<ItemResource> itemHandler = get();
 		if (itemHandler == null)return 0;
-		return itemHandler.getSlots();
+		return itemHandler.size();
 	}
 
 	public static BlockFilter getBlockFilterAt(Level level, BlockPos p, boolean make) {

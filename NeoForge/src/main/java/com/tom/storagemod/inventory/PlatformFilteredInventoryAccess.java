@@ -4,13 +4,15 @@ import java.util.Set;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import com.tom.storagemod.inventory.filter.IFilter;
 import com.tom.storagemod.util.Priority;
 import com.tom.storagemod.util.Priority.IPriority;
 
-public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPriority, IItemHandler {
+public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPriority, ResourceHandler<ItemResource> {
 	private final IInventoryAccess acc;
 	private final IFilter filter;
 	private final InventoryChangeTracker tracker;
@@ -26,17 +28,17 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 			}
 
 			@Override
-			protected int getCount(ItemStack is) {
-				return filter.isKeepLast() ? is.getCount() - 1 : is.getCount();
+			protected long getCount(NeoStack is) {
+				return filter.isKeepLast() ? is.count() - 1 : is.count();
 			}
 
 			@Override
-			protected IItemHandler getSlotHandler(IItemHandler def) {
+			protected ResourceHandler<ItemResource> getSlotHandler(ResourceHandler<ItemResource> def) {
 				return PlatformFilteredInventoryAccess.this;
 			}
 
 			@Override
-			public ItemStack[] prepForOffThread(Level level) {
+			public NeoStack[] prepForOffThread(Level level) {
 				filter.getItemPred().updateState();
 				return super.prepForOffThread(level);
 			}
@@ -77,7 +79,7 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 	}
 
 	@Override
-	public IItemHandler get() {
+	public ResourceHandler<ItemResource> get() {
 		return this;
 	}
 
@@ -88,53 +90,75 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 	}
 
 	@Override
-	public int getSlots() {
-		return getP().getSlots();
+	public int size() {
+		return getP().size();
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int slot) {
-		ItemStack is = getP().getStackInSlot(slot);
-		if (!test(is))return ItemStack.EMPTY;
-		if (filter.isKeepLast()) {
-			is = is.copy();
-			is.shrink(1);
-		}
+	public ItemResource getResource(int index) {
+		var is = getP().getResource(index);
+		if (!test(is))return ItemResource.EMPTY;
 		return is;
 	}
 
 	@Override
-	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-		if (!test(stack))return stack;
-		return getP().insertItem(slot, stack, simulate);
-	}
-
-	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate) {
-		ItemStack is = getP().getStackInSlot(slot);
-		if (!test(is))return ItemStack.EMPTY;
+	public long getAmountAsLong(int index) {
+		var handler = getP();
+		var is = getP().getResource(index);
+		if (!test(is))return 0L;
+		long cnt = handler.getAmountAsLong(index);
 		if (filter.isKeepLast()) {
-			amount = Math.min(amount, is.getCount() - 1);
+			return cnt - 1L;
 		}
-		return getP().extractItem(slot, amount, simulate);
+		return cnt;
 	}
 
 	@Override
-	public int getSlotLimit(int slot) {
-		return getP().getSlotLimit(slot);
+	public int insert(int slot, ItemResource stack, int amount, TransactionContext transaction) {
+		if (!test(stack))return 0;
+		return getP().insert(slot, stack, amount, transaction);
 	}
 
-	private IItemHandler getP() {
+	@Override
+	public int insert(ItemResource stack, int amount, TransactionContext transaction) {
+		if (!test(stack))return 0;
+		return getP().insert(stack, amount, transaction);
+	}
+
+	@Override
+	public int extract(int slot, ItemResource stack, int amount, TransactionContext transaction) {
+		if (!test(stack))return 0;
+		if (filter.isKeepLast()) {
+			long count = getP().getAmountAsLong(slot);
+			amount = (int) Math.min(amount, count - 1);
+		}
+		return getP().extract(slot, stack, amount, transaction);
+	}
+
+	@Override
+	public long getCapacityAsLong(int slot, ItemResource resource) {
+		long cap = getP().getCapacityAsLong(slot, resource);
+		if (filter.isKeepLast()) {
+			return cap - 1L;
+		}
+		return cap;
+	}
+
+	private ResourceHandler<ItemResource> getP() {
 		return acc.getPlatformHandler();
 	}
 
 	@Override
-	public boolean isItemValid(int slot, ItemStack stack) {
-		return test(stack) && getP().isItemValid(slot, stack);
+	public boolean isValid(int slot, ItemResource stack) {
+		return test(stack) && getP().isValid(slot, stack);
+	}
+
+	private boolean test(ItemResource stack) {
+		return filter.getItemPred().test(new StoredItemStack(stack.toStack(), 1));
 	}
 
 	private boolean test(ItemStack stack) {
-		return filter.getItemPred().test(new StoredItemStack(stack, stack.getCount()));
+		return filter.getItemPred().test(new StoredItemStack(stack, 1));
 	}
 
 	@Override

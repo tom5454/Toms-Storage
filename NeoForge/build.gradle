@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.168'
+    id 'net.neoforged.gradle.userdev' version '7.0.192'
 }
 
 version = mod_version
@@ -97,7 +97,7 @@ sourceSets {
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/top/**"
-			//if(!useLib)exclude "com/tom/storagemod/jade/**"
+			if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -134,10 +134,11 @@ dependencies {
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    implementation "curse.maven:jade-324717:6669809"
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html   
     
     if(useLib) {
+    	implementation "curse.maven:jade-324717:6669809"
+
         compileOnly "mezz.jei:jei-1.21.5-neoforge-api:21.3.2.22"
         compileOnly "mezz.jei:jei-1.21.5-common-api:21.3.2.22"
         // at runtime, use the full JEI jar

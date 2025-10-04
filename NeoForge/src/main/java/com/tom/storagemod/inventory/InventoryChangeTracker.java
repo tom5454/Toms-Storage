@@ -6,34 +6,36 @@ import java.util.stream.Stream;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import com.tom.storagemod.inventory.IInventoryAccess.IChangeNotifier;
 import com.tom.storagemod.inventory.IInventoryAccess.IInventoryChangeTracker;
 import com.tom.storagemod.inventory.IInventoryAccess.IMultiThreadedTracker;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 
-public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiThreadedTracker<ItemStack[], Long>, IChangeNotifier {
+public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiThreadedTracker<NeoStack[], Long>, IChangeNotifier {
 	public static final InventoryChangeTracker NULL = new InventoryChangeTracker(null);
-	private final WeakReference<IItemHandler> itemHandler;
+	private final WeakReference<ResourceHandler<ItemResource>> itemHandler;
 	private long lastUpdate, lastChange;
 	private StoredItemStack[] lastItems = new StoredItemStack[0];
 
-	public InventoryChangeTracker(IItemHandler itemHandler) {
+	public InventoryChangeTracker(ResourceHandler<ItemResource> itemHandler) {
 		this.itemHandler = new WeakReference<>(itemHandler);
 	}
 
 	@Override
 	public long getChangeTracker(Level level) {
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return 0L;
 		if (lastUpdate != level.getGameTime()) {
-			int slots = h.getSlots();
+			int slots = h.size();
 			if (lastItems.length != slots)lastItems = new StoredItemStack[slots];
 			boolean change = false;
 
 			for (int i = 0;i<slots;i++) {
-				ItemStack is = h.getStackInSlot(i);
+				NeoStack is = new NeoStack(h, i);
 				change |= updateChange(i, is);
 			}
 			if (change)lastChange = System.nanoTime();
@@ -42,27 +44,27 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 		return lastChange;
 	}
 
-	protected boolean checkFilter(ItemStack stack) {
-		return checkFilter(new StoredItemStack(stack, stack.getCount()));
+	protected boolean checkFilter(NeoStack stack) {
+		return checkFilter(new StoredItemStack(stack.resource().toStack(), stack.count()));
 	}
 
 	protected boolean checkFilter(StoredItemStack stack) {
 		return true;
 	}
 
-	protected int getCount(ItemStack is) {
-		return is.getCount();
+	protected long getCount(NeoStack is) {
+		return is.count();
 	}
 
-	protected IItemHandler getSlotHandler(IItemHandler def) {
+	protected ResourceHandler<ItemResource> getSlotHandler(ResourceHandler<ItemResource> def) {
 		return def;
 	}
 
-	private boolean updateChange(int i, ItemStack is) {
-		if (!is.isEmpty() && checkFilter(is)) {
-			int cnt = getCount(is);
-			if (lastItems[i] == null || !ItemStack.isSameItemSameComponents(lastItems[i].getStack(), is)) {
-				lastItems[i] = new StoredItemStack(is);
+	private boolean updateChange(int i, NeoStack is) {
+		if (!is.resource().isEmpty() && checkFilter(is)) {
+			long cnt = getCount(is);
+			if (lastItems[i] == null || !ItemStack.isSameItemSameComponents(lastItems[i].getStack(), is.resource().toStack())) {
+				lastItems[i] = new StoredItemStack(is.resource().toStack(), 1L);
 				lastItems[i].setCount(cnt);
 				return true;
 			} else if(lastItems[i].getQuantity() != cnt) {
@@ -78,14 +80,14 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 
 	@Override
 	public Stream<StoredItemStack> streamWrappedStacks(boolean parallel) {
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return Stream.empty();
 		return Arrays.stream(lastItems).filter(e -> e != null);
 	}
 
 	@Override
 	public long countItems(StoredItemStack filter) {
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return 0;
 		long c = 0;
 		for (int i = 0; i < lastItems.length; i++) {
@@ -97,7 +99,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 
 	@Override
 	public InventorySlot findSlot(ItemPredicate filter, boolean findEmpty) {
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
 		for (int i = 0; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
@@ -111,25 +113,25 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 	}
 
 	@Override
-	public ItemStack[] prepForOffThread(Level level) {
+	public NeoStack[] prepForOffThread(Level level) {
 		if (lastUpdate == level.getGameTime())return null;
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
-		int slots = h.getSlots();
+		int slots = h.size();
 		if (lastItems.length != slots)lastItems = new StoredItemStack[slots];
-		ItemStack[] items = new ItemStack[slots];
+		NeoStack[] items = new NeoStack[slots];
 		for (int i = 0;i<slots;i++) {
-			items[i] = h.getStackInSlot(i);
+			items[i] = new NeoStack(h, i);
 		}
 		return items;
 	}
 
 	@Override
-	public Long processOffThread(ItemStack[] array) {
+	public Long processOffThread(NeoStack[] array) {
 		int slots = array.length;
 		boolean change = false;
 		for (int i = 0;i<slots;i++) {
-			ItemStack is = array[i];
+			NeoStack is = array[i];
 			change |= updateChange(i, is);
 		}
 		if (change) return System.nanoTime();
@@ -146,25 +148,27 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 
 	@Override
 	public void onSlotChanged(InventorySlot slot) {
-		if (lastItems.length > slot.getId() && updateChange(slot.getId(), slot.getStack())) {
+		if (lastItems.length > slot.getId() && updateChange(slot.getId(), slot.getNeoStack())) {
 			lastChange = System.nanoTime();
 		}
 	}
 
 	@Override
 	public InventorySlot findSlotDest(StoredItemStack forStack) {
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
 		if (!checkFilter(forStack))return null;
 		for (int i = 0; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
-			if (is == null && !h.isItemValid(i, forStack.getStack())) {
+			if (is == null && !h.isValid(i, ItemResource.of(forStack.getStack()))) {
 				continue;
 			}
 			if (is == null || is.equalItem(forStack)) {
-				int rem = h.insertItem(i, forStack.getActualStack(), true).getCount();
-				if (rem < forStack.getQuantity()) {
-					return new InventorySlot(getSlotHandler(h), this, i);
+				try (Transaction tx = Transaction.open(null)) {
+					int rem = h.insert(i, ItemResource.of(forStack.getStack()), (int) forStack.getQuantity(), tx);
+					if (rem > 0) {
+						return new InventorySlot(getSlotHandler(h), this, i);
+					}
 				}
 			}
 		}
@@ -174,9 +178,9 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 	@Override
 	public InventorySlot findSlotAfter(InventorySlot slot, ItemPredicate filter, boolean findEmpty, boolean loop) {
 		if (slot == null)return findSlot(filter, findEmpty);
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null || slot.getHandler() != h)return null;
-		if (h.getSlots() <= slot.getId() + 1)return loop ? findSlot(filter, findEmpty) : null;
+		if (h.size() <= slot.getId() + 1)return loop ? findSlot(filter, findEmpty) : null;
 		for (int i = slot.getId() + 1; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
 			if (is == null) {
@@ -191,20 +195,22 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 	@Override
 	public InventorySlot findSlotDestAfter(InventorySlot slot, StoredItemStack forStack, boolean loop) {
 		if (slot == null)return findSlotDest(forStack);
-		IItemHandler h = itemHandler.get();
+		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
 		if (!checkFilter(forStack))return null;
 		if (slot.getHandler() != h)return null;
-		if (h.getSlots() <= slot.getId() + 1)return loop ? findSlotDest(forStack) : null;
+		if (h.size() <= slot.getId() + 1)return loop ? findSlotDest(forStack) : null;
 		for (int i = slot.getId() + 1; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
-			if (is == null && !h.isItemValid(i, forStack.getStack())) {
+			if (is == null && !h.isValid(i, ItemResource.of(forStack.getStack()))) {
 				continue;
 			}
 			if (is == null || is.equalItem(forStack)) {
-				int rem = h.insertItem(i, forStack.getActualStack(), true).getCount();
-				if (rem < forStack.getQuantity()) {
-					return new InventorySlot(getSlotHandler(h), this, i);
+				try (Transaction tx = Transaction.open(null)) {
+					int rem = h.insert(i, ItemResource.of(forStack.getStack()), (int) forStack.getQuantity(), tx);
+					if (rem > 0) {
+						return new InventorySlot(getSlotHandler(h), this, i);
+					}
 				}
 			}
 		}

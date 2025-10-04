@@ -26,7 +26,7 @@ public class ServerEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOW)
 	public static void onLeftClick(LeftClickBlock event) {
-		if (event.getEntity().level().isClientSide)return;
+		if (event.getEntity().level().isClientSide())return;
 		ItemStack is = event.getEntity().getItemInHand(InteractionHand.MAIN_HAND);
 		if (is.getItem() instanceof ILeftClickListener l) {
 			if (l.onLeftClick(is, event.getPos(), event.getEntity()))

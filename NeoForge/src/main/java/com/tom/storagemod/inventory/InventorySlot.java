@@ -1,59 +1,75 @@
 package com.tom.storagemod.inventory;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import com.tom.storagemod.inventory.IInventoryAccess.IChangeNotifier;
 
 public class InventorySlot {
-	private final IItemHandler handler;
+	private final ResourceHandler<ItemResource> handler;
 	private final IChangeNotifier notifier;
 	private final int id;
 
-	public InventorySlot(IItemHandler h, IChangeNotifier notifier, int i) {
+	public InventorySlot(ResourceHandler<ItemResource> h, IChangeNotifier notifier, int i) {
 		this.handler = h;
 		this.notifier = notifier;
 		this.id = i;
 	}
 
 	public ItemStack getStack() {
-		return handler.getStackInSlot(id);
+		return handler.getResource(id).toStack(handler.getAmountAsInt(id));
+	}
+
+	public NeoStack getNeoStack() {
+		return new NeoStack(handler, id);
 	}
 
 	public ItemStack extract(int amount) {
-		ItemStack is = handler.extractItem(id, amount, false);
-		if (!is.isEmpty())notifyChange();
-		return is;
+		try (Transaction tx = Transaction.open(null)) {
+			var resource = handler.getResource(id);
+			int is = handler.extract(id, resource, amount, tx);
+			if (is != 0)notifyChange();
+			tx.commit();
+			return resource.toStack(is);
+		}
 	}
 
 	public ItemStack insert(ItemStack stack) {
-		int c = stack.getCount();
-		ItemStack is = handler.insertItem(id, stack, false);
-		if (c != is.getCount())notifyChange();
-		return is;
+		try (Transaction tx = Transaction.open(null)) {
+			int c = stack.getCount();
+			int is = handler.insert(id, ItemResource.of(stack), stack.getCount(), tx);
+			if (is != 0)notifyChange();
+			if (c == is)return ItemStack.EMPTY;
+			return stack.copyWithCount(c - is);
+		}
 	}
 
 	public boolean transferTo(int amount, InventorySlot to) {
-		ItemStack is = handler.extractItem(id, amount, true);
-		if (is.isEmpty())return false;
-		int ex = is.getCount();
-		is = to.handler.insertItem(to.id, is, true);
-		if (is.isEmpty()) {
-			is = handler.extractItem(id, amount, false);
-			to.handler.insertItem(to.id, is, false);
-			notifyChange();
-			to.notifyChange();
-			return true;
-		} else if (is.getCount() < ex) {//Try inserting less
-			int ins = ex - is.getCount();
-			is = handler.extractItem(id, ins, true);
-			is = to.handler.insertItem(to.id, is, true);
-			if (is.isEmpty()) {
-				is = handler.extractItem(id, ins, false);
-				to.handler.insertItem(to.id, is, false);
+		var resource = handler.getResource(id);
+		int extracted, inserted;
+		try (Transaction tx = Transaction.open(null)) {
+			extracted = handler.extract(id, resource, amount, tx);
+			if (extracted == 0)return false;
+			inserted = to.handler.insert(to.id, resource, extracted, tx);
+			if (inserted == extracted) {
+				tx.commit();
 				notifyChange();
 				to.notifyChange();
 				return true;
+			}
+		}
+		if (inserted > 0) {//Try inserting less
+			try (Transaction tx = Transaction.open(null)) {
+				int ins = handler.extract(id, resource, inserted, tx);
+				int ex = to.handler.insert(to.id, resource, ins, tx);
+				if (ex == ins) {
+					tx.commit();
+					notifyChange();
+					to.notifyChange();
+					return true;
+				}
 			}
 		}
 		return false;
@@ -63,7 +79,7 @@ public class InventorySlot {
 		notifier.onSlotChanged(this);
 	}
 
-	protected IItemHandler getHandler() {
+	protected ResourceHandler<ItemResource> getHandler() {
 		return handler;
 	}
 

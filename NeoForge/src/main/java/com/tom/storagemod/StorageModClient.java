@@ -101,7 +101,7 @@ public class StorageModClient {
 	}
 
 	private static void initKeybinds(RegisterKeyMappingsEvent evt) {
-		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMapping.CATEGORY_GAMEPLAY);
+		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMapping.Category.GAMEPLAY);
 		evt.register(openTerm);
 	}
 
