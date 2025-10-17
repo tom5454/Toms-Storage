@@ -41,6 +41,7 @@ public class InventorySlot {
 			int c = stack.getCount();
 			int is = handler.insert(id, ItemResource.of(stack), stack.getCount(), tx);
 			if (is != 0)notifyChange();
+			tx.commit();
 			if (c == is)return ItemStack.EMPTY;
 			return stack.copyWithCount(c - is);
 		}

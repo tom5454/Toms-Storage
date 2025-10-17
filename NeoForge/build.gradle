@@ -31,7 +31,7 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-1.21.8'
+    archivesName = 'toms_storage-1.21.10'
 }
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
@@ -94,10 +94,10 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			if(!useLib)exclude "com/tom/storagemod/jei/**"
+			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			if(!useLib)exclude "com/tom/storagemod/top/**"
-			if(!useLib)exclude "com/tom/storagemod/jade/**"
+			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -134,16 +134,16 @@ dependencies {
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html   
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    
+    implementation "curse.maven:jade-324717:7056468"
+    
+    compileOnly "mezz.jei:jei-1.21.10-neoforge-api:26.0.0.1"
+    compileOnly "mezz.jei:jei-1.21.10-common-api:26.0.0.1"
+    // at runtime, use the full JEI jar
+    runtimeOnly "mezz.jei:jei-1.21.10-neoforge:26.0.0.1"
     
     if(useLib) {
-    	implementation "curse.maven:jade-324717:6669809"
-
-        compileOnly "mezz.jei:jei-1.21.5-neoforge-api:21.3.2.22"
-        compileOnly "mezz.jei:jei-1.21.5-common-api:21.3.2.22"
-        // at runtime, use the full JEI jar
-  	    runtimeOnly "mezz.jei:jei-1.21.5-neoforge:21.3.2.22"
-
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:19.0.806"
 	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:19.0.806"
 	    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:19.0.806"

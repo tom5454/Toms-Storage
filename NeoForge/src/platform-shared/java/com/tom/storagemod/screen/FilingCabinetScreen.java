@@ -69,7 +69,7 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 		int j = (this.height - this.imageHeight) / 2;
 		st.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17, 256, 256);
 		st.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96, 256, 256);
-		st.blit(RenderPipelines.GUI_TEXTURED, SIDE_SCROLLBAR, i + 170, j, 0, 0, 24, 115, 24, 115, 256, 256);
+		st.blit(RenderPipelines.GUI_TEXTURED, SIDE_SCROLLBAR, i + 170, j, 0, 0, 24, 115, 24, 115, 24, 115);
 	}
 
 	@Override

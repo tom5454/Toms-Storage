@@ -10,4 +10,4 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.5.0'
 }
 
-rootProject.name = "TomsStorage-1.21.9"
+rootProject.name = "TomsStorage-1.21.10"

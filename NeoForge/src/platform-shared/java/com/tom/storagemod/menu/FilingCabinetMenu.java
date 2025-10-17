@@ -14,7 +14,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.LimitedContainer;
 
 public class FilingCabinetMenu extends AbstractContainerMenu {
-	public static final ResourceLocation LOCKED_SLOT = ResourceLocation.tryBuild(StorageMod.modid, "item/locked_slot");
+	public static final ResourceLocation LOCKED_SLOT = ResourceLocation.tryBuild(StorageMod.modid, "icons/locked_slot");
 
 	private final Container containerParent;
 	private final LimitedContainer container;

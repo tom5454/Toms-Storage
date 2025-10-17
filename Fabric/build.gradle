@@ -59,6 +59,12 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
     
+    modImplementation ("curse.maven:jade-324717:7056475")
+    
+	modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    
     if(useLib) {
     	modCompileOnly('maven.modrinth:sodium:mc1.21.5-0.6.12-fabric')
 		modCompileOnly('maven.modrinth:iris:1.8.10+1.21.5-fabric')
@@ -86,12 +92,6 @@ dependencies {
 		
     	modCompileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
 		modLocalRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
-		
-		modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3") {
-	        exclude(group: "net.fabricmc.fabric-api")
-	    }
-	    
-	    modImplementation ("curse.maven:jade-324717:6674245")
 	    
 	    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 			exclude(group: "net.fabricmc.fabric-api")
@@ -125,8 +125,8 @@ sourceSets {
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
 			if(!useLib)exclude "com/tom/storagemod/rei/**"
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
-			if(!useLib)exclude "com/tom/storagemod/jade/**"
-			if(!useLib)exclude "com/tom/storagemod/ModMenu.java"
+			//if(!useLib)exclude "com/tom/storagemod/jade/**"
+			//if(!useLib)exclude "com/tom/storagemod/ModMenu.java"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
