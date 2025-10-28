@@ -71,7 +71,7 @@ public abstract class AbstractStorageTerminalBlock extends BaseEntityBlock imple
 
 		BlockEntity blockEntity_1 = world.getBlockEntity(pos);
 		if (blockEntity_1 instanceof StorageTerminalBlockEntity term) {
-			if(term.canInteractWith(player)) {
+			if(term.canInteractWith(player, false)) {
 				player.openMenu(term);
 			} else {
 				player.displayClientMessage(Component.translatable("chat.toms_storage.terminal_out_of_range"), true);

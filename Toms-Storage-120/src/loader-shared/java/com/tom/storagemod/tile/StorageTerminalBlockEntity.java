@@ -171,17 +171,28 @@ public class StorageTerminalBlockEntity extends BlockEntity implements MenuProvi
 		}
 	}
 
-	public boolean canInteractWith(Player player) {
-		if(level.getBlockEntity(worldPosition) != this)return false;
-		int d = 4;
-		int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
-		if(Config.get().wirelessTermBeaconLvl != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvl && termReach > 0) {
-			if(Config.get().wirelessTermBeaconLvlDim != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvlDim)return true;
-			else return player.level() == level;
-		}
-		d = Math.max(d, termReach);
-		return player.level() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*2*d*2);
-	}
+	public boolean canInteractWith(Player player, boolean menuCheck) {
+    if(level.getBlockEntity(worldPosition) != this)return false;
+    int d = 6;
+    int termReach = PlayerInvUtil.findItem(player, i -> i.getItem() instanceof WirelessTerminal, 0, i -> ((WirelessTerminal)i.getItem()).getRange(player, i));
+    
+    // Solo verificar beacon si el jugador tiene un terminal inalámbrico
+    if(termReach > 0 && Config.get().wirelessTermBeaconLvl != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvl) {
+        // Nivel suficiente para acceso cross-dimensional
+        if(Config.get().wirelessTermBeaconLvlDim != -1 && beaconLevel >= Config.get().wirelessTermBeaconLvlDim) {
+            return true;
+        }
+        // Nivel suficiente para acceso ilimitado en la misma dimensión
+        else if(player.level() == level) {
+            return true;
+        }
+    }
+    
+    // Si no hay beacon o no cumple requisitos, usar alcance normal
+    d = Math.max(d, termReach);
+    if (menuCheck)d += (d / 4);
+    return player.level() == level && !(player.distanceToSqr(this.worldPosition.getX() + 0.5D, this.worldPosition.getY() + 0.5D, this.worldPosition.getZ() + 0.5D) > d*d);
+}
 
 	public int getSorting() {
 		return sort;
