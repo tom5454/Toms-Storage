@@ -15,6 +15,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.pipeline.IrisPipelines;
@@ -24,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,6 +34,7 @@ import net.minecraft.world.level.storage.TagValueInput;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
@@ -103,14 +107,13 @@ public class StorageModClient implements ClientModInitializer {
 			return -1;
 		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get(), Content.invProxy.get());
 
-		/*WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
-			PoseStack ps = new PoseStack();
+		WorldRenderEvents.END_MAIN.register(ctx -> {
+			PoseStack ps = ctx.matrices();
 			ps.pushPose();
 			ClientUtil.drawTerminalOutline(ps);
 			ClientUtil.drawConfiguratorOutline(ps);
 			ps.popPose();
-			return true;
-		});*/
+		});
 
 		ClientLoginNetworking.registerGlobalReceiver(StorageMod.id("config"), (mc, handler, buf, fc) -> {
 			Config read;
@@ -141,9 +144,7 @@ public class StorageModClient implements ClientModInitializer {
 			ClientUtil.collectExtraTooltips(s, l);
 		});
 
-		/*ClientLifecycleEvents.CLIENT_STARTED.register(mc -> {
-			mc.gui.layers.add((gr, tr) -> ClientUtil.drawConfiguratorOverlay(gr));
-		});*/
+		HudElementRegistry.addLast(ResourceLocation.tryBuild(StorageMod.modid, "configurator_hud"), (gr, tr) -> ClientUtil.drawConfiguratorOverlay(gr));
 
 		//if (StorageMod.polymorph)PolymorphTerminalWidget.register();
 	}
