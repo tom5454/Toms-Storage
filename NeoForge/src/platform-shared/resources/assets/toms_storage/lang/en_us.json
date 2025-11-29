@@ -30,7 +30,7 @@
 	"menu.toms_storage.level_emitter": "Level Emitter",
 	"menu.toms_storage.inventory_connector": "Inventory Link",
 	"menu.toms_storage.inventory_configurator": "Inventory Configurator (%s)",
-	"menu.toms_storage.filing_cabinet": "Filling Cabinet",
+	"menu.toms_storage.filing_cabinet": "Filing Cabinet",
 	
 	"label.toms_storage.inventory_connector.beacon_level": "Beacon Level: %d",
 	
