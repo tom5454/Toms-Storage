@@ -68,11 +68,7 @@ public class StorageModClient {
 		bus.addListener(StorageModClient::registerScreens);
 		bus.addListener(StorageModClient::registerPipelines);
 		bus.addListener(StorageModClient::registerOverlays);
-
-		try {
-			mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-		} catch (Throwable e) {
-		}
+		mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 	}
 
 	private static void registerScreens(RegisterMenuScreensEvent e) {
