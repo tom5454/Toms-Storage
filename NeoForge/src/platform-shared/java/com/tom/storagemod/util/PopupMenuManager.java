@@ -13,6 +13,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -40,11 +41,11 @@ public class PopupMenuManager {
 
 	public boolean render(GuiGraphics g, Font font, int pMouseX, int pMouseY) {
 		if(menu != null) {
-			g.setComponentTooltipForNextFrame(font,
+			g.setTooltipForNextFrame(font,
 					IntStream.range(0, menu.size())
-					.mapToObj(i -> menu.get(i).getHoveredText(pMouseX - x, pMouseY - y - i * 10, selected == i))
+					.mapToObj(i -> menu.get(i).getHoveredText(pMouseX - x, pMouseY - y - i * 10, selected == i).getVisualOrderText())
 					.toList(),
-					x - 12, y + 12);
+					DefaultTooltipPositioner.INSTANCE, x - 12, y + 12, true);
 		}
 		return menu == null;
 	}
