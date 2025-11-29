@@ -11,11 +11,15 @@
 		"1.21.4-latest": "2.3.2",
 		"1.21.5-latest": "2.4.2",
 		"1.21.6-latest": "2.4.1",
-		"1.21.7-latest": "2.4.1",
-		"1.21.8-latest": "2.4.2"
+		"1.21.7-latest": "2.5.0",
+		"1.21.8-latest": "2.5.1"
 	},
 	"1.21.8": {
-		"2.4.2": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)"
+		"2.5.1": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)"
+	},
+	"1.21.7": {
+		"2.5.1": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)",
+		"2.5.0": "1.21.7 port"
 	},
 	"1.21.6": {
 		"2.4.1": "Fixed JEI/REI/EMI overlapping with some parts of the menus in the mod (Closes #594)\nFixed missing lang entry for inventory configurator (Closes #596)\nFixed JEI integration on 1.21.4 (Closes #599)\nFixed inventory cable connector linking menu not working on 1.21.6 (Closes #600)\nFixed crash with NeoForge 21.6.16-beta\nUpdated Russian translations (#598)",

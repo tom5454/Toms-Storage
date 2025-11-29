@@ -46,7 +46,6 @@ public class ItemFilterScreen extends AbstractFilteredScreen<ItemFilterMenu> {
 
 	@Override
 	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
 		buttonMatchNBT.setState(menu.matchNBT);
 		buttonAllowList.setState(menu.allowList);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

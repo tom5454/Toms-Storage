@@ -12,6 +12,8 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -65,11 +67,7 @@ public class StorageModClient {
 		bus.addListener(StorageModClient::registerScreens);
 		bus.addListener(StorageModClient::registerPipelines);
 		bus.addListener(StorageModClient::registerOverlays);
-
-		try {
-			mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-		} catch (Throwable e) {
-		}
+		mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 	}
 
 	private static void registerScreens(RegisterMenuScreensEvent e) {
@@ -85,6 +83,11 @@ public class StorageModClient {
 
 	public static void clientSetup() {
 		NeoForge.EVENT_BUS.register(StorageModClient.class);
+
+		ItemBlockRenderTypes.setRenderLayer(Content.paintedTrim.get(), ChunkSectionLayer.TRANSLUCENT);
+		ItemBlockRenderTypes.setRenderLayer(Content.invCableFramed.get(), ChunkSectionLayer.TRANSLUCENT);
+		ItemBlockRenderTypes.setRenderLayer(Content.invProxy.get(), ChunkSectionLayer.TRANSLUCENT);
+		ItemBlockRenderTypes.setRenderLayer(Content.invCableConnectorFramed.get(), ChunkSectionLayer.TRANSLUCENT);
 	}
 
 	public static void registerOverlays(RegisterGuiLayersEvent event) {

@@ -46,7 +46,7 @@ public class ClientUtil {
 
 	public static void tooltip(String key, boolean addShift, Consumer<Component> tooltip, Object... args) {
 		if(KeyUtil.hasShiftDown()) {
-			String[] sp = I18n.get("tooltip.toms_storage." + key, args).split("\\\\");
+			String[] sp = Component.translatable("tooltip.toms_storage." + key, args).getString().split("\\\\");
 			for (int i = 0; i < sp.length; i++) {
 				tooltip.accept(Component.literal(sp[i]));
 			}

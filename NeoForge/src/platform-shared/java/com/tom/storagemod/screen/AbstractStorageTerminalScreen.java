@@ -386,7 +386,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		int i1 = k + 14;
 		int j1 = l + rowCount * 18;
 
-		if(ghostItems && KeyUtil.hasShiftDown()) {
+		if(menu.itemsLoaded && ghostItems && KeyUtil.hasShiftDown()) {
 			if(!menu.noSort) {
 				List<StoredItemStack> list = getMenu().itemListClientSorted;
 				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();

@@ -27,7 +27,7 @@ public enum InventoryConnectorComponentProvider implements IBlockComponentProvid
 			int all = accessor.getServerData().getIntOr("all", 0);
 			int blocks = accessor.getServerData().getIntOr("blocks", 0);
 			tooltip.add(Component.translatable("tooltip.toms_storage.connector_info.size", free, all));
-			tooltip.add(JadeUI.progress(new ProgressView(Part.of((all - free) / (float) all), null, JadeUI.progressStyle(), BoxStyle.nestedBox())));
+			tooltip.add(JadeUI.progress(new ProgressView(Part.of((all - free) / Math.max(all, 1f)), null, JadeUI.progressStyle(), BoxStyle.nestedBox())));
 			tooltip.add(Component.translatable("tooltip.toms_storage.connector_info.inv", blocks));
 		}
 	}
