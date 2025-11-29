@@ -49,6 +49,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 	public int slotCount, freeCount;
 	public String search;
 	public boolean noSort;
+	public boolean itemsLoaded = false;
 	public Slot offhand;
 
 	public StorageTerminalMenu(int id, Inventory inv, StorageTerminalBlockEntity te) {
@@ -233,6 +234,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 			} else {
 				itemListClient = new ArrayList<>(itemList);
 			}
+			itemsLoaded = true;
 			pinv.setChanged();
 		}
 		message.getString("s").ifPresent(s -> this.search = s);
