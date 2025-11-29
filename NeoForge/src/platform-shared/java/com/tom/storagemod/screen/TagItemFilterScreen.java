@@ -100,7 +100,6 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 
 	@Override
 	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
 		buttonAllowList.setState(menu.allowList);
 		itemTagList.preRender(mouseX, mouseY);
 		filterList.preRender(mouseX, mouseY);
