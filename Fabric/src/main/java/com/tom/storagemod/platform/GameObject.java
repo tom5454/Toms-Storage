@@ -9,8 +9,8 @@ import java.util.function.Supplier;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -19,11 +19,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.tom.storagemod.StorageMod;
 
 public class GameObject<T> {
-	private final ResourceLocation id;
+	private final Identifier id;
 	private final Supplier<? extends T> sup;
 	private T value;
 
-	private GameObject(ResourceLocation id,Supplier<? extends T> sup) {
+	private GameObject(Identifier id,Supplier<? extends T> sup) {
 		this.id = id;
 		this.sup = sup;
 	}
@@ -46,14 +46,14 @@ public class GameObject<T> {
 		}
 
 		public <I extends T> GameObject<I> register(final String name, final Supplier<? extends I> sup) {
-			GameObject<I> obj = new GameObject<>(ResourceLocation.tryBuild(StorageMod.modid, name), sup);
+			GameObject<I> obj = new GameObject<>(Identifier.tryBuild(StorageMod.modid, name), sup);
 			toRegister.add(obj);
 			return obj;
 		}
 
 		public <I extends T> GameObject<I> register(final String name, final Function<ResourceKey<T>, ? extends I> sup) {
-			ResourceKey<T> key = ResourceKey.create(registry.key(), ResourceLocation.tryBuild(StorageMod.modid, name));
-			GameObject<I> obj = new GameObject<>(key.location(), () -> sup.apply(key));
+			ResourceKey<T> key = ResourceKey.create(registry.key(), Identifier.tryBuild(StorageMod.modid, name));
+			GameObject<I> obj = new GameObject<>(key.identifier(), () -> sup.apply(key));
 			toRegister.add(obj);
 			return obj;
 		}
@@ -65,7 +65,7 @@ public class GameObject<T> {
 		}
 	}
 
-	public ResourceLocation getId() {
+	public Identifier getId() {
 		return id;
 	}
 
@@ -92,7 +92,7 @@ public class GameObject<T> {
 		private List<GameObject<? extends Block>> blocks;
 
 		public GameObjectBlockEntity(String name, List<GameObject<? extends Block>> blocks, FabricBlockEntityTypeBuilder.Factory<T> factory) {
-			super(ResourceLocation.tryBuild(StorageMod.modid, name), () -> FabricBlockEntityTypeBuilder.<T>create(factory, blocks.stream().map(GameObject::get).toArray(Block[]::new)).build());
+			super(Identifier.tryBuild(StorageMod.modid, name), () -> FabricBlockEntityTypeBuilder.<T>create(factory, blocks.stream().map(GameObject::get).toArray(Block[]::new)).build());
 			this.blocks = blocks;
 		}
 

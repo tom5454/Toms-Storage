@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.IAutoFillTerminal;
@@ -15,10 +15,10 @@ import com.tom.storagemod.util.PopupMenuManager;
 import com.tom.storagemod.util.PopupMenuManager.ButtonElement;
 
 public class TerminalSearchModeButton extends IconButton {
-	private static final ResourceLocation ICON = ResourceLocation.tryBuild(StorageMod.modid, "icons/search_mode");
-	private static final ResourceLocation AUTO = ResourceLocation.tryBuild(StorageMod.modid, "icons/search_mode_auto");
-	private static final ResourceLocation KEEP = ResourceLocation.tryBuild(StorageMod.modid, "icons/search_mode_keep");
-	private static final ResourceLocation SYNC = ResourceLocation.tryBuild(StorageMod.modid, "icons/search_mode_sync");
+	private static final Identifier ICON = Identifier.tryBuild(StorageMod.modid, "icons/search_mode");
+	private static final Identifier AUTO = Identifier.tryBuild(StorageMod.modid, "icons/search_mode_auto");
+	private static final Identifier KEEP = Identifier.tryBuild(StorageMod.modid, "icons/search_mode_keep");
+	private static final Identifier SYNC = Identifier.tryBuild(StorageMod.modid, "icons/search_mode_sync");
 	private int searchType = -1;
 
 	public TerminalSearchModeButton(int x, int y, PopupMenuManager menu, boolean canSync, Runnable sendUpdate) {

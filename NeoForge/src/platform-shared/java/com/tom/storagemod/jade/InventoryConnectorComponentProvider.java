@@ -1,7 +1,7 @@
 package com.tom.storagemod.jade;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -16,7 +16,7 @@ public enum InventoryConnectorComponentProvider implements IBlockComponentProvid
 	INSTANCE;
 
 	@Override
-	public ResourceLocation getUid() {
+	public Identifier getUid() {
 		return JadePlugin.INVENTORY_CONNECTOR;
 	}
 

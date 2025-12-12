@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.StorageMod;
@@ -30,8 +30,8 @@ import mezz.jei.api.runtime.IJeiRuntime;
 public class JEIHandler implements IModPlugin {
 
 	@Override
-	public ResourceLocation getPluginUid() {
-		return ResourceLocation.tryBuild(StorageMod.modid, "jei");
+	public Identifier getPluginUid() {
+		return Identifier.tryBuild(StorageMod.modid, "jei");
 	}
 
 	@Override

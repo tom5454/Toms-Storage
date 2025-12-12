@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -16,9 +16,9 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.FilingCabinetMenu;
 
 public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
-	private static final ResourceLocation CONTAINER_BACKGROUND = ResourceLocation.parse("textures/gui/container/generic_54.png");
-	private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.parse("container/creative_inventory/scroller");
-	private static final ResourceLocation SIDE_SCROLLBAR = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/side_scrollbar.png");
+	private static final Identifier CONTAINER_BACKGROUND = Identifier.parse("textures/gui/container/generic_54.png");
+	private static final Identifier SCROLLER_SPRITE = Identifier.parse("container/creative_inventory/scroller");
+	private static final Identifier SIDE_SCROLLBAR = Identifier.tryBuild(StorageMod.modid, "textures/gui/side_scrollbar.png");
 	private final int containerRows;
 	private int lastScroll;
 	protected float currentScroll;

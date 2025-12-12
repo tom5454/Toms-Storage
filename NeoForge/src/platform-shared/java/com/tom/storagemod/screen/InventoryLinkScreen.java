@@ -24,7 +24,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.storage.ValueInput;
 
@@ -38,9 +38,9 @@ import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.IDataReceiver;
 
 public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> implements IDataReceiver {
-	private static final ResourceLocation gui = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/inventory_link.png");
-	private static final ResourceLocation privateChannel = ResourceLocation.tryBuild(StorageMod.modid, "icons/lock_on");
-	private static final ResourceLocation publicChannel = ResourceLocation.tryBuild(StorageMod.modid, "icons/lock_off");
+	private static final Identifier gui = Identifier.tryBuild(StorageMod.modid, "textures/gui/inventory_link.png");
+	private static final Identifier privateChannel = Identifier.tryBuild(StorageMod.modid, "icons/lock_on");
+	private static final Identifier publicChannel = Identifier.tryBuild(StorageMod.modid, "icons/lock_off");
 	private EditBox textF;
 	private Map<UUID, LinkChannel> connections = new HashMap<>();
 	private IconButton createBtn, deleteBtn;
@@ -95,13 +95,13 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	protected void init() {
 		clearWidgets();
 		super.init();
-		createBtn = addRenderableWidget(new IconButton(leftPos + 121, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), () -> {
+		createBtn = addRenderableWidget(new IconButton(leftPos + 121, topPos + 24, Component.translatable(""), Identifier.tryBuild(StorageMod.modid, "icons/add"), () -> {
 			String name = textF.getValue().trim();
 			if (!name.isEmpty()) {
 				sendEdit(null, new LinkChannel(publicBtn.getState(), name));
 			}
 		}));
-		deleteBtn = addRenderableWidget(new IconButton(leftPos + 138, topPos + 24, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), () -> {
+		deleteBtn = addRenderableWidget(new IconButton(leftPos + 138, topPos + 24, Component.translatable(""), Identifier.tryBuild(StorageMod.modid, "icons/deny"), () -> {
 			sendEdit(channelsList.getSelected(), null);
 		}));
 		publicBtn = addRenderableWidget(ToggleButton.builder(leftPos + 155, topPos + 24).

@@ -48,7 +48,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 			int x = pos.pos().getX();
 			int y = pos.pos().getY();
 			int z = pos.pos().getZ();
-			String dim = pos.dim().location().toString();
+			String dim = pos.dim().identifier().toString();
 			tooltip.accept(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.bound", x, y, z, dim));
 		}
 		tooltip.accept(Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind", Component.translatable("tooltip.toms_storage.adv_wireless_terminal.keybind.outline", Component.keybind("key.toms_storage.open_terminal")).withStyle(ChatFormatting.GREEN)));

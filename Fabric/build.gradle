@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version '1.14-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -36,12 +36,12 @@ maven {
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 def useLib = System.getProperty("useLib")
 
@@ -59,11 +59,11 @@ dependencies {
     }
     include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
     
-    modImplementation ("curse.maven:jade-324717:7056475")
-    
-	modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1") {
+	modImplementation("com.terraformersmc:modmenu:17.0.0-alpha.1") {
         exclude(group: "net.fabricmc.fabric-api")
     }
+    
+    modImplementation ("curse.maven:jade-324717:7312559")
     
     if(useLib) {
     	modCompileOnly('maven.modrinth:sodium:mc1.21.5-0.6.12-fabric')
@@ -122,12 +122,12 @@ sourceSets {
 	main {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/jei/**"
-			if(!useLib)exclude "com/tom/storagemod/rei/**"
-			if(!useLib)exclude "com/tom/storagemod/emi/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			//if(!useLib)exclude "com/tom/storagemod/ModMenu.java"
-			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
+			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
 			srcDir "../NeoForge/src/platform-shared/resources"
@@ -161,6 +161,9 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

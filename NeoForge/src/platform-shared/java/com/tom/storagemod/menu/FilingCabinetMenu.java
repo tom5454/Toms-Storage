@@ -1,6 +1,6 @@
 package com.tom.storagemod.menu;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,7 +14,7 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.util.LimitedContainer;
 
 public class FilingCabinetMenu extends AbstractContainerMenu {
-	public static final ResourceLocation LOCKED_SLOT = ResourceLocation.tryBuild(StorageMod.modid, "icons/locked_slot");
+	public static final Identifier LOCKED_SLOT = Identifier.tryBuild(StorageMod.modid, "icons/locked_slot");
 
 	private final Container containerParent;
 	private final LimitedContainer container;
@@ -71,7 +71,7 @@ public class FilingCabinetMenu extends AbstractContainerMenu {
 					}
 
 					@Override
-					public ResourceLocation getNoItemIcon() {
+					public Identifier getNoItemIcon() {
 						if (!isValid())
 							return LOCKED_SLOT;
 						else

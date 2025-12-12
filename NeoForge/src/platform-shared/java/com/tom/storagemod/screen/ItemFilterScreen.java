@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import com.tom.storagemod.StorageMod;
@@ -14,7 +14,7 @@ import com.tom.storagemod.menu.ItemFilterMenu;
 import com.tom.storagemod.screen.widget.ToggleButton;
 
 public class ItemFilterScreen extends AbstractFilteredScreen<ItemFilterMenu> {
-	private static final ResourceLocation DISPENSER_GUI_TEXTURES = ResourceLocation.parse("textures/gui/container/dispenser.png");
+	private static final Identifier DISPENSER_GUI_TEXTURES = Identifier.parse("textures/gui/container/dispenser.png");
 
 	private ToggleButton buttonAllowList, buttonMatchNBT;
 
@@ -28,14 +28,14 @@ public class ItemFilterScreen extends AbstractFilteredScreen<ItemFilterMenu> {
 		//this.titleX = (this.xSize - this.font.getStringPropertyWidth(this.title)) / 2;
 
 		buttonAllowList = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/deny")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/allow")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/deny")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/allow")).
 				build(s -> click(1, s)));
 		buttonAllowList.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.denyList")), Tooltip.create(Component.translatable("tooltip.toms_storage.allowList")));
 
 		buttonMatchNBT = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5 + 18).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/match_tag_off")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/match_tag_on")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/match_tag_off")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/match_tag_on")).
 				build(s -> click(0, s)));
 		buttonMatchNBT.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.matchNBT_off")), Tooltip.create(Component.translatable("tooltip.toms_storage.matchNBT_on")));
 	}

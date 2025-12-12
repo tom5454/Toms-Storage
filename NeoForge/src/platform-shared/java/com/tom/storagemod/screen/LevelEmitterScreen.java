@@ -11,7 +11,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 import com.tom.storagemod.StorageMod;
@@ -22,7 +22,7 @@ import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.KeyUtil;
 
 public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu> {
-	private static final ResourceLocation gui = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/level_emitter.png");
+	private static final Identifier gui = Identifier.tryBuild(StorageMod.modid, "textures/gui/level_emitter.png");
 	private ToggleButton lessThanBtn;
 	private EditBox textF;
 	private List<AmountBtn> amountBtns = new ArrayList<>();
@@ -69,8 +69,8 @@ public class LevelEmitterScreen extends AbstractFilteredScreen<LevelEmitterMenu>
 		});
 		addRenderableWidget(textF);
 		lessThanBtn = ToggleButton.builder(leftPos - 18, topPos + 5).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/greater_than")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/less_than")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/greater_than")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/less_than")).
 				build(s -> {
 					lessThanBtn.setState(s);
 					menu.lessThan = s;

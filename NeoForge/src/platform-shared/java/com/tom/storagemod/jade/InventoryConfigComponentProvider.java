@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,7 @@ public enum InventoryConfigComponentProvider implements IBlockComponentProvider 
 	INSTANCE;
 
 	@Override
-	public ResourceLocation getUid() {
+	public Identifier getUid() {
 		return JadePlugin.INVENTORY_CONFIG;
 	}
 
@@ -49,7 +49,7 @@ public enum InventoryConfigComponentProvider implements IBlockComponentProvider 
 						t.add(icon);
 						f.getTooltipLines(TooltipContext.of(accessor.getLevel()), accessor.getPlayer(), TooltipFlag.Default.NORMAL).forEach(t::add);
 
-						BoxStyle b = BoxStyle.transparent().clone();
+						BoxStyle b = BoxStyle.transparent().copy();
 						//b.borderColor = new int[] {0xFFFF0000, 0xFFFF0000, 0xFFFF0000, 0xFFFF0000};
 						b.borderWidth = 1;
 						tooltip.add(JadeUI.box(t, b));

@@ -5,12 +5,12 @@ import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.tom.storagemod.StorageMod;
 
 public record DataPacket(CompoundTag tag) implements CustomPacketPayload {
-	public static final CustomPacketPayload.Type<DataPacket> ID = new CustomPacketPayload.Type<>(ResourceLocation.tryBuild(StorageMod.modid, "data"));
+	public static final CustomPacketPayload.Type<DataPacket> ID = new CustomPacketPayload.Type<>(Identifier.tryBuild(StorageMod.modid, "data"));
 	public static final StreamCodec<FriendlyByteBuf, DataPacket> STREAM_CODEC = CustomPacketPayload.codec(DataPacket::write, DataPacket::new);
 
 	private DataPacket(FriendlyByteBuf pb) {

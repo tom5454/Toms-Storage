@@ -2,19 +2,19 @@ package com.tom.storagemod.screen.widget;
 
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 
 public class ToggleButton extends IconButton {
-	private ResourceLocation iconOn;
+	private Identifier iconOn;
 	private boolean state;
 	private Tooltip ttTrue, ttFalse;
 
 	public static class Builder {
 		private int x, y;
 		private Component name = Component.empty();
-		private ResourceLocation on, off;
+		private Identifier on, off;
 
 		public Builder(int x, int y) {
 			this.x = x;
@@ -26,12 +26,12 @@ public class ToggleButton extends IconButton {
 			return this;
 		}
 
-		public Builder iconOn(ResourceLocation icon) {
+		public Builder iconOn(Identifier icon) {
 			this.on = icon;
 			return this;
 		}
 
-		public Builder iconOff(ResourceLocation icon) {
+		public Builder iconOff(Identifier icon) {
 			this.off = icon;
 			return this;
 		}
@@ -45,7 +45,7 @@ public class ToggleButton extends IconButton {
 		return new Builder(x, y);
 	}
 
-	protected ToggleButton(int x, int y, Component name, ResourceLocation iconOff, ResourceLocation iconOn, BooleanConsumer pressable) {
+	protected ToggleButton(int x, int y, Component name, Identifier iconOff, Identifier iconOn, BooleanConsumer pressable) {
 		super(x, y, name, iconOff, onPress(pressable));
 		this.iconOn = iconOn;
 	}
@@ -60,7 +60,7 @@ public class ToggleButton extends IconButton {
 	}
 
 	@Override
-	public ResourceLocation getIcon() {
+	public Identifier getIcon() {
 		return state ? iconOn : icon;
 	}
 

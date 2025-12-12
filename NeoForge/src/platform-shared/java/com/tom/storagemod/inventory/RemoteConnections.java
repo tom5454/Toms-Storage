@@ -34,10 +34,10 @@ public class RemoteConnections extends SavedData {
 				).apply(b, RemoteConnections::new);
 	}).codec();
 
-	private static final SavedDataType<RemoteConnections> FACTORY = new SavedDataType<>(ID, RemoteConnections::new, __ -> CODEC, DataFixTypes.LEVEL);
+	private static final SavedDataType<RemoteConnections> FACTORY = new SavedDataType<>(ID, RemoteConnections::new, CODEC, DataFixTypes.LEVEL);
 	private Map<UUID, Channel> connections = new HashMap<>();
 
-	private RemoteConnections(SavedData.Context ctx) {
+	private RemoteConnections() {
 	}
 
 	private RemoteConnections(List<Connection> conns) {

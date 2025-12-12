@@ -6,29 +6,29 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.tom.storagemod.StorageMod;
 
 public class IconButton extends Button {
 	protected static final WidgetSprites SPRITES = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/slot_button"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/slot_button_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/slot_button_hovered")
+			Identifier.tryBuild(StorageMod.modid, "widget/slot_button"),
+			Identifier.tryBuild(StorageMod.modid, "widget/slot_button_disabled"),
+			Identifier.tryBuild(StorageMod.modid, "widget/slot_button_hovered")
 			);
 
 	protected Component name;
-	protected ResourceLocation icon;
+	protected Identifier icon;
 	protected ButtonPressHandler pressable;
 
-	public IconButton(int x, int y, Component name, ResourceLocation icon, ButtonPressHandler pressable) {
+	public IconButton(int x, int y, Component name, Identifier icon, ButtonPressHandler pressable) {
 		super(x, y, 16, 16, Component.empty(), null, Button.DEFAULT_NARRATION);
 		this.name = name;
 		this.icon = icon;
 		this.pressable = pressable;
 	}
 
-	public IconButton(int x, int y, Component name, ResourceLocation icon, Runnable pressable) {
+	public IconButton(int x, int y, Component name, Identifier icon, Runnable pressable) {
 		this(x, y, name, icon, onPressRunnable(pressable));
 	}
 
@@ -40,7 +40,7 @@ public class IconButton extends Button {
 	 * Draws this button to the screen.
 	 */
 	@Override
-	public void renderWidget(GuiGraphics st, int mouseX, int mouseY, float pt) {
+	public void renderContents(GuiGraphics st, int mouseX, int mouseY, float pt) {
 		if (this.visible) {
 			int x = getX();
 			int y = getY();
@@ -54,7 +54,7 @@ public class IconButton extends Button {
 		st.blitSprite(RenderPipelines.GUI_TEXTURED, getIcon(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
 	}
 
-	public ResourceLocation getIcon() {
+	public Identifier getIcon() {
 		return icon;
 	}
 

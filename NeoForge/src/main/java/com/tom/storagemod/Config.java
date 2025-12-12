@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -179,7 +179,7 @@ public class Config {
 		} else if(modConfig.getType() == Type.COMMON) {
 			blockedMods = new HashSet<>(COMMON.blockedMods.get());
 
-			blockedBlocks = COMMON.blockedBlocks.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).
+			blockedBlocks = COMMON.blockedBlocks.get().stream().map(Identifier::tryParse).filter(e -> e != null).
 					map(BuiltInRegistries.BLOCK::getValue).filter(e -> e != null && e != Blocks.AIR).
 					collect(Collectors.toSet());
 		}

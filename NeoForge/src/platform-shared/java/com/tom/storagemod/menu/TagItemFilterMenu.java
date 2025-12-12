@@ -5,7 +5,7 @@ import java.util.function.BooleanSupplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -120,7 +120,7 @@ public class TagItemFilterMenu extends AbstractFilteredMenu {
 	@Override
 	public void receive(ValueInput tag) {
 		super.receive(tag);
-		tag.list("l", ResourceLocation.CODEC).ifPresent(list -> {
+		tag.list("l", Identifier.CODEC).ifPresent(list -> {
 			filter.setTags(list.stream().toList());
 		});
 	}

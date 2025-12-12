@@ -12,7 +12,7 @@ public class InventoryConnectorConfigUtil {
 		if (Config.get().getBlockedBlocks().contains(block))
 			return false;
 		if (!Config.get().getBlockedMods().isEmpty()) {
-			var modid = block.builtInRegistryHolder().key().location().getNamespace();
+			var modid = block.builtInRegistryHolder().key().identifier().getNamespace();
 			if (Config.get().getBlockedMods().contains(modid))
 				return false;
 		}

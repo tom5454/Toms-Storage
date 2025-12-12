@@ -1,7 +1,7 @@
 package com.tom.storagemod.jade;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity;
 import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity.UsageInfo;
@@ -13,7 +13,7 @@ public enum InventoryConnectorDataProvider implements IServerDataProvider<BlockA
 	INSTANCE;
 
 	@Override
-	public ResourceLocation getUid() {
+	public Identifier getUid() {
 		return JadePlugin.INVENTORY_CONNECTOR;
 	}
 

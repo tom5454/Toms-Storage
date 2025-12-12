@@ -15,7 +15,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -58,7 +58,7 @@ import com.tom.storagemod.screen.TagItemFilterScreen;
 public class StorageModClient {
 	public static KeyMapping openTerm;
 	public static List<RenderPipeline> pipelines = new ArrayList<>();
-	public static final ResourceLocation CONFIGURATOR_OVERLAY_ID = ResourceLocation.tryBuild(StorageMod.modid, "configurator_info");
+	public static final Identifier CONFIGURATOR_OVERLAY_ID = Identifier.tryBuild(StorageMod.modid, "configurator_info");
 
 	public static void preInit(ModContainer mc, IEventBus bus) {
 		bus.addListener(StorageModClient::registerColors);

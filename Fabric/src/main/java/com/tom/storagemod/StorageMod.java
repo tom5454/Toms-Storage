@@ -27,7 +27,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.TickTask;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionResult;
@@ -68,7 +68,7 @@ public class StorageMod implements ModInitializer {
 	private static Config LOADED_CONFIG = configHolder.getConfig();
 	public static Config CONFIG = new Config();
 
-	public static final AttachmentType<BlockFilter> BLOCK_FILTER = AttachmentRegistry.createPersistent(ResourceLocation.tryBuild(StorageMod.modid, "block_filter"), BlockFilter.CODEC);
+	public static final AttachmentType<BlockFilter> BLOCK_FILTER = AttachmentRegistry.createPersistent(Identifier.tryBuild(StorageMod.modid, "block_filter"), BlockFilter.CODEC);
 
 	public static boolean polymorph;
 	public static Set<Block> blockedBlocks;
@@ -76,8 +76,8 @@ public class StorageMod implements ModInitializer {
 	public StorageMod() {
 	}
 
-	public static ResourceLocation id(String id) {
-		return ResourceLocation.tryBuild(modid, id);
+	public static Identifier id(String id) {
+		return Identifier.tryBuild(modid, id);
 	}
 
 	@Override
@@ -129,8 +129,8 @@ public class StorageMod implements ModInitializer {
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> InventoryStorage.of(be.getInv(), side), Content.filingCabinetBE.get());
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.invProxyBE.get());
 
-		ResourceLocation at = ResourceLocation.tryBuild(modid, "left_click_item_on_block");
-		ResourceLocation rl = ResourceLocation.tryBuild(modid, "use_item_first");
+		Identifier at = Identifier.tryBuild(modid, "left_click_item_on_block");
+		Identifier rl = Identifier.tryBuild(modid, "use_item_first");
 		AttackBlockCallback.EVENT.register(at, (player, world, hand, pos, direction) -> {
 			ItemStack is = player.getItemInHand(hand);
 			if (is.getItem() instanceof ILeftClickListener l)

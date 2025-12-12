@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
@@ -29,7 +29,7 @@ import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.IDataReceiver;
 
 public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMenu> implements IDataReceiver {
-	private static final ResourceLocation GUI_TEXTURES = ResourceLocation.tryBuild(StorageMod.modid, "textures/gui/tag_filter.png");
+	private static final Identifier GUI_TEXTURES = Identifier.tryBuild(StorageMod.modid, "textures/gui/tag_filter.png");
 	private ToggleButton buttonAllowList;
 	private IconButton buttonAdd, buttonRemove;
 	private List<String> itemTags = new ArrayList<>();
@@ -46,8 +46,8 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		//this.titleX = (this.xSize - this.font.getStringPropertyWidth(this.title)) / 2;
 
 		buttonAllowList = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/deny")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/allow")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/deny")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/allow")).
 				build(s -> click(0, s)));
 		buttonAllowList.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.denyList")), Tooltip.create(Component.translatable("tooltip.toms_storage.allowList")));
 
@@ -56,7 +56,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		filterList = addRenderableWidget(new ListHandler(leftPos + 109, topPos + 15));
 		filterList.setList(() -> filterTags);
 
-		buttonAdd = addRenderableWidget(new IconButton(leftPos + 90, topPos + 14, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/add"), () -> {
+		buttonAdd = addRenderableWidget(new IconButton(leftPos + 90, topPos + 14, Component.translatable(""), Identifier.tryBuild(StorageMod.modid, "icons/add"), () -> {
 			String sel = itemTagList.getSelected();
 			if(sel != null) {
 				if(!filterTags.contains(sel))
@@ -66,7 +66,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 			}
 		}));
 
-		buttonRemove = addRenderableWidget(new IconButton(leftPos + 90, topPos + 32, Component.translatable(""), ResourceLocation.tryBuild(StorageMod.modid, "icons/deny"), () -> {
+		buttonRemove = addRenderableWidget(new IconButton(leftPos + 90, topPos + 32, Component.translatable(""), Identifier.tryBuild(StorageMod.modid, "icons/deny"), () -> {
 			String sel = filterList.getSelected();
 			if(sel != null) {
 				filterTags.remove(sel);

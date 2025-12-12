@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.TooltipFlag;
@@ -70,7 +70,7 @@ public class TheOneProbeHandler implements Function<ITheOneProbe, Void>, IProbeI
 	}
 
 	@Override
-	public ResourceLocation getID() {
-		return ResourceLocation.tryBuild(StorageMod.modid, "top");
+	public Identifier getID() {
+		return Identifier.tryBuild(StorageMod.modid, "top");
 	}
 }

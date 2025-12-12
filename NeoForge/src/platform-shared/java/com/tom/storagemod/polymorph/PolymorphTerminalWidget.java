@@ -2,7 +2,7 @@ package com.tom.storagemod.polymorph;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.illusivesoulworks.polymorph.api.client.PolymorphWidgets;
 import com.illusivesoulworks.polymorph.api.client.widgets.PlayerRecipesWidget;
@@ -19,10 +19,10 @@ public class PolymorphTerminalWidget extends PlayerRecipesWidget {
 	}
 
 	@Override
-	public void selectRecipe(ResourceLocation resourceLocation) {
-		super.selectRecipe(resourceLocation);
+	public void selectRecipe(Identifier Identifier) {
+		super.selectRecipe(Identifier);
 		var mc = Minecraft.getInstance();
-		/*mc.getConnection().recipes().byKey(resourceLocation).ifPresent(recipe -> {
+		/*mc.getConnection().recipes().byKey(Identifier).ifPresent(recipe -> {
 			mc.gameMode.handleInventoryButtonClick((this.menu).containerId, 1);
 		});*/
 	}

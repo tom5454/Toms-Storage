@@ -1,6 +1,6 @@
 package com.tom.storagemod.jade;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -15,8 +15,8 @@ import snownee.jade.api.WailaPlugin;
 
 @WailaPlugin
 public class JadePlugin implements IWailaPlugin {
-	public static final ResourceLocation INVENTORY_CONNECTOR = ResourceLocation.tryBuild(StorageMod.modid, "inventory_connector");
-	public static final ResourceLocation INVENTORY_CONFIG = ResourceLocation.tryBuild(StorageMod.modid, "inventory_config");
+	public static final Identifier INVENTORY_CONNECTOR = Identifier.tryBuild(StorageMod.modid, "inventory_connector");
+	public static final Identifier INVENTORY_CONFIG = Identifier.tryBuild(StorageMod.modid, "inventory_config");
 
 	@Override
 	public void register(IWailaCommonRegistration registration) {

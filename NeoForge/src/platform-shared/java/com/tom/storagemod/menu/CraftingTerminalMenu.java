@@ -4,8 +4,8 @@ import java.util.List;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -188,7 +188,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	public void receive(ValueInput message) {
 		super.receive(message);
 		message.getString("fill").ifPresent(s -> {
-			var id = ResourceLocation.tryParse(s);
+			var id = Identifier.tryParse(s);
 			if (id != null) {
 				var recipe = pinv.player.level().getServer().getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id)).orElse(null);
 				if (recipe != null) {

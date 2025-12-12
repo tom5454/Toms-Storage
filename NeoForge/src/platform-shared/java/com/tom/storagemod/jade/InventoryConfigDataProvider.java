@@ -1,7 +1,7 @@
 package com.tom.storagemod.jade;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import com.tom.storagemod.inventory.BlockFilter;
@@ -13,7 +13,7 @@ public enum InventoryConfigDataProvider implements IServerDataProvider<BlockAcce
 	INSTANCE;
 
 	@Override
-	public ResourceLocation getUid() {
+	public Identifier getUid() {
 		return JadePlugin.INVENTORY_CONFIG;
 	}
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -108,7 +108,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 			}
 
 			@Override
-			public ResourceLocation getNoItemIcon() {
+			public Identifier getNoItemIcon() {
 				return InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
 			}
 		});

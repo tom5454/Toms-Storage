@@ -16,28 +16,28 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 import com.tom.storagemod.StorageMod;
 
 public abstract class ListWidget<T> extends AbstractWidget {
 	protected static final WidgetSprites LIST_BUTTON_SPRITES = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_hovered")
+			Identifier.tryBuild(StorageMod.modid, "widget/small_button"),
+			Identifier.tryBuild(StorageMod.modid, "widget/small_button_disabled"),
+			Identifier.tryBuild(StorageMod.modid, "widget/small_button_hovered")
 			);
 
 	protected static final WidgetSprites LIST_BUTTON_SPRITES_S = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_selected"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_button_selected_hovered")
+			Identifier.tryBuild(StorageMod.modid, "widget/small_button_selected"),
+			Identifier.tryBuild(StorageMod.modid, "widget/small_button_disabled"),
+			Identifier.tryBuild(StorageMod.modid, "widget/small_button_selected_hovered")
 			);
 
 	protected static final WidgetSprites SCROLL_SPRITES = new WidgetSprites(
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_scroll"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_scroll_disabled"),
-			ResourceLocation.tryBuild(StorageMod.modid, "widget/small_scroll_hovered")
+			Identifier.tryBuild(StorageMod.modid, "widget/small_scroll"),
+			Identifier.tryBuild(StorageMod.modid, "widget/small_scroll_disabled"),
+			Identifier.tryBuild(StorageMod.modid, "widget/small_scroll_hovered")
 			);
 
 	private final int elemH;
@@ -131,7 +131,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderWidget(GuiGraphics st, int mouseX, int mouseY, float pt) {
+		public void renderContents(GuiGraphics st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				T id = getId();
 				if(id != null) {
@@ -141,11 +141,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 					var spr = (id.equals(selected) ? LIST_BUTTON_SPRITES_S : LIST_BUTTON_SPRITES).get(this.active, this.isHoveredOrFocused());
 					st.blitSprite(RenderPipelines.GUI_TEXTURED, spr, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 					renderEntry(st, this.getX(), this.getY(), this.getWidth(), this.getHeight(), id, mouseX, mouseY, pt);
-					int c = this.active ? 0xFFFFFF : 0xA0A0A0;
-					int v = c | Mth.ceil(this.alpha * 255.0f) << 24;
-					int k = this.getX() + 2;
-					int l = this.getX() + this.getWidth() - 2;
-					AbstractWidget.renderScrollingString(st, getFont(), toComponent(id), k, this.getY(), l, this.getY() + this.getHeight(), v);
+					renderScrollingStringOverContents(st.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE), toComponent(id), 2);
 				}
 			}
 		}

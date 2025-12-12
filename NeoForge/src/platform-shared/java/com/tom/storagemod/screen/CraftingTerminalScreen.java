@@ -15,7 +15,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -29,7 +29,7 @@ import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
 public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<CraftingTerminalMenu> implements RecipeUpdateListener {
-	private static final ResourceLocation gui = ResourceLocation.tryBuild("toms_storage", "textures/gui/crafting_terminal.png");
+	private static final Identifier gui = Identifier.tryBuild("toms_storage", "textures/gui/crafting_terminal.png");
 	private final CraftingTerminalRecipeBookWidget recipeBookGui;
 	private boolean widthTooNarrow;
 	private ToggleButton buttonPullFromInv;
@@ -41,7 +41,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	}
 
 	@Override
-	public ResourceLocation getGui() {
+	public Identifier getGui() {
 		return gui;
 	}
 
@@ -67,8 +67,8 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		btnClr = new ButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, b -> clearGrid());
 		addRenderableWidget(btnClr);
 		buttonPullFromInv = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5 + 18*6).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/refill_off")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/refill_on")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/refill_off")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/refill_on")).
 				build(s -> {
 					buttonPullFromInv.setState(s);
 					sendUpdate();
@@ -139,9 +139,9 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	}
 
 	@Override
-	protected void renderSlots(GuiGraphics p_376566_) {
-		super.renderSlots(p_376566_);
-		this.recipeBookGui.renderGhostRecipe(p_376566_, true);
+	protected void renderSlots(GuiGraphics guiGraphics, int i, int j) {
+		super.renderSlots(guiGraphics, i, j);
+		this.recipeBookGui.renderGhostRecipe(guiGraphics, true);
 	}
 
 	@Override
@@ -213,9 +213,9 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 
 	public static class ButtonClear extends Button {
 		private static final WidgetSprites SPRITES = new WidgetSprites(
-				ResourceLocation.tryBuild(StorageMod.modid, "widget/clear_button"),
-				ResourceLocation.tryBuild(StorageMod.modid, "widget/clear_button_disabled"),
-				ResourceLocation.tryBuild(StorageMod.modid, "widget/clear_button_hovered")
+				Identifier.tryBuild(StorageMod.modid, "widget/clear_button"),
+				Identifier.tryBuild(StorageMod.modid, "widget/clear_button_disabled"),
+				Identifier.tryBuild(StorageMod.modid, "widget/clear_button_hovered")
 				);
 
 		public ButtonClear(int x, int y, OnPress pressable) {
@@ -226,7 +226,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderWidget(GuiGraphics st, int mouseX, int mouseY, float pt) {
+		public void renderContents(GuiGraphics st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				int x = getX();
 				int y = getY();

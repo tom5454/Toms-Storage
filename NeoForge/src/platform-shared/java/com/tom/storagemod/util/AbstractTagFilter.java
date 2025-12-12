@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +45,7 @@ public class AbstractTagFilter {
 		return tags;
 	}
 
-	public void setTags(List<ResourceLocation> tags) {
+	public void setTags(List<Identifier> tags) {
 		this.tags = tags.stream().map(t -> TagKey.create(Registries.ITEM, t)).toList();
 	}
 }

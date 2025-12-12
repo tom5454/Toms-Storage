@@ -7,18 +7,18 @@ import java.util.function.Function;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import com.tom.storagemod.StorageMod;
 
 public class EnumCycleButton<T extends Enum<T>> extends IconButton {
 	private T state;
 	public Function<T, Tooltip> tooltipFactory;
-	public Function<T, ResourceLocation> icon;
+	public Function<T, Identifier> icon;
 
 	public EnumCycleButton(int x, int y, Component name, String prefix, T[] el, Consumer<T> stateUpdate) {
 		super(x, y, name, null, onPress(el, stateUpdate));
-		this.icon = e -> ResourceLocation.tryBuild(StorageMod.modid, "icons/" + prefix + "_" + e.name().toLowerCase(Locale.ROOT));
+		this.icon = e -> Identifier.tryBuild(StorageMod.modid, "icons/" + prefix + "_" + e.name().toLowerCase(Locale.ROOT));
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class EnumCycleButton<T extends Enum<T>> extends IconButton {
 	}
 
 	@Override
-	public ResourceLocation getIcon() {
+	public Identifier getIcon() {
 		return icon.apply(state);
 	}
 

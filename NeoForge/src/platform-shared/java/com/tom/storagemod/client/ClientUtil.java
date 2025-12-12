@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -77,10 +77,10 @@ public class ClientUtil {
 		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
 		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 			BlockPos pos = lookingAt.getBlockPos();
-			Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
-			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
+			Vec3 renderPos = mc.gameRenderer.getMainCamera().position();
+			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
 			drawShape(ps, buf, state.getOcclusionShape(), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
-			mc.renderBuffers().bufferSource().endBatch(RenderType.lines());
+			mc.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
 		}
 	}
 
@@ -108,8 +108,8 @@ public class ClientUtil {
 			return;
 		}
 
-		Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
-		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderType.lines());
+		Vec3 renderPos = mc.gameRenderer.getMainCamera().position();
+		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
 
 		for (var pos : c.selection()) {
 			double x = pos.getX() - renderPos.x;
@@ -146,7 +146,7 @@ public class ClientUtil {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(CustomRenderTypes.linesNoDepth());
-		Vec3 renderPos = mc.gameRenderer.getMainCamera().getPosition();
+		Vec3 renderPos = mc.gameRenderer.getMainCamera().position();
 
 		BlockPos.betweenClosedStream(new AABB(player.blockPosition()).inflate(7)).forEach(pos -> {
 			double dist = renderPos.distanceToSqr(pos.getX(), pos.getY(), pos.getZ());

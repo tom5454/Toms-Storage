@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
@@ -36,7 +36,7 @@ public class Config implements ConfigData {
 
 	public Set<Block> getBlockedBlocks() {
 		if (StorageMod.blockedBlocks == null) {
-			StorageMod.blockedBlocks = blockedBlocks.stream().map(ResourceLocation::tryParse).filter(e -> e != null).
+			StorageMod.blockedBlocks = blockedBlocks.stream().map(Identifier::tryParse).filter(e -> e != null).
 					map(id -> BuiltInRegistries.BLOCK.getValue(id)).filter(e -> e != null && e != Blocks.AIR).collect(Collectors.toSet());
 		}
 		return StorageMod.blockedBlocks;

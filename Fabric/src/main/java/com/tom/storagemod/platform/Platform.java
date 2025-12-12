@@ -19,7 +19,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -54,7 +54,7 @@ public class Platform {
 		return item;
 	}
 
-	private static final ResourceKey<CreativeModeTab> ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.tryBuild(StorageMod.modid, "tab"));
+	private static final ResourceKey<CreativeModeTab> ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.tryBuild(StorageMod.modid, "tab"));
 
 	public static final CreativeModeTab STORAGE_MOD_TAB = FabricItemGroup.builder().title(Component.translatable("itemGroup.toms_storage.tab")).icon(() -> new ItemStack(Content.terminal.get())).displayItems((p, out) -> {
 		tabItems.forEach(out::accept);

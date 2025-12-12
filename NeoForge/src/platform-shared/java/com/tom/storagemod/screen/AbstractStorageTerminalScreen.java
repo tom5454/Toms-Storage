@@ -30,7 +30,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -76,9 +76,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMenu> extends TSContainerScreen<T> implements IDataReceiver {
-	private static final ResourceLocation SCROLLER_SPRITE = ResourceLocation.parse("container/creative_inventory/scroller");
-	private static final ResourceLocation SCROLLER_DISABLED_SPRITE = ResourceLocation.parse("container/creative_inventory/scroller_disabled");
-	private static final ResourceLocation FLOATING_SLOT = ResourceLocation.tryBuild(StorageMod.modid, "widget/floating_slot");
+	private static final Identifier SCROLLER_SPRITE = Identifier.parse("container/creative_inventory/scroller");
+	private static final Identifier SCROLLER_DISABLED_SPRITE = Identifier.parse("container/creative_inventory/scroller_disabled");
+	private static final Identifier FLOATING_SLOT = Identifier.tryBuild(StorageMod.modid, "widget/floating_slot");
 
 	private static final LoadingCache<StoredItemStack, List<String>> tooltipCache =
 			CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(key -> {
@@ -221,8 +221,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}));
 		buttonDirection = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5 + 18).
 				name(Component.translatable("narrator.toms_storage.terminal_sort_rev")).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_desc")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_asc")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/sort_desc")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/sort_asc")).
 				build(n -> {
 					comparator.setReversed(n);
 					buttonDirection.setState(n);
@@ -237,8 +237,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}));
 		buttonGhostMode = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5 + 18*4).
 				name(Component.translatable("narrator.toms_storage.terminal_ghost_items")).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/keep_last_off")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/keep_last_0")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/keep_last_off")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/keep_last_0")).
 				build(n -> {
 					ghostItems = n;
 					buttonGhostMode.setState(n);
@@ -247,8 +247,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		buttonGhostMode.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.ghostMode_off")), Tooltip.create(Component.translatable("tooltip.toms_storage.ghostMode_on")));
 		buttonTallMode = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5 + 18*5).
 				name(Component.translatable("narrator.toms_storage.terminal_tall_mode")).
-				iconOff(ResourceLocation.tryBuild(StorageMod.modid, "icons/tall_terminal_off")).
-				iconOn(ResourceLocation.tryBuild(StorageMod.modid, "icons/tall_terminal_on")).
+				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/tall_terminal_off")).
+				iconOn(Identifier.tryBuild(StorageMod.modid, "icons/tall_terminal_on")).
 				build(n -> {
 					tallMode = n;
 					buttonTallMode.setState(n);
@@ -517,7 +517,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			int l = slot.xDisplayPosition;
 			int t = slot.yDisplayPosition;
 			st.fill(l, t, l + 16, t + 16, -2130706433);
-			renderSlot(st, fakeSlotUnderMouse);
+			renderSlot(st, fakeSlotUnderMouse, mouseX, mouseY);
 			return true;
 		}
 		return false;
@@ -685,7 +685,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 	}
 
-	public abstract ResourceLocation getGui();
+	public abstract Identifier getGui();
 
 	@Override
 	protected void renderBg(GuiGraphics st, float partialTicks, int mouseX, int mouseY) {
