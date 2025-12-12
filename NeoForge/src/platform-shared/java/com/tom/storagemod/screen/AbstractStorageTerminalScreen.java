@@ -581,7 +581,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 				else
 					return super.mouseClicked(mouseButtonEvent, bl);
 			} else {
-				searchField.setFocused(false);
+				if (getFocused() == searchField)
+					setFocused(null);
 				return super.mouseClicked(mouseButtonEvent, bl);
 			}
 		}
