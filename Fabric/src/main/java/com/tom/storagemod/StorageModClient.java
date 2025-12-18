@@ -1,6 +1,8 @@
 package com.tom.storagemod;
 
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -8,6 +10,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
@@ -25,6 +28,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 
@@ -34,8 +38,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
+import com.tom.storagemod.client.UnbakedPaintedModel;
 import com.tom.storagemod.network.DataPacket;
 import com.tom.storagemod.network.NetworkHandler;
+import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
 import com.tom.storagemod.screen.FilingCabinetScreen;
 import com.tom.storagemod.screen.InventoryConfiguratorScreen;
@@ -74,7 +80,7 @@ public class StorageModClient implements ClientModInitializer {
 			}
 		});
 
-		/*ModelLoadingPlugin.register(new ModelLoadingPlugin() {
+		ModelLoadingPlugin.register(new ModelLoadingPlugin() {
 			private Set<BlockState> states = new HashSet<>();
 
 			@Override
@@ -87,7 +93,7 @@ public class StorageModClient implements ClientModInitializer {
 					return p;
 				});
 			}
-		});*/
+		});
 
 		ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
 			if (world != null) {
@@ -143,7 +149,7 @@ public class StorageModClient implements ClientModInitializer {
 		//if (StorageMod.polymorph)PolymorphTerminalWidget.register();
 	}
 
-	/*private static void bakeModels(Set<BlockState> states) {
+	private static void bakeModels(Set<BlockState> states) {
 		bindPaintedModel(states, Content.paintedTrim);
 		bindPaintedModel(states, Content.invCableFramed);
 		bindPaintedModel(states, Content.invProxy);
@@ -152,7 +158,7 @@ public class StorageModClient implements ClientModInitializer {
 
 	private static void bindPaintedModel(Set<BlockState> states, GameObject<? extends Block> block) {
 		states.addAll(block.get().getStateDefinition().getPossibleStates());
-	}*/
+	}
 
 	public static Supplier<RenderPipeline> registerPipeline(Supplier<RenderPipeline> factory) {
 		var p = factory.get();

@@ -179,8 +179,8 @@ public class ClientUtil {
 			q /= t;
 			r /= t;
 			s /= t;
-			vertexConsumer.addVertex(entry.pose(), (float)(k + d), (float)(l + e), (float)(m + f)).setColor(g, h, i, j).setNormal(entry, q, r, s);
-			vertexConsumer.addVertex(entry.pose(), (float)(n + d), (float)(o + e), (float)(p + f)).setColor(g, h, i, j).setNormal(entry, q, r, s);
+			vertexConsumer.addVertex(entry.pose(), (float)(k + d), (float)(l + e), (float)(m + f)).setColor(g, h, i, j).setLineWidth(2f).setNormal(entry, q, r, s);
+			vertexConsumer.addVertex(entry.pose(), (float)(n + d), (float)(o + e), (float)(p + f)).setColor(g, h, i, j).setLineWidth(2f).setNormal(entry, q, r, s);
 		});
 	}
 
@@ -210,30 +210,30 @@ public class ClientUtil {
 		final float t = (float) g;
 		final float u = (float) h;
 		final float v = (float) i;
-		vertexConsumer.addVertex(pose, q, r, s).setColor(j, o, p, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, r, s).setColor(j, o, p, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, r, s).setColor(n, k, p, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, u, s).setColor(n, k, p, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, r, s).setColor(n, o, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
-		vertexConsumer.addVertex(pose, q, r, v).setColor(n, o, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
-		vertexConsumer.addVertex(pose, t, r, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, -1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, u, s).setColor(j, k, l, m).setNormal(pose, -1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
-		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
-		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, -1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, r, v).setColor(j, k, l, m).setNormal(pose, 0.0f, -1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, q, r, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, -1.0f);
-		vertexConsumer.addVertex(pose, t, r, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, -1.0f);
-		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 1.0f, 0.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 1.0f, 0.0f);
-		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
-		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, r, s).setColor(j, o, p, m).setLineWidth(2f).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, s).setColor(j, o, p, m).setLineWidth(2f).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, s).setColor(n, k, p, m).setLineWidth(2f).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, u, s).setColor(n, k, p, m).setLineWidth(2f).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, s).setColor(n, o, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, r, v).setColor(n, o, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, t, r, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, -1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, u, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, -1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, u, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, -1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, -1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, q, r, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, -1.0f);
+		vertexConsumer.addVertex(pose, t, r, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, -1.0f);
+		vertexConsumer.addVertex(pose, q, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 1.0f, 0.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, r, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 1.0f, 0.0f);
+		vertexConsumer.addVertex(pose, t, u, s).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
+		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
 	}
 
 	public static void drawConfiguratorOverlay(GuiGraphics gr) {
