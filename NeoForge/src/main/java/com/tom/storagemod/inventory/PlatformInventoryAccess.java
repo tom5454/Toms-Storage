@@ -68,7 +68,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 		@Override
 		public IInventoryChangeTracker tracker() {
-			IItemHandler itemHandler = itemCache.getCapability();
+			IItemHandler itemHandler = get();
 			if (itemHandler != null)
 				tracker.setDelegate(WorldStates.getTracker(itemHandler));
 			else
@@ -91,7 +91,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		public boolean exists() {
-			return itemCache.getCapability() != null;
+			return valid && itemCache.getCapability() != null;
 		}
 
 		@Override

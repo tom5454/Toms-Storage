@@ -14,6 +14,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -35,6 +38,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -150,6 +154,15 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 
 
 		return super.mirror(blockState_1, blockMirror_1);
+	}
+
+	@Override
+	protected InteractionResult useItemOn(ItemStack item, BlockState state, Level world,
+			BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_316140_) {
+		if (tryScrape(item, state, world, pos, player, hand)) {
+			return InteractionResult.SUCCESS;
+		}
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 
 	@Override
