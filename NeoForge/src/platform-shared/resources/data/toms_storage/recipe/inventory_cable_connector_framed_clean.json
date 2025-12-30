@@ -1,14 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "toms_storage:inventory_cable_connector",
   "ingredients": [
-  	{
-  		"item": "toms_storage:inventory_cable_connector_framed"
-  	},
-  	{
-  		"item": "minecraft:water_bucket"
-  	}
+	"toms_storage:inventory_cable_connector",
+	"minecraft:water_bucket"
   ],
   "result": {
-    "id": "toms_storage:inventory_cable_connector_framed"
+    "id": "toms_storage:inventory_cable_connector"
   }
 }

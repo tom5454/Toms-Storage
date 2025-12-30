@@ -1,5 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "toms_storage:inventory_cable_connector",
   "pattern": [
   	" qP",
     "CcE",
