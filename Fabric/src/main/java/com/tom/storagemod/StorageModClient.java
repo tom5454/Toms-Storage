@@ -102,13 +102,12 @@ public class StorageModClient implements ClientModInitializer {
 			return -1;
 		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get(), Content.invProxy.get());
 
-		WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((ctx, hr) -> {
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(ctx -> {
 			PoseStack ps = new PoseStack();
 			ps.pushPose();
 			ClientUtil.drawTerminalOutline(ps);
 			ClientUtil.drawConfiguratorOutline(ps);
 			ps.popPose();
-			return true;
 		});
 
 		ClientLoginNetworking.registerGlobalReceiver(StorageMod.id("config"), (mc, handler, buf, fc) -> {
