@@ -71,7 +71,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 
 		@Override
 		public IInventoryChangeTracker tracker() {
-			@Nullable ResourceHandler<ItemResource> itemHandler = itemCache.getCapability();
+			@Nullable ResourceHandler<ItemResource> itemHandler = get();
 			if (itemHandler != null)
 				tracker.setDelegate(WorldStates.getTracker(itemHandler));
 			else
@@ -94,7 +94,7 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		public boolean exists() {
-			return itemCache.getCapability() != null;
+			return valid && itemCache.getCapability() != null;
 		}
 
 		@Override

@@ -18,8 +18,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -99,5 +100,9 @@ public class Platform {
 
 	public static ItemStack getCloneItemStack(Level level, BlockPos pos, Player player) {
 		return level.getBlockState(pos).getCloneItemStack(level, pos, false);
+	}
+
+	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
+		return item.is(ItemTags.AXES);
 	}
 }
