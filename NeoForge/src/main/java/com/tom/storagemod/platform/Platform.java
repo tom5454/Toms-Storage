@@ -30,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -123,5 +124,9 @@ public class Platform {
 
 	public static ItemStack getCloneItemStack(Level level, BlockPos pos, Player player) {
 		return level.getBlockState(pos).getCloneItemStack(pos, level, false, player);
+	}
+
+	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
+		return item.canPerformAction(ItemAbilities.AXE_SCRAPE);
 	}
 }
