@@ -94,7 +94,7 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
 			///*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
@@ -138,12 +138,12 @@ dependencies {
     
     implementation "curse.maven:jade-324717:7313008"
     
+    compileOnly "mezz.jei:jei-1.21.11-neoforge-api:27.3.0.14"
+    compileOnly "mezz.jei:jei-1.21.11-common-api:27.3.0.14"
+    // at runtime, use the full JEI jar
+    runtimeOnly "mezz.jei:jei-1.21.11-neoforge:27.3.0.14"
+    
     if(useLib) {
-	    compileOnly "mezz.jei:jei-1.21.10-neoforge-api:26.0.0.1"
-	    compileOnly "mezz.jei:jei-1.21.10-common-api:26.0.0.1"
-	    // at runtime, use the full JEI jar
-	    runtimeOnly "mezz.jei:jei-1.21.10-neoforge:26.0.0.1"
-	    
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:19.0.806"
 	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:19.0.806"
 	    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:19.0.806"

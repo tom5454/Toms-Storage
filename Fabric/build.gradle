@@ -81,7 +81,7 @@ dependencies {
     	modImplementation("org.anarres:jcpp:1.4.14")
     
 		// compile against the JEI API but do not include it at runtime
-		modCompileOnlyApi("mezz.jei:jei-1.21.5-common-api:${project.jei_version}")
+		modCompileOnlyApi("mezz.jei:jei-1.21.11-common-api:${project.jei_version}")
 		//modCompileOnlyApi("mezz.jei:jei-1.21.4-fabric-api:${project.jei_version}")
 		// at runtime, use the full JEI jar for Fabric
 		//modRuntimeOnly("mezz.jei:jei-1.21.4-fabric:${project.jei_version}")
@@ -122,7 +122,7 @@ sourceSets {
 	main {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			if(!useLib)exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"

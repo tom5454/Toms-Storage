@@ -95,7 +95,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 				var recipeId = recipe.id();
 				if (recipeId != null) {
 					CompoundTag compound = new CompoundTag();
-					compound.putString("fill", recipeId.location().toString());
+					compound.putString("fill", recipeId.identifier().toString());
 					term.sendMessage(compound);
 				}
 			}
