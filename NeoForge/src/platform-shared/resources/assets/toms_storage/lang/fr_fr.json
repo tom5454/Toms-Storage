@@ -25,8 +25,8 @@
 	
 	"itemGroup.toms_storage.tab": "Tom's Simple Storage",
 	
-	"menu.toms_storage.storage_terminal": "Cons. de stockage",
-	"menu.toms_storage.crafting_terminal": "Cons. de fabrication",
+	"menu.toms_storage.storage_terminal": "Cons. de stoc.",
+	"menu.toms_storage.crafting_terminal": "Cons. de fab.",
 	"menu.toms_storage.level_emitter": "Émetteur de signal",
 	"menu.toms_storage.inventory_connector": "Connecteur d'inventaire",
 	"menu.toms_storage.inventory_configurator": "Configurateur d'inventaire (%s)",
