@@ -122,8 +122,8 @@ sourceSets {
 	main {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
-			if(!useLib)exclude "com/tom/storagemod/jei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			if(!useLib) exclude "com/tom/storagemod/jei/**"
+			if(!useLib) exclude "com/tom/storagemod/rei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			//if(!useLib)exclude "com/tom/storagemod/ModMenu.java"
