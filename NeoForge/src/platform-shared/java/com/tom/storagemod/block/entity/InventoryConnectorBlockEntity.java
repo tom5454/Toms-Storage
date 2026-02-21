@@ -88,7 +88,7 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		Consumer<BlockPos> mbCheck = opos -> {
 			BlockFilter f = BlockFilter.getFilterAt(level, opos);
 			if (f != null)blockFilters.add(f);
-			toCheck.add(opos);
+			if (!onlyTrims)toCheck.add(opos);
 			checkedBlocks.add(opos);
 		};
 
@@ -104,11 +104,11 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 					} else if(state.getBlock() instanceof IInventoryNode) {
 						interfaces.add(new BlockFace(p, Direction.DOWN));
 						toCheck.add(p);
-					} else if(InventoryConnectorConfigUtil.canConnect(state) && !onlyTrims && BlockInventoryAccess.hasInventoryAt(level, p, state, d.getOpposite())) {
+					} else if(InventoryConnectorConfigUtil.canConnect(state) && BlockInventoryAccess.hasInventoryAt(level, p, state, d.getOpposite())) {
 						BlockFilter f = BlockFilter.getFilterAt(level, p);
 						if (f != null)blockFilters.add(f);
 						connected.put(p, d.getOpposite());
-						toCheck.add(p);
+						if (!onlyTrims)toCheck.add(p);
 
 						MultiblockInventoryAPI.EVENT.invoker().detectMultiblocks(level, p, state, mbCheck);
 					}

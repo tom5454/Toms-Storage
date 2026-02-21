@@ -174,5 +174,9 @@ public class StorageMod implements ModInitializer {
 		});
 
 		MultiblockInventoryAPI.EVENT.register(VanillaMultiblockInventories::checkChest);
+		//See build.gradle
+		/*if (FabricLoader.getInstance().isModLoaded("sophisticatedcore")) {
+			SophisticatedDoubleBlocks.register();
+		}*/
 	}
 }

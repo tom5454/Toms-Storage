@@ -31,6 +31,10 @@
     {
       "slug": "curios",
       "type": "optionalDependency"
-    }
+    },
+	{
+	  "slug": "sophisticated-storage",
+	  "type": "optionalDependency"
+	}
   ]
 }

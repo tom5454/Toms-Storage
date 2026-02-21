@@ -127,6 +127,7 @@ sourceSets {
 			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
+			exclude "com/tom/storagemod/inventory/compat/SophisticatedDoubleBlocks.java"
 		}
 		resources {
 			srcDir "../NeoForge/src/platform-shared/resources"
