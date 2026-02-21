@@ -65,6 +65,23 @@ dependencies {
     
     modImplementation ("curse.maven:jade-324717:7312559")
     
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
+		exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
+	   exclude(group: "net.fabricmc.fabric-api")
+	   exclude(group: "me.shedaniel.cloth")
+	   exclude(group: "dev.architectury")
+	}
+	modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
+	    exclude(group: "net.fabricmc.fabric-api")
+	    exclude(group: "me.shedaniel.cloth")
+	    exclude(group: "dev.architectury")
+	}
+	modImplementation("dev.architectury:architectury-fabric:19.0.1")
+    
     if(useLib) {
     	modCompileOnly('maven.modrinth:sodium:mc1.21.5-0.6.12-fabric')
 		modCompileOnly('maven.modrinth:iris:1.8.10+1.21.5-fabric')
@@ -92,23 +109,6 @@ dependencies {
 		
     	modCompileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
 		modLocalRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
-	    
-	    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
-			exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin:${project.rei_version}") {
-		   exclude(group: "net.fabricmc.fabric-api")
-		   exclude(group: "me.shedaniel.cloth")
-		   exclude(group: "dev.architectury")
-		}
-		modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"){
-		    exclude(group: "net.fabricmc.fabric-api")
-		    exclude(group: "me.shedaniel.cloth")
-		    exclude(group: "dev.architectury")
-		}
-		modImplementation("dev.architectury:architectury-fabric:17.0.8")
 	} else {
 		compileOnly files("../NeoForge/libs/polymorph_dummy.jar")
 		compileOnly files("../NeoForge/libs/vc_dummy.jar")
@@ -123,7 +123,7 @@ sourceSets {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
 			if(!useLib)exclude "com/tom/storagemod/jei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			//if(!useLib)exclude "com/tom/storagemod/ModMenu.java"

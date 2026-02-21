@@ -93,7 +93,7 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
@@ -144,9 +144,9 @@ dependencies {
     runtimeOnly "mezz.jei:jei-1.21.11-neoforge:27.3.0.14"
     
     if(useLib) {
-        compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:19.0.806"
-	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:19.0.806"
-	    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:19.0.806"
+        compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
+	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:21.11.814"
+	    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:21.11.814"
 	    implementation "me.shedaniel.cloth:cloth-config-neoforge:18.0.145"
         implementation "dev.architectury:architectury-neoforge:16.1.4"
         
