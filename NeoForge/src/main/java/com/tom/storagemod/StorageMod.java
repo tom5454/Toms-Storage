@@ -21,6 +21,7 @@ import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import com.tom.storagemod.api.MultiblockInventoryAPI;
 import com.tom.storagemod.inventory.PlatformItemHandler;
 import com.tom.storagemod.inventory.VanillaMultiblockInventories;
+import com.tom.storagemod.inventory.compat.SophisticatedDoubleBlocks;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
 
@@ -58,6 +59,9 @@ public class StorageMod {
 	private void setup(final FMLCommonSetupEvent event) {
 		LOGGER.info("Tom's Storage Setup starting");
 		MultiblockInventoryAPI.EVENT.register(VanillaMultiblockInventories::checkChest);
+		if (ModList.get().isLoaded("sophisticatedcore")) {
+			SophisticatedDoubleBlocks.register();
+		}
 	}
 
 	private void doClientStuff(final FMLClientSetupEvent event) {
