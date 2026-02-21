@@ -108,6 +108,10 @@ sourceSets {
 			//if(!useLib)exclude "com/tom/storagemod/jei/**"
 			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			//if(!useLib)exclude "com/tom/storagemod/emi/**"
+			
+			// Sophisticated Core Fabric is missing DoubleBlocks support the NeoForge version has
+			// https://github.com/P3pp3rF1y/SophisticatedCore/blob/1.21.x/src/main/java/net/p3pp3rf1y/sophisticatedcore/util/IDoubleBlock.java
+			exclude "com/tom/storagemod/inventory/compat/SophisticatedDoubleBlocks.java"
 		}
 		resources {
 			srcDir "../NeoForge/src/platform-shared/resources"
