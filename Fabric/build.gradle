@@ -86,7 +86,7 @@ dependencies {
 		// at runtime, use the full JEI jar for Fabric
 		//modRuntimeOnly("mezz.jei:jei-1.21.4-fabric:${project.jei_version}")
 		
-		modImplementation "curse.maven:polymorph-388800:5480539"
+		modImplementation "maven.modrinth:polymorph:Ng5Y6KVo"
 		
 		modImplementation "dev.emi:trinkets:3.10.0"
 		
@@ -128,6 +128,7 @@ sourceSets {
 			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			//if(!useLib)exclude "com/tom/storagemod/ModMenu.java"
 			if(!useLib)exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
+			exclude "com/tom/storagemod/inventory/compat/SophisticatedDoubleBlocks.java"
 		}
 		resources {
 			srcDir "../NeoForge/src/platform-shared/resources"

@@ -14,6 +14,7 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.LevelEmitterBlockEntity;
 import com.tom.storagemod.menu.slot.PhantomSlot;
 import com.tom.storagemod.util.DataSlots;
+import com.tom.storagemod.util.IntDataSlots;
 
 public class LevelEmitterMenu extends AbstractFilteredMenu {
 	private final Container inv;
@@ -88,7 +89,7 @@ public class LevelEmitterMenu extends AbstractFilteredMenu {
 			this.addSlot(new Slot(pinv, l, 8 + l * 18, 142));
 		}
 
-		addDataSlot(DataSlots.create(v -> count = v, () -> te != null ? te.getCount() : 0).onUpdate(this::updateGui));
+		addDataSlots(IntDataSlots.create(v -> count = v, () -> te != null ? te.getCount() : 0).onUpdate(this::updateGui));
 		addDataSlot(DataSlots.create(v -> lessThan = v > 0, () -> te != null && te.isLessThan() ? 1 : 0).onUpdate(this::updateGui));
 	}
 
