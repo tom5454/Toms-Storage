@@ -8,7 +8,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -80,14 +80,14 @@ public abstract class ListWidget<T> extends AbstractWidget {
 	}
 
 	@Override
-	protected void renderWidget(GuiGraphics st, int mouseX, int mouseY, float p_268085_) {
+	public void extractWidgetRenderState(GuiGraphicsExtractor st, int mouseX, int mouseY, float pt) {
 		int x = this.getX() + getWidth() - 6;
 		int y = this.getY() - 1 + (int) ((getHeight() - 9) * this.currentScroll);
 		boolean isHovered = mouseX >= x && mouseY >= y && mouseX < x + 5 && mouseY < y + 9;
 		st.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_SPRITES.get(this.needsScrollBars(), isHovered), x, y, 5, 9);
 	}
 
-	public void tooltip(GuiGraphics matrixStack, int mouseX, int mouseY) {
+	public void tooltip(GuiGraphicsExtractor matrixStack, int mouseX, int mouseY) {
 		listEntries.stream().filter(s -> s.isHovered()).findFirst().ifPresent(le -> {
 			T id = le.getId();
 			if(id != null)renderTooltip(matrixStack, id, mouseX, mouseY);
@@ -131,7 +131,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 		 * Draws this button to the screen.
 		 */
 		@Override
-		public void renderContents(GuiGraphics st, int mouseX, int mouseY, float pt) {
+		public void extractContents(GuiGraphicsExtractor st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				T id = getId();
 				if(id != null) {
@@ -141,7 +141,7 @@ public abstract class ListWidget<T> extends AbstractWidget {
 					var spr = (id.equals(selected) ? LIST_BUTTON_SPRITES_S : LIST_BUTTON_SPRITES).get(this.active, this.isHoveredOrFocused());
 					st.blitSprite(RenderPipelines.GUI_TEXTURED, spr, this.getX(), this.getY(), this.getWidth(), this.getHeight());
 					renderEntry(st, this.getX(), this.getY(), this.getWidth(), this.getHeight(), id, mouseX, mouseY, pt);
-					renderScrollingStringOverContents(st.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE), toComponent(id), 2);
+					extractScrollingStringOverContents(st.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE), toComponent(id), 2);
 				}
 			}
 		}
@@ -197,11 +197,11 @@ public abstract class ListWidget<T> extends AbstractWidget {
 	protected abstract Font getFont();
 	protected abstract void addButton(AbstractWidget listEntry);
 	protected abstract Component toComponent(T data);
-	protected abstract void renderTooltip(GuiGraphics graphics, T data, int mouseX, int mouseY);
+	protected abstract void renderTooltip(GuiGraphicsExtractor graphics, T data, int mouseX, int mouseY);
 
 	protected void selectionChanged(T to) {
 	}
 
-	protected void renderEntry(GuiGraphics st, int x2, int y2, int width, int height, T id, int mouseX, int mouseY, float pt) {
+	protected void renderEntry(GuiGraphicsExtractor st, int x2, int y2, int width, int height, T id, int mouseX, int mouseY, float pt) {
 	}
 }

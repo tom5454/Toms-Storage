@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -26,14 +26,13 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 	protected boolean wasClicking;
 
 	public FilingCabinetScreen(FilingCabinetMenu inv, Inventory p_97742_, Component p_97743_) {
-		super(inv, p_97742_, p_97743_);
+		super(inv, p_97742_, p_97743_, 176, 114 + inv.getRowCount() * 18);
 		this.containerRows = inv.getRowCount();
-		this.imageHeight = 114 + this.containerRows * 18;
 		this.inventoryLabelY = this.imageHeight - 94;
 	}
 
 	@Override
-	public void render(GuiGraphics st, int mouseX, int mouseY, float p_281873_) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 		int i = this.leftPos;
 		int j = this.topPos;
@@ -55,21 +54,22 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 			this.currentScroll = (mouseY - l - 7.5F) / (j1 - l - 15.0F);
 			this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
 		}
-		super.render(st, mouseX, mouseY, p_281873_);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
 		i = k;
 		j = l;
 		k = j1;
-		st.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
-		this.renderTooltip(st, mouseX, mouseY);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics st, float p_282334_, int p_282603_, int p_282158_) {
+	public void extractBackground(final GuiGraphicsExtractor gr, final int mouseX, final int mouseY,
+			final float a) {
+		super.extractBackground(gr, mouseX, mouseY, a);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		st.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17, 256, 256);
-		st.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96, 256, 256);
-		st.blit(RenderPipelines.GUI_TEXTURED, SIDE_SCROLLBAR, i + 170, j, 0, 0, 24, 115, 24, 115, 24, 115);
+		gr.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17, 256, 256);
+		gr.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96, 256, 256);
+		gr.blit(RenderPipelines.GUI_TEXTURED, SIDE_SCROLLBAR, i + 170, j, 0, 0, 24, 115, 24, 115, 24, 115);
 	}
 
 	@Override

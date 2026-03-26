@@ -160,7 +160,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 		if (currentRecipe.isEmpty()) {
 			craftResult.setItem(0, ItemStack.EMPTY);
 		} else {
-			craftResult.setItem(0, currentRecipe.get().value().assemble(input, level.registryAccess()));
+			craftResult.setItem(0, currentRecipe.get().value().assemble(input));
 		}
 
 		craftingListeners.forEach(CraftingTerminalMenu::onCraftMatrixChanged);

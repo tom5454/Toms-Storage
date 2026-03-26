@@ -4,7 +4,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +32,7 @@ public abstract class AbstractFilteredMenu extends AbstractContainerMenu impleme
 	}
 
 	@Override
-	public void clicked(int slotId, int dragType, ClickType click, Player player) {
+	public void clicked(int slotId, int dragType, ContainerInput click, Player player) {
 		Slot slot = slotId > -1 && slotId < slots.size() ? slots.get(slotId) : null;
 		if (slot instanceof PhantomSlot) {
 			ItemStack s = getCarried().copy();

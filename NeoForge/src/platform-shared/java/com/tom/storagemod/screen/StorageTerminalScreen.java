@@ -10,13 +10,11 @@ public class StorageTerminalScreen extends AbstractStorageTerminalScreen<Storage
 	private static final Identifier gui = Identifier.tryBuild("toms_storage", "textures/gui/storage_terminal.png");
 
 	public StorageTerminalScreen(StorageTerminalMenu screenContainer, Inventory inv, Component titleIn) {
-		super(screenContainer, inv, titleIn, 5, 202, 7, 17);
+		super(screenContainer, inv, titleIn, 5, 194, 202, 7, 17);
 	}
 
 	@Override
 	protected void init() {
-		imageWidth = 194;
-		imageHeight = 202;
 		super.init();
 		onPacket();
 	}

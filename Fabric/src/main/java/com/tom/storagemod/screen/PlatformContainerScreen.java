@@ -12,6 +12,10 @@ public abstract class PlatformContainerScreen<T extends AbstractContainerMenu> e
 		super(p_97741_, p_97742_, p_97743_);
 	}
 
+	public PlatformContainerScreen(T menu, Inventory inventory, Component title, int imageWidth, int imageHeight) {
+		super(menu, inventory, title, imageWidth, imageHeight);
+	}
+
 	public int getGuiLeft() {
 		return leftPos;
 	}

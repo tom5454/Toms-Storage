@@ -5,9 +5,8 @@ import java.util.List;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
@@ -17,7 +16,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
@@ -36,7 +35,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	private ButtonClear btnClr;
 
 	public CraftingTerminalScreen(CraftingTerminalMenu screenContainer, Inventory inv, Component titleIn) {
-		super(screenContainer, inv, titleIn, 5, 256, 7, 17);
+		super(screenContainer, inv, titleIn, 5, 194, 256, 7, 17);
 		recipeBookGui = new CraftingTerminalRecipeBookWidget(screenContainer);
 	}
 
@@ -55,8 +54,6 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 
 	@Override
 	protected void init() {
-		imageWidth = 194;
-		imageHeight = 256;
 		super.init();
 		this.widthTooNarrow = this.width < 379;
 		if(this.recipeBookGui.isVisible())recipeBookGui.toggleVisibility();
@@ -64,7 +61,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
 		addWidget(recipeBookGui);
 		this.setInitialFocus(this.recipeBookGui);
-		btnClr = new ButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, b -> clearGrid());
+		btnClr = new ButtonClear(leftPos + 80, topPos + 20 + rowCount * 18, _ -> clearGrid());
 		addRenderableWidget(btnClr);
 		buttonPullFromInv = addRenderableWidget(ToggleButton.builder(leftPos - 18, topPos + 5 + 18*6).
 				iconOff(Identifier.tryBuild(StorageMod.modid, "icons/refill_off")).
@@ -77,7 +74,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		addRenderableWidget(new RecipeBookButton(this.leftPos + 4, this.topPos + 38 + rowCount * 18, (p_214076_1_) -> {
 			this.recipeBookGui.toggleVisibility();
 			this.leftPos = this.recipeBookGui.updateScreenPosition(this.width, this.imageWidth - 16);
-			((ImageButton)p_214076_1_).setPosition(this.leftPos + 4, this.topPos + 38 + rowCount * 18);
+			p_214076_1_.setPosition(this.leftPos + 4, this.topPos + 38 + rowCount * 18);
 			setButtonsPos();
 		}));
 		setButtonsPos();
@@ -124,24 +121,27 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	}
 
 	@Override
-	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-			super.render(st, -1, -1, partialTicks);
-			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			super.extractRenderState(graphics, -1, -1, a);
+			this.recipeBookGui.extractRenderState(graphics, mouseX, mouseY, a);
 		} else {
-			super.render(st, mouseX, mouseY, partialTicks);
-			this.recipeBookGui.render(st, mouseX, mouseY, partialTicks);
+			super.extractRenderState(graphics, mouseX, mouseY, a);
+			this.recipeBookGui.extractRenderState(graphics, mouseX, mouseY, a);
 		}
-
-		this.renderTooltip(st, mouseX, mouseY);
-		this.recipeBookGui.renderTooltip(st, mouseX, mouseY, hoveredSlot);
 		this.setInitialFocus(this.recipeBookGui);
 	}
 
 	@Override
-	protected void renderSlots(GuiGraphics guiGraphics, int i, int j) {
-		super.renderSlots(guiGraphics, i, j);
-		this.recipeBookGui.renderGhostRecipe(guiGraphics, true);
+	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		super.extractTooltip(graphics, mouseX, mouseY);
+		this.recipeBookGui.extractTooltip(graphics, mouseX, mouseY, hoveredSlot);
+	}
+
+	@Override
+	protected void extractSlots(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		super.extractSlots(graphics, mouseX, mouseY);
+		this.recipeBookGui.extractGhostRecipe(graphics, true);
 	}
 
 	@Override
@@ -173,7 +173,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 	 * Called when the mouse is clicked over a slot or outside the gui.
 	 */
 	@Override
-	protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+	protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ContainerInput type) {
 		super.slotClicked(slotIn, slotId, mouseButton, type);
 		this.recipeBookGui.slotClicked(slotIn);
 	}
@@ -222,11 +222,8 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 			super(x, y, 11, 11, Component.empty(), pressable, DEFAULT_NARRATION);
 		}
 
-		/**
-		 * Draws this button to the screen.
-		 */
 		@Override
-		public void renderContents(GuiGraphics st, int mouseX, int mouseY, float pt) {
+		public void extractContents(GuiGraphicsExtractor st, int mouseX, int mouseY, float pt) {
 			if (this.visible) {
 				int x = getX();
 				int y = getY();

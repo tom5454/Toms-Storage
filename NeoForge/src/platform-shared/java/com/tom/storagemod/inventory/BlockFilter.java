@@ -7,7 +7,6 @@ import java.util.Set;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -24,6 +23,7 @@ import com.tom.storagemod.inventory.filter.IFilter;
 import com.tom.storagemod.inventory.filter.ItemFilter;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.item.IItemFilter;
+import com.tom.storagemod.util.BasicContainer;
 import com.tom.storagemod.util.BlockFaceReference;
 import com.tom.storagemod.util.Priority;
 
@@ -31,7 +31,7 @@ public class BlockFilter implements IFilter {
 	private BlockPos pos;
 	private Direction side;
 	private Set<BlockPos> connected;
-	public SimpleContainer filter = new SimpleContainer(1);
+	public BasicContainer filter = new BasicContainer(1);
 	private boolean skip, keepLast;
 	private Priority priority;
 	private ItemFilter itemFilter = ItemFilter.TRUE;
@@ -59,13 +59,13 @@ public class BlockFilter implements IFilter {
 		priority = Priority.NORMAL;
 		connected = new HashSet<>();
 		connected.add(pos);
-		filter.addListener(__ -> markFilterDirty());
+		filter.addListener(_ -> markFilterDirty());
 	}
 
 	public BlockFilter(BlockFilterState state) {
 		this.pos = state.pos();
 		loadFromState(state);
-		filter.addListener(__ -> markFilterDirty());
+		filter.addListener(_ -> markFilterDirty());
 	}
 
 	public void loadFromState(BlockFilterState state) {

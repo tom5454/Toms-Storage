@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -167,6 +167,8 @@ public class ClientUtil {
 						a);
 			}
 		});
+
+		mc.renderBuffers().bufferSource().endBatch();
 	}
 
 	private static void drawShape(PoseStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
@@ -236,7 +238,7 @@ public class ClientUtil {
 		vertexConsumer.addVertex(pose, t, u, v).setColor(j, k, l, m).setLineWidth(2f).setNormal(pose, 0.0f, 0.0f, 1.0f);
 	}
 
-	public static void drawConfiguratorOverlay(GuiGraphics gr) {
+	public static void drawConfiguratorOverlay(GuiGraphicsExtractor gr) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		if (player == null || mc.screen != null)
@@ -293,7 +295,7 @@ public class ClientUtil {
 		}
 
 		if (!messages.isEmpty()) {
-			gr.renderTooltip(mc.font, messages.stream().map(e -> ClientTooltipComponent.create(e.getVisualOrderText())).toList(), 5, 25, DefaultTooltipPositioner.INSTANCE, null);
+			gr.tooltip(mc.font, messages.stream().map(e -> ClientTooltipComponent.create(e.getVisualOrderText())).toList(), 5, 25, DefaultTooltipPositioner.INSTANCE, null);
 		}
 	}
 }

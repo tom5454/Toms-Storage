@@ -2,7 +2,7 @@ package com.tom.storagemod.screen;
 
 import java.util.function.Consumer;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -45,18 +45,19 @@ public class ItemFilterScreen extends AbstractFilteredScreen<ItemFilterMenu> {
 	}
 
 	@Override
-	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		buttonMatchNBT.setState(menu.matchNBT);
 		buttonAllowList.setState(menu.allowList);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderTooltip(matrixStack, mouseX, mouseY);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
+	public void extractBackground(final GuiGraphicsExtractor gr, final int mouseX, final int mouseY,
+			final float a) {
+		super.extractBackground(gr, mouseX, mouseY, a);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderPipelines.GUI_TEXTURED, DISPENSER_GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		gr.blit(RenderPipelines.GUI_TEXTURED, DISPENSER_GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override

@@ -289,7 +289,7 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 				player.openMenu(be);
 				return InteractionResult.SUCCESS;
 			} else {
-				player.displayClientMessage(Component.translatable("chat.toms_storage.inv_link_access_denied"), true);
+				player.sendOverlayMessage(Component.translatable("chat.toms_storage.inv_link_access_denied"));
 				return InteractionResult.PASS;
 			}
 		}

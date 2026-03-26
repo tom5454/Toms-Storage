@@ -3,7 +3,7 @@ package com.tom.storagemod.screen;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -88,20 +88,21 @@ public class InventoryConfiguratorScreen extends TSContainerScreen<InventoryConf
 	}
 
 	@Override
-	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		buttonPriority.setState(menu.priority);
 		buttonSide.setState(menu.side);
 		buttonSkip.setState(menu.skip);
 		buttonKeepLast.setState(menu.keepLast);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderTooltip(matrixStack, mouseX, mouseY);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
+	public void extractBackground(final GuiGraphicsExtractor gr, final int mouseX, final int mouseY,
+			final float a) {
+		super.extractBackground(gr, mouseX, mouseY, a);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		gr.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	private void click(int id) {

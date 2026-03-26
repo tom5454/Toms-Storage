@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -57,7 +57,7 @@ public class Platform {
 
 	private static final ResourceKey<CreativeModeTab> ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.tryBuild(StorageMod.modid, "tab"));
 
-	public static final CreativeModeTab STORAGE_MOD_TAB = FabricItemGroup.builder().title(Component.translatable("itemGroup.toms_storage.tab")).icon(() -> new ItemStack(Content.terminal.get())).displayItems((p, out) -> {
+	public static final CreativeModeTab STORAGE_MOD_TAB = FabricCreativeModeTab.builder().title(Component.translatable("itemGroup.toms_storage.tab")).icon(() -> new ItemStack(Content.terminal.get())).displayItems((p, out) -> {
 		tabItems.forEach(out::accept);
 	}).build();
 

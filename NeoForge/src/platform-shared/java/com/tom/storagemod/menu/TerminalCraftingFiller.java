@@ -38,7 +38,7 @@ public class TerminalCraftingFiller {
 			accountStack(i);
 		}
 		var ings = recipe.placementInfo().ingredients();
-		PlaceRecipeHelper.placeRecipe(3, 3, recipe, recipe.placementInfo().slotsToIngredientIndex(), (idx, slotId, _1, _2) -> {
+		PlaceRecipeHelper.placeRecipe(3, 3, recipe, recipe.placementInfo().slotsToIngredientIndex(), (idx, slotId, _, _) -> {
 			if (idx == -1)return;
 			Ingredient ingr = ings.get(idx);
 			boolean filled = false;
@@ -70,6 +70,6 @@ public class TerminalCraftingFiller {
 
 	public void accountStack(ItemStack st) {
 		if (st.has(DataComponents.CUSTOM_NAME))return;
-		allItems.computeIfAbsent(st.getItemHolder(), __ -> new ArrayList<>()).add(st);
+		allItems.computeIfAbsent(st.typeHolder(), _ -> new ArrayList<>()).add(st);
 	}
 }

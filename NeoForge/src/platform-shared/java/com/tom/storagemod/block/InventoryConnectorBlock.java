@@ -73,7 +73,7 @@ public class InventoryConnectorBlock extends BaseEntityBlock implements IInvento
 			if(tile instanceof InventoryConnectorBlockEntity) {
 				InventoryConnectorBlockEntity te = (InventoryConnectorBlockEntity) tile;
 				UsageInfo usage = te.getUsage();
-				player.displayClientMessage(Component.translatable("chat.toms_storage.inventory_connector.free_slots", usage.free(), usage.all(), usage.blocks()), true);
+				player.sendOverlayMessage(Component.translatable("chat.toms_storage.inventory_connector.free_slots", usage.free(), usage.all(), usage.blocks()));
 			}
 		}
 		return InteractionResult.SUCCESS;

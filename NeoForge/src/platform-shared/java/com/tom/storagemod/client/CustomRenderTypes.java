@@ -10,8 +10,9 @@ import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.platform.CompareOp;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.StorageModClient;
@@ -20,7 +21,7 @@ public class CustomRenderTypes {
 	public static final Supplier<RenderPipeline> LINES = StorageModClient.registerPipeline(() -> {
 		return RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
 				.withLocation(Identifier.tryBuild(StorageMod.modid, "pipeline/lines"))
-				.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+				.withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
 				.build();
 	});
 

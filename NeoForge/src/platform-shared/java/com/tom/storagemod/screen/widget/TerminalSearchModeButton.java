@@ -1,7 +1,7 @@
 package com.tom.storagemod.screen.widget;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
@@ -76,7 +76,7 @@ public class TerminalSearchModeButton extends IconButton {
 	}
 
 	@Override
-	protected void drawIcon(GuiGraphics st, int mouseX, int mouseY, float pt) {
+	protected void drawIcon(GuiGraphicsExtractor st, int mouseX, int mouseY, float pt) {
 		int x = getX();
 		int y = getY();
 		st.blitSprite(RenderPipelines.GUI_TEXTURED, ICON, x + 1, y + 1, 14, 14);

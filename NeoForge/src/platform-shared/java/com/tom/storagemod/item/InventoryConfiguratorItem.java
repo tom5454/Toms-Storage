@@ -108,7 +108,7 @@ public class InventoryConfiguratorItem extends PlatformItem implements ILeftClic
 								level.blockEntityChanged(pos);
 								c.massSelectEnd(f.getConnectedBlocks());
 							} else {
-								player.displayClientMessage(Component.translatable("chat.toms_storage.area_too_big"), true);
+								player.sendOverlayMessage(Component.translatable("chat.toms_storage.area_too_big"));
 								c.massSelectEnd();
 							}
 						} else {

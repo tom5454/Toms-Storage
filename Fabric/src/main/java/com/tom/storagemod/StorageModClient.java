@@ -1,7 +1,6 @@
 package com.tom.storagemod;
 
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -9,15 +8,12 @@ import java.util.function.Supplier;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.pipeline.IrisPipelines;
 import net.irisshaders.iris.pipeline.programs.ShaderKey;
@@ -25,7 +21,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
@@ -36,9 +31,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
-import com.tom.storagemod.client.UnbakedPaintedModel;
 import com.tom.storagemod.network.DataPacket;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
@@ -68,19 +61,13 @@ public class StorageModClient implements ClientModInitializer {
 		MenuScreens.register(Content.tagItemFilterMenu.get(), TagItemFilterScreen::new);
 		MenuScreens.register(Content.filingCabinetMenu.get(), FilingCabinetScreen::new);
 
-		BlockRenderLayerMap.putBlock(Content.paintedTrim.get(), ChunkSectionLayer.TRANSLUCENT);
-		BlockRenderLayerMap.putBlock(Content.invCableFramed.get(), ChunkSectionLayer.TRANSLUCENT);
-		BlockRenderLayerMap.putBlock(Content.levelEmitter.get(), ChunkSectionLayer.CUTOUT);
-		BlockRenderLayerMap.putBlock(Content.invCableConnectorFramed.get(), ChunkSectionLayer.TRANSLUCENT);
-		BlockRenderLayerMap.putBlock(Content.invProxy.get(), ChunkSectionLayer.TRANSLUCENT);
-
 		ClientPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
 			if(Minecraft.getInstance().screen instanceof IDataReceiver d) {
 				d.receive(TagValueInput.create(ProblemReporter.DISCARDING, c.player().registryAccess(), p.tag()));
 			}
 		});
 
-		ModelLoadingPlugin.register(new ModelLoadingPlugin() {
+		/*ModelLoadingPlugin.register(new ModelLoadingPlugin() {
 			private Set<BlockState> states = new HashSet<>();
 
 			@Override
@@ -93,22 +80,10 @@ public class StorageModClient implements ClientModInitializer {
 					return p;
 				});
 			}
-		});
+		});*/
 
-		ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
-			if (world != null) {
-				try {
-					BlockState mimicBlock = ((PaintedBlockEntity)world.getBlockEntity(pos)).getPaintedBlockState();
-					return Minecraft.getInstance().getBlockColors().getColor(mimicBlock, world, pos, tintIndex);
-				} catch (Exception var8) {
-					return -1;
-				}
-			}
-			return -1;
-		}, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invCableConnectorFramed.get(), Content.invProxy.get());
-
-		WorldRenderEvents.END_MAIN.register(ctx -> {
-			PoseStack ps = ctx.matrices();
+		LevelRenderEvents.END_MAIN.register(ctx -> {
+			PoseStack ps = ctx.poseStack();
 			ps.pushPose();
 			ClientUtil.drawTerminalOutline(ps);
 			ClientUtil.drawConfiguratorOutline(ps);
@@ -125,11 +100,11 @@ public class StorageModClient implements ClientModInitializer {
 			}
 			StorageMod.CONFIG = read;
 			StorageMod.LOGGER.info("Received server config");
-			return CompletableFuture.completedFuture(PacketByteBufs.empty());
+			return CompletableFuture.completedFuture(FriendlyByteBufs.empty());
 		});
 
 		openTerm = new KeyMapping("key.toms_storage.open_terminal", InputConstants.KEY_B, KeyMapping.Category.GAMEPLAY);
-		KeyBindingHelper.registerKeyBinding(openTerm);
+		KeyMappingHelper.registerKeyMapping(openTerm);
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (client.player == null)

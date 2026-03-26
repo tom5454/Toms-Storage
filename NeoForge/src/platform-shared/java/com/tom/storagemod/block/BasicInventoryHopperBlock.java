@@ -45,7 +45,7 @@ public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
 					player.setItemInHand(hand, ItemStack.EMPTY);
 				}
 				Component txt = h.getFilter().getHoverName();
-				player.displayClientMessage(Component.translatable("tooltip.toms_storage.filter_item", txt), true);
+				player.sendOverlayMessage(Component.translatable("tooltip.toms_storage.filter_item", txt));
 			}
 		}
 		return InteractionResult.SUCCESS;
@@ -62,11 +62,11 @@ public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
 						player.getInventory().add(h.getFilter());
 					}
 					h.setFilter(ItemStack.EMPTY);
-					player.displayClientMessage(Component.translatable("tooltip.toms_storage.filter_item", Component.translatable("tooltip.toms_storage.empty")), true);
+					player.sendOverlayMessage(Component.translatable("tooltip.toms_storage.filter_item", Component.translatable("tooltip.toms_storage.empty")));
 				} else {
 					ItemStack s = h.getFilter();
 					Component txt = s.isEmpty() ? Component.translatable("tooltip.toms_storage.empty") : s.getHoverName();
-					player.displayClientMessage(Component.translatable("tooltip.toms_storage.filter_item", txt), true);
+					player.sendOverlayMessage(Component.translatable("tooltip.toms_storage.filter_item", txt));
 				}
 			}
 		}

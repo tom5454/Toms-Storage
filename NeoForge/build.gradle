@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.192'
+    id 'net.neoforged.gradle.userdev' version '7.1.21'
 }
 
 version = mod_version
@@ -31,11 +31,10 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-1.21.11'
+    archivesName = 'toms_storage-26.1'
 }
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 def useLib = System.getProperty("useLib")
 
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -93,11 +92,11 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			//*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
-			///*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -136,13 +135,6 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-    implementation "curse.maven:jade-324717:7313008"
-    
-    compileOnly "mezz.jei:jei-1.21.11-neoforge-api:27.3.0.14"
-    compileOnly "mezz.jei:jei-1.21.11-common-api:27.3.0.14"
-    // at runtime, use the full JEI jar
-    runtimeOnly "mezz.jei:jei-1.21.11-neoforge:27.3.0.14"
-    
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
 	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:21.11.814"
@@ -161,6 +153,13 @@ dependencies {
 		implementation "curse.maven:polymorph-388800:5995380"
 	
     	implementation "curse.maven:the-one-probe-245211:5502323"
+    	
+    	implementation "curse.maven:jade-324717:7313008"
+		
+		compileOnly "mezz.jei:jei-1.21.11-neoforge-api:27.3.0.14"
+		compileOnly "mezz.jei:jei-1.21.11-common-api:27.3.0.14"
+		// at runtime, use the full JEI jar
+		runtimeOnly "mezz.jei:jei-1.21.11-neoforge:27.3.0.14"
     } else {
     	compileOnly files("libs/curios_dummy.jar")
     	compileOnly files("libs/vc_dummy.jar")

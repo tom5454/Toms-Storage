@@ -63,11 +63,11 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		@Override
 		public Storage<ItemVariant> get() {
 			if (cache == null)return null;
-			if (cache.getWorld().getGameTime() == lastCheck) {
+			if (cache.getLevel().getGameTime() == lastCheck) {
 				return storageCache;
 			}
 			Storage<ItemVariant> sv = cache != null ? cache.find(d) : null;
-			lastCheck = cache.getWorld().getGameTime();
+			lastCheck = cache.getLevel().getGameTime();
 			storageCache = sv;
 			return sv;
 		}

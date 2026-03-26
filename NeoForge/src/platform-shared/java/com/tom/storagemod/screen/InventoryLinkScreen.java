@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
@@ -79,16 +79,18 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
+	public void extractBackground(final GuiGraphicsExtractor gr, final int mouseX, final int mouseY,
+			final float a) {
+		super.extractBackground(gr, mouseX, mouseY, a);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderPipelines.GUI_TEXTURED, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		gr.blit(RenderPipelines.GUI_TEXTURED, gui, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics st, int p_97809_, int p_97810_) {
-		st.drawString(font, this.title, this.titleLabelX, this.titleLabelY, 0xFF404040, false);
-		st.drawString(font, I18n.get("label.toms_storage.inventory_connector.beacon_level", menu.beaconLvl), this.titleLabelX, this.titleLabelY + 10, 0xFF404040, false);
+	protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+		graphics.text(font, this.title, this.titleLabelX, this.titleLabelY, 0xFF404040, false);
+		graphics.text(font, I18n.get("label.toms_storage.inventory_connector.beacon_level", menu.beaconLvl), this.titleLabelX, this.titleLabelY + 10, 0xFF404040, false);
 	}
 
 	@Override
@@ -169,11 +171,15 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	}
 
 	@Override
-	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		channelsList.preRender(mouseX, mouseY);
-		super.render(st, mouseX, mouseY, partialTicks);
-		this.renderTooltip(st, mouseX, mouseY);
-		channelsList.tooltip(st, mouseX, mouseY);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
+	}
+
+	@Override
+	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		super.extractTooltip(graphics, mouseX, mouseY);
+		channelsList.tooltip(graphics, mouseX, mouseY);
 	}
 
 	@Override
@@ -214,7 +220,7 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 		}
 
 		@Override
-		protected void renderTooltip(GuiGraphics graphics, LinkChannel data, int mouseX, int mouseY) {
+		protected void renderTooltip(GuiGraphicsExtractor graphics, LinkChannel data, int mouseX, int mouseY) {
 			List<Component> tt = new ArrayList<>();
 			if (!data.ownerName().isEmpty()) {
 				boolean owner = data.owner().equals(minecraft.player.getUUID());
@@ -228,7 +234,7 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 		}
 
 		@Override
-		protected void renderEntry(GuiGraphics st, int x, int y, int width, int height, LinkChannel id, int mouseX,
+		protected void renderEntry(GuiGraphicsExtractor st, int x, int y, int width, int height, LinkChannel id, int mouseX,
 				int mouseY, float pt) {
 			st.blitSprite(RenderPipelines.GUI_TEXTURED, id.publicChannel() ? publicChannel : privateChannel, x + width - 16, y, 16, 16);
 		}

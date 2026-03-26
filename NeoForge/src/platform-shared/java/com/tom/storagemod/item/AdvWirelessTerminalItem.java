@@ -74,10 +74,10 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 						InteractionResult r = state.useWithoutItem(termWorld, playerIn, lookingAt);
 						return r;
 					} else {
-						playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_invalid_block"), true);
+						playerIn.sendOverlayMessage(Component.translatable("chat.toms_storage.terminal_invalid_block"));
 					}
 				} else {
-					playerIn.displayClientMessage(Component.translatable("chat.toms_storage.terminal_not_loaded"), true);
+					playerIn.sendOverlayMessage(Component.translatable("chat.toms_storage.terminal_not_loaded"));
 				}
 			} else {
 				return InteractionResult.CONSUME;
@@ -96,7 +96,7 @@ public class AdvWirelessTerminalItem extends Item implements WirelessTerminal {
 					ItemStack stack = c.getItemInHand();
 					stack.applyComponents(DataComponentPatch.builder().set(Content.boundPosComponent.get(), new WorldPos(c.getLevel().dimension(), pos)).build());
 					if(c.getPlayer() != null)
-						c.getPlayer().displayClientMessage(Component.translatable("chat.toms_storage.terminal_bound"), true);
+						c.getPlayer().sendOverlayMessage(Component.translatable("chat.toms_storage.terminal_bound"));
 					return InteractionResult.SUCCESS;
 				}
 			} else

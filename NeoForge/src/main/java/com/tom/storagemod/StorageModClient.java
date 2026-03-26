@@ -4,28 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
 import net.irisshaders.iris.pipeline.IrisPipelines;
 import net.irisshaders.iris.pipeline.programs.ShaderKey;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.core.BlockPos;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -40,7 +32,6 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
 
-import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.BakedPaintedModel;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.client.CustomRenderTypes;
@@ -61,7 +52,6 @@ public class StorageModClient {
 	public static final Identifier CONFIGURATOR_OVERLAY_ID = Identifier.tryBuild(StorageMod.modid, "configurator_info");
 
 	public static void preInit(ModContainer mc, IEventBus bus) {
-		bus.addListener(StorageModClient::registerColors);
 		bus.addListener(StorageModClient::initKeybinds);
 		bus.addListener(StorageModClient::bakeModels);
 		bus.addListener(StorageModClient::registerScreens);
@@ -83,18 +73,13 @@ public class StorageModClient {
 
 	public static void clientSetup() {
 		NeoForge.EVENT_BUS.register(StorageModClient.class);
-
-		ItemBlockRenderTypes.setRenderLayer(Content.paintedTrim.get(), ChunkSectionLayer.TRANSLUCENT);
-		ItemBlockRenderTypes.setRenderLayer(Content.invCableFramed.get(), ChunkSectionLayer.TRANSLUCENT);
-		ItemBlockRenderTypes.setRenderLayer(Content.invProxy.get(), ChunkSectionLayer.TRANSLUCENT);
-		ItemBlockRenderTypes.setRenderLayer(Content.invCableConnectorFramed.get(), ChunkSectionLayer.TRANSLUCENT);
 	}
 
 	public static void registerOverlays(RegisterGuiLayersEvent event) {
 		event.registerAboveAll(CONFIGURATOR_OVERLAY_ID, StorageModClient::renderConfiguratorOverlay);
 	}
 
-	public static void renderConfiguratorOverlay(GuiGraphics gr, DeltaTracker p_348559_) {
+	public static void renderConfiguratorOverlay(GuiGraphicsExtractor gr, DeltaTracker p_348559_) {
 		ClientUtil.drawConfiguratorOverlay(gr);
 	}
 
@@ -106,22 +91,6 @@ public class StorageModClient {
 	private static void initKeybinds(RegisterKeyMappingsEvent evt) {
 		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMapping.Category.GAMEPLAY);
 		evt.register(openTerm);
-	}
-
-	private static void registerColors(RegisterColorHandlersEvent.Block event) {
-		event.register(StorageModClient::getColor, Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invProxy.get(), Content.invCableConnectorFramed.get());
-	}
-
-	private static int getColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tintIndex) {
-		if (world != null) {
-			try {
-				BlockState mimicBlock = ((PaintedBlockEntity)world.getBlockEntity(pos)).getPaintedBlockState();
-				return Minecraft.getInstance().getBlockColors().getColor(mimicBlock, world, pos, tintIndex);
-			} catch (Exception var8) {
-				return -1;
-			}
-		}
-		return -1;
 	}
 
 	private static void bakeModels(ModelEvent.ModifyBakingResult event) {
@@ -139,7 +108,7 @@ public class StorageModClient {
 	}
 
 	@SubscribeEvent
-	public static void renderWorldOutline(RenderLevelStageEvent.AfterParticles evt) {
+	public static void renderWorldOutline(RenderLevelStageEvent.AfterTranslucentParticles evt) {
 		ClientUtil.drawTerminalOutline(evt.getPoseStack());
 		ClientUtil.drawConfiguratorOutline(evt.getPoseStack());
 	}

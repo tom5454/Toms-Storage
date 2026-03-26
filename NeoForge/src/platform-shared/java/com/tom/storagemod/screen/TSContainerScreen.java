@@ -10,6 +10,10 @@ public abstract class TSContainerScreen<T extends AbstractContainerMenu> extends
 		super(p_97741_, p_97742_, p_97743_);
 	}
 
+	public TSContainerScreen(T menu, Inventory inventory, Component title, int imageWidth, int imageHeight) {
+		super(menu, inventory, title, imageWidth, imageHeight);
+	}
+
 	@Override
 	public boolean mouseScrolled(double p_364830_, double p_360707_, double p_364436_, double p_364417_) {
 		return super.mouseScrolled(p_364830_, p_360707_, p_364436_, p_364417_) || mouseScrolled0(p_364830_, p_360707_, p_364436_, p_364417_);

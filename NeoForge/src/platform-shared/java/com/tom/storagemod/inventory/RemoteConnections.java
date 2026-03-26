@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.player.Player;
@@ -23,10 +24,11 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.components.WorldPos;
 
 public class RemoteConnections extends SavedData {
-	private static final String ID = "toms_storage_rc";
+	private static final Identifier ID = Identifier.tryBuild(StorageMod.modid, "rc");
 
 	public static final Codec<RemoteConnections> CODEC = RecordCodecBuilder.<RemoteConnections>mapCodec(b -> {
 		return b.group(

@@ -1,4 +1,4 @@
-accessWidener	v1	named
+accessWidener	v1	official
 accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent searchBox Lnet/minecraft/client/gui/components/EditBox;
 accessible field net/minecraft/client/gui/screens/recipebook/RecipeBookComponent ghostSlots Lnet/minecraft/client/gui/screens/recipebook/GhostSlots;
 
@@ -13,3 +13,5 @@ accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots setInpu
 accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots setResult (Lnet/minecraft/world/inventory/Slot;Lnet/minecraft/util/context/ContextMap;Lnet/minecraft/world/item/crafting/display/SlotDisplay;)V
 
 accessible method net/minecraft/client/renderer/rendertype/RenderType create (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
+
+mutable field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I

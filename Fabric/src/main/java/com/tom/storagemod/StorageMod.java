@@ -17,12 +17,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
@@ -91,15 +91,15 @@ public class StorageMod implements ModInitializer {
 		Platform.BLOCK_ENTITY.runRegistration();
 		Platform.MENU_TYPE.runRegistration();
 
-		PayloadTypeRegistry.playS2C().register(DataPacket.ID, DataPacket.STREAM_CODEC);
-		PayloadTypeRegistry.playC2S().register(DataPacket.ID, DataPacket.STREAM_CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(DataPacket.ID, DataPacket.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(DataPacket.ID, DataPacket.STREAM_CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
 			if(c.player().containerMenu instanceof IDataReceiver d) {
 				d.receive(TagValueInput.create(ProblemReporter.DISCARDING, c.player().registryAccess(), p.tag()));
 			}
 		});
 
-		PayloadTypeRegistry.playC2S().register(OpenTerminalPacket.ID, OpenTerminalPacket.STREAM_CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(OpenTerminalPacket.ID, OpenTerminalPacket.STREAM_CODEC);
 		ServerPlayNetworking.registerGlobalReceiver(OpenTerminalPacket.ID, (p, c) -> {
 			ItemStack t = PlayerInvUtil.findItem(c.player(), i -> i.getItem() instanceof WirelessTerminal e && e.canOpen(i), ItemStack.EMPTY, Function.identity());
 			if(!t.isEmpty())
@@ -110,7 +110,7 @@ public class StorageMod implements ModInitializer {
 		});
 
 		ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, sync) -> {
-			FriendlyByteBuf packet = PacketByteBufs.create();
+			FriendlyByteBuf packet = FriendlyByteBufs.create();
 			try (OutputStreamWriter writer = new OutputStreamWriter(new ByteBufOutputStream(packet))){
 				gson.toJson(LOADED_CONFIG, writer);
 			} catch (IOException e) {
@@ -126,7 +126,7 @@ public class StorageMod implements ModInitializer {
 
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.connectorBE.get());
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.invInterfaceBE.get());
-		ItemStorage.SIDED.registerForBlockEntity((be, side) -> InventoryStorage.of(be.getInv(), side), Content.filingCabinetBE.get());
+		ItemStorage.SIDED.registerForBlockEntity((be, side) -> ContainerStorage.of(be.getInv(), side), Content.filingCabinetBE.get());
 		ItemStorage.SIDED.registerForBlockEntity((be, side) -> PlatformItemHandler.of(be), Content.invProxyBE.get());
 
 		Identifier at = Identifier.tryBuild(modid, "left_click_item_on_block");

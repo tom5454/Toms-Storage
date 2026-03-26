@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialFlags;
+import net.minecraft.client.resources.model.sprite.Material.Baked;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,18 +27,18 @@ public class BakedPaintedModel implements DynamicBlockStateModel {
 	}
 
 	@Override
-	public TextureAtlasSprite particleIcon() {
-		return parent.particleIcon();
+	public Baked particleMaterial() {
+		return parent.particleMaterial();
 	}
 
 	@Override
-	public TextureAtlasSprite particleIcon(BlockAndTintGetter level, BlockPos pos, BlockState state) {
-		return parent.particleIcon(level, pos, state);
+	public Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+		return parent.particleMaterial(level, pos, state);
 	}
 
 	@Override
 	public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random,
-			List<BlockModelPart> parts) {
+			List<BlockStateModelPart> parts) {
 		BlockStateModel model = null;
 		Supplier<BlockState> blockstateSupp = level.getModelData(pos).get(PaintedBlockEntity.FACADE_STATE);
 		BlockState blockstate = null;
@@ -48,10 +49,34 @@ public class BakedPaintedModel implements DynamicBlockStateModel {
 		}
 
 		if(model == null)
-			model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockstate);
+			model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(blockstate);
 
 		if (model instanceof BakedPaintedModel)return;
 
 		model.collectParts(level, pos, blockstate, random, parts);
+	}
+
+	@Override
+	public @MaterialFlags int materialFlags() {
+		return parent.materialFlags();
+	}
+
+	@Override
+	public @MaterialFlags int materialFlags(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+		BlockStateModel model = null;
+		Supplier<BlockState> blockstateSupp = level.getModelData(pos).get(PaintedBlockEntity.FACADE_STATE);
+		BlockState blockstate = null;
+		if(blockstateSupp != null)blockstate = blockstateSupp.get();
+		if (blockstate == null || blockstate == Blocks.AIR.defaultBlockState()) {
+			blockstate = state;
+			model = parent;
+		}
+
+		if(model == null)
+			model = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(blockstate);
+
+		if (model instanceof BakedPaintedModel)return parent.materialFlags();
+
+		return model.materialFlags(level, pos, blockstate);
 	}
 }

@@ -1,25 +1,12 @@
 package com.tom.storagemod.client;
 
 import java.util.List;
-import java.util.function.Predicate;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
-import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialFlags;
+import net.minecraft.client.resources.model.sprite.Material.Baked;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-
-import com.tom.storagemod.block.entity.PaintedBlockEntity;
 
 public class BakedPaintedModel implements BlockStateModel {
 	private BlockStateModel parent;
@@ -29,6 +16,21 @@ public class BakedPaintedModel implements BlockStateModel {
 	}
 
 	@Override
+	public Baked particleMaterial() {
+		return parent.particleMaterial();
+	}
+
+	@Override
+	public void collectParts(RandomSource random, List<BlockStateModelPart> output) {
+		parent.collectParts(random, output);
+	}
+
+	@Override
+	public @MaterialFlags int materialFlags() {
+		return parent.materialFlags();
+	}
+
+	/*@Override
 	public void emitQuads(QuadEmitter emitter, BlockAndTintGetter blockView, BlockPos pos, BlockState state,
 			RandomSource random, Predicate<@Nullable Direction> cullTest) {
 		BlockEntity tile = blockView.getBlockEntity(pos);
@@ -76,5 +78,5 @@ public class BakedPaintedModel implements BlockStateModel {
 	@Override
 	public TextureAtlasSprite particleIcon() {
 		return parent.particleIcon();
-	}
+	}*/
 }

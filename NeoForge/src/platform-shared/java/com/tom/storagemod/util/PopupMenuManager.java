@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -42,7 +42,7 @@ public class PopupMenuManager {
 		this.selected = -1;
 	}
 
-	public boolean render(GuiGraphics g, Font font, int pMouseX, int pMouseY) {
+	public boolean extract(GuiGraphicsExtractor g, Font font, int pMouseX, int pMouseY) {
 		if(menu != null) {
 			g.setTooltipForNextFrame(font,
 					IntStream.range(0, menu.size())

@@ -18,7 +18,7 @@ import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.input.CharacterEvent;
@@ -92,12 +92,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(key -> {
 				var ctx = Minecraft.getInstance().level.registryAccess().createSerializationContext(JsonOps.COMPRESSED);
 				return DataComponentPatch.CODEC.encodeStart(ctx, key.getStack().getComponentsPatch()).
-						mapOrElse(JsonElement::toString, e -> "");
+						mapOrElse(JsonElement::toString, _ -> "");
 			}));
 
 	private static final LoadingCache<StoredItemStack, List<String>> tagCache =
 			CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.SECONDS).build(CacheLoader.from(
-					key -> key.getStack().getTags().map(t -> t.location().toString()).toList()
+					key -> key.getStack().tags().map(t -> t.location().toString()).toList()
 					));
 
 	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
@@ -123,8 +123,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	private Comparator<StoredItemStack> sortComp;
 	protected PopupMenuManager popup = new PopupMenuManager(this);
 
-	public AbstractStorageTerminalScreen(T screenContainer, Inventory inv, Component titleIn, int textureSlotCount, int guiHeight, int slotStartX, int slotStartY) {
-		super(screenContainer, inv, titleIn);
+	public AbstractStorageTerminalScreen(T screenContainer, Inventory inv, Component titleIn, int textureSlotCount, int imageWidth, int guiHeight, int slotStartX, int slotStartY) {
+		super(screenContainer, inv, titleIn, imageWidth, guiHeight);
 		screenContainer.onPacket = this::onPacket;
 		this.textureSlotCount = textureSlotCount;
 		this.guiHeight = guiHeight;
@@ -193,6 +193,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			menu.setOffset(0, (rowCount - textureSlotCount) * 18);
 			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
 		} else {
+			imageHeight = guiHeight;
 			rowCount = textureSlotCount;
 			menu.setOffset(0, 0);
 			menu.addStorageSlots(rowCount, slotStartX + 1, slotStartY + 1);
@@ -377,7 +378,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	}
 
 	@Override
-	public void render(GuiGraphics st, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
 		int i = this.leftPos;
 		int j = this.topPos;
@@ -418,32 +419,32 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
 			getMenu().scrollTo(this.currentScroll);
 		}
-		super.render(st, mouseX, mouseY, partialTicks);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
 
 		i = k;
 		j = l;
 		k = j1;
-		st.blitSprite(RenderPipelines.GUI_TEXTURED, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
 
-		searchField.render(st, mouseX, mouseY, partialTicks);
+		searchField.extractRenderState(graphics, mouseX, mouseY, a);
 
 		if(menu.beaconLvl >= 0) {
 			int x = 176;
 			int y = 24 + rowCount * 18;
-			st.renderItem(new ItemStack(Items.BEACON), leftPos + x, topPos + y);
+			graphics.item(new ItemStack(Items.BEACON), leftPos + x, topPos + y);
 
 			if(isHovering(x, y, 16, 16, mouseX, mouseY)) {
 				String info;
 				if(Config.get().wirelessTermBeaconLvlCrossDim != -1 && menu.beaconLvl >= Config.get().wirelessTermBeaconLvlCrossDim)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.anywhere");
 				else if(Config.get().wirelessTermBeaconLvl != -1 && menu.beaconLvl >= Config.get().wirelessTermBeaconLvl)info = "\\" + I18n.get("tooltip.toms_storage.terminal_beacon.sameDim");
 				else info = "";
-				st.setComponentTooltipForNextFrame(font,
+				graphics.setComponentTooltipForNextFrame(font,
 						Arrays.stream(I18n.get("tooltip.toms_storage.terminal_beacon", menu.beaconLvl, info).split("\\\\")).
 						map(s -> (Component) Component.literal(s)).toList(), mouseX, mouseY);
 			}
 		}
 		if(isHovering(176, 4, 16, 10, mouseX, mouseY)) {
-			st.setComponentTooltipForNextFrame(font, List.of(
+			graphics.setComponentTooltipForNextFrame(font, List.of(
 					Component.translatable("tooltip.toms_storage.terminal_stat.slots",
 							menu.slotCount == Short.MAX_VALUE ?
 									Component.translatable("tooltip.toms_storage.terminal_stat.alot") : menu.slotCount
@@ -458,7 +459,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					),
 					mouseX, mouseY);
 		}
-		if (popup.render(st, font, mouseX, mouseY)) {
+		if (popup.extract(graphics, font, mouseX, mouseY)) {
 			if (this.menu.getCarried().isEmpty() && slotIDUnderMouse != -1) {
 				SlotStorage slot = getMenu().storageSlotList.get(slotIDUnderMouse);
 				if(slot.stack != null) {
@@ -466,25 +467,23 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						ClientUtil.setTooltip(Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()));
 					}
 					ItemStack is = slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack();
-					st.setTooltipForNextFrame(font, is, mouseX, mouseY);
+					graphics.setTooltipForNextFrame(font, is, mouseX, mouseY);
 					ClientUtil.setTooltip();
 				}
-			} else {
-				this.renderTooltip(st, mouseX, mouseY);
 			}
 		} else {
-			st.setTooltipForNextFrame(Component.empty(), 0, 0);
+			graphics.setTooltipForNextFrame(Component.empty(), 0, 0);
 		}
 	}
 
 	@Override
-	protected void renderLabels(GuiGraphics st, int mouseX, int mouseY) {
-		super.renderLabels(st, mouseX, mouseY);
-		st.drawString(font, "i", 180, 6, 0xFF404040, false);
-		slotIDUnderMouse = drawSlots(st, mouseX, mouseY);
+	protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+		super.extractLabels(graphics, xm, ym);
+		graphics.text(font, "i", 180, 6, 0xFF404040, false);
+		slotIDUnderMouse = drawSlots(graphics, xm, ym);
 	}
 
-	protected int drawSlots(GuiGraphics st, int mouseX, int mouseY) {
+	protected int drawSlots(GuiGraphicsExtractor st, int mouseX, int mouseY) {
 		StorageTerminalMenu term = getMenu();
 		int slotHover = -1;
 		for (int i = 0;i < term.storageSlotList.size();i++) {
@@ -493,14 +492,14 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		return slotHover;
 	}
 
-	protected boolean drawSlot(GuiGraphics st, SlotStorage slot, int mouseX, int mouseY) {
+	protected boolean drawSlot(GuiGraphicsExtractor st, SlotStorage slot, int mouseX, int mouseY) {
 		if (slot.stack != null) {
 			try {
 				ItemStack stack = slot.stack.getStack().copyWithCount(1);
 				int i = slot.xDisplayPosition, j = slot.yDisplayPosition;
 
-				st.renderItem(stack, i, j);
-				st.renderItemDecorations(font, stack, i, j);
+				st.item(stack, i, j);
+				st.itemDecorations(font, stack, i, j);
 
 				drawStackSize(st, getFont(), slot.stack.getQuantity(), i, j);
 			} catch (Exception e) {
@@ -517,13 +516,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			int l = slot.xDisplayPosition;
 			int t = slot.yDisplayPosition;
 			st.fill(l, t, l + 16, t + 16, -2130706433);
-			renderSlot(st, fakeSlotUnderMouse, mouseX, mouseY);
+			extractSlot(st, fakeSlotUnderMouse, mouseX, mouseY);
 			return true;
 		}
 		return false;
 	}
 
-	private void drawStackSize(GuiGraphics st, Font fr, long size, int x, int y) {
+	private void drawStackSize(GuiGraphicsExtractor st, Font fr, long size, int x, int y) {
 		float scaleFactor = 0.6f;
 		String stackSize = NumberFormatUtil.formatNumber(size);
 		st.pose().pushMatrix();
@@ -532,7 +531,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		float inverseScaleFactor = 1.0f / scaleFactor;
 		int X = (int) (((float) x + 0 + 16.0f - fr.width(stackSize) * scaleFactor) * inverseScaleFactor);
 		int Y = (int) (((float) y + 0 + 16.0f - 7.0f * scaleFactor) * inverseScaleFactor);
-		st.drawString(fr, stackSize, X, Y, size == 0 ? 0xFFFFFF00 : 0xFFFFFFFF, true);
+		st.text(fr, stackSize, X, Y, size == 0 ? 0xFFFFFF00 : 0xFFFFFFFF, true);
 		st.pose().popMatrix();
 	}
 
@@ -689,24 +688,26 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	public abstract Identifier getGui();
 
 	@Override
-	protected void renderBg(GuiGraphics st, float partialTicks, int mouseX, int mouseY) {
+	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+		super.extractBackground(graphics, mouseX, mouseY, a);
+
 		if(tallMode) {
-			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY, 256, 256);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, slotStartY, 256, 256);
 			int guiStart = textureSlotCount * 18 + slotStartY;
 			int guiRStart = rowCount * 18 + slotStartY;
 			int guiSize = guiHeight - textureSlotCount * 18 - slotStartY;
-			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize, 256, 256);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + guiRStart, 0, guiStart, this.imageWidth, guiSize, 256, 256);
 			int scrollbarW = 25;
-			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY, 0, slotStartY, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 			for (int i = 1;i < rowCount - 1;i++) {
-				st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
+				graphics.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY + i * 18, 0, slotStartY + 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 			}
-			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos + slotStartY + (rowCount - 1) * 18, 0, slotStartY + (textureSlotCount - 1) * 18, slotStartX + 9 * 18 + scrollbarW, 18, 256, 256);
 		} else
-			st.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+			graphics.blit(RenderPipelines.GUI_TEXTURED, getGui(), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 
 		Slot offh = getMenu().offhand;
-		st.blitSprite(RenderPipelines.GUI_TEXTURED, FLOATING_SLOT, this.leftPos + offh.x - 8, this.topPos + offh.y - 8, 32, 32);
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FLOATING_SLOT, this.leftPos + offh.x - 8, this.topPos + offh.y - 8, 32, 32);
 	}
 
 	protected void onUpdateSearch(String text) {}

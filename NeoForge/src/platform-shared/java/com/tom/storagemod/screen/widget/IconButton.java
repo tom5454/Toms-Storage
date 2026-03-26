@@ -1,6 +1,6 @@
 package com.tom.storagemod.screen.widget;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.input.InputWithModifiers;
@@ -40,7 +40,7 @@ public class IconButton extends Button {
 	 * Draws this button to the screen.
 	 */
 	@Override
-	public void renderContents(GuiGraphics st, int mouseX, int mouseY, float pt) {
+	public void extractContents(GuiGraphicsExtractor st, int mouseX, int mouseY, float pt) {
 		if (this.visible) {
 			int x = getX();
 			int y = getY();
@@ -50,7 +50,7 @@ public class IconButton extends Button {
 		}
 	}
 
-	protected void drawIcon(GuiGraphics st, int mouseX, int mouseY, float pt) {
+	protected void drawIcon(GuiGraphicsExtractor st, int mouseX, int mouseY, float pt) {
 		st.blitSprite(RenderPipelines.GUI_TEXTURED, getIcon(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
 	}
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -87,7 +87,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 	@Override
 	protected void containerTick() {
 		ItemStack s = menu.slots.get(0).getItem();
-		List<String> tags = s.getTags().map(t -> t.location().toString()).toList();
+		List<String> tags = s.tags().map(t -> t.location().toString()).toList();
 		if(!itemTags.equals(tags)) {
 			itemTags.clear();
 			itemTags.addAll(tags);
@@ -101,24 +101,29 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 	}
 
 	@Override
-	public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		buttonAllowList.setState(menu.allowList);
 		itemTagList.preRender(mouseX, mouseY);
 		filterList.preRender(mouseX, mouseY);
 		buttonAdd.active = itemTagList.getSelected() != null;
 		buttonRemove.active = filterList.getSelected() != null;
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderTooltip(matrixStack, mouseX, mouseY);
-
-		itemTagList.tooltip(matrixStack, mouseX, mouseY);
-		filterList.tooltip(matrixStack, mouseX, mouseY);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
 	}
 
 	@Override
-	protected void renderBg(GuiGraphics matrixStack, float partialTicks, int x, int y) {
+	protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+		super.extractTooltip(graphics, mouseX, mouseY);
+		itemTagList.tooltip(graphics, mouseX, mouseY);
+		filterList.tooltip(graphics, mouseX, mouseY);
+	}
+
+	@Override
+	public void extractBackground(final GuiGraphicsExtractor gr, final int mouseX, final int mouseY,
+			final float a) {
+		super.extractBackground(gr, mouseX, mouseY, a);
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
-		matrixStack.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+		gr.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURES, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
 	}
 
 	@Override
@@ -151,7 +156,7 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 		}
 
 		@Override
-		protected void renderTooltip(GuiGraphics graphics, String data, int mouseX, int mouseY) {
+		protected void renderTooltip(GuiGraphicsExtractor graphics, String data, int mouseX, int mouseY) {
 			graphics.setTooltipForNextFrame(font, Component.literal(data), mouseX, mouseY);
 		}
 	}
