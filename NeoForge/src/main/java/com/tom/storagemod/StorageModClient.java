@@ -23,6 +23,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
@@ -35,6 +36,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.tom.storagemod.client.BakedPaintedModel;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.client.CustomRenderTypes;
+import com.tom.storagemod.client.PaintedExtension;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
 import com.tom.storagemod.screen.CraftingTerminalScreen;
@@ -57,6 +59,7 @@ public class StorageModClient {
 		bus.addListener(StorageModClient::registerScreens);
 		bus.addListener(StorageModClient::registerPipelines);
 		bus.addListener(StorageModClient::registerOverlays);
+		bus.addListener(StorageModClient::registerClientExtensions);
 		mc.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 	}
 
@@ -81,6 +84,10 @@ public class StorageModClient {
 
 	public static void renderConfiguratorOverlay(GuiGraphicsExtractor gr, DeltaTracker p_348559_) {
 		ClientUtil.drawConfiguratorOverlay(gr);
+	}
+
+	private static void registerClientExtensions(RegisterClientExtensionsEvent ev) {
+		ev.registerBlock(new PaintedExtension(), Content.paintedTrim.get(), Content.invCableFramed.get(), Content.invProxy.get(), Content.invCableConnectorFramed.get());
 	}
 
 	@SubscribeEvent

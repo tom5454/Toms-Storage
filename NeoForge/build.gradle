@@ -96,7 +96,7 @@ sourceSets {
 			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -135,6 +135,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
+	implementation "curse.maven:jade-324717:7817285"
+    
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
 	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:21.11.814"
@@ -153,8 +155,6 @@ dependencies {
 		implementation "curse.maven:polymorph-388800:5995380"
 	
     	implementation "curse.maven:the-one-probe-245211:5502323"
-    	
-    	implementation "curse.maven:jade-324717:7313008"
 		
 		compileOnly "mezz.jei:jei-1.21.11-neoforge-api:27.3.0.14"
 		compileOnly "mezz.jei:jei-1.21.11-common-api:27.3.0.14"

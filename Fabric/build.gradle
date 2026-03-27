@@ -54,18 +54,19 @@ dependencies {
 	compileOnly("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
 	localRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
 	
-	/*api("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+	api("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"*/
+    include "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+    
+    implementation("com.terraformersmc:modmenu:18.0.0-alpha.8") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    
+    implementation ("curse.maven:jade-324717:7815591")
 	
+    /*
     if(useLib) {
-		implementation("com.terraformersmc:modmenu:17.0.0-alpha.1") {
-	        exclude(group: "net.fabricmc.fabric-api")
-	    }
-	    
-	    implementation ("curse.maven:jade-324717:7312559")
-	    
 	    compileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
 			exclude(group: "net.fabricmc.fabric-api")
 		    exclude(group: "me.shedaniel.cloth")
@@ -109,12 +110,11 @@ dependencies {
 		
     	compileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
 		localRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
-	} else {
+	} else {*/
 		compileOnly files("../NeoForge/libs/polymorph_dummy.jar")
 		compileOnly files("../NeoForge/libs/vc_dummy.jar")
 		compileOnly files("libs/trinkets_dummy.jar")
-		compileOnly files("../NeoForge/libs/iris.jar")
-	}
+	// }*/
 	compileOnly files("../NeoForge/libs/iris.jar")
 }
 
@@ -125,8 +125,8 @@ sourceSets {
 			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/ModMenu.java"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/ModMenu.java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 			exclude "com/tom/storagemod/inventory/compat/SophisticatedDoubleBlocks.java"
 		}
