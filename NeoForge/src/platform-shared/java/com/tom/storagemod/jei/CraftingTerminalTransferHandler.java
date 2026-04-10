@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -126,7 +126,7 @@ public class CraftingTerminalTransferHandler<C extends AbstractContainerMenu & I
 		}
 
 		@Override
-		public void showError(GuiGraphics guiGraphics, int mouseX, int mouseY, IRecipeSlotsView recipeSlotsView,
+		public void showError(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, IRecipeSlotsView recipeSlotsView,
 				int recipeX, int recipeY) {
 			this.parent.showError(guiGraphics, mouseX, mouseY, recipeSlotsView, recipeX, recipeY);
 		}

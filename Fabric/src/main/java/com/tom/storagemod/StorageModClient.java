@@ -1,6 +1,7 @@
 package com.tom.storagemod;
 
 import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -9,6 +10,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -32,6 +34,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.tom.storagemod.client.ClientUtil;
+import com.tom.storagemod.client.UnbakedPaintedModel;
 import com.tom.storagemod.network.DataPacket;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.GameObject;
@@ -67,7 +70,7 @@ public class StorageModClient implements ClientModInitializer {
 			}
 		});
 
-		/*ModelLoadingPlugin.register(new ModelLoadingPlugin() {
+		ModelLoadingPlugin.register(new ModelLoadingPlugin() {
 			private Set<BlockState> states = new HashSet<>();
 
 			@Override
@@ -80,7 +83,7 @@ public class StorageModClient implements ClientModInitializer {
 					return p;
 				});
 			}
-		});*/
+		});
 
 		LevelRenderEvents.END_MAIN.register(ctx -> {
 			PoseStack ps = ctx.poseStack();

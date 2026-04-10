@@ -28,6 +28,17 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
     maven { url "https://maven.terraformersmc.com/releases/"}
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 base {
@@ -93,7 +104,7 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
@@ -136,6 +147,14 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
 	implementation "curse.maven:jade-324717:7817285"
+	
+	compileOnly "mezz.jei:jei-26.1.1-neoforge-api:29.4.0.23"
+	compileOnly "mezz.jei:jei-26.1.1-common-api:29.4.0.23"
+	// at runtime, use the full JEI jar
+	runtimeOnly "mezz.jei:jei-26.1.1-neoforge:29.4.0.23"
+	
+	compileOnly('maven.modrinth:sophisticated-core:26.1-1.4.22.1669')
+	compileOnly('maven.modrinth:sophisticated-storage:26.1-1.5.45.1612')
     
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
@@ -155,11 +174,6 @@ dependencies {
 		implementation "curse.maven:polymorph-388800:5995380"
 	
     	implementation "curse.maven:the-one-probe-245211:5502323"
-		
-		compileOnly "mezz.jei:jei-1.21.11-neoforge-api:27.3.0.14"
-		compileOnly "mezz.jei:jei-1.21.11-common-api:27.3.0.14"
-		// at runtime, use the full JEI jar
-		runtimeOnly "mezz.jei:jei-1.21.11-neoforge:27.3.0.14"
     } else {
     	compileOnly files("libs/curios_dummy.jar")
     	compileOnly files("libs/vc_dummy.jar")
@@ -167,7 +181,7 @@ dependencies {
     }
     
     compileOnly files("libs/iris.jar")
-    implementation files("libs/sophisticated_dummy.jar")
+    //implementation files("libs/sophisticated_dummy.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

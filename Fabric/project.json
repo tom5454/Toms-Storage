@@ -5,10 +5,12 @@
   "verId": "26.1",
   "display": "Tom's Storage 26.1",
   "subver": [
-	"26.1"
+	"26.1",
+	"26.1.1",
+	"26.1.2"
   ],
    "versionType": "release",
-  "j21": true,
+  "j25": true,
   "appendMCVersion": false,
   "onGit": true,
   "depProjects": [

@@ -1,7 +1,6 @@
 package com.tom.storagemod.platform;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Function;
@@ -118,7 +117,7 @@ public class Platform {
 	}
 
 	public static Iterable<Holder<Item>> getIngredientItems(Ingredient ingr) {
-		if (ingr.isCustom())return Collections.emptyList();
+		if (ingr.isCustom())return ingr.items().toList();
 		return ingr.getValues();
 	}
 
