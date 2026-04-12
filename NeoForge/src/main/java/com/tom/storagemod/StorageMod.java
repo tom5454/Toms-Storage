@@ -59,7 +59,7 @@ public class StorageMod {
 	private void setup(final FMLCommonSetupEvent event) {
 		LOGGER.info("Tom's Storage Setup starting");
 		MultiblockInventoryAPI.EVENT.register(VanillaMultiblockInventories::checkChest);
-		if (ModList.get().isLoaded("sophisticatedcore")) {
+		if (ModList.get().isLoaded("sophisticatedstorage")) {
 			SophisticatedDoubleBlocks.register();
 		}
 	}
