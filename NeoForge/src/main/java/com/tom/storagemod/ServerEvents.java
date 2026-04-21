@@ -7,7 +7,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
-import net.neoforged.neoforge.event.level.BlockEvent.BreakEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 
 import com.tom.storagemod.block.entity.BlockFilterAttachment;
 import com.tom.storagemod.item.ILeftClickListener;
@@ -17,7 +17,7 @@ import com.tom.storagemod.platform.Platform;
 public class ServerEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOW)
-	public static void onBlockBreak(BreakEvent event) {
+	public static void onBlockBreak(BreakBlockEvent event) {
 		BlockEntity be = event.getLevel().getBlockEntity(event.getPos());
 		if (be == null || !be.hasData(Platform.BLOCK_FILTER))return;
 		BlockFilterAttachment d = be.getData(Platform.BLOCK_FILTER);
