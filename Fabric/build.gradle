@@ -73,7 +73,7 @@ dependencies {
 	
 	compileOnly('maven.modrinth:sodium:mc26.1.1-0.8.9-fabric')
 	compileOnly('maven.modrinth:iris:1.10.9+26.1-fabric')
-	compileOnly('maven.modrinth:vivecraft:26.1.1-1.3.7-b2-fabric')
+	compileOnly('maven.modrinth:vivecraft:26.1.2-1.3.7-b4-fabric')
 	implementation "com.electronwill.night-config:core:3.6.6"
 	implementation "com.electronwill.night-config:toml:3.6.6"
 	implementation("org.lwjgl:lwjgl-openvr:3.3.3")
@@ -84,6 +84,9 @@ dependencies {
 	implementation("org.antlr:antlr4-runtime:4.13.1")
 	implementation("io.github.douira:glsl-transformer:2.0.1")
 	implementation("org.anarres:jcpp:1.4.14")
+	
+	implementation "maven.modrinth:trinkets-updated:4.0.0-alpha.8+26.1"
+	
     /*
     if(useLib) {
 	    compileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.rei_version}"){
@@ -105,14 +108,12 @@ dependencies {
 
 		implementation "maven.modrinth:polymorph:Ng5Y6KVo"
 		
-		implementation "dev.emi:trinkets:3.10.0"
-		
     	compileOnly  "dev.emi:emi-fabric:1.1.13+1.21.1:api"
 		localRuntime "dev.emi:emi-fabric:1.1.13+1.21.1"
 	} else {*/
 		compileOnly files("../NeoForge/libs/polymorph_dummy.jar")
 		//compileOnly files("../NeoForge/libs/vc_dummy.jar")
-		compileOnly files("libs/trinkets_dummy.jar")
+		//compileOnly files("libs/trinkets_dummy.jar")
 		//compileOnly files("../NeoForge/libs/iris.jar")
 	// }*/
 }
