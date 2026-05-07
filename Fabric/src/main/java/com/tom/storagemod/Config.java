@@ -22,6 +22,9 @@ public class Config implements ConfigData {
 	public int invConnectorMaxCables = 2048;
 	public int advWirelessRange = 64;
 	public int basicHopperCooldown = 10;
+	public int basicHopperRetryCooldown = 4;
+	public int basicHopperIdleCooldown = 10;
+	public int basicHopperTransferAmount = 1;
 	@Tooltip
 	public int wirelessTermBeaconLvl = 1, wirelessTermBeaconLvlCrossDim = 4;
 	@Tooltip
@@ -44,5 +47,16 @@ public class Config implements ConfigData {
 
 	public List<String> getBlockedMods() {
 		return blockedMods;
+	}
+
+	public BasicHopperSettings basicHopperSettings() {
+		return new BasicHopperSettings(
+				Math.max(1, basicHopperCooldown),
+				Math.max(1, basicHopperRetryCooldown),
+				Math.max(1, basicHopperIdleCooldown),
+				Math.max(1, basicHopperTransferAmount));
+	}
+
+	public static record BasicHopperSettings(int transferCooldown, int retryCooldown, int idleCooldown, int transferAmount) {
 	}
 }

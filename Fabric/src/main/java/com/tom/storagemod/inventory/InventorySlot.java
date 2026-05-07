@@ -64,16 +64,20 @@ public class InventorySlot implements Storage<ItemVariant> {
 	}
 
 	public boolean transferTo(int i, InventorySlot to) {
+		return transferToAmount(i, to) > 0;
+	}
+
+	public int transferToAmount(int i, InventorySlot to) {
 		try (Transaction tr = Transaction.openOuter()) {
 			long t = StorageUtil.move(this, to, Predicates.alwaysTrue(), i, tr);
 			if (t > 0) {
 				notifyChange();
 				to.notifyChange();
 				tr.commit();
-				return true;
+				return (int) t;
 			}
 		}
-		return false;
+		return 0;
 	}
 
 	public StorageView<ItemVariant> getView() {

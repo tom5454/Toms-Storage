@@ -34,8 +34,12 @@ public class InventorySlot {
 	}
 
 	public boolean transferTo(int amount, InventorySlot to) {
+		return transferToAmount(amount, to) > 0;
+	}
+
+	public int transferToAmount(int amount, InventorySlot to) {
 		ItemStack is = handler.extractItem(id, amount, true);
-		if (is.isEmpty())return false;
+		if (is.isEmpty())return 0;
 		int ex = is.getCount();
 		is = to.handler.insertItem(to.id, is, true);
 		if (is.isEmpty()) {
@@ -43,7 +47,7 @@ public class InventorySlot {
 			to.handler.insertItem(to.id, is, false);
 			notifyChange();
 			to.notifyChange();
-			return true;
+			return amount;
 		} else if (is.getCount() < ex) {//Try inserting less
 			int ins = ex - is.getCount();
 			is = handler.extractItem(id, ins, true);
@@ -53,10 +57,10 @@ public class InventorySlot {
 				to.handler.insertItem(to.id, is, false);
 				notifyChange();
 				to.notifyChange();
-				return true;
+				return ins;
 			}
 		}
-		return false;
+		return 0;
 	}
 
 	private void notifyChange() {

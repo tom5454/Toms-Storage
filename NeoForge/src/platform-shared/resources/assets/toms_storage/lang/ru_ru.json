@@ -182,7 +182,10 @@
 	"config.toms_storage.inv_link_beacon_lvl_same_dim": "Требуемый уровень маяка для связи в пределах одного измерения с неограниченной дальностью\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 полностью отключает эту функцию",
 	"config.toms_storage.inv_link_beacon_lvl_dim": "Требуемый уровень маяка для межпространственной связи\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 полностью отключает эту функцию",
 	"config.toms_storage.run_multithreaded": "Использовать многопоточность для повышения производительности",
-	"config.toms_storage.basic_hopper_cooldown": "Задержка переноса базовой инвентарной воронки (в тиках)",
+	"config.toms_storage.basic_hopper_cooldown": "Задержка после успешной передачи базовой инвентарной воронки (в тиках)",
+	"config.toms_storage.basic_hopper_retry_cooldown": "Задержка повторной попытки базовой инвентарной воронки (в тиках)",
+	"config.toms_storage.basic_hopper_idle_cooldown": "Задержка ожидания базовой инвентарной воронки (в тиках)",
+	"config.toms_storage.basic_hopper_transfer_amount": "Количество предметов за цикл у базовой инвентарной воронки",
 	"config.toms_storage.inv_blocked_blocks": "Список ID блоков, игнорируемых инвентарным коннектором",
 	"config.toms_storage.inv_blocked_mods": "Список ID модов, чьи блоки игнорируются инвентарным коннектором",
 	
@@ -212,7 +215,10 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "Требуемый уровень маяка для связи в одном измерении с неограниченной дальностью\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 полностью отключает эту функцию",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "Требуемый уровень маяка для межпространственной связи\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 полностью отключает эту функцию",
 	"text.autoconfig.toms_storage.option.runMultithreaded": "Использовать многопоточность для повышения производительности",
-	"text.autoconfig.toms_storage.option.basicHopperCooldown": "Задержка переноса базовой инвентарной воронки (в тиках)",
+	"text.autoconfig.toms_storage.option.basicHopperCooldown": "Задержка после успешной передачи базовой инвентарной воронки (в тиках)",
+	"text.autoconfig.toms_storage.option.basicHopperRetryCooldown": "Задержка повторной попытки базовой инвентарной воронки (в тиках)",
+	"text.autoconfig.toms_storage.option.basicHopperIdleCooldown": "Задержка ожидания базовой инвентарной воронки (в тиках)",
+	"text.autoconfig.toms_storage.option.basicHopperTransferAmount": "Количество предметов за цикл у базовой инвентарной воронки",
 	"text.autoconfig.toms_storage.option.blockedBlocks": "Список ID блоков, игнорируемых инвентарным коннектором",
 	"text.autoconfig.toms_storage.option.blockedMods": "Список ID модов, чьи блоки игнорируются инвентарным коннектором",
 	
