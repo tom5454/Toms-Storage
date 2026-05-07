@@ -20,10 +20,18 @@ import com.tom.storagemod.item.IItemFilter;
 import com.tom.storagemod.util.BlockFaceReference;
 
 public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBlockEntity {
+	private static final ItemPredicate ACCEPT_ALL = s -> true;
+
+	private enum WaitState {
+		NONE,
+		WAITING_FOR_SOURCE_CHANGE,
+		RESCAN_SOURCE
+	}
+
 	private ItemStack filter = ItemStack.EMPTY;
 	private int cooldown;
 	private long topChange, bottomChange;
-	public int waiting = 0;
+	private WaitState waitState = WaitState.NONE;
 	private ItemPredicate filterPred;
 	private InventorySlot topSlot;
 
@@ -53,7 +61,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		} else {
 			filterPred = s -> ItemStack.isSameItemSameComponents(s.getStack(), filter);
 		}
-		waiting = 0;
+		resetSourceState();
 		setChanged();
 	}
 
@@ -64,6 +72,7 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	@Override
 	public void updateServer() {
 		if(!filter.isEmpty() && filterPred == null)setFilter(filter);//update predicate
+		Config.BasicHopperSettings settings = Config.get().basicHopperSettings();
 		BlockState state = level.getBlockState(worldPosition);
 		Direction facing = state.getValue(AbstractInventoryHopperBlock.FACING);
 		IInventoryAccess top = topCache.getAccess(level, worldPosition.relative(facing.getOpposite()));
@@ -71,9 +80,6 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		boolean topNet = topCache.isNetwork();
 		if (!topCache.isValid() || !bottomCache.isValid())return;
 		if (!topNet && !bottomCache.isNetwork())return;
-		int baseCd = Math.max(1, Config.get().basicHopperCooldown);
-		int midCd = Math.max(1, baseCd * 4 / 10);
-		int fastCd = Math.max(1, baseCd / 10);
 		if (cooldown > 0) {
 			cooldown--;
 			return;
@@ -86,60 +92,99 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 		long t = tt.getChangeTracker(level);
 		if (topChange != t) {
 			topChange = t;
-			waiting = 0;
-			topSlot = null;
-		} else cooldown = midCd;
-		if (waiting == 1)return;
+			resetSourceState();
+		} else if (waitState == WaitState.WAITING_FOR_SOURCE_CHANGE) {
+			scheduleCooldown(settings.idleCooldown());
+			return;
+		}
 
 		IInventoryChangeTracker bt = bottom.tracker();
 		long b = bt.getChangeTracker(level);
 		if (bottomChange != b) {
 			bottomChange = b;
-			waiting = 0;
-		} else cooldown = midCd;
-		if (waiting == 2)return;
+		}
 
 		boolean topWasNull = topSlot == null;
 		if(hasFilter)filterPred.updateState();
-		if (topSlot == null || waiting == 3)
-			topSlot = tt.findSlotAfter(topSlot, hasFilter ? filterPred : (s -> true), false, true);
+		if (topSlot == null || waitState == WaitState.RESCAN_SOURCE) {
+			topSlot = tt.findSlotAfter(topSlot, hasFilter ? filterPred : ACCEPT_ALL, false, true);
+			waitState = WaitState.NONE;
+		}
 
 		if (topSlot == null) {
-			if(topWasNull) {
-				waiting = 1;
-				cooldown = baseCd;
-			} else {
-				cooldown = midCd;
-			}
+			waitForSourceChange(topWasNull ? settings.idleCooldown() : settings.retryCooldown());
 			return;
 		}
 
 		ItemStack is = topSlot.getStack();
 		if (is.isEmpty()) {
-			waiting = 3;
-			cooldown = fastCd;
+			waitForSourceRescan(settings.retryCooldown());
 			return;
 		}
 		StoredItemStack st = new StoredItemStack(is);
 		if(hasFilter && !filterPred.test(st)) {
-			waiting = 3;
-			cooldown = fastCd;
+			waitForSourceRescan(settings.retryCooldown());
 			return;
 		}
 
-		InventorySlot bottomSlot = bt.findSlotDest(st);
-		if (bottomSlot == null) {
-			waiting = 3;
-			cooldown = baseCd;
-			return;
-		}
-
-		if (topSlot.transferTo(1, bottomSlot)) {
-			cooldown = baseCd;
+		int moved = transferItems(bt, settings.transferAmount(), hasFilter);
+		if (moved > 0) {
+			waitState = WaitState.NONE;
+			scheduleCooldown(settings.transferCooldown());
 		} else {
-			waiting = 3;
-			cooldown = baseCd;
+			waitForSourceRescan(settings.retryCooldown());
 		}
+	}
+
+	private int transferItems(IInventoryChangeTracker bottomTracker, int transferBudget, boolean filtered) {
+		int moved = 0;
+		while (topSlot != null && moved < transferBudget) {
+			ItemStack stack = topSlot.getStack();
+			if (stack.isEmpty()) {
+				topSlot = null;
+				break;
+			}
+
+			StoredItemStack stored = new StoredItemStack(stack);
+			if (filtered && !filterPred.test(stored)) {
+				topSlot = null;
+				break;
+			}
+
+			InventorySlot bottomSlot = bottomTracker.findSlotDest(stored);
+			if (bottomSlot == null)break;
+
+			int requested = Math.min(transferBudget - moved, stack.getCount());
+			int transferred = topSlot.transferToAmount(requested, bottomSlot);
+			if (transferred <= 0)break;
+
+			moved += transferred;
+			if (topSlot.getStack().isEmpty()) {
+				topSlot = null;
+				break;
+			}
+		}
+		return moved;
+	}
+
+	private void resetSourceState() {
+		waitState = WaitState.NONE;
+		topSlot = null;
+	}
+
+	private void waitForSourceChange(int nextCooldown) {
+		waitState = WaitState.WAITING_FOR_SOURCE_CHANGE;
+		topSlot = null;
+		scheduleCooldown(nextCooldown);
+	}
+
+	private void waitForSourceRescan(int nextCooldown) {
+		waitState = WaitState.RESCAN_SOURCE;
+		scheduleCooldown(nextCooldown);
+	}
+
+	private void scheduleCooldown(int nextCooldown) {
+		cooldown = Math.max(1, nextCooldown);
 	}
 
 	@Override

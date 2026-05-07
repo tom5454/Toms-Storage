@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -32,6 +32,9 @@ public class Config {
 	public int wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 	public int invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 	public int basicHopperCooldown;
+	public int basicHopperRetryCooldown;
+	public int basicHopperIdleCooldown;
+	public int basicHopperTransferAmount;
 	//public int inventoryConnectorMaxSlots;
 	private Set<String> blockedMods = new HashSet<>();
 	private Set<Block> blockedBlocks = new HashSet<>();
@@ -49,6 +52,9 @@ public class Config {
 		public IntValue wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 		public IntValue invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 		public IntValue basicHopperCooldown;
+		public IntValue basicHopperRetryCooldown;
+		public IntValue basicHopperIdleCooldown;
+		public IntValue basicHopperTransferAmount;
 		//public IntValue inventoryConnectorMaxSlots;
 
 		private Server(ModConfigSpec.Builder builder) {
@@ -115,6 +121,18 @@ public class Config {
 					translation("config.toms_storage.basic_hopper_cooldown").
 					defineInRange("basicHopperCooldown", 10, 1, 200);
 
+			basicHopperRetryCooldown = builder.comment("Tick cooldown before retrying a blocked Basic Inventory Hopper transfer").
+					translation("config.toms_storage.basic_hopper_retry_cooldown").
+					defineInRange("basicHopperRetryCooldown", 4, 1, 200);
+
+			basicHopperIdleCooldown = builder.comment("Tick cooldown while the Basic Inventory Hopper is idle or waiting for new items").
+					translation("config.toms_storage.basic_hopper_idle_cooldown").
+					defineInRange("basicHopperIdleCooldown", 10, 1, 200);
+
+			basicHopperTransferAmount = builder.comment("Maximum amount of items moved by the Basic Inventory Hopper per transfer cycle").
+					translation("config.toms_storage.basic_hopper_transfer_amount").
+					defineInRange("basicHopperTransferAmount", 1, 1, 64);
+
 			/*inventoryConnectorMaxSlots = builder.comment("Inventory Connector maximum slots").
 					translation("config.toms_storage.inv_connector_max_slots").
 					defineInRange("inventoryConnectorMaxSlots", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);*/
@@ -175,11 +193,14 @@ public class Config {
 			invLinkBeaconLvlCrossDim = SERVER.invLinkBeaconLvlCrossDim.get();
 			runMultithreaded = SERVER.runMultithreaded.getAsBoolean();
 			basicHopperCooldown = SERVER.basicHopperCooldown.get();
+			basicHopperRetryCooldown = SERVER.basicHopperRetryCooldown.get();
+			basicHopperIdleCooldown = SERVER.basicHopperIdleCooldown.get();
+			basicHopperTransferAmount = SERVER.basicHopperTransferAmount.get();
 			//inventoryConnectorMaxSlots = SERVER.inventoryConnectorMaxSlots.getAsInt();
 		} else if(modConfig.getType() == Type.COMMON) {
 			blockedMods = new HashSet<>(COMMON.blockedMods.get());
 
-			blockedBlocks = COMMON.blockedBlocks.get().stream().map(Identifier::tryParse).filter(e -> e != null).
+			blockedBlocks = COMMON.blockedBlocks.get().stream().map(ResourceLocation::tryParse).filter(e -> e != null).
 					map(BuiltInRegistries.BLOCK::getValue).filter(e -> e != null && e != Blocks.AIR).
 					collect(Collectors.toSet());
 		}
@@ -203,5 +224,16 @@ public class Config {
 
 	public Set<String> getBlockedMods() {
 		return blockedMods;
+	}
+
+	public BasicHopperSettings basicHopperSettings() {
+		return new BasicHopperSettings(
+				Math.max(1, basicHopperCooldown),
+				Math.max(1, basicHopperRetryCooldown),
+				Math.max(1, basicHopperIdleCooldown),
+				Math.max(1, basicHopperTransferAmount));
+	}
+
+	public static record BasicHopperSettings(int transferCooldown, int retryCooldown, int idleCooldown, int transferAmount) {
 	}
 }

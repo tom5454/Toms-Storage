@@ -182,7 +182,10 @@
 	"config.toms_storage.inv_link_beacon_lvl_same_dim": "Inventory Cable Connector requied beacon level for same dimension access with unlimited range\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"config.toms_storage.inv_link_beacon_lvl_dim": "Inventory Cable Connector requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"config.toms_storage.run_multithreaded": "Use multithreading to improve performance",
-	"config.toms_storage.basic_hopper_cooldown": "Basic Inventory Hopper transfer cooldown (ticks)",
+	"config.toms_storage.basic_hopper_cooldown": "Basic Inventory Hopper successful transfer cooldown (ticks)",
+	"config.toms_storage.basic_hopper_retry_cooldown": "Basic Inventory Hopper retry cooldown (ticks)",
+	"config.toms_storage.basic_hopper_idle_cooldown": "Basic Inventory Hopper idle cooldown (ticks)",
+	"config.toms_storage.basic_hopper_transfer_amount": "Basic Inventory Hopper transfer amount per cycle",
 	"config.toms_storage.inv_blocked_blocks": "List of block ids ignored by the inventory connector",
 	"config.toms_storage.inv_blocked_mods": "List of mod ids whose blocks is ignored by the inventory connector",
 	
@@ -212,7 +215,10 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "Inventory Cable Connector requied beacon level for same dimension access with unlimited range\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "Inventory Cable Connector requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.runMultithreaded": "Use multithreading to improve performance",
-	"text.autoconfig.toms_storage.option.basicHopperCooldown": "Basic Inventory Hopper transfer cooldown (ticks)",
+	"text.autoconfig.toms_storage.option.basicHopperCooldown": "Basic Inventory Hopper successful transfer cooldown (ticks)",
+	"text.autoconfig.toms_storage.option.basicHopperRetryCooldown": "Basic Inventory Hopper retry cooldown (ticks)",
+	"text.autoconfig.toms_storage.option.basicHopperIdleCooldown": "Basic Inventory Hopper idle cooldown (ticks)",
+	"text.autoconfig.toms_storage.option.basicHopperTransferAmount": "Basic Inventory Hopper transfer amount per cycle",
 	"text.autoconfig.toms_storage.option.blockedBlocks": "List of block ids ignored by the inventory connector",
 	"text.autoconfig.toms_storage.option.blockedMods": "List of mod ids whose blocks is ignored by the inventory connector",
 	
