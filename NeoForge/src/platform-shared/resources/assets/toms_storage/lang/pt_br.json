@@ -102,6 +102,7 @@
 	"text.autoconfig.toms_storage.option.invConnectorMaxCables": "Conector de cabo de inventário Número máximo de cabos",
 	"text.autoconfig.toms_storage.option.wirelessRange": "Alcance do terminal sem fio",
 	"text.autoconfig.toms_storage.option.advWirelessRange": "Faixa avançada de terminais sem fio",
+	"text.autoconfig.toms_storage.option.smartInsertion": "Ativar lógica de inserção inteligente",
 	
 	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Abra o Terminal"
 }

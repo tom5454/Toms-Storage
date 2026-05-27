@@ -120,6 +120,10 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, stack);
 	}
 
+	public void consolidate() {
+		itemCache.getAccess(level, worldPosition).consolidate();
+	}
+
 	@Override
 	public void updateServer() {
 		if(updateItems) {

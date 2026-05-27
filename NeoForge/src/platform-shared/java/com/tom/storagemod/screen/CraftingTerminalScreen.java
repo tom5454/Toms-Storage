@@ -88,7 +88,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 		searchField.setX(this.leftPos + 82);
 		btnClr.setX(this.leftPos + 80);
 		int space = recipeBookGui.isVisible() ? recipeBookGui.searchBox.getY() - 16 : imageHeight;
-		List<Button> buttons = Arrays.asList(buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonPullFromInv, buttonTallMode);
+		List<Button> buttons = Arrays.asList(buttonSortingType, buttonDirection, buttonSearchType, buttonCtrlMode, buttonGhostMode, buttonPullFromInv, buttonTallMode, buttonConsolidate);
 		int y = topPos + 5;
 		int x = leftPos - 18;
 		for (int i = 0; i < buttons.size(); i++) {

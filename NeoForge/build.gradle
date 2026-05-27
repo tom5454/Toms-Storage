@@ -93,8 +93,8 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			//*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			exclude "com/tom/storagemod/rei/**"
+			exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
 			///*if(!useLib)*/exclude "com/tom/storagemod/jade/**"

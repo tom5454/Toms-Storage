@@ -111,6 +111,17 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IChangeN
 	}
 
 	@Override
+	public long getTotalItems() {
+		Storage<ItemVariant> h = storage;
+		if (h == null)return 0;
+		long c = 0;
+		for (StoredItemStack is : lastItems.values()) {
+			if (is != null)c += is.getQuantity();
+		}
+		return c;
+	}
+
+	@Override
 	public InventorySlot findSlot(ItemPredicate filter, boolean findEmpty) {
 		return findSlot(filter, findEmpty, Collections.emptySet());
 	}

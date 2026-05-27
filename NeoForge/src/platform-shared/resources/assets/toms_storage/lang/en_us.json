@@ -108,6 +108,7 @@
 	"tooltip.toms_storage.ghostMode_off": "Disable sorting while holding SHIFT",
 	"tooltip.toms_storage.tallMode_off": "Terminal Size: Default",
 	"tooltip.toms_storage.tallMode_on": "Terminal Size: Auto",
+	"tooltip.toms_storage.consolidate": "Group Items",
 	"tooltip.toms_storage.opt.search_auto": "Auto Select search: %s",
 	"tooltip.toms_storage.opt.search_keep": "Keep search: %s",
 	"tooltip.toms_storage.opt.search_sync": "Sync search with %s: %s",
@@ -159,6 +160,7 @@
 	"tooltip.toms_storage.disabled_by_redstone": "Disabled by Redstone",
 	
 	"narrator.toms_storage.terminal_search": "Terminal Search Field",
+	"narrator.toms_storage.terminal_consolidate": "Group Items Button",
 	"narrator.toms_storage.level_emitter_amount": "Level Emitter Item Count",
 	"narrator.toms_storage.inventory_link_channel": "Inventory Link Channel Name Field",
 	
@@ -212,6 +214,7 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "Inventory Cable Connector requied beacon level for same dimension access with unlimited range\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "Inventory Cable Connector requied beacon level for cross dimensional access\nValue of 0 only requires a single beacon block nearby\nValue of -1 disables this feature entirely",
 	"text.autoconfig.toms_storage.option.runMultithreaded": "Use multithreading to improve performance",
+	"text.autoconfig.toms_storage.option.smartInsertion": "Enable Smart Insertion logic",
 	"text.autoconfig.toms_storage.option.basicHopperCooldown": "Basic Inventory Hopper transfer cooldown (ticks)",
 	"text.autoconfig.toms_storage.option.blockedBlocks": "List of block ids ignored by the inventory connector",
 	"text.autoconfig.toms_storage.option.blockedMods": "List of mod ids whose blocks is ignored by the inventory connector",

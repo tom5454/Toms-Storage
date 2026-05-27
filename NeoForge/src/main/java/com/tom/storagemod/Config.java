@@ -24,7 +24,7 @@ import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 public class Config {
 	private static final Config INSTANCE = new Config();
 
-	public boolean onlyTrims, runMultithreaded;
+	public boolean onlyTrims, runMultithreaded, smartInsertion;
 	public int invConnectorScanRange;
 	public int invConnectorCableRange = 0;
 	public int wirelessRange;
@@ -44,7 +44,7 @@ public class Config {
 		public IntValue invConnectorScanRange;
 		public IntValue invConnectorCableRange;
 		public IntValue wirelessRange;
-		public BooleanValue onlyTrimsConnect, runMultithreaded;
+		public BooleanValue onlyTrimsConnect, runMultithreaded, smartInsertion;
 		public IntValue advWirelessRange;
 		public IntValue wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 		public IntValue invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
@@ -111,6 +111,10 @@ public class Config {
 					translation("config.toms_storage.run_multithreaded").
 					define("runMultithreaded", true);
 
+			smartInsertion = builder.comment("Enable Smart Insertion logic").
+					translation("config.toms_storage.smart_insertion").
+					define("smartInsertion", true);
+
 			basicHopperCooldown = builder.comment("Base tick cooldown for Basic Inventory Hopper item transfer").
 					translation("config.toms_storage.basic_hopper_cooldown").
 					defineInRange("basicHopperCooldown", 10, 1, 200);
@@ -174,6 +178,7 @@ public class Config {
 			invLinkBeaconLvlSameDim = SERVER.invLinkBeaconLvlSameDim.get();
 			invLinkBeaconLvlCrossDim = SERVER.invLinkBeaconLvlCrossDim.get();
 			runMultithreaded = SERVER.runMultithreaded.getAsBoolean();
+			smartInsertion = SERVER.smartInsertion.getAsBoolean();
 			basicHopperCooldown = SERVER.basicHopperCooldown.get();
 			//inventoryConnectorMaxSlots = SERVER.inventoryConnectorMaxSlots.getAsInt();
 		} else if(modConfig.getType() == Type.COMMON) {

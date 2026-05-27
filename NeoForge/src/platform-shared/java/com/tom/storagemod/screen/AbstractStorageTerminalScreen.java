@@ -62,6 +62,7 @@ import com.tom.storagemod.inventory.StoredItemStack.SortingTypes;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;
 import com.tom.storagemod.screen.widget.EnumCycleButton;
+import com.tom.storagemod.screen.widget.IconButton;
 import com.tom.storagemod.screen.widget.TerminalSearchModeButton;
 import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.ComponentJoiner;
@@ -120,6 +121,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected EnumCycleButton<ControllMode> buttonCtrlMode;
 	protected TerminalSearchModeButton buttonSearchType;
 	protected ToggleButton buttonDirection, buttonGhostMode, buttonTallMode;
+	protected IconButton buttonConsolidate;
 	private Comparator<StoredItemStack> sortComp;
 	protected PopupMenuManager popup = new PopupMenuManager(this);
 
@@ -256,6 +258,12 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					init();
 				}));
 		buttonTallMode.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.tallMode_off")), Tooltip.create(Component.translatable("tooltip.toms_storage.tallMode_on")));
+		buttonConsolidate = addRenderableWidget(new IconButton(leftPos - 18, topPos + 5 + 18*6, Component.translatable("narrator.toms_storage.terminal_consolidate"), Identifier.tryBuild(StorageMod.modid, "icons/match_tag_on"), (b, ev) -> {
+			CompoundTag nbt = new CompoundTag();
+			nbt.putBoolean("consolidate", true);
+			menu.sendMessage(nbt);
+		}));
+		buttonConsolidate.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.consolidate")));
 		buttonSortingType.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.sorting_" + s.name().toLowerCase(Locale.ROOT)));
 		buttonCtrlMode.tooltipFactory = s -> Tooltip.create(Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + s.name().toLowerCase(Locale.ROOT)).split("\\\\")).map(Component::literal).collect(ComponentJoiner.joining(Component.empty(), Component.literal("\n"))));
 		updateSearch();
