@@ -98,6 +98,18 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 	}
 
 	@Override
+	public long getTotalItems() {
+		ResourceHandler<ItemResource> h = itemHandler.get();
+		if (h == null)return 0;
+		long c = 0;
+		for (int i = 0; i < lastItems.length; i++) {
+			StoredItemStack is = lastItems[i];
+			if (is != null)c += is.getQuantity();
+		}
+		return c;
+	}
+
+	@Override
 	public InventorySlot findSlot(ItemPredicate filter, boolean findEmpty) {
 		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
@@ -158,12 +170,16 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
 		if (!checkFilter(forStack))return null;
+		int empty = -1;
 		for (int i = 0; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
-			if (is == null && !h.isValid(i, ItemResource.of(forStack.getStack()))) {
+			if (is == null) {
+				if (empty == -1 && h.isValid(i, ItemResource.of(forStack.getStack()))) {
+					empty = i;
+				}
 				continue;
 			}
-			if (is == null || is.equalItem(forStack)) {
+			if (is.equalItem(forStack)) {
 				try (Transaction tx = Transaction.open(null)) {
 					int rem = h.insert(i, ItemResource.of(forStack.getStack()), (int) forStack.getQuantity(), tx);
 					if (rem > 0) {
@@ -172,6 +188,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 				}
 			}
 		}
+		if (empty != -1)return new InventorySlot(getSlotHandler(h), this, empty);
 		return null;
 	}
 

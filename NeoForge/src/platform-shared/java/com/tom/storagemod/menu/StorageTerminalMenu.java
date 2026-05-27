@@ -273,6 +273,9 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 	public void receive(ValueInput message) {
 		if(pinv.player.isSpectator())return;
 		message.getString("s").ifPresent(te::setLastSearch);
+		if (message.getBooleanOr("consolidate", false)) {
+			te.consolidate();
+		}
 		sync.receiveInteract(message, this);
 		message.child("c").ifPresent(d -> {
 			te.setSorting(d.getIntOr("s", 0));

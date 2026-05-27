@@ -93,6 +93,7 @@
 	"config.toms_storage.adv_wireless_beacon_lvl_dim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
 	"config.toms_storage.inv_link_beacon_lvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨",
 	"config.toms_storage.inv_link_beacon_lvl_dim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨",
+	"config.toms_storage.smart_insertion": "스마트 삽입 로직 활성화",
 	
 	"text.autoconfig.toms_storage.title": "Tom's Simple Storage Configuration",
 	"text.autoconfig.toms_storage.option.invConnectorScanRange": "인벤토리 커넥터 범위",
@@ -103,5 +104,6 @@
 	"_text.autoconfig.toms_storage.option.wirelessTermBeaconLvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
 	"_text.autoconfig.toms_storage.option.wirelessTermBeaconLvlCrossDim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨\n값이 0이면 주변에 신호기 블록 하나만 필요",
 	"_text.autoconfig.toms_storage.option.invLinkBeaconLvl": "무한 범위를 위해 고급 무선 터미널에 필요한 신호기 레벨",
-	"_text.autoconfig.toms_storage.option.invLinkBeaconLvlDim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨"
+	"_text.autoconfig.toms_storage.option.invLinkBeaconLvlDim": "차원을 넘는 접근을 위해 고급 무선 터미널에 필요한 신호기 레벨",
+	"text.autoconfig.toms_storage.option.smart_insertion": "스마트 삽입 로직 활성화"
 }

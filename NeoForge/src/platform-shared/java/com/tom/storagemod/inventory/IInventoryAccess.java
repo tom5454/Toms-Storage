@@ -54,6 +54,19 @@ public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 
 	default void markInvalid() {}
 
+	default void consolidate() {
+		IInventoryChangeTracker tr = tracker();
+		tr.streamWrappedStacks(false).toList().forEach(sis -> {
+			ItemStack pulled = pullMatchingStack(sis.getStack(), sis.getQuantity());
+			if (!pulled.isEmpty()) {
+				ItemStack remainder = pushStack(pulled);
+				if (!remainder.isEmpty()) {
+					pushStack(remainder);
+				}
+			}
+		});
+	}
+
 	public static interface IMultiThreadedTracker<A, B> {
 		A prepForOffThread(Level level);
 		B processOffThread(A array);
@@ -69,6 +82,7 @@ public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 
 		Stream<StoredItemStack> streamWrappedStacks(boolean parallel);
 		long countItems(StoredItemStack filter);
+		long getTotalItems();
 		InventorySlot findSlot(ItemPredicate filter, boolean findEmpty);
 		InventorySlot findSlotAfter(InventorySlot slot, ItemPredicate filter, boolean findEmpty, boolean loop);
 		InventorySlot findSlotDest(StoredItemStack forStack);
@@ -85,6 +99,11 @@ public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 			@Override
 			public long countItems(StoredItemStack filter) {
 				return delegate.countItems(filter);
+			}
+
+			@Override
+			public long getTotalItems() {
+				return delegate.getTotalItems();
 			}
 
 			@Override

@@ -167,7 +167,8 @@
 	"config.toms_storage.inv_link_beacon_lvl_same_dim": "インベントリケーブルコネクタが同一ディメンション内の無限範囲接続のインベントリ接続のために要求するビーコンレベル\n値0なら近くにビーコンブロックが1つあればよい\n値-1ならこの機能を完全に無効にする",
 	"config.toms_storage.inv_link_beacon_lvl_dim": "インベントリケーブルコネクタがディメンション間インベントリ接続のために要求するビーコンレベル\n値-1ならこの機能を完全に無効にする",
 	"config.toms_storage.run_multithreaded": "マルチスレッドを使用してパフォーマンスを向上させる",
-	
+	"config.toms_storage.smart_insertion": "スマート挿入ロジックを有効にする",
+
 	"toms_storage.configuration.title": "Tom's Simple Storage 設定",
 	"toms_storage.configuration.section.toms.storage.common.toml.title": "Tom's Simple Storage 一般設定",
 	"toms_storage.configuration.section.toms.storage.server.toml.title": "Tom's Simple Storage サーバー設定",
@@ -194,6 +195,7 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "値0なら近くにビーコンブロックが1つあればよい\n値-1ならこの機能を完全に無効にする",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "インベントリケーブルコネクタが要求するディメンション間インベントリ接続のためのビーコンレベル\n値0なら近くにビーコンブロックが1つあればよい\n値-1ならこの機能を完全に無効にする",
 	"text.autoconfig.toms_storage.option.runMultithreaded": "マルチスレッドを使用してパフォーマンスを向上させる",
+	"text.autoconfig.toms_storage.option.smart_insertion": "スマート挿入ロジックを有効にする",
 	
 	"key.toms_storage.open_terminal": "[Tom's Simple Storage] ターミナルを開く",
 	

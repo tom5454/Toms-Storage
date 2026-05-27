@@ -16,7 +16,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry.Gui.Tooltip;
 
 @me.shedaniel.autoconfig.annotation.Config(name = "toms_storage")
 public class Config implements ConfigData {
-	public boolean onlyTrims = false, runMultithreaded = true;
+	public boolean onlyTrims = false, runMultithreaded = true, smartInsertion = true;
 	public int invConnectorScanRange = 16;
 	public int wirelessRange = 16;
 	public int invConnectorMaxCables = 2048;

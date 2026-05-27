@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -77,6 +78,9 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 
 	@Override
 	public ItemStack pushStack(ItemStack stack) {
+		if (Config.get().smartInsertion) {
+			return com.tom.storagemod.util.SmartInsertion.push(connected, stack);
+		}
 		for (int i = 0;i<connected.size();i++) {
 			stack = connected.get(i).pushStack(stack);
 			if (stack.isEmpty())return ItemStack.EMPTY;
@@ -244,6 +248,16 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 		}
 
 		@Override
+		public long getTotalItems() {
+			long c = 0;
+			for (int i = 0;i<connected.size();i++) {
+				IInventoryAccess ia = connected.get(i);
+				c += ia.tracker().getTotalItems();
+			}
+			return c;
+		}
+
+		@Override
 		public InventorySlot findSlot(ItemPredicate filter, boolean findEmpty) {
 			for (int i = 0;i<connected.size();i++) {
 				IInventoryAccess ia = connected.get(i);
@@ -255,6 +269,9 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 
 		@Override
 		public InventorySlot findSlotDest(StoredItemStack forStack) {
+			if (Config.get().smartInsertion) {
+				return com.tom.storagemod.util.SmartInsertion.findSlotDest(connected, forStack);
+			}
 			for (int i = 0;i<connected.size();i++) {
 				IInventoryAccess ia = connected.get(i);
 				InventorySlot is = ia.tracker().findSlotDest(forStack);
@@ -286,5 +303,35 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 
 	public Collection<IInventoryAccess> getConnected() {
 		return connected;
+	}
+
+	@Override
+	public void consolidate() {
+		IInventoryChangeTracker trFull = tracker();
+		trFull.streamWrappedStacks(false).toList().forEach(sis -> {
+			List<IInventoryAccess> hasItem = new ArrayList<>();
+			for (IInventoryAccess ia : connected) {
+				if (ia.tracker().countItems(sis) > 0) {
+					hasItem.add(ia);
+				}
+			}
+			if (hasItem.size() > 1) {
+				hasItem.sort(Comparator.comparingLong((IInventoryAccess ia) -> ia.tracker().countItems(sis)).reversed());
+				for (int i = hasItem.size() - 1; i > 0; i--) {
+					IInventoryAccess source = hasItem.get(i);
+					ItemStack pulled = source.pullMatchingStack(sis.getStack(), sis.getQuantity());
+					if (!pulled.isEmpty()) {
+						ItemStack stack = pulled;
+						for (int j = 0; j < i; j++) {
+							stack = hasItem.get(j).pushStack(stack);
+							if (stack.isEmpty()) break;
+						}
+						if (!stack.isEmpty()) {
+							source.pushStack(stack);
+						}
+					}
+				}
+			}
+		});
 	}
 }

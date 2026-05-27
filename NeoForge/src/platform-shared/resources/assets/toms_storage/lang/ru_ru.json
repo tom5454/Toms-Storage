@@ -180,7 +180,8 @@
 	"config.toms_storage.inv_link_beacon_lvl_same_dim": "Требуемый уровень маяка для связи в пределах одного измерения с неограниченной дальностью\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 отключает эту функцию полностью",
 	"config.toms_storage.inv_link_beacon_lvl_dim": "Требуемый уровень маяка для межизмерительной связи\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 отключает эту функцию полностью",
 	"config.toms_storage.run_multithreaded": "Использовать многопоточность для повышения производительности",
-	"config.toms_storage.inv_blocked_blocks": "Список ID блоков, игнорируемых инвентарным коннектором",
+	"config.toms_storage.smart_insertion": "Включить умную логику вставки",
+	"config.toms_storage.inv_blocked_blocks": "Список id блоков, игнорируемых инвентарным соединителем",
 	"config.toms_storage.inv_blocked_mods": "Список ID модов, чьи блоки игнорируются инвентарным коннектором",
 	
 	"toms_storage.configuration.title": "Настройки Tom's Simple Storage",
@@ -209,7 +210,8 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "Требуемый уровень маяка для связи в одном измерении с неограниченной дальностью\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 полностью отключает эту функцию",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "Требуемый уровень маяка для межизмерительной связи\nЗначение 0 требует только одного маячного блока рядом\nЗначение -1 полностью отключает эту функцию",
 	"text.autoconfig.toms_storage.option.runMultithreaded": "Использовать многопоточность для повышения производительности",
-	"text.autoconfig.toms_storage.option.blockedBlocks": "Список ID блоков, игнорируемых инвентарным коннектором",
+	"text.autoconfig.toms_storage.option.smart_insertion": "Включить умную логику вставки",
+	"text.autoconfig.toms_storage.option.blockedBlocks": "Список id блоков, игнорируемых инвентарным соединителем",
 	"text.autoconfig.toms_storage.option.blockedMods": "Список ID модов, чьи блоки игнорируются инвентарным коннектором",
 	
 	"key.toms_storage.open_terminal": "[Tom's Simple Storage] Open Terminal",

@@ -171,6 +171,7 @@
 	"config.toms_storage.inv_link_beacon_lvl_same_dim": "存储线缆连接器同维度无限距离访问所需的信标等级\n值为0则只需要周围有信标方块\n值为-1则完全禁止此功能",
 	"config.toms_storage.inv_link_beacon_lvl_dim": "存储线缆连接器跨维度访问所需的信标等级\n值为0则只需要周围有信标方块\n值为-1则完全禁止此功能",
 	"config.toms_storage.run_multithreaded": "使用多线程以提高性能",
+	"config.toms_storage.smart_insertion": "启用智能插入逻辑",
 	"config.toms_storage.inv_blocked_blocks": "存储连接器忽略的方块id列表",
 	"config.toms_storage.inv_blocked_mods": "存储连接器忽略的模组id列表",
 	
@@ -200,6 +201,7 @@
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlSameDim.@Tooltip": "存储线缆连接器同维度无限距离访问所需的信标等级\n值为0则只需要周围有信标方块\n值为-1则完全禁止此功能",
 	"text.autoconfig.toms_storage.option.invLinkBeaconLvlCrossDim.@Tooltip": "存储线缆连接器跨维度访问所需的信标等级\n值为0则只需要周围有信标方块\n值为-1则完全禁止此功能",
 	"text.autoconfig.toms_storage.option.runMultithreaded": "使用多线程以提高性能",
+	"text.autoconfig.toms_storage.option.smart_insertion": "启用智能插入逻辑",
 	"text.autoconfig.toms_storage.option.blockedBlocks": "存储连接器忽略的方块id列表",
 	"text.autoconfig.toms_storage.option.blockedMods": "存储连接器忽略的模组id列表",
 	
