@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -64,7 +65,7 @@ public class ClientUtil {
 		Collections.addAll(toolip, tooltipExt);
 	}
 
-	public static void drawTerminalOutline(PoseStack ps) {
+	public static void drawTerminalOutline(PoseStack ps, SubmitNodeCollector snc) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		if (player == null)
@@ -77,10 +78,10 @@ public class ClientUtil {
 		BlockState state = mc.level.getBlockState(lookingAt.getBlockPos());
 		if(state.is(StorageTags.REMOTE_ACTIVATE)) {
 			BlockPos pos = lookingAt.getBlockPos();
-			Vec3 renderPos = mc.gameRenderer.getMainCamera().position();
-			VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
-			drawShape(ps, buf, state.getOcclusionShape(), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
-			mc.renderBuffers().bufferSource().endBatch(RenderTypes.lines());
+			Vec3 renderPos = mc.gameRenderer.mainCamera().position();
+			snc.submitCustomGeometry(ps, RenderTypes.lines(), (pose, buf) -> {
+				drawShape(pose, buf, state.getOcclusionShape(), pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z, 1, 1, 1, 0.4f);
+			});
 		}
 	}
 
@@ -92,7 +93,7 @@ public class ClientUtil {
 		return (BlockHitResult) player.pick(maxDist, 0f, hitFluids);
 	}
 
-	public static void drawConfiguratorOutline(PoseStack ps) {
+	public static void drawConfiguratorOutline(PoseStack ps, SubmitNodeCollector snc) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		if (player == null)
@@ -104,49 +105,49 @@ public class ClientUtil {
 
 		var c = is.get(Content.configuratorComponent.get());
 		if(!c.selecting() && !c.showInvBox()) {
-			drawPaintedHighlights(ps);
+			drawPaintedHighlights(ps, snc);
 			return;
 		}
 
-		Vec3 renderPos = mc.gameRenderer.getMainCamera().position();
-		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+		Vec3 renderPos = mc.gameRenderer.mainCamera().position();
 
-		for (var pos : c.selection()) {
-			double x = pos.getX() - renderPos.x;
-			double y = pos.getY() - renderPos.y;
-			double z = pos.getZ() - renderPos.z;
+		snc.submitCustomGeometry(ps, RenderTypes.lines(), (pose, buf) -> {
+			for (var pos : c.selection()) {
+				double x = pos.getX() - renderPos.x;
+				double y = pos.getY() - renderPos.y;
+				double z = pos.getZ() - renderPos.z;
 
-			renderLineBox(ps, buf, x, y, z, x + 1, y + 1, z + 1, 1, 1, 1, 0.4f);
-		}
-
-		VertexConsumer bufNd = mc.renderBuffers().bufferSource().getBuffer(CustomRenderTypes.linesNoDepth());
+				renderLineBox(pose, buf, x, y, z, x + 1, y + 1, z + 1, 1, 1, 1, 0.4f);
+			}
+		});
 
 		if (c.massSelect() && mc.hitResult instanceof BlockHitResult hr) {
 			int sx = c.boxStart().getX();
 			int sy = c.boxStart().getY();
 			int sz = c.boxStart().getZ();
 
-			AABB bb = AABB.encapsulatingFullBlocks(new BlockPos(sx, sy, sz), hr.getBlockPos());
-			bb = bb.move(-renderPos.x, -renderPos.y, -renderPos.z);
-			renderLineBox(ps, bufNd, bb, 1, 1, 0, 0.4f);
+			AABB bb = AABB.encapsulatingFullBlocks(new BlockPos(sx, sy, sz), hr.getBlockPos())
+					.move(-renderPos.x, -renderPos.y, -renderPos.z);
+			snc.submitCustomGeometry(ps, CustomRenderTypes.linesNoDepth(), (pose, buf) -> {
+				renderLineBox(pose, buf, bb, 1, 1, 0, 0.4f);
+			});
 		}
-
 		if (c.isBound()) {
 			double x = c.bound().getX() - renderPos.x;
 			double y = c.bound().getY() - renderPos.y;
 			double z = c.bound().getZ() - renderPos.z;
 
-			renderLineBox(ps, bufNd, x, y, z, x + 1, y + 1, z + 1, 1f, 0, 0, 1f);
+			snc.submitCustomGeometry(ps, CustomRenderTypes.linesNoDepth(), (pose, buf) -> {
+				renderLineBox(pose, buf, x, y, z, x + 1, y + 1, z + 1, 1f, 0, 0, 1f);
+			});
 		}
-
-		mc.renderBuffers().bufferSource().endBatch();
 	}
 
-	private static void drawPaintedHighlights(PoseStack ps) {
+	private static void drawPaintedHighlights(PoseStack ps, SubmitNodeCollector snc) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
-		VertexConsumer buf = mc.renderBuffers().bufferSource().getBuffer(CustomRenderTypes.linesNoDepth());
-		Vec3 renderPos = mc.gameRenderer.getMainCamera().position();
+		Vec3 renderPos = mc.gameRenderer.mainCamera().position();
+		List<PaintHighlight> blocks = new ArrayList<>();
 
 		BlockPos.betweenClosedStream(new AABB(player.blockPosition()).inflate(7)).forEach(pos -> {
 			double dist = renderPos.distanceToSqr(pos.getX(), pos.getY(), pos.getZ());
@@ -161,18 +162,25 @@ public class ClientUtil {
 					a = 1f - ((float) ((dist - 25) / 24f));
 				}
 
-				drawShape(ps, buf, shape,
-						pos.getX() - renderPos.x, pos.getY() - renderPos.y, pos.getZ() - renderPos.z,
-						ARGB.red(color) / 255f, ARGB.green(color) / 255f, ARGB.blue(color) / 255f,
-						a);
+				blocks.add(new PaintHighlight(shape, new Vec3(pos).subtract(renderPos), color, a));
 			}
 		});
 
-		mc.renderBuffers().bufferSource().endBatch();
+		snc.submitCustomGeometry(ps, CustomRenderTypes.linesNoDepth(), (pose, buf) -> {
+			for (PaintHighlight paintHighlight : blocks) {
+				Vec3 pos = paintHighlight.pos();
+				int color = paintHighlight.color();
+				drawShape(pose, buf, paintHighlight.shape(),
+						pos.x, pos.y, pos.z,
+						ARGB.red(color) / 255f, ARGB.green(color) / 255f, ARGB.blue(color) / 255f,
+						paintHighlight.a());
+			}
+		});
 	}
 
-	private static void drawShape(PoseStack matrices, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
-		PoseStack.Pose entry = matrices.last();
+	private record PaintHighlight(VoxelShape shape, Vec3 pos, int color, float a) {}
+
+	private static void drawShape(PoseStack.Pose entry, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
 		voxelShape.forAllEdges((k, l, m, n, o, p) -> {
 			float q = (float)(n - k);
 			float r = (float)(o - l);
@@ -190,22 +198,21 @@ public class ClientUtil {
 		return Arrays.stream(I18n.get(text, objects).split("\\\\")).map(Component::literal).collect(ComponentJoiner.joining(Component.empty(), Component.literal("\n")));
 	}
 
-	public static void renderLineBox(final PoseStack poseStack, final VertexConsumer vertexConsumer, final AABB aABB,
+	public static void renderLineBox(final PoseStack.Pose poseStack, final VertexConsumer vertexConsumer, final AABB aABB,
 			final float f, final float g, final float h, final float i) {
 		renderLineBox(poseStack, vertexConsumer, aABB.minX, aABB.minY, aABB.minZ, aABB.maxX, aABB.maxY, aABB.maxZ, f, g,
 				h, i, f, g, h);
 	}
 
-	public static void renderLineBox(final PoseStack poseStack, final VertexConsumer vertexConsumer, final double d,
+	public static void renderLineBox(final PoseStack.Pose poseStack, final VertexConsumer vertexConsumer, final double d,
 			final double e, final double f, final double g, final double h, final double i, final float j,
 			final float k, final float l, final float m) {
 		renderLineBox(poseStack, vertexConsumer, d, e, f, g, h, i, j, k, l, m, j, k, l);
 	}
 
-	public static void renderLineBox(final PoseStack poseStack, final VertexConsumer vertexConsumer, final double d,
+	public static void renderLineBox(final PoseStack.Pose pose, final VertexConsumer vertexConsumer, final double d,
 			final double e, final double f, final double g, final double h, final double i, final float j,
 			final float k, final float l, final float m, final float n, final float o, final float p) {
-		final PoseStack.Pose pose = poseStack.last();
 		final float q = (float) d;
 		final float r = (float) e;
 		final float s = (float) f;
@@ -241,7 +248,7 @@ public class ClientUtil {
 	public static void drawConfiguratorOverlay(GuiGraphicsExtractor gr) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
-		if (player == null || mc.screen != null)
+		if (player == null || mc.gui.screen() != null)
 			return;
 
 		ItemStack is = player.getItemInHand(InteractionHand.MAIN_HAND);

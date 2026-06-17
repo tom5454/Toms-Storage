@@ -39,8 +39,8 @@ public class NetworkHandler {
 
 	public static void handleDataClient(DataPacket packet, IPayloadContext context) {
 		context.enqueueWork(() -> {
-			if(Minecraft.getInstance().screen instanceof IDataReceiver) {
-				((IDataReceiver)Minecraft.getInstance().screen).receive(TagValueInput.create(ProblemReporter.DISCARDING, context.player().registryAccess(), packet.tag()));
+			if(Minecraft.getInstance().gui.screen() instanceof IDataReceiver receiver) {
+				receiver.receive(TagValueInput.create(ProblemReporter.DISCARDING, context.player().registryAccess(), packet.tag()));
 			}
 		});
 	}

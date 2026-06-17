@@ -23,6 +23,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.Block;
@@ -65,7 +66,7 @@ public class StorageModClient implements ClientModInitializer {
 		MenuScreens.register(Content.filingCabinetMenu.get(), FilingCabinetScreen::new);
 
 		ClientPlayNetworking.registerGlobalReceiver(DataPacket.ID, (p, c) -> {
-			if(Minecraft.getInstance().screen instanceof IDataReceiver d) {
+			if(Minecraft.getInstance().gui.screen() instanceof IDataReceiver d) {
 				d.receive(TagValueInput.create(ProblemReporter.DISCARDING, c.player().registryAccess(), p.tag()));
 			}
 		});
@@ -87,9 +88,10 @@ public class StorageModClient implements ClientModInitializer {
 
 		LevelRenderEvents.END_MAIN.register(ctx -> {
 			PoseStack ps = ctx.poseStack();
+			SubmitNodeCollector snc = ctx.submitNodeCollector();
 			ps.pushPose();
-			ClientUtil.drawTerminalOutline(ps);
-			ClientUtil.drawConfiguratorOutline(ps);
+			ClientUtil.drawTerminalOutline(ps, snc);
+			ClientUtil.drawConfiguratorOutline(ps, snc);
 			ps.popPose();
 		});
 

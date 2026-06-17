@@ -22,7 +22,7 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -115,9 +115,9 @@ public class StorageModClient {
 	}
 
 	@SubscribeEvent
-	public static void renderWorldOutline(RenderLevelStageEvent.AfterTranslucentParticles evt) {
-		ClientUtil.drawTerminalOutline(evt.getPoseStack());
-		ClientUtil.drawConfiguratorOutline(evt.getPoseStack());
+	public static void renderWorldOutline(SubmitCustomGeometryEvent evt) {
+		ClientUtil.drawTerminalOutline(evt.getPoseStack(), evt.getSubmitNodeCollector());
+		ClientUtil.drawConfiguratorOutline(evt.getPoseStack(), evt.getSubmitNodeCollector());
 	}
 
 	@SubscribeEvent

@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.1.21'
+    id 'net.neoforged.moddev' version '2.0.141'
 }
 
 version = mod_version
@@ -42,59 +42,85 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-26.1'
+    archivesName = 'toms_storage-26.2'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 def useLib = System.getProperty("useLib")
 
-minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
-//minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
+import net.neoforged.moddevgradle.internal.utils.StringUtils;
 
-// Default run configurations.
-// These can be tweaked, removed, or duplicated as needed.
-runs {
-    // applies to all the run configs below
-    configureEach {
-        // Recommended logging data for a userdev environment
-        // The markers can be added/remove as needed separated by commas.
-        // "SCAN": For mods scan.
-        // "REGISTRIES": For firing of registry events.
-        // "REGISTRYDUMP": For getting the contents of all registries.
-        systemProperty 'forge.logging.markers', 'REGISTRIES'
+neoForge {
+    // Specify the version of NeoForge to use.
+    version = project.neo_version
 
-        // Recommended logging level for the console
-        // You can set various levels here.
-        // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-        systemProperty 'forge.logging.console.level', 'debug'
+    // This line is optional. Access Transformers are automatically detected
+    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
-        modSource project.sourceSets.main
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            client()
+
+            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        // This run config launches GameTestServer and runs all registered gametests, then exits.
+        // By default, the server will crash when no gametests are provided.
+        // The gametest system is also enabled by default for other run configs under the /test command.
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        data {
+            clientData()
+
+            // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
+            // gameDirectory = project.file('run-data')
+
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        // applies to all the run configs above
+        configureEach {
+            // Recommended logging data for a userdev environment
+            // The markers can be added/remove as needed separated by commas.
+            // "SCAN": For mods scan.
+            // "REGISTRIES": For firing of registry events.
+            // "REGISTRYDUMP": For getting the contents of all registries.
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+            // Recommended logging level for the console
+            // You can set various levels here.
+            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
     }
 
-    client {
-        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    mods {
+        // define mod <-> source bindings
+        // these are used to tell the game which sources are for which mod
+        // multi mod projects should define one per mod
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
     }
+    
+    runs.each { run -> run.ideName = project.name + StringUtils.capitalize(run.name) }
+}
 
-    server {
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        arguments '--nogui'
-    }
-
-    // This run config launches GameTestServer and runs all registered gametests, then exits.
-    // By default, the server will crash when no gametests are provided.
-    // The gametest system is also enabled by default for other run configs under the /test command.
-    gameTestServer {
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-    }
-
-    /*data {
-        // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
-        // workingDirectory project.file('run-data')
-
-        // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-        arguments '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-    }*/
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
 }
 
 // Include resources generated by data generators.
@@ -104,10 +130,10 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
-			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -146,7 +172,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-	implementation "curse.maven:jade-324717:7817285"
+	/*implementation "curse.maven:jade-324717:7817285"
 	
 	compileOnly "mezz.jei:jei-26.1.1-neoforge-api:29.4.0.23"
 	compileOnly "mezz.jei:jei-26.1.1-common-api:29.4.0.23"
@@ -154,7 +180,7 @@ dependencies {
 	runtimeOnly "mezz.jei:jei-26.1.1-neoforge:29.4.0.23"
 	
 	compileOnly('maven.modrinth:sophisticated-core:26.1-1.4.22.1669')
-	compileOnly('maven.modrinth:sophisticated-storage:26.1-1.5.45.1612')
+	compileOnly('maven.modrinth:sophisticated-storage:26.1-1.5.45.1612')*/
     
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
@@ -181,7 +207,7 @@ dependencies {
     }
     
     compileOnly files("libs/iris.jar")
-    //implementation files("libs/sophisticated_dummy.jar")
+    implementation files("libs/sophisticated_dummy.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

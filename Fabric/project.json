@@ -1,13 +1,11 @@
 {
   "type": "fabric",
-  "name": "toms_storage_fabric-26.1",
-  "mcVer": "26.1",
-  "verId": "26.1",
-  "display": "Tom's Storage 26.1",
+  "name": "toms_storage_fabric-26.2",
+  "mcVer": "26.2",
+  "verId": "26.2",
+  "display": "Tom's Storage 26.2",
   "subver": [
-	"26.1",
-	"26.1.1",
-	"26.1.2"
+	"26.2"
   ],
    "versionType": "release",
   "j25": true,
