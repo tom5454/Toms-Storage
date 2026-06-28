@@ -14,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
@@ -119,12 +120,18 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		blockFilters.forEach(f -> f.getConnectedBlocks().forEach(connected::remove));
 
 		Map<BlockFace, BlockInventoryAccess> invA = new HashMap<>();
+		Set<IItemHandler> seenHandlers = new HashSet<>();
 		connected.forEach((p, d) -> {
 			BlockFace s = new BlockFace(p, d);
 			BlockInventoryAccess acc = invAccesses.remove(s);
 			if (acc == null) {
 				acc = new BlockInventoryAccess();
 				acc.onLoad(level, p, d, this);
+			}
+			IItemHandler handler = acc.get();
+			if (handler != null && !seenHandlers.add(handler)) {
+				acc.markInvalid();
+				return;
 			}
 			invA.put(s, acc);
 			connectedInvs.add(wrapper.apply(acc));
