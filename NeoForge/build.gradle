@@ -130,10 +130,10 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -172,15 +172,15 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-	/*implementation "curse.maven:jade-324717:7817285"
+	implementation "curse.maven:jade-324717:8326243"
 	
-	compileOnly "mezz.jei:jei-26.1.1-neoforge-api:29.4.0.23"
-	compileOnly "mezz.jei:jei-26.1.1-common-api:29.4.0.23"
+	compileOnly "mezz.jei:jei-26.2-neoforge-api:30.7.0.41"
+	compileOnly "mezz.jei:jei-26.2-common-api:30.7.0.41"
 	// at runtime, use the full JEI jar
-	runtimeOnly "mezz.jei:jei-26.1.1-neoforge:29.4.0.23"
+	runtimeOnly "mezz.jei:jei-26.2-neoforge:30.7.0.41"
 	
-	compileOnly('maven.modrinth:sophisticated-core:26.1-1.4.22.1669')
-	compileOnly('maven.modrinth:sophisticated-storage:26.1-1.5.45.1612')*/
+	compileOnly('maven.modrinth:sophisticated-core:26.2-1.4.79.2130')
+	compileOnly('maven.modrinth:sophisticated-storage:26.2-1.5.88.1938')
     
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
@@ -207,7 +207,7 @@ dependencies {
     }
     
     compileOnly files("libs/iris.jar")
-    implementation files("libs/sophisticated_dummy.jar")
+    //implementation files("libs/sophisticated_dummy.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

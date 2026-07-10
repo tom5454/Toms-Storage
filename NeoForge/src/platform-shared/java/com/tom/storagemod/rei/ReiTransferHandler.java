@@ -26,7 +26,7 @@ public class ReiTransferHandler implements TransferHandler {
 	@Override
 	public Result handle(Context context) {
 		if(context.getMenu() instanceof IAutoFillTerminal) {
-			if (!context.getDisplay().getCategoryIdentifier().equals(CRAFTING) || context.getMinecraft().screen == context.getContainerScreen())
+			if (!context.getDisplay().getCategoryIdentifier().equals(CRAFTING) || context.getMinecraft().gui.screen() == context.getContainerScreen())
 				return Result.createNotApplicable();
 			if (context.getContainerScreen() instanceof AbstractStorageTerminalScreen scr && !context.isActuallyCrafting() && !scr.isSmartItemSearchOn()) {
 				return Result.createSuccessful().blocksFurtherHandling();
