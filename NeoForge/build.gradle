@@ -28,6 +28,17 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
     maven { url "https://maven.terraformersmc.com/releases/"}
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 base {
@@ -142,6 +153,9 @@ dependencies {
     compileOnly "mezz.jei:jei-1.21.10-common-api:26.0.0.1"
     // at runtime, use the full JEI jar
     runtimeOnly "mezz.jei:jei-1.21.10-neoforge:26.0.0.1"
+
+    compileOnly('maven.modrinth:sophisticated-core:1.21.10-1.4.74.2129')
+	compileOnly('maven.modrinth:sophisticated-storage:1.21.10-1.5.79.1946')
     
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:19.0.806"
@@ -168,7 +182,6 @@ dependencies {
     }
     
     compileOnly files("libs/iris.jar")
-    implementation files("libs/sophisticated_dummy.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
