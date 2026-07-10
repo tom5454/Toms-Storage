@@ -6,7 +6,7 @@
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.17",
 		"1.21-latest": "2.0.12",
-		"1.21.1-latest": "2.3.0",
+		"1.21.1-latest": "2.3.2",
 		"1.21.3-latest": "2.1.1",
 		"1.21.4-latest": "2.3.3",
 		"1.21.5-latest": "2.4.3",
@@ -14,7 +14,23 @@
 		"1.21.7-latest": "2.5.2",
 		"1.21.8-latest": "2.6.0",
 		"1.21.10-latest": "2.7.0",
-		"1.21.11-latest": "2.8.0"
+		"1.21.11-latest": "2.8.0",
+		"26.1-latest": "2.9.3",
+		"26.1.1-latest": "2.9.3",
+		"26.1.2-latest": "2.9.3"
+	},
+	"26.1.2": {
+		"2.9.3": "Fix crash if sophisticatedcore is installed, but not sophisticatedstorage"
+	},
+	"26.1.1": {
+		"2.9.3": "Fix crash if sophisticatedcore is installed, but not sophisticatedstorage",
+		"2.9.2": "Added JEI integration"
+	},
+	"26.1": {
+		"2.9.3": "Fix crash if sophisticatedcore is installed, but not sophisticatedstorage",
+		"2.9.2": "Added JEI integration",
+		"2.9.1": "Fix painted blocks color on NeoForge\nAdded Jade support",
+		"2.9.0": "26.1 update"
 	},
 	"1.21.11": {
 		"2.8.0": "Added Sophisticated Storage compat for detecting multiblock inventories (#306, Closes #648)\nFixed Inventory Configurator bug with multiblock inventories\nFixed onlyTrimsConnect (Closes #692)\nImproved French translations (#695)\nIncrease Level Emitter limit to signed int limit 2.1B (Closes #671)",
@@ -72,6 +88,8 @@
 		"2.1.0": "1.21.3 port"
 	},
 	"1.21.1": {
+		"2.3.2": "Fix crash if sophisticatedcore is installed, but not sophisticatedstorage",
+		"2.3.1": "Fix sophisticated storage compat",
 		"2.3.0": "Added Sophisticated Storage compat for detecting multiblock inventories (#306, Closes #648)\nFixed Inventory Configurator bug with multiblock inventories\nFixed onlyTrimsConnect (Closes #692)\nImproved French translations (#695)\nIncrease Level Emitter limit to signed int limit 2.1B (Closes #671)",
 		"2.2.3": "Fixed items initially not loading when ghost mode is enabled (#637)\nUpdate description for advanced wireless terminal (Closes #639)\nFixed crash with Blur+ (Closes #619)\nFixed recipe book position (Closes #613)",
 		"2.2.2": "Added configurable hopper cooldown (#597)\nFixed crash with inventory proxy (Closes #609)\nFixed crash with legendary tooltips (Closes #603)\nFixed crash with REI on 1.21.6+ (Closes #610)",

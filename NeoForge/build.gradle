@@ -28,6 +28,17 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
     maven { url "https://maven.terraformersmc.com/releases/"}
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 base {
@@ -93,11 +104,11 @@ sourceSets {
 	main {
 		java {
 			srcDir "src/platform-shared/java"
-			//*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
+			if(!useLib)exclude "com/tom/storagemod/rei/**"
+			//if(!useLib)exclude "com/tom/storagemod/jei/**"
+			if(!useLib)exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
-			///*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
+			//if(!useLib)exclude "com/tom/storagemod/jade/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
 		}
 		resources {
@@ -142,11 +153,14 @@ dependencies {
     compileOnly "mezz.jei:jei-1.21.11-common-api:27.3.0.14"
     // at runtime, use the full JEI jar
     runtimeOnly "mezz.jei:jei-1.21.11-neoforge:27.3.0.14"
+
+    compileOnly('maven.modrinth:sophisticated-core:1.21.11-1.4.75.2124')
+	compileOnly('maven.modrinth:sophisticated-storage:1.21.11-1.5.78.1944')
     
     if(useLib) {
-        compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"
-	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:21.11.814"
-	    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:21.11.814"
+        compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.816"
+	    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:21.11.816"
+	    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:21.11.816"
 	    implementation "me.shedaniel.cloth:cloth-config-neoforge:18.0.145"
         implementation "dev.architectury:architectury-neoforge:16.1.4"
         
@@ -168,7 +182,6 @@ dependencies {
     }
     
     compileOnly files("libs/iris.jar")
-    implementation files("libs/sophisticated_dummy.jar")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
