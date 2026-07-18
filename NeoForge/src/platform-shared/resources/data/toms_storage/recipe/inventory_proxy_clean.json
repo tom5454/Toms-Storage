@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+  	{
+  		"item": "toms_storage:inventory_proxy"
+  	},
+  	{
+  		"item": "minecraft:water_bucket"
+  	}
+  ],
+  "result": {
+    "id": "toms_storage:inventory_proxy"
+  }
+}

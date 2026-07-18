@@ -53,3 +53,9 @@ Simple vanilla style storage mod.
     versionRange="[1.21.0,1.21.2)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.toms_storage]]
+    modId="sophisticatedstorage"
+    type="optional"
+    versionRange="[1.5.36,)"
+    ordering="NONE"
+    side="BOTH"

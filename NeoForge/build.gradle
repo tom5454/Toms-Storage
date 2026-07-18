@@ -28,6 +28,17 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
     maven { url "https://maven.terraformersmc.com/releases/"}
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 base {
@@ -156,6 +167,9 @@ dependencies {
     
     runtimeOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1"
     compileOnly "top.theillusivec4.curios:curios-neoforge:9.4.0+1.21.1:api"
+    
+    compileOnly('maven.modrinth:sophisticated-core:1.21.1-1.4.23.1664')
+	compileOnly('maven.modrinth:sophisticated-storage:1.21.1-1.5.36.1606')
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

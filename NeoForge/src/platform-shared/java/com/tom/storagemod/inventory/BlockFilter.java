@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 
 import com.tom.storagemod.StorageTags;
+import com.tom.storagemod.api.MultiblockInventoryAPI;
 import com.tom.storagemod.inventory.filter.IFilter;
 import com.tom.storagemod.inventory.filter.ItemFilter;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
@@ -182,7 +183,7 @@ public class BlockFilter implements IFilter {
 
 	private void fillMultiblock(Level level) {
 		if (multiblockFilled)return;
-		VanillaMultiblockInventories.checkChest(level, pos, level.getBlockState(pos), p -> addConnected(level, p));
+		MultiblockInventoryAPI.EVENT.invoker().detectMultiblocks(level, pos, level.getBlockState(pos), p -> addConnected(level, p));
 		multiblockFilled = true;
 	}
 
