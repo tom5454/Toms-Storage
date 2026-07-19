@@ -2,28 +2,25 @@ package com.tom.storagemod.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.StackedContents;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.menu.TerminalCraftingFiller;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.platform.Platform;
@@ -38,8 +35,8 @@ public class TerminalSyncManager {
 	private static final int MAX_PACKET_SIZE = 64000;
 	private Object2IntMap<StoredItemStack> idMap = new Object2IntOpenHashMap<>();
 	private Int2ObjectMap<StoredItemStack> idMap2 = new Int2ObjectArrayMap<>();
-	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
-	private Map<StoredItemStack, StoredItemStack> itemList = new HashMap<>();
+	private Map<StoredItemStack, TerminalItemStack> items = new HashMap<>();
+	private Map<TerminalItemStack, TerminalItemStack> itemList = new HashMap<>();
 	private int lastId = 1, lastChangeID = -1;
 	private RegistryFriendlyByteBuf workBuf;
 
@@ -47,11 +44,9 @@ public class TerminalSyncManager {
 		workBuf = Platform.makeRegByteBuf(Unpooled.buffer(MAX_PACKET_SIZE, MAX_PACKET_SIZE * 2), reg);
 	}
 
-	private void write(RegistryFriendlyByteBuf buf, StoredItemStack stack) {
+	private void write(RegistryFriendlyByteBuf buf, TerminalItemStack stack) {
 		ItemStack st = stack.getStack();
-		Item item = st.getItem();
-		DataComponentPatch components = st.getComponentsPatch();
-		byte flags = (byte) ((stack.getQuantity() == 0 ? 1 : 0) | (!components.isEmpty() ? 2 : 0));
+		byte flags = (byte) (stack.getQuantity() == 0 ? 1 : 0);
 		boolean wr = true;
 		int id = idMap.getInt(stack);
 		if(id != 0) {
@@ -64,58 +59,66 @@ public class TerminalSyncManager {
 			idMap2.put(i, (StoredItemStack) s);
 			return i;
 		}));
-		if(wr)buf.writeVarInt(BuiltInRegistries.ITEM.getId(item));
-		if(stack.getQuantity() != 0)buf.writeVarLong(stack.getQuantity());
-		if(wr && !components.isEmpty())DataComponentPatch.STREAM_CODEC.encode(buf, components);
+		if (wr) {
+			ItemStack.STREAM_CODEC.encode(buf, st);
+		}
+		if (stack.getQuantity() != 0) {
+			buf.writeVarLong(stack.getQuantity());
+			buf.writeVarInt(stack.getUsedSlotCount());
+		}
 	}
 
-	private void writeMiniStack(RegistryFriendlyByteBuf buf, StoredItemStack stack) {
+	private void writeMiniStack(RegistryFriendlyByteBuf buf, TerminalItemStack stack) {
 		int id = idMap.getInt(stack);
 		byte flags = (byte) ((stack.getQuantity() == 0 ? 1 : 0) | 2);
 		buf.writeByte(flags);
 		buf.writeVarInt(id);
-		buf.writeVarInt(BuiltInRegistries.ITEM.getId(stack.getStack().getItem()));
-		if(stack.getQuantity() != 0)buf.writeVarLong(stack.getQuantity());
-		DataComponentPatch tag = DataComponentPatch.builder().set(DataComponents.LORE, new ItemLore(List.of(Component.translatable("tooltip.toms_storage.nbt_overflow").withStyle(ChatFormatting.RED)))).build();
-		DataComponentPatch.STREAM_CODEC.encode(buf, tag);
+		ItemStack is = new ItemStack(stack.getStack().getItem());
+		is.set(DataComponents.LORE, new ItemLore(List.of(Component.translatable("tooltip.toms_storage.nbt_overflow").withStyle(ChatFormatting.RED))));
+		ItemStack.STREAM_CODEC.encode(buf, is);
+		if (stack.getQuantity() != 0) {
+			buf.writeVarLong(stack.getQuantity());
+			buf.writeVarInt(stack.getUsedSlotCount());
+		}
 	}
 
-	private StoredItemStack read(RegistryFriendlyByteBuf buf) {
+	private TerminalItemStack read(RegistryFriendlyByteBuf buf) {
 		byte flags = buf.readByte();
 		int id = buf.readVarInt();
 		boolean rd = (flags & 4) == 0;
-		StoredItemStack stack;
+		TerminalItemStack stack;
 		if(rd) {
-			stack = new StoredItemStack(new ItemStack(BuiltInRegistries.ITEM.byId(buf.readVarInt())));
+			stack = new TerminalItemStack(ItemStack.STREAM_CODEC.decode(buf));
 		} else {
-			stack = new StoredItemStack(idMap2.get(id).getStack());
+			var st = idMap2.get(id);
+			if (st == null) {
+				ItemStack is = new ItemStack(Items.BARRIER);
+				is.set(DataComponents.LORE, new ItemLore(List.of(Component.translatable("tooltip.toms_storage.item_sync_error").withStyle(ChatFormatting.RED))));
+				stack = new TerminalItemStack(is);
+			} else
+				stack = new TerminalItemStack(st.getStack());
 		}
-		long count = (flags & 1) != 0 ? 0 : buf.readVarLong();
-		stack.setCount(count);
-		if(rd && (flags & 2) != 0) {
-			DataComponentPatch dataComponentPatch = DataComponentPatch.STREAM_CODEC.decode(buf);
-			stack.getStack().applyComponents(dataComponentPatch);
+		if ((flags & 1) == 0) {
+			stack.setCount(buf.readVarLong());
+			stack.setUsedSlotCount(buf.readVarInt());
 		}
 		idMap.put(stack, id);
 		idMap2.put(id, stack);
 		return stack;
 	}
 
-	public void update(int changeID, Map<StoredItemStack, StoredItemStack> items, ServerPlayer player, Consumer<CompoundTag> extraSync) {
+	public void update(int changeID, Map<StoredItemStack, TerminalItemStack> items, ServerPlayer player, Consumer<CompoundTag> extraSync) {
 		if (changeID != lastChangeID) {
 			lastChangeID = changeID;
-			List<StoredItemStack> toWrite = new ArrayList<>();
-			Set<StoredItemStack> found = new HashSet<>();
+			List<TerminalItemStack> toWrite = new ArrayList<>();
 			items.forEach((s, c) -> {
-				StoredItemStack pc = this.items.get(s);
-				if(pc != null)found.add(s);
+				TerminalItemStack pc = this.items.remove(s);
 				if(pc == null || !c.equalDetails(pc)) {
 					toWrite.add(c);
 				}
 			});
 			this.items.forEach((s, c) -> {
-				if(!found.contains(s))
-					toWrite.add(new StoredItemStack(s.getStack(), 0L));
+				toWrite.add(new TerminalItemStack(s.getStack(), 0L));
 			});
 			this.items.clear();
 			this.items.putAll(items);
@@ -123,7 +126,7 @@ public class TerminalSyncManager {
 				workBuf.writerIndex(0);
 				int j = 0;
 				for (int i = 0; i < toWrite.size(); i++, j++) {
-					StoredItemStack stack = toWrite.get(i);
+					TerminalItemStack stack = toWrite.get(i);
 					int li = workBuf.writerIndex();
 					try {
 						write(workBuf, stack);
@@ -167,7 +170,7 @@ public class TerminalSyncManager {
 	public boolean receiveUpdate(RegistryAccess registryAccess, CompoundTag tag) {
 		if(tag.contains("d")) {
 			RegistryFriendlyByteBuf buf = Platform.makeRegByteBuf(Unpooled.wrappedBuffer(tag.getByteArray("d")), registryAccess);
-			List<StoredItemStack> in = new ArrayList<>();
+			List<TerminalItemStack> in = new ArrayList<>();
 			short len = tag.getShort("l");
 			for (int i = 0; i < len; i++) {
 				in.add(read(buf));
@@ -214,15 +217,18 @@ public class TerminalSyncManager {
 			if((flags & 2) != 0) {
 				stack = null;
 			} else {
-				stack = new StoredItemStack(idMap2.get(buf.readVarInt()).getStack());
+				stack = idMap2.get(buf.readVarInt());
 				long count = buf.readVarLong();
-				stack.setCount(count);
+				if (stack != null) {
+					stack = new StoredItemStack(stack.getStack());
+					stack.setCount(count);
+				}
 			}
 			handler.onInteract(stack, buf.readEnum(SlotAction.class), (flags & 1) != 0);
 		}
 	}
 
-	public List<StoredItemStack> getAsList() {
+	public List<TerminalItemStack> getAsList() {
 		return new ArrayList<>(this.itemList.values());
 	}
 

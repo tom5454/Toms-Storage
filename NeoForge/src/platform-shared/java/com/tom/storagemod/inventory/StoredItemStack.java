@@ -1,17 +1,12 @@
 package com.tom.storagemod.inventory;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
 public class StoredItemStack {
-	private ItemStack stack;
-	private long count;
+	protected ItemStack stack;
+	protected long count;
 	private int hash;
 	private boolean hashZero;
-
-	private String displayNameCache;
-	private String descriptionIdCache;
-	private String namespaceCache;
 
 	public StoredItemStack(ItemStack stack, long count) {
 		this.stack = stack;
@@ -66,28 +61,6 @@ public class StoredItemStack {
 		return hash;
 	}
 
-	public String getDisplayName() {
-		if (displayNameCache == null)
-			displayNameCache = stack.getHoverName().getString();
-		return displayNameCache;
-	}
-
-	public String getDescriptionId() {
-		if (descriptionIdCache == null) {
-			descriptionIdCache = stack.getDescriptionId();
-		}
-
-		return descriptionIdCache;
-	}
-
-	public String getNamespace() {
-		if (namespaceCache == null) {
-			namespaceCache = BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace();
-		}
-
-		return namespaceCache;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -130,23 +103,5 @@ public class StoredItemStack {
 
 	public int getMaxStackSize() {
 		return stack.getMaxStackSize();
-	}
-
-	public long getStackCount() {
-		if (count == 0) {
-			return 0;
-		}
-
-		return (long) Math.ceil((double) count / stack.getMaxStackSize());
-	}
-
-	public static StoredItemStack merge(StoredItemStack a, StoredItemStack b) {
-		if (a == null)return b;
-		if (b == null)return a;
-		return new StoredItemStack(a.stack, a.count + b.count, a.hashCode());
-	}
-
-	public boolean equalDetails(StoredItemStack pc) {
-		return pc.count == count;
 	}
 }

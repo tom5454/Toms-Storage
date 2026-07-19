@@ -52,6 +52,7 @@ import com.tom.storagemod.Config;
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.inventory.sorting.SortingTypes;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;
@@ -271,13 +272,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
 			getMenu().itemListClientSorted.clear();
-			Predicate<StoredItemStack> pred = null;
+			Predicate<TerminalItemStack> pred = null;
 			String[] or = searchString.split("\\|");
 			for (int i = 0; i < or.length; i++) {
 				String part = or[i].trim();
 				if (part.isEmpty())continue;
 				String[] sp = part.split(" ");
-				Predicate<StoredItemStack> p = Predicates.alwaysTrue();
+				Predicate<TerminalItemStack> p = Predicates.alwaysTrue();
 				for (int j = 0; j < sp.length; j++) {
 					String s = sp[j].toLowerCase();
 					if (s.startsWith("@")) {
@@ -329,7 +330,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			if (pred == null)pred = Predicates.alwaysTrue();
 			try {
 				for (int i = 0;i < getMenu().itemListClient.size();i++) {
-					StoredItemStack is = getMenu().itemListClient.get(i);
+					TerminalItemStack is = getMenu().itemListClient.get(i);
 					if (is != null && is.getStack() != null) {
 						if (pred.test(is))
 							addStackToClientList(is);
@@ -361,7 +362,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 	}
 
-	private void addStackToClientList(StoredItemStack is) {
+	private void addStackToClientList(TerminalItemStack is) {
 		getMenu().itemListClientSorted.add(is);
 	}
 
@@ -382,8 +383,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 		if(menu.itemsLoaded && ghostItems && hasShiftDown()) {
 			if(!menu.noSort) {
-				List<StoredItemStack> list = getMenu().itemListClientSorted;
-				Object2IntMap<StoredItemStack> map = new Object2IntOpenHashMap<>();
+				List<TerminalItemStack> list = getMenu().itemListClientSorted;
+				Object2IntMap<TerminalItemStack> map = new Object2IntOpenHashMap<>();
 				map.defaultReturnValue(Integer.MAX_VALUE);
 				for (int m = 0; m < list.size(); m++) {
 					map.put(list.get(m), m);
@@ -453,8 +454,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			if (this.menu.getCarried().isEmpty() && slotIDUnderMouse != -1) {
 				SlotStorage slot = getMenu().storageSlotList.get(slotIDUnderMouse);
 				if(slot.stack != null) {
-					if (slot.stack.getQuantity() > 9999) {
-						ClientUtil.setTooltip(Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()));
+					if (slot.stack.getQuantity() > 9999 || sortingType == SortingTypes.SPACE_EFFICIENCY) {
+						ClientUtil.setTooltip(
+								Component.translatable("tooltip.toms_storage.amount", slot.stack.getQuantity()),
+								Component.translatable("tooltip.toms_storage.slots_used", slot.stack.getUsedSlotCount())
+								);
 					}
 					try {
 						st.renderTooltip(font, slot.stack.getQuantity() == 0 ? slot.stack.getStack() : slot.stack.getActualStack(), mouseX, mouseY);

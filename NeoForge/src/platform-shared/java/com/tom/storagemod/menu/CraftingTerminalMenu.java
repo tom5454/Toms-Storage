@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
 
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.CraftingTerminalBlockEntity;
-import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.platform.NeoForgeMenu;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
@@ -149,7 +149,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 				return itemstack;
 			} else if (index > 0 && index < 10) {
 				if(te == null)return ItemStack.EMPTY;
-				ItemStack stack = ((CraftingTerminalBlockEntity) te).pushStack(itemstack);
+				ItemStack stack = te.pushStack(itemstack);
 				slot.set(stack);
 				if (!playerIn.level().isClientSide)
 					broadcastChanges();
@@ -249,7 +249,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	}
 
 	@Override
-	public List<StoredItemStack> getStoredItems() {
+	public List<TerminalItemStack> getStoredItems() {
 		return itemList;
 	}
 

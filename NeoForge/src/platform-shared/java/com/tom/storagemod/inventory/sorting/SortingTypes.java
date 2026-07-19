@@ -3,7 +3,7 @@ package com.tom.storagemod.inventory.sorting;
 import java.util.Comparator;
 import java.util.function.Supplier;
 
-import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 
 public enum SortingTypes {
 	AMOUNT(ComparatorAmount::new),
@@ -15,13 +15,13 @@ public enum SortingTypes {
 	;
 
 	public static final SortingTypes[] VALUES = values();
-	private final Supplier<Comparator<StoredItemStack>> factory;
+	private final Supplier<Comparator<TerminalItemStack>> factory;
 
-	private SortingTypes(Supplier<Comparator<StoredItemStack>> factory) {
+	private SortingTypes(Supplier<Comparator<TerminalItemStack>> factory) {
 		this.factory = factory;
 	}
 
-	public Comparator<StoredItemStack> create(boolean reversed) {
+	public Comparator<TerminalItemStack> create(boolean reversed) {
 		return reversed ? factory.get().reversed() : factory.get();
 	}
 }

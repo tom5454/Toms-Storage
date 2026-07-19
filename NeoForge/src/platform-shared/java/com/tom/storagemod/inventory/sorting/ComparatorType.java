@@ -10,9 +10,9 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 
-public class ComparatorType implements Comparator<StoredItemStack> {
+public class ComparatorType implements Comparator<TerminalItemStack> {
 
 	private static Map<Item, Integer> makeLookup() {
 		var tab = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(CreativeModeTabs.SEARCH);
@@ -40,7 +40,7 @@ public class ComparatorType implements Comparator<StoredItemStack> {
 	}
 
 	@Override
-	public int compare(StoredItemStack in1, StoredItemStack in2) {
+	public int compare(TerminalItemStack in1, TerminalItemStack in2) {
 		var lookup = getLookup();
 		int val1 = lookup.getOrDefault(in1.getStack().getItem(), Integer.MAX_VALUE);
 		int val2 = lookup.getOrDefault(in2.getStack().getItem(), Integer.MAX_VALUE);
