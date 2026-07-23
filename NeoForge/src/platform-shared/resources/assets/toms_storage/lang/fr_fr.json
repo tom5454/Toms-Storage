@@ -57,7 +57,7 @@
 	"tooltip.toms_storage.amount": "Quantité d'objets: %d",
 	"tooltip.toms_storage.sorting_amount": "Trier par quantité",
 	"tooltip.toms_storage.sorting_name": "Trier par nom",
-	"tooltip.toms_storage.sorting_by_mod": "Trier par mod",
+	"tooltip.toms_storage.sorting_mod": "Trier par mod",
 	"tooltip.toms_storage.search": "Recherche",
 	"tooltip.toms_storage.search_auto": "Recherche automatique",
 	"tooltip.toms_storage.search_keep": "Recherche (conserver)",

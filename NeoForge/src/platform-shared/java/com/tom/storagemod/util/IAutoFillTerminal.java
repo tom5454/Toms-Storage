@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 
 import net.minecraft.nbt.CompoundTag;
 
-import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 
 public interface IAutoFillTerminal {
 	public static List<ISearchHandler> updateSearch = new ArrayList<>();
 
 	void sendMessage(CompoundTag compound);
-	List<StoredItemStack> getStoredItems();
+	List<TerminalItemStack> getStoredItems();
 	boolean isSmartSearch();
 
 	static boolean hasSync() {
