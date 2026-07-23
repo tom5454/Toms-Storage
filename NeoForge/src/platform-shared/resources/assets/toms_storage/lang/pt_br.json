@@ -57,7 +57,7 @@
 	"tooltip.toms_storage.amount": "Valor do item: %d",
 	"tooltip.toms_storage.sorting_amount": "Classificar por quantidade do item",
 	"tooltip.toms_storage.sorting_name": "Classificar por nome do item",
-	"tooltip.toms_storage.sorting_by_mod": "Classificar por Mod",
+	"tooltip.toms_storage.sorting_mod": "Classificar por Mod",
 	"tooltip.toms_storage.search": "Pesquisa padrão",
 	"tooltip.toms_storage.search_auto": "Pesquisa automatica",
 	"tooltip.toms_storage.search_keep": "Guarda de Pesquisa Padrão",

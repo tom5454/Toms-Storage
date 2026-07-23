@@ -57,7 +57,7 @@
 	"tooltip.toms_storage.amount": "アイテム数: %d",
 	"tooltip.toms_storage.sorting_amount": "アイテム数でソート",
 	"tooltip.toms_storage.sorting_name": "アイテム名でソート",
-	"tooltip.toms_storage.sorting_by_mod": "MODでソート",
+	"tooltip.toms_storage.sorting_mod": "MODでソート",
 	"tooltip.toms_storage.search": "標準検索",
 	"tooltip.toms_storage.search_auto": "自動検索",
 	"tooltip.toms_storage.search_keep": "標準検索-保持",

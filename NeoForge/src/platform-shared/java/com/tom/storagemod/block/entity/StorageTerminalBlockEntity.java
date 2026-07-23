@@ -30,6 +30,7 @@ import com.tom.storagemod.inventory.IInventoryAccess;
 import com.tom.storagemod.inventory.IInventoryAccess.IInventoryChangeTracker;
 import com.tom.storagemod.inventory.NetworkInventory;
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.item.WirelessTerminal;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.platform.PlatformBlockEntity;
@@ -40,7 +41,7 @@ import com.tom.storagemod.util.Util;
 
 public class StorageTerminalBlockEntity extends PlatformBlockEntity implements MenuProvider, TickableServer {
 	private NetworkInventory itemCache = new NetworkInventory();
-	private Map<StoredItemStack, StoredItemStack> items = new HashMap<>();
+	private Map<StoredItemStack, TerminalItemStack> items = new HashMap<>();
 	private int sort;
 	private int searchType;
 	private int modes;
@@ -82,7 +83,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		return Component.translatable("menu.toms_storage.storage_terminal");
 	}
 
-	public Map<StoredItemStack, StoredItemStack> getStacks() {
+	public Map<StoredItemStack, TerminalItemStack> getStacks() {
 		updateItems = true;
 		return items;
 	}
@@ -130,11 +131,13 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 				changeTracker = ct;
 
 				if (Config.get().runMultithreaded) {
-					items = tr.streamWrappedStacks(true).collect(Collectors.groupingByConcurrent(Function.identity(), Util.reducingWithCopy(null, StoredItemStack::merge, StoredItemStack::new)));
+					items = tr.streamWrappedStacks(true).map(TerminalItemStack::new)
+							.collect(Collectors.groupingBy(Function.identity(), Util.reducingWithCopy(null, TerminalItemStack::merge, TerminalItemStack::new)));
 				} else {
 					items = new HashMap<>();
-					tr.streamWrappedStacks(false).forEach(s -> items.merge(s, s, StoredItemStack::merge));
-					items.replaceAll((k, v) -> new StoredItemStack(v));
+					tr.streamWrappedStacks(false).map(TerminalItemStack::new)
+					.forEach(s -> items.merge(s, s, TerminalItemStack::merge));
+					items.replaceAll((k, v) -> new TerminalItemStack(v));
 				}
 				slotCount = Mth.clamp(ii.getSlotCount(), 0, Short.MAX_VALUE);
 				freeCount = Mth.clamp(ii.getFreeSlotCount(), 0, Short.MAX_VALUE);
