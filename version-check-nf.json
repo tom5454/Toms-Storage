@@ -6,7 +6,7 @@
 		"1.20.5-latest": "1.6.13",
 		"1.20.6-latest": "1.6.17",
 		"1.21-latest": "2.0.12",
-		"1.21.1-latest": "2.3.2",
+		"1.21.1-latest": "2.4.0",
 		"1.21.3-latest": "2.1.1",
 		"1.21.4-latest": "2.3.3",
 		"1.21.5-latest": "2.4.3",
@@ -17,14 +17,16 @@
 		"1.21.11-latest": "2.8.1",
 		"26.1-latest": "2.9.3",
 		"26.1.1-latest": "2.9.3",
-		"26.1.2-latest": "2.9.5",
-		"26.2-latest": "2.10.0"
+		"26.1.2-latest": "2.10.0",
+		"26.2-latest": "2.11.0"
 	},
 	"26.2": {
+		"2.11.0": "Improve terminal performance (Closes #532)\nAdded more sorting options (#640)\n- Space Efficiency (Stack count)\n- Item ID\n- Creative Tab Order\nUpdated Brazilian and Russian translations (#728, #741)\n\nFix crash with Polymer (Closes #767)",
 		"2.10.1": "Fixed JEI not working",
 		"2.10.0": "26.2 port"
 	},
 	"26.1.2": {
+		"2.10.0": "Improve terminal performance (Closes #532)\nAdded more sorting options (#640)\n- Space Efficiency (Stack count)\n- Item ID\n- Creative Tab Order\nUpdated Brazilian and Russian translations (#728, #741)\n\nFix crash with Polymer (Closes #767)",
 		"2.9.5": "Updated Trinkets compat\nFixed crash with Puzzleslib",
 		"2.9.4": "Fix crash on new NeoForge version",
 		"2.9.3": "Fix crash if sophisticatedcore is installed, but not sophisticatedstorage"
@@ -97,6 +99,7 @@
 		"2.1.0": "1.21.3 port"
 	},
 	"1.21.1": {
+		"2.4.0": "Improve terminal performance (Closes #532)\nAdded more sorting options (#640)\n- Space Efficiency (Stack count)\n- Item ID\n- Creative Tab Order\nUpdated Brazilian and Russian translations (#728, #741)\n\nFix crash with Polymer (Closes #767)",
 		"2.3.2": "Fix crash if sophisticatedcore is installed, but not sophisticatedstorage",
 		"2.3.1": "Fix sophisticated storage compat",
 		"2.3.0": "Added Sophisticated Storage compat for detecting multiblock inventories (#306, Closes #648)\nFixed Inventory Configurator bug with multiblock inventories\nFixed onlyTrimsConnect (Closes #692)\nImproved French translations (#695)\nIncrease Level Emitter limit to signed int limit 2.1B (Closes #671)",
