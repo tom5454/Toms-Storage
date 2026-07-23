@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.StorageTerminalBlockEntity;
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.network.NetworkHandler;
 import com.tom.storagemod.util.DataSlots;
 import com.tom.storagemod.util.IDataReceiver;
@@ -37,9 +38,9 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 	protected StorageTerminalBlockEntity te;
 	protected int playerSlotsStart;
 	public List<SlotStorage> storageSlotList = new ArrayList<>();
-	public List<StoredItemStack> itemList = Lists.<StoredItemStack>newArrayList();
-	public List<StoredItemStack> itemListClient = Lists.<StoredItemStack>newArrayList();
-	public List<StoredItemStack> itemListClientSorted = Lists.<StoredItemStack>newArrayList();
+	public List<TerminalItemStack> itemList = Lists.<TerminalItemStack>newArrayList();
+	public List<TerminalItemStack> itemListClient = Lists.<TerminalItemStack>newArrayList();
+	public List<TerminalItemStack> itemListClientSorted = Lists.<TerminalItemStack>newArrayList();
 	public List<SlotData> slotData = new ArrayList<>();
 	public TerminalSyncManager sync;
 	private int lines;
@@ -148,7 +149,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 		private final int slotIndex;
 		/** The inventory we want to extract a slot from. */
 		public final StorageTerminalBlockEntity inventory;
-		public StoredItemStack stack;
+		public TerminalItemStack stack;
 
 		public SlotStorage(StorageTerminalBlockEntity inventory, int slotIndex, int xPosition, int yPosition) {
 			this.xDisplayPosition = xPosition;
@@ -207,7 +208,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 		}
 	}
 
-	public final void setSlotContents(int id, StoredItemStack stack) {
+	public final void setSlotContents(int id, TerminalItemStack stack) {
 		storageSlotList.get(id).stack = stack;
 	}
 
@@ -218,7 +219,7 @@ public class StorageTerminalMenu extends RecipeBookMenu implements IDataReceiver
 	@Override
 	public void broadcastChanges() {
 		if(te == null)return;
-		Map<StoredItemStack, StoredItemStack> itemsCount = te.getStacks();
+		Map<StoredItemStack, TerminalItemStack> itemsCount = te.getStacks();
 		sync.update(te.getChangeCount(), itemsCount, (ServerPlayer) pinv.player, !te.getLastSearch().equals(search) ? tag -> {
 			search = te.getLastSearch();
 			tag.putString("s", search);

@@ -57,7 +57,7 @@
 	"tooltip.toms_storage.amount": "物品数量：%d",
 	"tooltip.toms_storage.sorting_amount": "按物品数量进行排序",
 	"tooltip.toms_storage.sorting_name": "按物品名称进行排序",
-	"tooltip.toms_storage.sorting_by_mod": "按所属模组进行排序",
+	"tooltip.toms_storage.sorting_mod": "按所属模组进行排序",
 	"tooltip.toms_storage.search": "标准搜索",
 	"tooltip.toms_storage.search_auto": "自动搜索",
 	"tooltip.toms_storage.search_keep": "保持标准搜索",
