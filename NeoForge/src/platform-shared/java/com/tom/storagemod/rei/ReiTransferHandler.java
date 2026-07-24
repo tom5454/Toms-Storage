@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
 
@@ -58,7 +59,7 @@ public class ReiTransferHandler implements TransferHandler {
 
 						if (!found) {
 							for (ItemStack stack : list) {
-								StoredItemStack s = new StoredItemStack(stack);
+								TerminalItemStack s = new TerminalItemStack(stack);
 								if(stored.contains(s)) {
 									found = true;
 									break;

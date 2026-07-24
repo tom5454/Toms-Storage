@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.inventory.StoredItemStack;
+import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
 import com.tom.storagemod.screen.AbstractStorageTerminalScreen;
 import com.tom.storagemod.util.IAutoFillTerminal;
@@ -115,7 +116,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 
 					if (!found) {
 						for (ItemStack stack : list) {
-							StoredItemStack s = new StoredItemStack(stack);
+							TerminalItemStack s = new TerminalItemStack(stack);
 							if(stored.contains(s)) {
 								found = true;
 								break;
@@ -125,7 +126,6 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 
 					if (!found) {
 						missing.add(width == 1 ? i * 3 : width == 2 ? ((i % 2) + i / 2 * 3) : i);
-						//missing.add(i);
 					}
 				}
 				i++;
