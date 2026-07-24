@@ -179,7 +179,7 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 	public InventorySlot findSlotAfter(InventorySlot slot, ItemPredicate filter, boolean findEmpty, boolean loop) {
 		if (slot == null)return findSlot(filter, findEmpty);
 		ResourceHandler<ItemResource> h = itemHandler.get();
-		if (h == null || slot.getHandler() != h)return null;
+		if (h == null)return null;
 		if (h.size() <= slot.getId() + 1)return loop ? findSlot(filter, findEmpty) : null;
 		for (int i = slot.getId() + 1; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];
@@ -198,7 +198,6 @@ public class InventoryChangeTracker implements IInventoryChangeTracker, IMultiTh
 		ResourceHandler<ItemResource> h = itemHandler.get();
 		if (h == null)return null;
 		if (!checkFilter(forStack))return null;
-		if (slot.getHandler() != h)return null;
 		if (h.size() <= slot.getId() + 1)return loop ? findSlotDest(forStack) : null;
 		for (int i = slot.getId() + 1; i < lastItems.length; i++) {
 			StoredItemStack is = lastItems[i];

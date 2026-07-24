@@ -104,6 +104,9 @@ public class TerminalSyncManager {
 		if ((flags & 1) == 0) {
 			stack.setCount(buf.readVarLong());
 			stack.setUsedSlotCount(buf.readVarInt());
+		} else {
+			stack.setCount(0);
+			stack.setUsedSlotCount(0);
 		}
 		idMap.put(stack, id);
 		idMap2.put(id, stack);
