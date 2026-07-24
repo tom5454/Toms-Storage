@@ -274,6 +274,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		}
 	}
 
+	private boolean matchSearch(Pattern m, String value) {
+		// Entrypoint for JustEnoughCharacters
+		return m.matcher(value).find();
+	}
+
 	protected void updateSearch() {
 		String searchString = searchField.getValue();
 		if (refreshItemList || !searchLast.equals(searchString)) {
@@ -289,7 +294,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					String s = sp[j].toLowerCase();
 					if (s.startsWith("@")) {
 						String fs = s.substring(1);
-						p = p.and(is -> BuiltInRegistries.ITEM.getKey(is.getStack().getItem()).getNamespace().contains(fs));
+						p = p.and(is -> is.getNamespace().contains(fs));
 					} else if (s.startsWith("#")) {
 						String fs = s.substring(1);
 						p = p.and(is -> {
@@ -305,7 +310,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						p = p.and(is -> {
 							if (is.getStack().getComponentsPatch().isEmpty())return false;
 							try {
-								return m.matcher(componentCache.get(is)).find();
+								return matchSearch(m, componentCache.get(is));
 							} catch (Exception e) {
 								return false;
 							}
@@ -316,11 +321,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 						p = p.and(is -> {
 							try {
 								String dspName = is.getDisplayName();
-								if (m.matcher(dspName.toLowerCase()).find()) {
+								if (matchSearch(m, dspName.toLowerCase())) {
 									return true;
 								}
 								for (String lp : tooltipCache.get(is)) {
-									if (m.matcher(lp).find()) {
+									if (matchSearch(m, lp)) {
 										return true;
 									}
 								}
