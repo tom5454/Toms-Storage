@@ -236,7 +236,15 @@ public class TerminalSyncManager {
 	}
 
 	public void fillStackedContents(StackedContents stc) {
-		items.forEach((s, c) -> stc.accountSimpleStack(c.getActualStack()));
+		itemList.values().forEach(c -> {
+			if (c.getQuantity() > 0) {
+				// getStack() always has count 1 - give accountStack a copy with the real
+				// quantity, otherwise it clamps everything down to 1.
+				ItemStack stack = c.getStack().copy();
+				stack.setCount((int) Math.min(c.getQuantity(), 65536));
+				stc.accountStack(stack, stack.getCount());
+			}
+		});
 	}
 
 	public long getAmount(StoredItemStack stack) {

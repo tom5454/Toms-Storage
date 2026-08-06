@@ -207,7 +207,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		this.searchField.setTextColor(16777215);
 		this.searchField.setValue(searchLast);
 		searchLast = "";
-		addWidget(searchField);
+		addRenderableWidget(searchField);
 		buttonSortingType = addRenderableWidget(new EnumCycleButton<>(leftPos - 18, topPos + 5, Component.translatable("narrator.toms_storage.terminal_sort"), "sort", SortingTypes.VALUES, n -> {
 			sortingType = n;
 			buttonSortingType.setState(n);
@@ -547,6 +547,14 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	}
 
 	@Override
+	protected void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+		if (slot instanceof StorageTerminalMenu.SlotStorage) {
+			return;
+		}
+		super.renderSlot(guiGraphics, slot);
+	}
+
+	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 		if (popup.mouseClick(mouseX, mouseY, mouseButton))return true;
 		if (slotIDUnderMouse > -1) {
@@ -595,6 +603,16 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	protected void storageSlotClick(StoredItemStack slotStack, SlotAction act, boolean mod) {
 		menu.sync.sendInteract(slotStack, act, mod);
+	}
+
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int mouseButton) {
+		if (slotIDUnderMouse > -1) {
+			// Storage slots are handled entirely in mouseClicked; skip vanilla's release
+			// handling here or it re-triggers clicked() and pushes the just-pulled item back.
+			return true;
+		}
+		return super.mouseReleased(mouseX, mouseY, mouseButton);
 	}
 
 	public boolean isPullOne(int mouseButton) {

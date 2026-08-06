@@ -59,6 +59,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		craftMatrix = te.getCraftingInv();
 		craftResult = te.getCraftResult();
 		init();
+		addStorageSlots(5, 8, 18);
 		this.addPlayerSlots(inv, 8, 174);
 		te.registerCrafting(this);
 	}
@@ -68,6 +69,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		craftMatrix = new TransientCraftingContainer(this, 3, 3);
 		craftResult = new ResultContainer();
 		init();
+		addStorageSlots(5, 8, 18);
 		this.addPlayerSlots(inv, 8, 174);
 	}
 
@@ -107,7 +109,8 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 
 	@Override
 	protected void addStorageSlots() {
-		addStorageSlots(5, 8, 18);
+		// No-op: storage slots are added explicitly after init() in the constructors below,
+		// so the crafting result/grid keep slots 0..9 (required by the recipe book).
 	}
 
 	@Override
@@ -125,7 +128,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 			if (index == 0) {
 				if(te == null)return ItemStack.EMPTY;
 
-				if (!((CraftingTerminalBlockEntity)te).canCraft() || !this.moveItemStackTo(itemstack1, 10, 46, true)) {
+				if (!((CraftingTerminalBlockEntity)te).canCraft() || !this.moveItemStackTo(itemstack1, playerSlotsStart + 1, playerSlotsStart + 1 + 36, true)) {
 					return ItemStack.EMPTY;
 				}
 
@@ -186,10 +189,26 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	@Override
 	public void fillCraftSlotsStackedContents(StackedContents itemHelperIn) {
 		this.craftMatrix.fillStackedContents(itemHelperIn);
-		if(te != null)sync.fillStackedContents(itemHelperIn);
-		else itemList.forEach(e -> {
-			itemHelperIn.accountSimpleStack(e.getActualStack());
-		});
+		if(te != null) {
+			te.getStacks().forEach((s, c) -> {
+				// c (the value) holds the merged quantity; s (the key) may be stale.
+				if (c.getQuantity() > 0) {
+					// getStack() always has count 1 - give accountStack a copy with the real
+					// quantity, otherwise it clamps everything down to 1.
+					ItemStack stack = c.getStack().copy();
+					stack.setCount((int) Math.min(c.getQuantity(), 65536));
+					itemHelperIn.accountStack(stack, stack.getCount());
+				}
+			});
+		} else {
+			itemList.forEach(e -> {
+				if (e.getQuantity() > 0) {
+					ItemStack stack = e.getStack().copy();
+					stack.setCount((int) Math.min(e.getQuantity(), 65536));
+					itemHelperIn.accountStack(stack, stack.getCount());
+				}
+			});
+		}
 	}
 
 	@Override

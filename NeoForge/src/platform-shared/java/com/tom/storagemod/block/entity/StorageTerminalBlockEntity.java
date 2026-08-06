@@ -46,7 +46,6 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	private int searchType;
 	private int modes;
 	private String lastSearch = "";
-	private boolean updateItems;
 	private int changeCount;
 	private int beaconLevel;
 	private long changeTracker;
@@ -84,7 +83,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	}
 
 	public Map<StoredItemStack, TerminalItemStack> getStacks() {
-		updateItems = true;
+		refreshItems();
 		return items;
 	}
 
@@ -121,30 +120,33 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, stack);
 	}
 
+	// Shared by the tick loop and getStacks() so callers always get current counts, not a
+	// tick-old snapshot. changeTracker still skips the rescan when nothing changed.
+	private void refreshItems() {
+		IInventoryAccess ii = itemCache.getAccess(level, worldPosition);
+		IInventoryChangeTracker tr = ii.tracker();
+		long ct = tr.getChangeTracker(level);
+		if (changeTracker != ct) {
+			changeTracker = ct;
+
+			if (Config.get().runMultithreaded) {
+				items = tr.streamWrappedStacks(true).map(TerminalItemStack::new)
+						.collect(Collectors.groupingBy(Function.identity(), Util.reducingWithCopy(null, TerminalItemStack::merge, TerminalItemStack::new)));
+			} else {
+				items = new HashMap<>();
+				tr.streamWrappedStacks(false).map(TerminalItemStack::new)
+				.forEach(s -> items.merge(s, s, TerminalItemStack::merge));
+				items.replaceAll((k, v) -> new TerminalItemStack(v));
+			}
+			slotCount = Mth.clamp(ii.getSlotCount(), 0, Short.MAX_VALUE);
+			freeCount = Mth.clamp(ii.getFreeSlotCount(), 0, Short.MAX_VALUE);
+			changeCount++;
+		}
+	}
+
 	@Override
 	public void updateServer() {
-		if(updateItems) {
-			IInventoryAccess ii = itemCache.getAccess(level, worldPosition);
-			IInventoryChangeTracker tr = ii.tracker();
-			long ct = tr.getChangeTracker(level);
-			if (changeTracker != ct) {
-				changeTracker = ct;
-
-				if (Config.get().runMultithreaded) {
-					items = tr.streamWrappedStacks(true).map(TerminalItemStack::new)
-							.collect(Collectors.groupingBy(Function.identity(), Util.reducingWithCopy(null, TerminalItemStack::merge, TerminalItemStack::new)));
-				} else {
-					items = new HashMap<>();
-					tr.streamWrappedStacks(false).map(TerminalItemStack::new)
-					.forEach(s -> items.merge(s, s, TerminalItemStack::merge));
-					items.replaceAll((k, v) -> new TerminalItemStack(v));
-				}
-				slotCount = Mth.clamp(ii.getSlotCount(), 0, Short.MAX_VALUE);
-				freeCount = Mth.clamp(ii.getFreeSlotCount(), 0, Short.MAX_VALUE);
-				changeCount++;
-			}
-			updateItems = false;
-		}
+		refreshItems();
 		if(level.getGameTime() % 40 == Math.abs(worldPosition.hashCode()) % 40) {
 			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(8)).mapToInt(p -> {
 				if(level.isLoaded(p)) {
