@@ -117,6 +117,7 @@ sourceSets {
 	}
 }
 
+// Exclude duplicate resource tags (e.g. data/curios/tags/item/belt.json) across platform-shared and main resources
 tasks.withType(Copy).configureEach {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

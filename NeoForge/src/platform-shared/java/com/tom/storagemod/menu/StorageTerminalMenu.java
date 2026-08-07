@@ -311,7 +311,9 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 				}
 
 				if (action != null) {
-					sync.sendInteract(slotStorage.stack, action, mod);
+					if (slotStorage.stack != null || !getCarried().isEmpty()) {
+						sync.sendInteract(slotStorage.stack, action, mod);
+					}
 				}
 			}
 			return;
@@ -334,7 +336,9 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 				}
 			} else if (index >= 0 && index < slots.size() && slots.get(index) instanceof SlotStorage slotStorage) {
 				if (playerIn.level().isClientSide) {
-					sync.sendInteract(slotStorage.stack, SlotAction.SHIFT_PULL, false);
+					if (slotStorage.stack != null && slotStorage.stack.getQuantity() > 0) {
+						sync.sendInteract(slotStorage.stack, SlotAction.SHIFT_PULL, false);
+					}
 				}
 			} else {
 				return shiftClickItems(playerIn, index);
