@@ -40,13 +40,16 @@ import com.tom.storagemod.util.TickerUtil.TickableServer;
 import com.tom.storagemod.util.Util;
 
 public class StorageTerminalBlockEntity extends PlatformBlockEntity implements MenuProvider, TickableServer {
+	private static final int PASSIVE_REFRESH_INTERVAL_TICKS = 20;
+	private static final int BEACON_SCAN_INTERVAL_TICKS = 40;
+	private static final int BEACON_SCAN_RADIUS = 8;
+
 	private NetworkInventory itemCache = new NetworkInventory();
 	private Map<StoredItemStack, TerminalItemStack> items = new HashMap<>();
 	private int sort;
 	private int searchType;
 	private int modes;
 	private String lastSearch = "";
-	private boolean updateItems;
 	private int changeCount;
 	private int beaconLevel;
 	private long changeTracker;
@@ -84,7 +87,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	}
 
 	public Map<StoredItemStack, TerminalItemStack> getStacks() {
-		updateItems = true;
+		refreshItems();
 		return items;
 	}
 
@@ -121,32 +124,38 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 		Containers.dropItemStack(level, worldPosition.getX() + .5f, worldPosition.getY() + .5f, worldPosition.getZ() + .5f, stack);
 	}
 
+	// Shared by the tick loop and getStacks() so callers always get current counts, not a
+	// tick-old snapshot. changeTracker still skips the rescan when nothing changed.
+	private void refreshItems() {
+		IInventoryAccess ii = itemCache.getAccess(level, worldPosition);
+		IInventoryChangeTracker tr = ii.tracker();
+		long ct = tr.getChangeTracker(level);
+		if (changeTracker != ct) {
+			changeTracker = ct;
+
+			if (Config.get().runMultithreaded) {
+				items = tr.streamWrappedStacks(true).map(TerminalItemStack::new)
+						.collect(Collectors.groupingBy(Function.identity(), Util.reducingWithCopy(null, TerminalItemStack::merge, TerminalItemStack::new)));
+			} else {
+				items = new HashMap<>();
+				tr.streamWrappedStacks(false).map(TerminalItemStack::new)
+				.forEach(s -> items.merge(s, s, TerminalItemStack::merge));
+				items.replaceAll((k, v) -> new TerminalItemStack(v));
+			}
+			slotCount = Mth.clamp(ii.getSlotCount(), 0, Short.MAX_VALUE);
+			freeCount = Mth.clamp(ii.getFreeSlotCount(), 0, Short.MAX_VALUE);
+			changeCount++;
+		}
+	}
+
 	@Override
 	public void updateServer() {
-		if(updateItems) {
-			IInventoryAccess ii = itemCache.getAccess(level, worldPosition);
-			IInventoryChangeTracker tr = ii.tracker();
-			long ct = tr.getChangeTracker(level);
-			if (changeTracker != ct) {
-				changeTracker = ct;
-
-				if (Config.get().runMultithreaded) {
-					items = tr.streamWrappedStacks(true).map(TerminalItemStack::new)
-							.collect(Collectors.groupingBy(Function.identity(), Util.reducingWithCopy(null, TerminalItemStack::merge, TerminalItemStack::new)));
-				} else {
-					items = new HashMap<>();
-					tr.streamWrappedStacks(false).map(TerminalItemStack::new)
-					.forEach(s -> items.merge(s, s, TerminalItemStack::merge));
-					items.replaceAll((k, v) -> new TerminalItemStack(v));
-				}
-				slotCount = Mth.clamp(ii.getSlotCount(), 0, Short.MAX_VALUE);
-				freeCount = Mth.clamp(ii.getFreeSlotCount(), 0, Short.MAX_VALUE);
-				changeCount++;
-			}
-			updateItems = false;
+		// Passive keep-warm; getStacks() already forces a fresh refresh on every real read.
+		if(level.getGameTime() % PASSIVE_REFRESH_INTERVAL_TICKS == Math.abs(worldPosition.hashCode()) % PASSIVE_REFRESH_INTERVAL_TICKS) {
+			refreshItems();
 		}
-		if(level.getGameTime() % 40 == Math.abs(worldPosition.hashCode()) % 40) {
-			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(8)).mapToInt(p -> {
+		if(level.getGameTime() % BEACON_SCAN_INTERVAL_TICKS == Math.abs(worldPosition.hashCode()) % BEACON_SCAN_INTERVAL_TICKS) {
+			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(BEACON_SCAN_RADIUS)).mapToInt(p -> {
 				if(level.isLoaded(p)) {
 					BlockState st = level.getBlockState(p);
 					if(st.is(Blocks.BEACON)) {

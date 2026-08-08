@@ -103,6 +103,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 sourceSets {
 	main {
 		java {
+			srcDir "src/main/java"
 			srcDir "src/platform-shared/java"
 			//if(!useLib)exclude "com/tom/storagemod/rei/**"
 			//if(!useLib)exclude "com/tom/storagemod/jei/**"
@@ -110,9 +111,18 @@ sourceSets {
 			//if(!useLib)exclude "com/tom/storagemod/top/**"
 		}
 		resources {
+			srcDir "src/main/resources"
 			srcDir "src/platform-shared/resources"
 		}
 	}
+}
+
+// Exclude duplicate resource tags (e.g. data/curios/tags/item/belt.json) across platform-shared and main resources
+tasks.withType(Copy).configureEach {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.withType(Jar).configureEach {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 dependencies {

@@ -83,6 +83,13 @@ public class InventoryConfiguratorScreen extends PlatformContainerScreen<Invento
 			click(7);
 		}));
 		buttonRemoveFilter.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.inv_config.remove_filter")));
+
+		// Set initial state here, not just in render(): narration can run right after init()
+		// and would otherwise see a null EnumCycleButton state.
+		buttonPriority.setState(menu.priority);
+		buttonSide.setState(menu.side);
+		buttonSkip.setState(menu.skip);
+		buttonKeepLast.setState(menu.keepLast);
 	}
 
 	@Override

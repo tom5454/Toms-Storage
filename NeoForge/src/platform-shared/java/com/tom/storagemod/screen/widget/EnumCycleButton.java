@@ -24,12 +24,15 @@ public class EnumCycleButton<T extends Enum<T>> extends IconButton {
 
 	@Override
 	protected MutableComponent createNarrationMessage() {
+		if (state == null) {
+			return wrapDefaultNarrationMessage(name.copy());
+		}
 		return wrapDefaultNarrationMessage(name.copy().append(" ").append(Component.translatable("narrator.toms_storage.button_state." + state.name().toLowerCase(Locale.ROOT))));
 	}
 
 	@Override
 	public ResourceLocation getIcon() {
-		return icon.apply(state);
+		return state == null ? null : icon.apply(state);
 	}
 
 	public void setState(T state) {

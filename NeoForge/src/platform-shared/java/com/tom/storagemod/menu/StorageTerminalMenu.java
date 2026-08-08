@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.RecipeBookMenu;
@@ -142,9 +143,11 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 
 	protected final void addSlotToContainer(SlotStorage slotStorage) {
 		storageSlotList.add(slotStorage);
+		this.addSlot(slotStorage);
 	}
 
-	public static class SlotStorage {
+	public static class SlotStorage extends Slot {
+		private static final net.minecraft.world.Container DUMMY_CONTAINER = new net.minecraft.world.SimpleContainer(0);
 		/** display position of the inventory slot on the screen x axis */
 		public int xDisplayPosition;
 		/** display position of the inventory slot on the screen y axis */
@@ -156,10 +159,51 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 		public TerminalItemStack stack;
 
 		public SlotStorage(StorageTerminalBlockEntity inventory, int slotIndex, int xPosition, int yPosition) {
+			super(DUMMY_CONTAINER, slotIndex, xPosition, yPosition);
 			this.xDisplayPosition = xPosition;
 			this.yDisplayPosition = yPosition;
 			this.slotIndex = slotIndex;
 			this.inventory = inventory;
+		}
+
+		@Override
+		public ItemStack getItem() {
+			return stack != null ? stack.getStack() : ItemStack.EMPTY;
+		}
+
+		@Override
+		public void set(ItemStack stack) {
+			// Virtual slot; do not modify DUMMY_CONTAINER
+		}
+
+		@Override
+		public void setByPlayer(ItemStack stack, ItemStack previousStack) {
+			// Virtual slot; do not modify DUMMY_CONTAINER
+		}
+
+		@Override
+		public int getMaxStackSize() {
+			return Integer.MAX_VALUE;
+		}
+
+		@Override
+		public int getMaxStackSize(ItemStack stack) {
+			return Integer.MAX_VALUE;
+		}
+
+		@Override
+		public void setChanged() {
+			// Virtual slot
+		}
+
+		@Override
+		public boolean mayPickup(Player playerIn) {
+			return stack != null && stack.getQuantity() > 0;
+		}
+
+		@Override
+		public boolean mayPlace(ItemStack stack) {
+			return true;
 		}
 
 		public ItemStack pullFromSlot(long max) {
@@ -248,6 +292,36 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	}
 
 	@Override
+	public void clicked(int slotId, int button, ClickType clickType, Player player) {
+		if (slotId >= 0 && slotId < slots.size() && slots.get(slotId) instanceof SlotStorage slotStorage) {
+			if (player.level().isClientSide) {
+				SlotAction action = null;
+				boolean mod = false;
+
+				if (clickType == ClickType.QUICK_MOVE) {
+					action = SlotAction.SHIFT_PULL;
+				} else if (clickType == ClickType.PICKUP) {
+					if (button == 0) {
+						action = SlotAction.PULL_OR_PUSH_STACK;
+					} else if (button == 1) {
+						action = getCarried().isEmpty() ? SlotAction.GET_HALF : SlotAction.PULL_ONE;
+					}
+				} else if (clickType == ClickType.CLONE) {
+					action = SlotAction.PULL_OR_PUSH_STACK;
+				}
+
+				if (action != null) {
+					if (slotStorage.stack != null || !getCarried().isEmpty()) {
+						sync.sendInteract(slotStorage.stack, action, mod);
+					}
+				}
+			}
+			return;
+		}
+		super.clicked(slotId, button, clickType, player);
+	}
+
+	@Override
 	public final ItemStack quickMoveStack(Player playerIn, int index) {
 		if (slots.size() > index) {
 			if (index > playerSlotsStart && te != null) {
@@ -259,6 +333,12 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 					slot.set(itemstack);
 					if (!playerIn.level().isClientSide)
 						broadcastChanges();
+				}
+			} else if (index >= 0 && index < slots.size() && slots.get(index) instanceof SlotStorage slotStorage) {
+				if (playerIn.level().isClientSide) {
+					if (slotStorage.stack != null && slotStorage.stack.getQuantity() > 0) {
+						sync.sendInteract(slotStorage.stack, SlotAction.SHIFT_PULL, false);
+					}
 				}
 			} else {
 				return shiftClickItems(playerIn, index);

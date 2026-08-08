@@ -47,7 +47,10 @@ public class IconButton extends Button {
 	}
 
 	protected void drawIcon(GuiGraphics st, int mouseX, int mouseY, float pt) {
-		st.blitSprite(getIcon(), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+		ResourceLocation iconLoc = getIcon();
+		if (iconLoc != null) {
+			st.blitSprite(iconLoc, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+		}
 	}
 
 	public ResourceLocation getIcon() {
