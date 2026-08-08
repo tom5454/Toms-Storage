@@ -17,6 +17,9 @@ import com.tom.storagemod.block.entity.CraftingTerminalBlockEntity;
 import com.tom.storagemod.inventory.StoredItemStack;
 
 class TerminalRecipePlacer extends ServerPlaceRecipe<CraftingInput, CraftingRecipe> {
+	// Slot 0 is the crafting result; the grid occupies the slots right after it.
+	private static final int GRID_SLOT_START = 1;
+
 	private CraftingTerminalBlockEntity te;
 	private Player player;
 
@@ -52,8 +55,9 @@ class TerminalRecipePlacer extends ServerPlaceRecipe<CraftingInput, CraftingReci
 		// Only clears if something actually changed, so an early return in the vanilla method
 		// (which can leave an unrelated, pre-existing grid untouched) doesn't wipe it.
 		int gridSize = this.menu.getGridWidth() * this.menu.getGridHeight();
+		int gridSlotEnd = GRID_SLOT_START + gridSize - 1;
 		List<ItemStack> before = new ArrayList<>(gridSize);
-		for (int i = 1; i <= gridSize; i++) {
+		for (int i = GRID_SLOT_START; i <= gridSlotEnd; i++) {
 			before.add(this.menu.getSlot(i).getItem().copy());
 		}
 
@@ -61,8 +65,8 @@ class TerminalRecipePlacer extends ServerPlaceRecipe<CraftingInput, CraftingReci
 
 		if (!this.menu.recipeMatches(recipe)) {
 			boolean changed = false;
-			for (int i = 1; i <= gridSize; i++) {
-				if (!ItemStack.matches(before.get(i - 1), this.menu.getSlot(i).getItem())) {
+			for (int i = GRID_SLOT_START; i <= gridSlotEnd; i++) {
+				if (!ItemStack.matches(before.get(i - GRID_SLOT_START), this.menu.getSlot(i).getItem())) {
 					changed = true;
 					break;
 				}

@@ -33,6 +33,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class TerminalSyncManager {
 	private static final int MAX_PACKET_SIZE = 64000;
+	public static final int MAX_ACCOUNTED_STACK_SIZE = 65536;
 	private Object2IntMap<StoredItemStack> idMap = new Object2IntOpenHashMap<>();
 	private Int2ObjectMap<StoredItemStack> idMap2 = new Int2ObjectArrayMap<>();
 	private Map<StoredItemStack, TerminalItemStack> items = new HashMap<>();
@@ -241,7 +242,7 @@ public class TerminalSyncManager {
 				// getStack() always has count 1 - give accountStack a copy with the real
 				// quantity, otherwise it clamps everything down to 1.
 				ItemStack stack = c.getStack().copy();
-				stack.setCount((int) Math.min(c.getQuantity(), 65536));
+				stack.setCount((int) Math.min(c.getQuantity(), MAX_ACCOUNTED_STACK_SIZE));
 				stc.accountStack(stack, stack.getCount());
 			}
 		});

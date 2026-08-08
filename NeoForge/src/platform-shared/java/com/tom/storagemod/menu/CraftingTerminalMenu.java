@@ -29,6 +29,7 @@ import com.tom.storagemod.inventory.TerminalItemStack;
 import com.tom.storagemod.platform.NeoForgeMenu;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.IDataReceiver;
+import com.tom.storagemod.util.TerminalSyncManager;
 
 public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFillTerminal, IDataReceiver, NeoForgeMenu {
 	public static class SlotCrafting extends Slot {
@@ -196,7 +197,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 					// getStack() always has count 1 - give accountStack a copy with the real
 					// quantity, otherwise it clamps everything down to 1.
 					ItemStack stack = c.getStack().copy();
-					stack.setCount((int) Math.min(c.getQuantity(), 65536));
+					stack.setCount((int) Math.min(c.getQuantity(), TerminalSyncManager.MAX_ACCOUNTED_STACK_SIZE));
 					itemHelperIn.accountStack(stack, stack.getCount());
 				}
 			});
@@ -204,7 +205,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 			itemList.forEach(e -> {
 				if (e.getQuantity() > 0) {
 					ItemStack stack = e.getStack().copy();
-					stack.setCount((int) Math.min(e.getQuantity(), 65536));
+					stack.setCount((int) Math.min(e.getQuantity(), TerminalSyncManager.MAX_ACCOUNTED_STACK_SIZE));
 					itemHelperIn.accountStack(stack, stack.getCount());
 				}
 			});

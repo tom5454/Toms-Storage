@@ -40,6 +40,10 @@ import com.tom.storagemod.util.TickerUtil.TickableServer;
 import com.tom.storagemod.util.Util;
 
 public class StorageTerminalBlockEntity extends PlatformBlockEntity implements MenuProvider, TickableServer {
+	private static final int PASSIVE_REFRESH_INTERVAL_TICKS = 20;
+	private static final int BEACON_SCAN_INTERVAL_TICKS = 40;
+	private static final int BEACON_SCAN_RADIUS = 8;
+
 	private NetworkInventory itemCache = new NetworkInventory();
 	private Map<StoredItemStack, TerminalItemStack> items = new HashMap<>();
 	private int sort;
@@ -146,9 +150,12 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 
 	@Override
 	public void updateServer() {
-		refreshItems();
-		if(level.getGameTime() % 40 == Math.abs(worldPosition.hashCode()) % 40) {
-			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(8)).mapToInt(p -> {
+		// Passive keep-warm; getStacks() already forces a fresh refresh on every real read.
+		if(level.getGameTime() % PASSIVE_REFRESH_INTERVAL_TICKS == Math.abs(worldPosition.hashCode()) % PASSIVE_REFRESH_INTERVAL_TICKS) {
+			refreshItems();
+		}
+		if(level.getGameTime() % BEACON_SCAN_INTERVAL_TICKS == Math.abs(worldPosition.hashCode()) % BEACON_SCAN_INTERVAL_TICKS) {
+			beaconLevel = BlockPos.betweenClosedStream(new AABB(worldPosition).inflate(BEACON_SCAN_RADIUS)).mapToInt(p -> {
 				if(level.isLoaded(p)) {
 					BlockState st = level.getBlockState(p);
 					if(st.is(Blocks.BEACON)) {

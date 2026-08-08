@@ -40,6 +40,15 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 	private Set<IInventoryConnector> linkedConnectors = new HashSet<>();
 	private Set<BlockFace> interfaces = new HashSet<>();
 
+	// Scratch buffers reused across detectTouchingInventories() calls to avoid reallocating
+	// collections every scan (every 20 ticks per connector).
+	private final Map<BlockPos, Direction> scanConnected = new HashMap<>();
+	private final Set<BlockFilter> scanBlockFilters = new HashSet<>();
+	private Set<BlockFace> scanInterfaces = new HashSet<>();
+	private final Stack<BlockPos> scanToCheck = new Stack<>();
+	private final Set<BlockPos> scanCheckedBlocks = new HashSet<>();
+	private Map<BlockFace, BlockInventoryAccess> scanInvA = new HashMap<>();
+
 	public InventoryConnectorBlockEntity(BlockPos p_155229_, BlockState p_155230_) {
 		super(Content.connectorBE.get(), p_155229_, p_155230_);
 	}
@@ -73,12 +82,17 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		UnaryOperator<IInventoryAccess> wrapper = connFilter != null ? i -> connFilter.wrap(level, i) : UnaryOperator.identity();
 
 		connectedInvs.clear();
-		Map<BlockPos, Direction> connected = new HashMap<>();
-		Set<BlockFilter> blockFilters = new HashSet<>();
-		Set<BlockFace> interfaces = new HashSet<>();
+		Map<BlockPos, Direction> connected = scanConnected;
+		Set<BlockFilter> blockFilters = scanBlockFilters;
+		Set<BlockFace> interfaces = scanInterfaces;
+		connected.clear();
+		blockFilters.clear();
+		interfaces.clear();
 
-		Stack<BlockPos> toCheck = new Stack<>();
-		Set<BlockPos> checkedBlocks = new HashSet<>();
+		Stack<BlockPos> toCheck = scanToCheck;
+		Set<BlockPos> checkedBlocks = scanCheckedBlocks;
+		toCheck.clear();
+		checkedBlocks.clear();
 		toCheck.add(worldPosition);
 		checkedBlocks.add(worldPosition);
 		int maxRange = Config.get().invConnectorScanRange;
@@ -118,7 +132,8 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 
 		blockFilters.forEach(f -> f.getConnectedBlocks().forEach(connected::remove));
 
-		Map<BlockFace, BlockInventoryAccess> invA = new HashMap<>();
+		Map<BlockFace, BlockInventoryAccess> invA = scanInvA;
+		invA.clear();
 		connected.forEach((p, d) -> {
 			BlockFace s = new BlockFace(p, d);
 			BlockInventoryAccess acc = invAccesses.remove(s);
@@ -142,11 +157,16 @@ public class InventoryConnectorBlockEntity extends PlatformBlockEntity implement
 		});
 		invAccesses.values().forEach(IInventoryAccess::markInvalid);
 		invAccesses.clear();
+		// Swap the now-empty invAccesses map into the scratch slot for reuse next scan,
+		// instead of allocating a fresh map every 20 ticks.
+		scanInvA = invAccesses;
 		invAccesses = invA;
 
 		if (!this.interfaces.equals(interfaces)) {
 			var net = InventoryCableNetwork.getNetwork(level);
 			this.interfaces.forEach(net::markNodeInvalid);
+			// Swap the old interfaces set into the scratch slot for reuse next scan.
+			scanInterfaces = this.interfaces;
 			this.interfaces = interfaces;
 			net.markNodeInvalid(worldPosition);
 		}
