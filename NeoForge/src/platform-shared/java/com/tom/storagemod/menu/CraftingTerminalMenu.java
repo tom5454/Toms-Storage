@@ -179,7 +179,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 			((CraftingTerminalBlockEntity) te).clear(playerIn);
 		else if(te != null && id == 1)
 			((CraftingTerminalBlockEntity) te).polymorphUpdate(playerIn);
-		else super.clickMenuButton(playerIn, id);
+		else return super.clickMenuButton(playerIn, id);
 		return false;
 	}
 

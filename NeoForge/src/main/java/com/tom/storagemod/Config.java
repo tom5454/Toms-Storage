@@ -32,6 +32,7 @@ public class Config {
 	public int wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 	public int invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 	public int basicHopperCooldown;
+	public int compactMaxSlotChecksPerTick, compactMaxMovesPerTick;
 	//public int inventoryConnectorMaxSlots;
 	private Set<String> blockedMods = new HashSet<>();
 	private Set<Block> blockedBlocks = new HashSet<>();
@@ -49,6 +50,7 @@ public class Config {
 		public IntValue wirelessTermBeaconLvl, wirelessTermBeaconLvlCrossDim;
 		public IntValue invLinkBeaconLvl, invLinkBeaconRange, invLinkBeaconLvlSameDim, invLinkBeaconLvlCrossDim;
 		public IntValue basicHopperCooldown;
+		public IntValue compactMaxSlotChecksPerTick, compactMaxMovesPerTick;
 		//public IntValue inventoryConnectorMaxSlots;
 
 		private Server(ModConfigSpec.Builder builder) {
@@ -115,6 +117,14 @@ public class Config {
 					translation("config.toms_storage.basic_hopper_cooldown").
 					defineInRange("basicHopperCooldown", 10, 1, 200);
 
+			compactMaxSlotChecksPerTick = builder.comment("Maximum inventory slots checked per tick while compacting a storage network").
+					translation("config.toms_storage.compact_max_slot_checks").
+					defineInRange("compactMaxSlotChecksPerTick", 256, 2, 65536);
+
+			compactMaxMovesPerTick = builder.comment("Maximum item-stack moves per tick while compacting a storage network").
+					translation("config.toms_storage.compact_max_moves").
+					defineInRange("compactMaxMovesPerTick", 8, 1, 1024);
+
 			/*inventoryConnectorMaxSlots = builder.comment("Inventory Connector maximum slots").
 					translation("config.toms_storage.inv_connector_max_slots").
 					defineInRange("inventoryConnectorMaxSlots", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);*/
@@ -175,6 +185,8 @@ public class Config {
 			invLinkBeaconLvlCrossDim = SERVER.invLinkBeaconLvlCrossDim.get();
 			runMultithreaded = SERVER.runMultithreaded.getAsBoolean();
 			basicHopperCooldown = SERVER.basicHopperCooldown.get();
+			compactMaxSlotChecksPerTick = SERVER.compactMaxSlotChecksPerTick.get();
+			compactMaxMovesPerTick = SERVER.compactMaxMovesPerTick.get();
 			//inventoryConnectorMaxSlots = SERVER.inventoryConnectorMaxSlots.getAsInt();
 		} else if(modConfig.getType() == Type.COMMON) {
 			blockedMods = new HashSet<>(COMMON.blockedMods.get());

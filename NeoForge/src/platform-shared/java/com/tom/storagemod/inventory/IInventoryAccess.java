@@ -54,6 +54,28 @@ public interface IInventoryAccess extends IChangeTrackerAccess, IProxy {
 
 	default void markInvalid() {}
 
+	default Object getStructureKey() {
+		return new IdentityKey(this);
+	}
+
+	public static final class IdentityKey {
+		private final Object value;
+
+		public IdentityKey(Object value) {
+			this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof IdentityKey other && value == other.value;
+		}
+
+		@Override
+		public int hashCode() {
+			return System.identityHashCode(value);
+		}
+	}
+
 	public static interface IMultiThreadedTracker<A, B> {
 		A prepForOffThread(Level level);
 		B processOffThread(A array);

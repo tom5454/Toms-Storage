@@ -57,6 +57,7 @@ import com.tom.storagemod.inventory.sorting.SortingTypes;
 import com.tom.storagemod.menu.StorageTerminalMenu;
 import com.tom.storagemod.menu.StorageTerminalMenu.SlotStorage;
 import com.tom.storagemod.screen.widget.EnumCycleButton;
+import com.tom.storagemod.screen.widget.IconButton;
 import com.tom.storagemod.screen.widget.TerminalSearchModeButton;
 import com.tom.storagemod.screen.widget.ToggleButton;
 import com.tom.storagemod.util.ComponentJoiner;
@@ -115,6 +116,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected EnumCycleButton<ControllMode> buttonCtrlMode;
 	protected TerminalSearchModeButton buttonSearchType;
 	protected ToggleButton buttonDirection, buttonGhostMode, buttonTallMode;
+	protected IconButton buttonCompact;
 	private Comparator<StoredItemStack> sortComp;
 	protected PopupMenuManager popup = new PopupMenuManager(this);
 
@@ -251,6 +253,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					init();
 				}));
 		buttonTallMode.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.tallMode_off")), Tooltip.create(Component.translatable("tooltip.toms_storage.tallMode_on")));
+		buttonCompact = addRenderableWidget(new IconButton(leftPos - 18, topPos + 5 + 18*6,
+				Component.translatable("narrator.toms_storage.terminal_compact"),
+				ResourceLocation.tryBuild(StorageMod.modid, "icons/sort_space_efficiency"), button -> {
+					minecraft.gameMode.handleInventoryButtonClick(menu.containerId, StorageTerminalMenu.COMPACT_BUTTON_ID);
+					button.active = false;
+				}));
+		buttonCompact.setTooltip(Tooltip.create(Component.translatable("tooltip.toms_storage.terminal_compact")));
 		buttonSortingType.tooltipFactory = s -> Tooltip.create(Component.translatable("tooltip.toms_storage.sorting_" + s.name().toLowerCase(Locale.ROOT)));
 		buttonCtrlMode.tooltipFactory = s -> Tooltip.create(Arrays.stream(I18n.get("tooltip.toms_storage.ctrlMode_" + s.name().toLowerCase(Locale.ROOT)).split("\\\\")).map(Component::literal).collect(ComponentJoiner.joining(Component.empty(), Component.literal("\n"))));
 		updateSearch();
@@ -373,6 +382,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	@Override
 	protected void containerTick() {
+		if (buttonCompact != null)buttonCompact.active = menu.compacting == 0;
 		updateSearch();
 	}
 
@@ -483,6 +493,14 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	protected void renderLabels(GuiGraphics st, int mouseX, int mouseY) {
 		super.renderLabels(st, mouseX, mouseY);
 		st.drawString(font, "i", 180, 6, 4210752, false);
+		if (menu.slotCount >= 0 && menu.freeCount >= 0) {
+			String totalSlots = menu.slotCount == Short.MAX_VALUE ? "32K+" : NumberFormatUtil.formatNumber(menu.slotCount);
+			String usedSlots = menu.slotCount == Short.MAX_VALUE || menu.freeCount == Short.MAX_VALUE ?
+					"?" : NumberFormatUtil.formatNumber(Math.max(0, menu.slotCount - menu.freeCount));
+			Component usage = Component.translatable("label.toms_storage.terminal_slot_usage", usedSlots, totalSlots);
+			int right = slotStartX + 9 * 18;
+			st.drawString(font, usage, right - font.width(usage), inventoryLabelY, 4210752, false);
+		}
 		st.pose().pushPose();
 		slotIDUnderMouse = drawSlots(st, mouseX, mouseY);
 		st.pose().popPose();

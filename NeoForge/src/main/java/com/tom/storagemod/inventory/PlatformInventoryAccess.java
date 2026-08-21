@@ -107,6 +107,14 @@ public interface PlatformInventoryAccess extends IInventoryAccess {
 		}
 
 		@Override
+		public Object getStructureKey() {
+			return new BlockStructureKey(new IInventoryAccess.IdentityKey(this), new IInventoryAccess.IdentityKey(get()));
+		}
+
+		private record BlockStructureKey(IInventoryAccess.IdentityKey access, IInventoryAccess.IdentityKey handler) {
+		}
+
+		@Override
 		public String toString() {
 			return "BlockInventoryAccess at " + itemCache.pos();
 		}

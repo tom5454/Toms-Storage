@@ -170,6 +170,8 @@ dependencies {
     
     compileOnly('maven.modrinth:sophisticated-core:1.21.1-1.4.23.1664')
 	compileOnly('maven.modrinth:sophisticated-storage:1.21.1-1.5.36.1606')
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -217,4 +219,8 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+tasks.named('test', Test).configure {
+	useJUnitPlatform()
 }

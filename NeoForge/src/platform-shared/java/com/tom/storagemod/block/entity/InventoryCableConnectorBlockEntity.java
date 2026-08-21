@@ -77,7 +77,7 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 			Direction facing = state.getValue(InventoryCableConnectorBlock.FACING);
 			BlockPos pos = worldPosition.relative(facing);
 			BlockState st = level.getBlockState(pos);
-			mergedHandler.clear();
+			mergedHandler.beginRebuild();
 			linkedConnectors.clear();
 			beaconLevel = -1;
 			detectCableNetwork();
@@ -119,6 +119,7 @@ public class InventoryCableConnectorBlockEntity extends PaintedBlockEntity imple
 					else self = block;
 				}
 			}
+			mergedHandler.finishRebuild();
 		}
 	}
 

@@ -147,6 +147,7 @@
 	"tooltip.toms_storage.terminal_stat.free": "Free slots: %s (%s%%)",
 	"tooltip.toms_storage.terminal_stat.unique": "Unique items: %s",
 	"tooltip.toms_storage.terminal_stat.alot": "Alot (>32k)",
+	"label.toms_storage.terminal_slot_usage": "Used: %s/%s slots",
 	"tooltip.toms_storage.config_overlay.block": "Configuring Block: %d, %d, %d",
 	"tooltip.toms_storage.config_overlay.block_alt": "Configuring Block: %s",
 	"tooltip.toms_storage.config_overlay.mass_select": "Multiblock Area Mass Selecting",
@@ -229,5 +230,10 @@
 	"config.jade.plugin_toms_storage.inventory_config": "Inventory Configurator Info",
 	"config.jade.plugin_toms_storage.inventory_hopper": "Inventory Hopper Info",
 	
-	"overlay.toms_storage.configurator_info": "Tom's Simple Storage: Configurator Overlay"
+	"overlay.toms_storage.configurator_info": "Tom's Simple Storage: Configurator Overlay",
+
+	"narrator.toms_storage.terminal_compact": "Compact storage network",
+	"tooltip.toms_storage.terminal_compact": "Compact matching stacks in connected inventories",
+	"config.toms_storage.compact_max_slot_checks": "Compaction slot checks per tick",
+	"config.toms_storage.compact_max_moves": "Compaction moves per tick"
 }

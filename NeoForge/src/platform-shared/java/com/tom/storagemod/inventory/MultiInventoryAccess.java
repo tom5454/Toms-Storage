@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +28,9 @@ import com.tom.storagemod.util.WorldStates;
 public abstract class MultiInventoryAccess implements IInventoryAccess {
 	protected List<IInventoryAccess> connected = new ArrayList<>();
 	protected MultiChangeTracker tracker = new MultiChangeTracker();
+	private Map<Priority, Set<Object>> structureKeys = Map.of();
+	private long structureRevision;
+	private boolean rebuildInProgress;
 
 	public MultiInventoryAccess() {
 		WorldStates.trackers.put(getPlatformHandler(), tracker());
@@ -57,6 +61,7 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 					connected.add(a);
 			}
 		}
+		if (!rebuildInProgress)updateStructureRevision();
 		refresh();
 	}
 
@@ -108,7 +113,37 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 	}
 
 	public void clear() {
+		rebuildInProgress = false;
+		if (!structureKeys.isEmpty()) {
+			structureKeys = Map.of();
+			structureRevision++;
+		}
 		connected.clear();
+	}
+
+	public void beginRebuild() {
+		rebuildInProgress = true;
+		connected.clear();
+	}
+
+	public void finishRebuild() {
+		if (!rebuildInProgress)return;
+		rebuildInProgress = false;
+		updateStructureRevision();
+	}
+
+	private void updateStructureRevision() {
+		Map<Priority, Set<Object>> newStructureKeys = connected.stream().collect(Collectors.groupingBy(
+				IPriority.GETTER, () -> new EnumMap<>(Priority.class),
+				Collectors.mapping(IInventoryAccess::getStructureKey, Collectors.toSet())));
+		if (!newStructureKeys.equals(structureKeys)) {
+			structureKeys = newStructureKeys;
+			structureRevision++;
+		}
+	}
+
+	public long getStructureRevision() {
+		return structureRevision;
 	}
 
 	public int getInventoryCount() {

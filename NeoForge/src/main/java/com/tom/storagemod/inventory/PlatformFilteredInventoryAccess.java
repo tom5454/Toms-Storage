@@ -143,6 +143,14 @@ public class PlatformFilteredInventoryAccess implements IInventoryAccess, IPrior
 	}
 
 	@Override
+	public Object getStructureKey() {
+		return new FilteredStructureKey(acc.getStructureKey(), filter.getStructureKey());
+	}
+
+	private record FilteredStructureKey(Object access, Object filter) {
+	}
+
+	@Override
 	public String toString() {
 		return "Filtering: {" + acc + " by " + filter + "}";
 	}

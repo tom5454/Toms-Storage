@@ -35,6 +35,7 @@ public class BlockFilter implements IFilter {
 	private ItemFilter itemFilter = ItemFilter.TRUE;
 	private boolean filterNeedsUpdate = true;
 	private boolean multiblockFilled;
+	private long structureRevision;
 
 	public BlockFilter(BlockPos pos) {
 		this.pos = pos;
@@ -92,6 +93,7 @@ public class BlockFilter implements IFilter {
 		priority = Priority.VALUES[Math.abs(tag.getInt("priority")) % Priority.VALUES.length];
 		keepLast = tag.getBoolean("keepLast");
 		multiblockFilled = true;
+		structureRevision++;
 	}
 
 	public void dropContents(LevelAccessor level, BlockPos pos2) {
@@ -145,8 +147,19 @@ public class BlockFilter implements IFilter {
 		return priority;
 	}
 
+	@Override
+	public Object getStructureKey() {
+		return new FilterStructureKey(new IInventoryAccess.IdentityKey(this), structureRevision);
+	}
+
+	private record FilterStructureKey(IInventoryAccess.IdentityKey filter, long revision) {
+	}
+
 	public void setPriority(Priority priority) {
-		this.priority = priority;
+		if (this.priority != priority) {
+			this.priority = priority;
+			structureRevision++;
+		}
 	}
 
 	@Override
@@ -155,17 +168,23 @@ public class BlockFilter implements IFilter {
 	}
 
 	public void setSkip(boolean skip) {
-		this.skip = skip;
+		if (this.skip != skip) {
+			this.skip = skip;
+			structureRevision++;
+		}
 	}
 
 	public void setSide(Direction side) {
-		this.side = side;
+		if (this.side != side) {
+			this.side = side;
+			structureRevision++;
+		}
 	}
 
 	public void addConnected(Level level, BlockPos pos) {
 		if (!this.pos.equals(pos))
 			PlatformInventoryAccess.removeBlockFilterAt(level, pos);
-		connected.add(pos.immutable());
+		if (connected.add(pos.immutable()))structureRevision++;
 	}
 
 	@Override
@@ -174,11 +193,15 @@ public class BlockFilter implements IFilter {
 	}
 
 	public void setKeepLast(boolean keepLast) {
-		this.keepLast = keepLast;
+		if (this.keepLast != keepLast) {
+			this.keepLast = keepLast;
+			structureRevision++;
+		}
 	}
 
 	public void markFilterDirty() {
 		filterNeedsUpdate = true;
+		structureRevision++;
 	}
 
 	private void fillMultiblock(Level level) {

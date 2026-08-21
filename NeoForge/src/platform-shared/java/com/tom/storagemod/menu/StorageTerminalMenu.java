@@ -37,6 +37,7 @@ import com.tom.storagemod.util.TerminalSyncManager.InteractHandler;
 import com.tom.storagemod.util.TerminalSyncManager.SlotAction;
 
 public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> implements IDataReceiver, InteractHandler {
+	public static final int COMPACT_BUTTON_ID = 2;
 	protected StorageTerminalBlockEntity te;
 	protected int playerSlotsStart;
 	public List<SlotStorage> storageSlotList = new ArrayList<>();
@@ -48,7 +49,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	private int lines;
 	protected Inventory pinv;
 	public Runnable onPacket;
-	public int sorting, modes, searchType = -1, beaconLvl, changeCount;
+	public int sorting, modes, searchType = -1, beaconLvl, changeCount, compacting;
 	public int slotCount, freeCount;
 	public String search;
 	public boolean noSort;
@@ -72,6 +73,7 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 		addDataSlot(DataSlots.create(v -> beaconLvl = v, () -> te != null ? te.getBeaconLevel() : -1));
 		addDataSlot(DataSlots.create(v -> slotCount = v, () -> te != null ? te.getSlotCount() : -1));
 		addDataSlot(DataSlots.create(v -> freeCount = v, () -> te != null ? te.getFreeCount() : -1));
+		addDataSlot(DataSlots.create(v -> compacting = v, () -> te != null && te.isCompacting() ? 1 : 0).onUpdate(this::updateGui));
 	}
 
 	private void updateGui() {
@@ -189,6 +191,14 @@ public class StorageTerminalMenu extends RecipeBookMenu<CraftingInput, CraftingR
 	@Override
 	public boolean stillValid(Player playerIn) {
 		return te == null || te.canInteractWith(playerIn, true);
+	}
+
+	@Override
+	public boolean clickMenuButton(Player player, int id) {
+		if (id == COMPACT_BUTTON_ID) {
+			return te != null && !player.isSpectator() && stillValid(player) && te.requestCompaction();
+		}
+		return super.clickMenuButton(player, id);
 	}
 
 	public final void scrollTo(float p_148329_1_) {

@@ -3,6 +3,7 @@ package com.tom.storagemod.inventory.filter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.tom.storagemod.inventory.IInventoryAccess;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.util.Priority;
 
@@ -10,6 +11,10 @@ public interface IFilter {
 	ItemPredicate getItemPred();
 	boolean isKeepLast();
 	Priority getPriority();
+
+	default Object getStructureKey() {
+		return new IInventoryAccess.IdentityKey(this);
+	}
 
 	public static class MultiFilter implements IFilter, ItemPredicate {
 		private List<IFilter> filters = new ArrayList<>();
@@ -68,6 +73,11 @@ public interface IFilter {
 			for (IFilter f : filters) {
 				f.getItemPred().updateState();
 			}
+		}
+
+		@Override
+		public Object getStructureKey() {
+			return filters.stream().map(IFilter::getStructureKey).toList();
 		}
 
 		@Override

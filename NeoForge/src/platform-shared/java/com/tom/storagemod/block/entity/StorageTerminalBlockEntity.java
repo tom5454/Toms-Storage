@@ -28,6 +28,7 @@ import com.tom.storagemod.block.AbstractStorageTerminalBlock;
 import com.tom.storagemod.block.AbstractStorageTerminalBlock.TerminalPos;
 import com.tom.storagemod.inventory.IInventoryAccess;
 import com.tom.storagemod.inventory.IInventoryAccess.IInventoryChangeTracker;
+import com.tom.storagemod.inventory.InventoryCompactor;
 import com.tom.storagemod.inventory.NetworkInventory;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.inventory.TerminalItemStack;
@@ -51,6 +52,7 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 	private int beaconLevel;
 	private long changeTracker;
 	private int slotCount, freeCount;
+	private InventoryCompactor.Session compaction;
 
 	public StorageTerminalBlockEntity(BlockPos pos, BlockState state) {
 		super(Content.terminalBE.get(), pos, state);
@@ -123,6 +125,12 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 
 	@Override
 	public void updateServer() {
+		if (compaction != null) {
+			InventoryCompactor.TickResult result = compaction.tick(
+					Config.get().compactMaxSlotChecksPerTick,
+					Config.get().compactMaxMovesPerTick);
+			if (result.finished())compaction = null;
+		}
 		if(updateItems) {
 			IInventoryAccess ii = itemCache.getAccess(level, worldPosition);
 			IInventoryChangeTracker tr = ii.tracker();
@@ -251,5 +259,22 @@ public class StorageTerminalBlockEntity extends PlatformBlockEntity implements M
 
 	public int getSlotCount() {
 		return slotCount;
+	}
+
+	public boolean requestCompaction() {
+		if (compaction != null)return true;
+		IInventoryAccess access = itemCache.getAccess(level, worldPosition);
+		compaction = InventoryCompactor.start(access, this::recoverCompactionRemainder);
+		return compaction != null;
+	}
+
+	private void recoverCompactionRemainder(ItemStack stack) {
+		if (stack.isEmpty())return;
+		ItemStack remainder = itemCache.getAccess(level, worldPosition).pushStack(stack);
+		if (!remainder.isEmpty())dropItem(remainder);
+	}
+
+	public boolean isCompacting() {
+		return compaction != null;
 	}
 }
