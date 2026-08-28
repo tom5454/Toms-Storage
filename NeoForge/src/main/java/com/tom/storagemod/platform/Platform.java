@@ -23,6 +23,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.IEventBus;
@@ -121,5 +122,14 @@ public class Platform {
 
 	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
 		return item.canPerformAction(ItemAbilities.AXE_SCRAPE);
+	}
+
+	/**
+	 * No-op on NeoForge. On Fabric this binds a PacketContext for {@code player} while {@code r}
+	 * runs, which some Fabric-only mods (e.g. Polymer) require during manual ItemStack encoding.
+	 * That concept doesn't exist on NeoForge, so {@code r} just runs directly.
+	 */
+	public static void runWithPacketContext(ServerPlayer player, Runnable r) {
+		r.run();
 	}
 }

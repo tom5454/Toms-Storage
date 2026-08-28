@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContextProvider;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,6 +21,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -99,5 +102,16 @@ public class Platform {
 
 	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
 		return item.is(ItemTags.AXES);
+	}
+
+	/**
+	 * Runs {@code r} with a PacketContext bound for {@code player}. This is required because
+	 * some Fabric mods (e.g. Polymer) patch ItemStack encoding to expect a PacketContext to be
+	 * set up via ScopedValue, which isn't the case when we encode ItemStacks manually here
+	 * (outside of the normal packet-sending pipeline). Without this, such mods throw
+	 * "PacketContext is required, but it wasn't set up!" when TerminalSyncManager syncs items.
+	 */
+	public static void runWithPacketContext(ServerPlayer player, Runnable r) {
+		PacketContext.runWithContext((PacketContextProvider) player, r);
 	}
 }

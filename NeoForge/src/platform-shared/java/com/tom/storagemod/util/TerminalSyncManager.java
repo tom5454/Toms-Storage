@@ -111,6 +111,10 @@ public class TerminalSyncManager {
 	}
 
 	public void update(int changeID, Map<StoredItemStack, TerminalItemStack> items, ServerPlayer player, Consumer<CompoundTag> extraSync) {
+		Platform.runWithPacketContext(player, () -> updateInternal(changeID, items, player, extraSync));
+	}
+
+	private void updateInternal(int changeID, Map<StoredItemStack, TerminalItemStack> items, ServerPlayer player, Consumer<CompoundTag> extraSync) {
 		if (changeID != lastChangeID) {
 			lastChangeID = changeID;
 			List<TerminalItemStack> toWrite = new ArrayList<>();
