@@ -108,7 +108,22 @@ public class FilingCabinetMenu extends AbstractContainerMenu {
 					return ItemStack.EMPTY;
 				}
 			} else if (!this.moveItemStackTo(itemstack1, 0, this.containerRows * 9, false)) {
-				return ItemStack.EMPTY;
+				if (!containerParent.canPlaceItem(0, itemstack1)) {
+					return ItemStack.EMPTY;
+				}
+				boolean inserted = false;
+				for (int i = 0;i<containerParent.getContainerSize();i++) {
+					if (containerParent.getItem(i).isEmpty()) {
+						containerParent.setItem(i, itemstack);
+						itemstack1.setCount(0);
+						containerParent.setChanged();
+						inserted = true;
+						break;
+					}
+				}
+				if (!inserted) {
+					return ItemStack.EMPTY;
+				}
 			}
 
 			if (itemstack1.isEmpty()) {
