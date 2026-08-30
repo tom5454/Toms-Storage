@@ -1,0 +1,28 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"inv_changed-redstone": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "redstone_dust"
+					}
+				]
+			}
+		}
+	},
+	"rewards": {
+		"recipes": [
+			"toms_storage:level_emitter",
+			"toms_storage:item_filter",
+			"toms_storage:tag_item_filter",
+			"toms_storage:poly_item_filter"
+		]
+	},
+	"requirements": [
+		[
+			"inv_changed-redstone"
+		]
+	]
+}

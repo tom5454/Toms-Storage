@@ -10,6 +10,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -29,7 +30,7 @@ import com.tom.storagemod.menu.CraftingTerminalMenu;
 import com.tom.storagemod.polymorph.PolymorphHelper;
 import com.tom.storagemod.util.CraftingMatrix;
 
-public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
+public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity implements Clearable {
 	private Optional<RecipeHolder<CraftingRecipe>> currentRecipe = Optional.empty();
 	private final CraftingContainer craftMatrix = new CraftingMatrix(3, 3, () -> {
 		if (level != null && !level.isClientSide) {
@@ -230,5 +231,10 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 
 	public void setCraftSlot(int x, int y, ItemStack actualStack) {
 		craftMatrix.setItem(x + y * 3, actualStack);
+	}
+
+	@Override
+	public void clearContent() {
+		craftMatrix.clearContent();
 	}
 }
