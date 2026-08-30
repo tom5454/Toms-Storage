@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContextProvider;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,6 +22,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -104,5 +107,9 @@ public class Platform {
 
 	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
 		return item.is(ItemTags.AXES);
+	}
+
+	public static void runWithPacketContext(ServerPlayer player, Runnable r) {
+		PacketContext.runWithContext((PacketContextProvider) player, r);
 	}
 }

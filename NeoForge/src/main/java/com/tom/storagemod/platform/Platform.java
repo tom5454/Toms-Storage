@@ -15,6 +15,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -127,5 +128,9 @@ public class Platform {
 
 	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
 		return item.canPerformAction(ItemAbilities.AXE_SCRAPE);
+	}
+
+	public static void runWithPacketContext(ServerPlayer player, Runnable r) {
+		r.run();
 	}
 }

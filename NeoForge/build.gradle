@@ -148,10 +148,10 @@ dependencies {
     
 	implementation "curse.maven:jade-324717:7817285"
 	
-	compileOnly "mezz.jei:jei-26.1.2-neoforge-api:29.16.0.48"
-	compileOnly "mezz.jei:jei-26.1.2-common-api:29.16.0.48"
+	compileOnly "mezz.jei:jei-26.1.2-neoforge-api:29.29.0.77"
+	compileOnly "mezz.jei:jei-26.1.2-common-api:29.29.0.77"
 	// at runtime, use the full JEI jar
-	runtimeOnly "mezz.jei:jei-26.1.2-neoforge:29.16.0.48"
+	runtimeOnly "mezz.jei:jei-26.1.2-neoforge:29.29.0.77"
 	
 	compileOnly('maven.modrinth:sophisticated-core:26.1.2-1.4.86.2162')
 	compileOnly('maven.modrinth:sophisticated-storage:26.1.2-1.5.94.1980')

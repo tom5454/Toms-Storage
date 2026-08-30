@@ -24,7 +24,7 @@ public abstract class PlatformContainerScreen<T extends AbstractContainerMenu> e
 		return topPos;
 	}
 
-	public Slot getSlotUnderMouse() {
+	public Slot getHoveredSlot() {
 		return null;
 	}
 }
