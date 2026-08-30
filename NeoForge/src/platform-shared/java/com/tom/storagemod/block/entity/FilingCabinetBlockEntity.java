@@ -5,6 +5,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
@@ -18,7 +19,7 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.menu.FilingCabinetMenu;
 import com.tom.storagemod.util.FilingCabinetContainer;
 
-public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvider, Nameable {
+public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvider, Nameable, Clearable {
 	private FilingCabinetContainer inv = new FilingCabinetContainer(512, this::setChanged, this::canInteractWith);
 	private Component name;
 
@@ -75,5 +76,10 @@ public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvide
 	@Override
 	public Component getCustomName() {
 		return this.name;
+	}
+
+	@Override
+	public void clearContent() {
+		inv.clearContent();
 	}
 }

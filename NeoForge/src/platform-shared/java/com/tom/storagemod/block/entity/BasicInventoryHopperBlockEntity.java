@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.tom.storagemod.Config;
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.AbstractInventoryHopperBlock;
 import com.tom.storagemod.inventory.IInventoryAccess;
@@ -15,10 +17,9 @@ import com.tom.storagemod.inventory.InventorySlot;
 import com.tom.storagemod.inventory.StoredItemStack;
 import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.item.IItemFilter;
-import com.tom.storagemod.Config;
 import com.tom.storagemod.util.BlockFaceReference;
 
-public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBlockEntity {
+public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBlockEntity implements Clearable {
 	private ItemStack filter = ItemStack.EMPTY;
 	private int cooldown;
 	private long topChange, bottomChange;
@@ -139,5 +140,10 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 			waiting = 3;
 			cooldown = baseCd;
 		}
+	}
+
+	@Override
+	public void clearContent() {
+		setFilter(ItemStack.EMPTY);
 	}
 }
