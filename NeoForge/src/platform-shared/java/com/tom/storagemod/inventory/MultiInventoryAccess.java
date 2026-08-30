@@ -44,7 +44,8 @@ public abstract class MultiInventoryAccess implements IInventoryAccess {
 				q.addAll(ic.getConnectedConnectors());
 			}
 		}
-		var map = all.stream().flatMap(c -> c.getConnectedInventories().stream()).
+		Set<Object> seenHandlers = new HashSet<>();
+		var map = all.stream().flatMap(c -> c.getConnectedInventories().stream()).filter(e -> seenHandlers.add(e.get())).
 				collect(Collectors.groupingBy(IPriority.GETTER, () -> new EnumMap<>(Priority.class), Collectors.toList()));
 		Set<IInventoryAccess> allRoots = new HashSet<>();
 		allRoots.add(this);

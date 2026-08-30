@@ -25,7 +25,7 @@ public class EMIPlugin implements EmiPlugin {
 		registry.addGenericDragDropHandler(new EmiGhostIngredientHandler());
 		registry.addGenericStackProvider((scr, x, y) -> {
 			if(scr instanceof AbstractStorageTerminalScreen<?> t) {
-				net.minecraft.world.inventory.Slot sl = t.getSlotUnderMouse();
+				net.minecraft.world.inventory.Slot sl = t.getHoveredSlot();
 				if(sl != null)return new EmiStackInteraction(EmiStack.of(sl.getItem()), null, false);
 			}
 			return EmiStackInteraction.EMPTY;

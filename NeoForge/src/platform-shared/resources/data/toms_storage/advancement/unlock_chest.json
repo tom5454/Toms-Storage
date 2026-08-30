@@ -1,0 +1,36 @@
+{
+	"parent": "minecraft:recipes/root",
+	"criteria": {
+		"inv_changed-chest": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"items": "chest"
+					}
+				]
+			}
+		}
+	},
+	"rewards": {
+		"recipes": [
+			"toms_storage:inventory_cable_framed",
+			"toms_storage:inventory_cable_framed_clean",
+			"toms_storage:basic_inventory_hopper",
+			"toms_storage:inventory_cable",
+			"toms_storage:inventory_proxy",
+			"toms_storage:inventory_proxy_clean",
+			"toms_storage:open_crate",
+			"toms_storage:paint_kit",
+			"toms_storage:trim_clean",
+			"toms_storage:trim",
+			"toms_storage:inventory_configurator",
+			"toms_storage:filing_cabinet"
+		]
+	},
+	"requirements": [
+		[
+			"inv_changed-chest"
+		]
+	]
+}

@@ -2,6 +2,7 @@ package com.tom.storagemod.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +20,7 @@ import com.tom.storagemod.inventory.filter.ItemPredicate;
 import com.tom.storagemod.item.IItemFilter;
 import com.tom.storagemod.util.BlockFaceReference;
 
-public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBlockEntity {
+public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBlockEntity implements Clearable {
 	private ItemStack filter = ItemStack.EMPTY;
 	private int cooldown;
 	private long topChange, bottomChange;
@@ -146,5 +147,10 @@ public class BasicInventoryHopperBlockEntity extends AbstractInventoryHopperBloc
 	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
 		if (!filter.isEmpty() && filter.getItem() instanceof IItemFilter)
 			Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), filter);
+	}
+
+	@Override
+	public void clearContent() {
+		setFilter(ItemStack.EMPTY);
 	}
 }

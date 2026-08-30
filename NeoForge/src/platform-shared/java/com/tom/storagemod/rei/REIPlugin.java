@@ -41,7 +41,7 @@ public class REIPlugin implements REIClientPlugin {
 	public void registerScreens(ScreenRegistry registry) {
 		registry.registerFocusedStack((scr, point) -> {
 			if(scr instanceof AbstractStorageTerminalScreen<?> t) {
-				net.minecraft.world.inventory.Slot sl = t.getSlotUnderMouse();
+				net.minecraft.world.inventory.Slot sl = t.getHoveredSlot();
 				if(sl != null)return CompoundEventResult.interruptTrue(EntryStack.of(VanillaEntryTypes.ITEM, sl.getItem()));
 			}
 			return CompoundEventResult.pass();

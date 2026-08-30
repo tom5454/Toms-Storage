@@ -749,8 +749,8 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	}
 
 	@Override
-	public Slot getSlotUnderMouse() {
-		Slot s = super.getSlotUnderMouse();
+	public Slot getHoveredSlot() {
+		Slot s = super.getHoveredSlot();
 		if(s != null)return s;
 		if(slotIDUnderMouse > -1 && getMenu().getSlotByID(slotIDUnderMouse).stack != null) {
 			fakeSlotUnderMouse.container.setItem(0, getMenu().getSlotByID(slotIDUnderMouse).stack.getStack());

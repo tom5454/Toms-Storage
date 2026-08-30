@@ -3,6 +3,7 @@ package com.tom.storagemod.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -19,7 +20,7 @@ import com.tom.storagemod.Content;
 import com.tom.storagemod.menu.FilingCabinetMenu;
 import com.tom.storagemod.util.FilingCabinetContainer;
 
-public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvider, Nameable {
+public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvider, Nameable, Clearable {
 	private FilingCabinetContainer inv = new FilingCabinetContainer(512, this::setChanged, this::canInteractWith);
 	private Component name;
 
@@ -77,5 +78,10 @@ public class FilingCabinetBlockEntity extends BlockEntity implements MenuProvide
 	@Override
 	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
 		Containers.dropContents(level, pos, inv);
+	}
+
+	@Override
+	public void clearContent() {
+		inv.clearContent();
 	}
 }

@@ -116,60 +116,60 @@ public class TerminalSyncManager {
 	public void update(int changeID, Map<StoredItemStack, TerminalItemStack> items, ServerPlayer player, Consumer<CompoundTag> extraSync) {
 		if (changeID != lastChangeID) {
 			lastChangeID = changeID;
-			List<TerminalItemStack> toWrite = new ArrayList<>();
-			items.forEach((s, c) -> {
-				TerminalItemStack pc = this.items.remove(s);
-				if(pc == null || !c.equalDetails(pc)) {
-					toWrite.add(c);
-				}
-			});
-			this.items.forEach((s, c) -> {
-				toWrite.add(new TerminalItemStack(s.getStack(), 0L));
-			});
-			this.items.clear();
-			this.items.putAll(items);
-			if(!toWrite.isEmpty()) {
-				workBuf.writerIndex(0);
-				int j = 0;
-				for (int i = 0; i < toWrite.size(); i++, j++) {
-					TerminalItemStack stack = toWrite.get(i);
-					int li = workBuf.writerIndex();
-					try {
-						write(workBuf, stack);
-					} catch (IndexOutOfBoundsException e) {
-						workBuf.writerIndex(li);
-						writeMiniStack(workBuf, stack);
-					}
-					int s = workBuf.writerIndex();
-					if((s > MAX_PACKET_SIZE || j > 32000) && j > 1) {
-						CompoundTag t = writeBuf("d", workBuf, li);
-						t.putShort("l", (short) j);
-						NetworkHandler.sendTo(player, t);
-						j = 0;
-						workBuf.writerIndex(0);
-						if(s - li > MAX_PACKET_SIZE) {
-							writeMiniStack(workBuf, stack);
-						} else {
-							workBuf.writeBytes(workBuf, li, s - li);
-						}
-					}
-				}
-				if(j > 0 || extraSync != null) {
-					CompoundTag t;
-					if(j > 0) {
-						t = writeBuf("d", workBuf, workBuf.writerIndex());
-						t.putShort("l", (short) j);
-					} else t = new CompoundTag();
-					if(extraSync != null)extraSync.accept(t);
-					NetworkHandler.sendTo(player, t);
-					return;
-				}
-			}
+			Platform.runWithPacketContext(player, () -> updateInternal(changeID, items, player));
 		}
 		if(extraSync != null) {
 			CompoundTag t = new CompoundTag();
 			extraSync.accept(t);
 			NetworkHandler.sendTo(player, t);
+		}
+	}
+
+	private void updateInternal(int changeID, Map<StoredItemStack, TerminalItemStack> items, ServerPlayer player) {
+		List<TerminalItemStack> toWrite = new ArrayList<>();
+		items.forEach((s, c) -> {
+			TerminalItemStack pc = this.items.remove(s);
+			if(pc == null || !c.equalDetails(pc)) {
+				toWrite.add(c);
+			}
+		});
+		this.items.forEach((s, c) -> {
+			toWrite.add(new TerminalItemStack(s.getStack(), 0L));
+		});
+		this.items.clear();
+		this.items.putAll(items);
+		if(!toWrite.isEmpty()) {
+			workBuf.writerIndex(0);
+			int j = 0;
+			for (int i = 0; i < toWrite.size(); i++, j++) {
+				TerminalItemStack stack = toWrite.get(i);
+				int li = workBuf.writerIndex();
+				try {
+					write(workBuf, stack);
+				} catch (IndexOutOfBoundsException e) {
+					workBuf.writerIndex(li);
+					writeMiniStack(workBuf, stack);
+				}
+				int s = workBuf.writerIndex();
+				if((s > MAX_PACKET_SIZE || j > 32000) && j > 1) {
+					CompoundTag t = writeBuf("d", workBuf, li);
+					t.putShort("l", (short) j);
+					NetworkHandler.sendTo(player, t);
+					j = 0;
+					workBuf.writerIndex(0);
+					if(s - li > MAX_PACKET_SIZE) {
+						writeMiniStack(workBuf, stack);
+					} else {
+						workBuf.writeBytes(workBuf, li, s - li);
+					}
+				}
+			}
+			if(j > 0) {
+				CompoundTag t = writeBuf("d", workBuf, workBuf.writerIndex());
+				t.putShort("l", (short) j);
+				NetworkHandler.sendTo(player, t);
+				return;
+			}
 		}
 	}
 

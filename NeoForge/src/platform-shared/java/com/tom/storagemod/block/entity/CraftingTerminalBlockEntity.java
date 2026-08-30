@@ -7,6 +7,7 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +31,7 @@ import com.tom.storagemod.polymorph.PolymorphHelper;
 import com.tom.storagemod.util.CraftingMatrix;
 import com.tom.storagemod.util.Util;
 
-public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
+public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity implements Clearable {
 	private Optional<RecipeHolder<CraftingRecipe>> currentRecipe = Optional.empty();
 	private final CraftingContainer craftMatrix = new CraftingMatrix(3, 3, () -> {
 		if (level != null && !level.isClientSide()) {
@@ -218,5 +219,10 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	@Override
 	public void preRemoveSideEffects(BlockPos pos, BlockState state) {
 		Containers.dropContents(level, pos, craftMatrix);
+	}
+
+	@Override
+	public void clearContent() {
+		craftMatrix.clearContent();
 	}
 }
