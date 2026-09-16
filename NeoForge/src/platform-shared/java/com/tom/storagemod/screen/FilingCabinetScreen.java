@@ -2,15 +2,15 @@ package com.tom.storagemod.screen;
 
 import java.util.function.Consumer;
 
-import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.FilingCabinetMenu;
@@ -23,7 +23,6 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 	private int lastScroll;
 	protected float currentScroll;
 	protected boolean isScrolling;
-	protected boolean wasClicking;
 
 	public FilingCabinetScreen(FilingCabinetMenu inv, Inventory p_97742_, Component p_97743_) {
 		super(inv, p_97742_, p_97743_, 176, 114 + inv.getRowCount() * 18);
@@ -33,32 +32,26 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
-		int i = this.leftPos;
-		int j = this.topPos;
-		int k = i + 174;
-		int l = j + 18;
-		int i1 = k + 14;
-		int j1 = l + containerRows * 18;
-
-		if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
-			this.isScrolling = true;
-		}
-
-		if (!flag) {
-			this.isScrolling = false;
-		}
-		this.wasClicking = flag;
-
-		if (this.isScrolling) {
-			this.currentScroll = (mouseY - l - 7.5F) / (j1 - l - 15.0F);
-			this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
-		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
-		i = k;
-		j = l;
-		k = j1;
-		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
+
+		if (this.insideScrollbar(mouseX, mouseY)) {
+			graphics.requestCursor(this.isScrolling ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND);
+		}
+
+		int xscr = this.leftPos + 174;
+		int yscr = this.topPos + 18;
+		int yscr2 = yscr + containerRows * 18;
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, xscr, yscr + (int) ((yscr2 - yscr - 17) * this.currentScroll), 12, 15);
+	}
+
+	protected boolean insideScrollbar(final double xm, final double ym) {
+		int xo = this.leftPos;
+		int yo = this.topPos;
+		int xscr = xo + 174;
+		int yscr = yo + 18;
+		int xscr2 = xscr + 14;
+		int yscr2 = yscr + containerRows * 18;
+		return xm >= xscr && ym >= yscr && xm < xscr2 && ym < yscr2;
 	}
 
 	@Override
@@ -94,6 +87,36 @@ public class FilingCabinetScreen extends TSContainerScreen<FilingCabinetMenu> {
 		this.currentScroll = (float)(this.currentScroll - p_mouseScrolled_5_ / i);
 		this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
 		return true;
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (event.button() == 1 && insideScrollbar(event.x(), event.y())) {
+			this.isScrolling = true;
+			return true;
+		}
+		return super.mouseClicked(event, doubleClick);
+	}
+
+	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (this.isScrolling) {
+			int yscr = this.topPos + 18;
+			int yscr2 = yscr + containerRows * 18;
+			currentScroll = ((float)event.y() - yscr - 7.5F) / (yscr2 - yscr - 15F);
+			currentScroll = Mth.clamp(currentScroll, 0.0F, 1.0F);
+			return true;
+		} else {
+			return super.mouseDragged(event, dx, dy);
+		}
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (event.button() == 1) {
+			this.isScrolling = false;
+		}
+		return super.mouseReleased(event);
 	}
 
 	@Override

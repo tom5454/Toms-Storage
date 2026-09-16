@@ -26,13 +26,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.FilingCabinetBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
 public class FilingCabinetBlock extends BaseEntityBlock implements BlockWithTooltip {
-	public static final MapCodec<FilingCabinetBlock> CODEC = simpleCodec(FilingCabinetBlock::new);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	public FilingCabinetBlock(Block.Properties pr) {
@@ -87,11 +84,6 @@ public class FilingCabinetBlock extends BaseEntityBlock implements BlockWithTool
 	@Override
 	public BlockEntity newBlockEntity(BlockPos p_153215_, BlockState p_153216_) {
 		return new FilingCabinetBlockEntity(p_153215_, p_153216_);
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

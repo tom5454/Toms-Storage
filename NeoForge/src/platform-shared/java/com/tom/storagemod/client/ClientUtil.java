@@ -302,7 +302,8 @@ public class ClientUtil {
 		}
 
 		if (!messages.isEmpty()) {
-			gr.tooltip(mc.font, messages.stream().map(e -> ClientTooltipComponent.create(e.getVisualOrderText())).toList(), 5, 25, DefaultTooltipPositioner.INSTANCE, null);
+			var lines = messages.stream().map(e -> ClientTooltipComponent.create(e.getVisualOrderText())).toList();
+			gr.tooltip(mc.font, lines, 5, 25, DefaultTooltipPositioner.INSTANCE, null, false);
 		}
 	}
 }

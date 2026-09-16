@@ -41,8 +41,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.LevelEmitterBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
@@ -52,7 +50,6 @@ import com.tom.storagemod.util.TickerUtil;
 public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock, BlockWithTooltip {
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-	public static final MapCodec<LevelEmitterBlock> CODEC = simpleCodec(LevelEmitterBlock::new);
 
 	public LevelEmitterBlock(Block.Properties pr) {
 		super(pr);
@@ -100,10 +97,10 @@ public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCabl
 		}
 	}
 
-	@Override
+	/*@Override
 	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
 		return state.getValue(FACING) != side;
-	}
+	}*/
 
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
@@ -190,11 +187,6 @@ public class LevelEmitterBlock extends BaseEntityBlock implements IInventoryCabl
 			player.openMenu(be);
 		}
 		return InteractionResult.SUCCESS;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

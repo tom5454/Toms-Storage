@@ -30,8 +30,8 @@ import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 
 import com.tom.storagemod.client.BakedPaintedModel;
 import com.tom.storagemod.client.ClientUtil;
@@ -96,7 +96,7 @@ public class StorageModClient {
 	}
 
 	private static void initKeybinds(RegisterKeyMappingsEvent evt) {
-		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMapping.Category.GAMEPLAY);
+		openTerm = new KeyMapping("key.toms_storage.open_terminal", KeyConflictContext.IN_GAME, InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_B), KeyMapping.Category.GAMEPLAY);
 		evt.register(openTerm);
 	}
 

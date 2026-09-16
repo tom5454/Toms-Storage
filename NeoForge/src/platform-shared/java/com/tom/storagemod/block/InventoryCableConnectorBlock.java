@@ -42,8 +42,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.Config;
 import com.tom.storagemod.block.entity.InventoryCableConnectorBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
@@ -61,7 +59,6 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	private static final Direction[] FACING_VALUES = Direction.values();
 	protected VoxelShape[][] shapes;
-	public static final MapCodec<InventoryCableConnectorBlock> CODEC = simpleCodec(InventoryCableConnectorBlock::new);
 
 	public InventoryCableConnectorBlock(Block.Properties pr) {
 		super(pr);
@@ -294,11 +291,6 @@ public class InventoryCableConnectorBlock extends BaseEntityBlock implements IIn
 			}
 		}
 		return InteractionResult.PASS;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

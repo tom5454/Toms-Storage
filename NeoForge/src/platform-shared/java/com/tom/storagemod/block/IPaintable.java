@@ -38,7 +38,7 @@ public interface IPaintable {
 				if (player instanceof ServerPlayer sp) {
 					CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(sp, pos, item);
 				}
-				world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0f, 1.0f);
+				world.playSound(player, pos, SoundEvents.AXE_STRIP.value(), SoundSource.BLOCKS, 1.0f, 1.0f);
 				if (player != null) {
 					item.hurtAndBreak(1, player, hand);
 				}

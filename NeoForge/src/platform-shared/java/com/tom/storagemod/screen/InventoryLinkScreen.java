@@ -10,8 +10,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -27,6 +25,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.storage.ValueInput;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.InventoryLinkMenu;
@@ -47,9 +47,6 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 	private ToggleButton publicBtn;
 	private List<LinkChannel> sortedList = new ArrayList<>();
 	private ListHandler channelsList;
-	protected float currentScroll;
-	protected boolean isScrolling;
-	protected boolean wasClicking;
 
 	public InventoryLinkScreen(InventoryLinkMenu p_97741_, Inventory p_97742_, Component p_97743_) {
 		super(p_97741_, p_97742_, p_97743_);
@@ -172,7 +169,6 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		channelsList.preRender(mouseX, mouseY);
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 	}
 
@@ -184,11 +180,11 @@ public class InventoryLinkScreen extends TSContainerScreen<InventoryLinkMenu> im
 
 	@Override
 	public boolean keyPressed(KeyEvent keyEvent) {
-		if (keyEvent.key() == 256) {
+		if (keyEvent.isEscape()) {
 			this.onClose();
 			return true;
 		}
-		if(keyEvent.key() == GLFW.GLFW_KEY_TAB)return super.keyPressed(keyEvent);
+		if(keyEvent.key() == InputConstants.KEY_TAB)return super.keyPressed(keyEvent);
 		return !this.textF.keyPressed(keyEvent) && !this.textF.canConsumeInput() ? super.keyPressed(keyEvent) : true;
 	}
 

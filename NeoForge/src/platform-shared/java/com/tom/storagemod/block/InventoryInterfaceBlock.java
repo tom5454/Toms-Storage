@@ -23,15 +23,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.InventoryInterfaceBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.TickerUtil;
 
 public class InventoryInterfaceBlock extends BaseEntityBlock implements IInventoryCable, IInventoryNode, NeoForgeBlock, BlockWithTooltip {
-	public static final MapCodec<InventoryInterfaceBlock> CODEC = simpleCodec(InventoryInterfaceBlock::new);
 
 	public InventoryInterfaceBlock(Block.Properties pr) {
 		super(pr);
@@ -57,11 +54,6 @@ public class InventoryInterfaceBlock extends BaseEntityBlock implements IInvento
 	@Override
 	public RenderShape getRenderShape(BlockState p_149645_1_) {
 		return RenderShape.MODEL;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

@@ -12,8 +12,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
@@ -44,6 +42,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.storage.ValueInput;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import com.mojang.serialization.JsonOps;
 
 import com.google.common.base.Predicates;
@@ -99,16 +99,9 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					key -> key.getStack().tags().map(t -> t.location().toString()).toList()
 					));
 
-	/** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
 	protected float currentScroll;
-	/** True if the scrollbar is being dragged */
 	protected boolean isScrolling;
-	/**
-	 * True if the left mouse button was held down last time drawScreen was
-	 * called.
-	 */
 	private boolean refreshItemList;
-	protected boolean wasClicking;
 	protected EditBox searchField;
 	protected int slotIDUnderMouse = -1, controllMode, rowCount;
 	private String searchLast = "";
@@ -384,14 +377,6 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
-		int i = this.leftPos;
-		int j = this.topPos;
-		int k = i + 174;
-		int l = j + 18;
-		int i1 = k + 14;
-		int j1 = l + rowCount * 18;
-
 		if(menu.itemsLoaded && ghostItems && KeyUtil.hasShiftDown()) {
 			if(!menu.noSort) {
 				List<TerminalItemStack> list = getMenu().itemListClientSorted;
@@ -409,27 +394,20 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			refreshItemList = true;
 			menu.itemListClient = new ArrayList<>(menu.itemList);
 		}
-
-		if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
-			this.isScrolling = this.needsScrollBars();
-		}
-
-		if (!flag) {
-			this.isScrolling = false;
-		}
-		this.wasClicking = flag;
-
-		if (this.isScrolling) {
-			this.currentScroll = (mouseY - l - 7.5F) / (j1 - l - 15.0F);
-			this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
-			getMenu().scrollTo(this.currentScroll);
-		}
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 
-		i = k;
-		j = l;
-		k = j1;
-		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, i, j + (int) ((k - j - 17) * this.currentScroll), 12, 15);
+		if (this.insideScrollbar(mouseX, mouseY)) {
+			if (this.needsScrollBars()) {
+				graphics.requestCursor(this.isScrolling ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND);
+			} else {
+				graphics.requestCursor(CursorTypes.NOT_ALLOWED);
+			}
+		}
+
+		int xscr = this.leftPos + 174;
+		int yscr = this.topPos + 18;
+		int yscr2 = yscr + rowCount * 18;
+		graphics.blitSprite(RenderPipelines.GUI_TEXTURED, this.needsScrollBars() ? SCROLLER_SPRITE : SCROLLER_DISABLED_SPRITE, xscr, yscr + (int) ((yscr2 - yscr - 17) * this.currentScroll), 12, 15);
 
 		searchField.extractRenderState(graphics, mouseX, mouseY, a);
 
@@ -547,6 +525,16 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		return this.getMenu().itemListClientSorted.size() > rowCount * 9;
 	}
 
+	protected boolean insideScrollbar(final double xm, final double ym) {
+		int xo = this.leftPos;
+		int yo = this.topPos;
+		int xscr = xo + 174;
+		int yscr = yo + 18;
+		int xscr2 = xscr + 14;
+		int yscr2 = yscr + rowCount * 18;
+		return xm >= xscr && ym >= yscr && xm < xscr2 && ym < yscr2 && needsScrollBars();
+	}
+
 	@Override
 	public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
 		if (popup.mouseClick(mouseButtonEvent))return true;
@@ -579,8 +567,10 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					}
 				}
 			}
-		} else if (GLFW.glfwGetKey(minecraft.getWindow().handle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
-			storageSlotClick(null, SlotAction.SPACE_CLICK, false);
+			/*} else if (GLFW.glfwGetKey(minecraft.getWindow().handle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
+			storageSlotClick(null, SlotAction.SPACE_CLICK, false);*/
+		} else if (insideScrollbar(mouseButtonEvent.x(), mouseButtonEvent.y())) {
+			this.isScrolling = this.needsScrollBars();
 		} else {
 			if (isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseButtonEvent.x(), mouseButtonEvent.y())) {
 				if(mouseButton == 1)
@@ -596,6 +586,28 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		return true;
 	}
 
+	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (this.isScrolling) {
+			int yscr = this.topPos + 18;
+			int yscr2 = yscr + rowCount * 18;
+			this.currentScroll = ((float)event.y() - yscr - 7.5F) / (yscr2 - yscr - 15.0F);
+			this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
+			this.menu.scrollTo(this.currentScroll);
+			return true;
+		} else {
+			return super.mouseDragged(event, dx, dy);
+		}
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (event.button() == 1) {
+			this.isScrolling = false;
+		}
+		return super.mouseReleased(event);
+	}
+
 	protected void storageSlotClick(StoredItemStack slotStack, SlotAction act, boolean mod) {
 		menu.sync.sendInteract(slotStack, act, mod);
 	}
@@ -603,11 +615,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	public boolean isPullOne(MouseButtonEvent mouseButtonEvent) {
 		switch (ctrlm()) {
 		case AE:
-			return mouseButtonEvent.button() == 1 && mouseButtonEvent.hasShiftDown();
+			return mouseButtonEvent.button() == 3 && mouseButtonEvent.hasShiftDown();
 		case RS:
 			return mouseButtonEvent.button() == 2;
 		case DEF:
-			return mouseButtonEvent.button() == 1 && !menu.getCarried().isEmpty();
+			return mouseButtonEvent.button() == 3 && !menu.getCarried().isEmpty();
 		default:
 			return false;
 		}
@@ -620,7 +632,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		case RS:
 			return mouseButtonEvent.hasShiftDown() && mouseButtonEvent.button() == 2;
 		case DEF:
-			return mouseButtonEvent.button() == 1 && mouseButtonEvent.hasShiftDown();
+			return mouseButtonEvent.button() == 3 && mouseButtonEvent.hasShiftDown();
 		default:
 			return false;
 		}
@@ -629,11 +641,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	public boolean pullHalf(MouseButtonEvent mouseButtonEvent) {
 		switch (ctrlm()) {
 		case AE:
-			return mouseButtonEvent.button() == 1;
+			return mouseButtonEvent.button() == 3;
 		case RS:
-			return mouseButtonEvent.button() == 1;
+			return mouseButtonEvent.button() == 3;
 		case DEF:
-			return mouseButtonEvent.button() == 1 && menu.getCarried().isEmpty();
+			return mouseButtonEvent.button() == 3 && menu.getCarried().isEmpty();
 		default:
 			return false;
 		}
@@ -644,7 +656,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 		case AE:
 		case RS:
 		case DEF:
-			return mouseButtonEvent.button() == 0;
+			return mouseButtonEvent.button() == 1;
 		default:
 			return false;
 		}
@@ -662,11 +674,11 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 	@Override
 	public boolean keyPressed(KeyEvent event) {
 		if (popup.keyPressed(event))return true;
-		if (event.key() == 256) {
+		if (event.isEscape()) {
 			this.onClose();
 			return true;
 		}
-		if(event.key() == GLFW.GLFW_KEY_TAB)return super.keyPressed(event);
+		if(event.key() == InputConstants.KEY_TAB)return super.keyPressed(event);
 		if (this.searchField.keyPressed(event) || this.searchField.canConsumeInput()) {
 			return true;
 		}

@@ -16,6 +16,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +31,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -127,7 +127,8 @@ public class Platform {
 	}
 
 	public static boolean canScrapeWithItem(ItemStack item, Player player, InteractionHand hand) {
-		return item.canPerformAction(ItemAbilities.AXE_SCRAPE);
+		//return item.canPerformAction(ItemAbilities.AXE_SCRAPE); //TODO replace with block transformer
+		return item.is(ItemTags.AXES);
 	}
 
 	public static void runWithPacketContext(ServerPlayer player, Runnable r) {

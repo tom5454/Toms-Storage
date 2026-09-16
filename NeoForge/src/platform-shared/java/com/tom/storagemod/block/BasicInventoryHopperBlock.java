@@ -7,19 +7,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.BasicInventoryHopperBlockEntity;
 import com.tom.storagemod.item.IItemFilter;
 
 public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
-	public static final MapCodec<BasicInventoryHopperBlock> CODEC = simpleCodec(BasicInventoryHopperBlock::new);
 
 	public BasicInventoryHopperBlock(Block.Properties pr) {
 		super(pr);
@@ -71,10 +67,5 @@ public class BasicInventoryHopperBlock extends AbstractInventoryHopperBlock {
 			}
 		}
 		return InteractionResult.SUCCESS;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 }

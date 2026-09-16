@@ -6,8 +6,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,6 +17,8 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 public class PopupMenuManager {
 	private final Screen screen;
@@ -77,11 +77,11 @@ public class PopupMenuManager {
 			if (selected != -1) {
 				if(menu.get(selected).keyPressed(event))return true;
 			}
-			if (event.key() == GLFW.GLFW_KEY_DOWN) {
+			if (event.key() == InputConstants.KEY_DOWN) {
 				selected = (selected + 1) % menu.size();
-			} else if (event.key() == GLFW.GLFW_KEY_UP) {
+			} else if (event.key() == InputConstants.KEY_UP) {
 				selected = (selected + menu.size() - 1) % menu.size();
-			} else if (event.key() == 256) {
+			} else if (event.isEscape()) {
 				menu = null;
 			}
 			return true;
@@ -102,7 +102,7 @@ public class PopupMenuManager {
 		}
 
 		default boolean keyPressed(KeyEvent event) {
-			if(event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_KP_ENTER) {
+			if(event.key() == InputConstants.KEY_RETURN || event.key() == InputConstants.KEY_NUMPADENTER) {
 				activate();
 				return true;
 			}
@@ -176,7 +176,7 @@ public class PopupMenuManager {
 
 		@Override
 		public boolean keyPressed(KeyEvent event) {
-			if (activated && event.key() == 256) {
+			if (activated && event.isEscape()) {
 				box.setValue(value);
 				activated = false;
 				return true;

@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
-import net.fabricmc.fabric.api.networking.v1.context.PacketContextProvider;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,7 +40,6 @@ import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.platform.GameObject.GameRegistry;
 import com.tom.storagemod.platform.GameObject.GameRegistryBE;
 
-import eu.pb4.trinkets.api.TrinketsApi;
 import io.netty.buffer.ByteBuf;
 
 public class Platform {
@@ -79,11 +77,11 @@ public class Platform {
 	private static boolean trinkets = FabricLoader.getInstance().isModLoaded("trinkets");
 	public static <T> T checkExtraSlots(Player player, Predicate<ItemStack> is, T def, Function<ItemStack, T> map) {
 		if(trinkets) {
-			var tc = TrinketsApi.getAttachment(player);
+			/*var tc = TrinketsApi.getAttachment(player);
 			if(tc != null) {
 				var s = tc.equipped(is, false);
 				if(!s.isEmpty())return map.apply(s.get(0).get());
-			}
+			}*/
 		}
 		return def;
 	}
@@ -110,6 +108,6 @@ public class Platform {
 	}
 
 	public static void runWithPacketContext(ServerPlayer player, Runnable r) {
-		PacketContext.runWithContext((PacketContextProvider) player, r);
+		PacketContext.runWithContext(player, r);
 	}
 }

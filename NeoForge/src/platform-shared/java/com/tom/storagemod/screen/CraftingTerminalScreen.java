@@ -3,8 +3,6 @@ package com.tom.storagemod.screen;
 import java.util.Arrays;
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -20,6 +18,8 @@ import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 import com.tom.storagemod.StorageMod;
 import com.tom.storagemod.menu.CraftingTerminalMenu;
@@ -189,7 +189,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if(event.key() == GLFW.GLFW_KEY_S && hoveredSlot != null) {
+		if(event.key() == InputConstants.KEY_S && hoveredSlot != null) {
 			ItemStack itemstack = null;
 
 			for (var e : this.recipeBookGui.ghostSlots.ingredients.entrySet()) {
@@ -204,7 +204,7 @@ public class CraftingTerminalScreen extends AbstractStorageTerminalScreen<Crafti
 				return true;
 			}
 		}
-		if(event.key() == GLFW.GLFW_KEY_ESCAPE && this.recipeBookGui.isVisible() && this.widthTooNarrow) {
+		if(event.isEscape() && this.recipeBookGui.isVisible() && this.widthTooNarrow) {
 			this.recipeBookGui.toggleVisibility();
 			return true;
 		}

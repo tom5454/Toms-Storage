@@ -22,14 +22,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.OpenCrateBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.util.TickerUtil;
 
 public class OpenCrateBlock extends BaseEntityBlock implements BlockWithTooltip {
-	public static final MapCodec<OpenCrateBlock> CODEC = simpleCodec(OpenCrateBlock::new);
 
 	public OpenCrateBlock(Block.Properties pr) {
 		super(pr);
@@ -77,10 +74,5 @@ public class OpenCrateBlock extends BaseEntityBlock implements BlockWithTooltip 
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().
 				setValue(BlockStateProperties.FACING, context.getNearestLookingDirection().getOpposite());
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 }

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.lwjgl.glfw.GLFW;
-
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -14,10 +11,13 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
 
 import com.tom.storagemod.StorageMod;
 
@@ -43,7 +43,6 @@ public abstract class ListWidget<T> extends AbstractWidget {
 	private final int elemH;
 	protected float currentScroll;
 	protected boolean isScrolling;
-	protected boolean wasClicking;
 	protected Supplier<List<T>> list;
 	protected T selected;
 	private List<ListEntry> listEntries = new ArrayList<>();
@@ -56,27 +55,14 @@ public abstract class ListWidget<T> extends AbstractWidget {
 		}
 	}
 
-	public void preRender(int mouseX, int mouseY) {
-		boolean flag = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) != GLFW.GLFW_RELEASE;
-
-		int k = this.getX() + 56;
-		int l = this.getY() - 1;
-		int i1 = k + 14;
-		int j1 = l + 58;
-
-		if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
-			this.isScrolling = this.needsScrollBars();
-		}
-
-		if (!flag) {
-			this.isScrolling = false;
-		}
-		this.wasClicking = flag;
-
-		if (this.isScrolling) {
-			this.currentScroll = (mouseY - l - 4.5F) / (j1 - l - 9.0F);
-			this.currentScroll = Mth.clamp(this.currentScroll, 0.0F, 1.0F);
-		}
+	private boolean insideScrollbar(final double xm, final double ym) {
+		int xo = this.getX();
+		int yo = this.getY();
+		int xscr = xo + 56;
+		int yscr = yo - 1;
+		int xscr2 = xscr + 14;
+		int yscr2 = yscr + 58;
+		return xm >= xscr && ym >= yscr && xm < xscr2 && ym < yscr2 && needsScrollBars();
 	}
 
 	@Override
@@ -85,6 +71,14 @@ public abstract class ListWidget<T> extends AbstractWidget {
 		int y = this.getY() - 1 + (int) ((getHeight() - 9) * this.currentScroll);
 		boolean isHovered = mouseX >= x && mouseY >= y && mouseX < x + 5 && mouseY < y + 9;
 		st.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLL_SPRITES.get(this.needsScrollBars(), isHovered), x, y, 5, 9);
+
+		if (this.insideScrollbar(mouseX, mouseY)) {
+			if (this.needsScrollBars()) {
+				st.requestCursor(this.isScrolling ? CursorTypes.RESIZE_NS : CursorTypes.POINTING_HAND);
+			} else {
+				st.requestCursor(CursorTypes.NOT_ALLOWED);
+			}
+		}
 	}
 
 	public void tooltip(GuiGraphicsExtractor matrixStack, int mouseX, int mouseY) {
@@ -101,6 +95,38 @@ public abstract class ListWidget<T> extends AbstractWidget {
 	@Override
 	public boolean mouseScrolled(double p_94734_, double p_94735_, double p_94736_, double dir) {
 		return scroll(dir);
+	}
+
+	@Override
+	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+		if (event.button() == 1) {
+			if (this.insideScrollbar(event.x(), event.y())) {
+				this.isScrolling = this.needsScrollBars();
+				return true;
+			}
+		}
+		return super.mouseClicked(event, doubleClick);
+	}
+
+	@Override
+	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+		if (this.isScrolling) {
+			int yscr = this.getY() - 1;
+			int yscr2 = yscr + 58;
+			currentScroll = ((float)event.y() - yscr - 4.5F) / (yscr2 - yscr - 9.0F);
+			currentScroll = Mth.clamp(currentScroll, 0.0F, 1.0F);
+			return true;
+		} else {
+			return super.mouseDragged(event, dx, dy);
+		}
+	}
+
+	@Override
+	public boolean mouseReleased(MouseButtonEvent event) {
+		if (event.button() == 1) {
+			this.isScrolling = false;
+		}
+		return super.mouseReleased(event);
 	}
 
 	private boolean scroll(double dir) {

@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.141'
+    id 'net.neoforged.moddev' version '2.0.147'
 }
 
 version = mod_version
@@ -42,7 +42,7 @@ repositories {
 }
 
 base {
-    archivesName = 'toms_storage-26.2'
+    archivesName = 'toms_storage-26.3'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
@@ -130,7 +130,7 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
@@ -172,15 +172,15 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     
-	implementation "curse.maven:jade-324717:8326243"
+	implementation "curse.maven:jade-324717:8892782"
 	
-	compileOnly "mezz.jei:jei-26.2-neoforge-api:30.7.0.41"
+	/*compileOnly "mezz.jei:jei-26.2-neoforge-api:30.7.0.41"
 	compileOnly "mezz.jei:jei-26.2-common-api:30.7.0.41"
 	// at runtime, use the full JEI jar
 	runtimeOnly "mezz.jei:jei-26.2-neoforge:30.7.0.41"
 	
 	compileOnly('maven.modrinth:sophisticated-core:26.2-1.4.79.2130')
-	compileOnly('maven.modrinth:sophisticated-storage:26.2-1.5.88.1938')
+	compileOnly('maven.modrinth:sophisticated-storage:26.2-1.5.88.1938')*/
     
     if(useLib) {
         compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:21.11.814"

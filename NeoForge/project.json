@@ -1,12 +1,12 @@
 {
   "type": "neoforge",
-  "name": "toms_storage-26.2",
-  "mcVer": "26.2",
-  "verId": "26.2",
-  "display": "[NeoForge] Tom's Storage 26.2",
+  "name": "toms_storage-26.3",
+  "mcVer": "26.3",
+  "verId": "26.3",
+  "display": "[NeoForge] Tom's Storage 26.3",
   "onGit": true,
   "subver": [
-	"26.2"
+	"26.3"
   ],
   "versionType": "release",
   "j25": true,

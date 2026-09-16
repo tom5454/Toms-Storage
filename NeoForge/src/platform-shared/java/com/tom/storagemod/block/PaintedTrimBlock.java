@@ -22,14 +22,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.Content;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
 public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable, BlockWithTooltip, IConfiguratorHighlight {
-	public static final MapCodec<PaintedTrimBlock> CODEC = simpleCodec(PaintedTrimBlock::new);
 
 	public PaintedTrimBlock(Block.Properties pr) {
 		super(pr);
@@ -73,11 +70,6 @@ public class PaintedTrimBlock extends BaseEntityBlock implements IPaintable, Blo
 	protected ItemStack getCloneItemStack(LevelReader p_382795_, BlockPos p_383120_, BlockState p_382830_,
 			boolean p_388788_) {
 		return new ItemStack(Content.inventoryTrim.get());
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

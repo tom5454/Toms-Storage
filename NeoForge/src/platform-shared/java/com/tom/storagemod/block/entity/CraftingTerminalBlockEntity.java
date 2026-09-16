@@ -7,6 +7,7 @@ import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
@@ -131,7 +132,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity impl
 					rem = pushStack(rem);
 					if(rem.isEmpty())continue;
 					if (thePlayer.getInventory().add(rem)) continue;
-					thePlayer.drop(rem, false);
+					thePlayer.drop(rem, false, Prediction.PREDICTED);
 				}
 			}
 			refillingGrid = false;

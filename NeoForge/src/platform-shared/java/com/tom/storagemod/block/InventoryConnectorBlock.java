@@ -27,8 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity;
 import com.tom.storagemod.block.entity.InventoryConnectorBlockEntity.UsageInfo;
 import com.tom.storagemod.client.ClientUtil;
@@ -37,7 +35,6 @@ import com.tom.storagemod.util.BlockFace;
 import com.tom.storagemod.util.TickerUtil;
 
 public class InventoryConnectorBlock extends BaseEntityBlock implements IInventoryCable, NeoForgeBlock, BlockWithTooltip {
-	public static final MapCodec<InventoryConnectorBlock> CODEC = simpleCodec(InventoryConnectorBlock::new);
 
 	public InventoryConnectorBlock(Block.Properties pr) {
 		super(pr);
@@ -77,11 +74,6 @@ public class InventoryConnectorBlock extends BaseEntityBlock implements IInvento
 			}
 		}
 		return InteractionResult.SUCCESS;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

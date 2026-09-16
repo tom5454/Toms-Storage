@@ -32,8 +32,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.redstone.Orientation;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
 import com.tom.storagemod.util.BlockFace;
@@ -47,7 +45,6 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final BooleanProperty[] DIR_TO_PROPERTY = new BooleanProperty[] {DOWN, UP, NORTH, SOUTH, WEST, EAST};
-	public static final MapCodec<InventoryCableBlock> CODEC = simpleCodec(InventoryCableBlock::new);
 
 	public InventoryCableBlock(Block.Properties pr) {
 		super(4f, pr);
@@ -157,11 +154,6 @@ public class InventoryCableBlock extends PipeBlock implements SimpleWaterloggedB
 
 
 		return super.mirror(blockState_1, blockMirror_1);
-	}
-
-	@Override
-	protected MapCodec<? extends PipeBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

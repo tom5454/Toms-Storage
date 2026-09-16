@@ -1,22 +1,27 @@
 package com.tom.storagemod.util;
 
-import org.lwjgl.glfw.GLFW;
+import java.nio.ByteBuffer;
 
-import net.minecraft.client.Minecraft;
+import org.lwjgl.sdl.SDLKeyboard;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 public class KeyUtil {
 
 	public static boolean hasControlDown() {
-		if (RenderSystem.isOnRenderThread())
-			return GLFW.glfwGetKey(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_KEY_LEFT_CONTROL) != GLFW.GLFW_RELEASE;
+		if (RenderSystem.isOnRenderThread()) {
+			ByteBuffer keyboardState = SDLKeyboard.SDL_GetKeyboardState();
+			return keyboardState.get(InputConstants.KEY_LCONTROL) != 0;
+		}
 		return false;
 	}
 
 	public static boolean hasShiftDown() {
-		if (RenderSystem.isOnRenderThread())
-			return GLFW.glfwGetKey(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_KEY_LEFT_SHIFT) != GLFW.GLFW_RELEASE;
+		if (RenderSystem.isOnRenderThread()) {
+			ByteBuffer keyboardState = SDLKeyboard.SDL_GetKeyboardState();
+			return keyboardState.get(InputConstants.KEY_LSHIFT) != 0;
+		}
 		return false;
 	}
 

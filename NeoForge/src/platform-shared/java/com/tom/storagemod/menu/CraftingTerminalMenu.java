@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -144,7 +145,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 
 				slot.onTake(playerIn, itemstack1);
 				if (index == 0) {
-					playerIn.drop(itemstack1, false);
+					playerIn.drop(itemstack1, false, Prediction.PREDICTED);
 				}
 
 				return itemstack;

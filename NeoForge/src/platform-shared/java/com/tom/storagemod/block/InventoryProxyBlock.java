@@ -28,14 +28,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.InventoryProxyBlockEntity;
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 
 public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable, BlockWithTooltip, IConfiguratorHighlight {
-	public static final MapCodec<InventoryProxyBlock> CODEC = simpleCodec(InventoryProxyBlock::new);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
 	public InventoryProxyBlock(Block.Properties pr) {
@@ -75,11 +72,6 @@ public class InventoryProxyBlock extends BaseEntityBlock implements IPaintable, 
 	@Override
 	public RenderShape getRenderShape(BlockState p_149645_1_) {
 		return RenderShape.MODEL;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

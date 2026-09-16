@@ -103,8 +103,6 @@ public class TagItemFilterScreen extends AbstractFilteredScreen<TagItemFilterMen
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		buttonAllowList.setState(menu.allowList);
-		itemTagList.preRender(mouseX, mouseY);
-		filterList.preRender(mouseX, mouseY);
 		buttonAdd.active = itemTagList.getSelected() != null;
 		buttonRemove.active = filterList.getSelected() != null;
 		super.extractRenderState(graphics, mouseX, mouseY, a);

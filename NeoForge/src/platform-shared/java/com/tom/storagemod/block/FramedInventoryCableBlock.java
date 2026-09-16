@@ -42,8 +42,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.mojang.serialization.MapCodec;
-
 import com.tom.storagemod.block.entity.PaintedBlockEntity;
 import com.tom.storagemod.client.ClientUtil;
 import com.tom.storagemod.inventory.InventoryCableNetwork;
@@ -56,7 +54,6 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
 	public static final BooleanProperty EAST = BlockStateProperties.EAST;
 	public static final BooleanProperty WEST = BlockStateProperties.WEST;
-	public static final MapCodec<FramedInventoryCableBlock> CODEC = simpleCodec(FramedInventoryCableBlock::new);
 	private final Function<BlockState, VoxelShape> highlightShapes;
 
 	public FramedInventoryCableBlock(Block.Properties pr) {
@@ -181,11 +178,6 @@ public class FramedInventoryCableBlock extends BaseEntityBlock implements IInven
 	@Override
 	public RenderShape getRenderShape(BlockState p_149645_1_) {
 		return RenderShape.MODEL;
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
