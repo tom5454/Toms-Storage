@@ -130,7 +130,7 @@ sourceSets {
 		java {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
@@ -174,12 +174,12 @@ dependencies {
     
 	implementation "curse.maven:jade-324717:8892782"
 	
-	/*compileOnly "mezz.jei:jei-26.2-neoforge-api:30.7.0.41"
-	compileOnly "mezz.jei:jei-26.2-common-api:30.7.0.41"
+	compileOnly "mezz.jei:jei-26.3-neoforge-api:31.6.0.25"
+	compileOnly "mezz.jei:jei-26.3-common-api:31.6.0.25"
 	// at runtime, use the full JEI jar
-	runtimeOnly "mezz.jei:jei-26.2-neoforge:30.7.0.41"
+	runtimeOnly "mezz.jei:jei-26.3-neoforge:31.6.0.25"
 	
-	compileOnly('maven.modrinth:sophisticated-core:26.2-1.4.79.2130')
+	/*compileOnly('maven.modrinth:sophisticated-core:26.2-1.4.79.2130')
 	compileOnly('maven.modrinth:sophisticated-storage:26.2-1.5.88.1938')*/
     
     if(useLib) {

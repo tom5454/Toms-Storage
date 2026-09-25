@@ -498,7 +498,7 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 			}
 		}
 
-		if (mouseX >= getGuiLeft() + slot.xDisplayPosition - 1 && mouseY >= getGuiTop() + slot.yDisplayPosition - 1 && mouseX < getGuiLeft() + slot.xDisplayPosition + 17 && mouseY < getGuiTop() + slot.yDisplayPosition + 17) {
+		if (mouseX >= leftPos + slot.xDisplayPosition - 1 && mouseY >= topPos + slot.yDisplayPosition - 1 && mouseX < leftPos + slot.xDisplayPosition + 17 && mouseY < topPos + slot.yDisplayPosition + 17) {
 			int l = slot.xDisplayPosition;
 			int t = slot.yDisplayPosition;
 			st.fill(l, t, l + 16, t + 16, -2130706433);
@@ -567,13 +567,13 @@ public abstract class AbstractStorageTerminalScreen<T extends StorageTerminalMen
 					}
 				}
 			}
-			/*} else if (GLFW.glfwGetKey(minecraft.getWindow().handle(), GLFW.GLFW_KEY_SPACE) != GLFW.GLFW_RELEASE) {
-			storageSlotClick(null, SlotAction.SPACE_CLICK, false);*/
+		} else if (KeyUtil.hasSpaceDown()) {
+			storageSlotClick(null, SlotAction.SPACE_CLICK, false);
 		} else if (insideScrollbar(mouseButtonEvent.x(), mouseButtonEvent.y())) {
 			this.isScrolling = this.needsScrollBars();
 		} else {
 			if (isHovering(searchField.getX() - leftPos, searchField.getY() - topPos, 89, this.getFont().lineHeight, mouseButtonEvent.x(), mouseButtonEvent.y())) {
-				if(mouseButton == 1)
+				if(mouseButton == 3)
 					searchField.setValue("");
 				else
 					return super.mouseClicked(mouseButtonEvent, bl);

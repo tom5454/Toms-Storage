@@ -65,11 +65,11 @@ dependencies {
     
     implementation ("maven.modrinth:jade:26.3.1+fabric")
     
-    /* // compile against the JEI API but do not include it at runtime
-	compileOnlyApi("mezz.jei:jei-26.2-common-api:${project.jei_version}")
-	compileOnlyApi("mezz.jei:jei-26.2-fabric-api:${project.jei_version}")
+    // compile against the JEI API but do not include it at runtime
+	compileOnlyApi("mezz.jei:jei-26.3-common-api:${project.jei_version}")
+	compileOnlyApi("mezz.jei:jei-26.3-fabric-api:${project.jei_version}")
 	// at runtime, use the full JEI jar for Fabric
-	runtimeOnly("mezz.jei:jei-26.2-fabric:${project.jei_version}")*/
+	runtimeOnly("mezz.jei:jei-26.3-fabric:${project.jei_version}")
 	
 	//compileOnly('maven.modrinth:sodium:mc26.3-0.9.2-fabric')
 	//compileOnly('maven.modrinth:iris:1.11.6+26.3-fabric')
@@ -121,7 +121,7 @@ sourceSets {
 	main {
 		java {
 			srcDir "../NeoForge/src/platform-shared/java"
-			/*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"

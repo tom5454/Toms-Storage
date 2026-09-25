@@ -16,15 +16,15 @@ public abstract class PlatformContainerScreen<T extends AbstractContainerMenu> e
 		super(menu, inventory, title, imageWidth, imageHeight);
 	}
 
-	public int getGuiLeft() {
+	public int getLeftPos() {
 		return leftPos;
 	}
 
-	public int getGuiTop() {
+	public int getTopPos() {
 		return topPos;
 	}
 
 	public Slot getHoveredSlot() {
-		return null;
+		return hoveredSlot;
 	}
 }

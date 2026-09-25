@@ -25,4 +25,11 @@ public class KeyUtil {
 		return false;
 	}
 
+	public static boolean hasSpaceDown() {
+		if (RenderSystem.isOnRenderThread()) {
+			ByteBuffer keyboardState = SDLKeyboard.SDL_GetKeyboardState();
+			return keyboardState.get(InputConstants.KEY_SPACE) != 0;
+		}
+		return false;
+	}
 }

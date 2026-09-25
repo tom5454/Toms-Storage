@@ -54,7 +54,7 @@ public class JeiGhostIngredientHandler implements IGhostIngredientHandler<Abstra
 		public SlotTarget(AbstractFilteredScreen gui, Slot slot) {
 			this.slot = slot;
 			this.gui = gui;
-			this.area = new Rect2i(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, 16, 16);
+			this.area = new Rect2i(gui.getLeftPos() + slot.x, gui.getTopPos() + slot.y, 16, 16);
 		}
 
 		@Override
