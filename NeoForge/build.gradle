@@ -25,7 +25,8 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-	maven { url "https://maven.shedaniel.me/" }
+	maven { url "https://raw.githubusercontent.com/Pandaismyname1/SEMI/maven" }
+    maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.architectury.dev/" }
     maven { url "https://maven.terraformersmc.com/releases/"}
     exclusiveContent {
@@ -131,7 +132,7 @@ sourceSets {
 			srcDir "src/platform-shared/java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/top/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
@@ -178,6 +179,10 @@ dependencies {
 	compileOnly "mezz.jei:jei-26.3-common-api:31.6.0.25"
 	// at runtime, use the full JEI jar
 	runtimeOnly "mezz.jei:jei-26.3-neoforge:31.6.0.25"
+
+	// EMI (SEMI on MC 26.x) crafting terminal integration.
+	// "1.1.24+26.3" should be bumped together with EMI API changes.
+	compileOnly "dev.emi:semi-neoforge:1.1.24-SNAPSHOT+26.3"
 	
 	/*compileOnly('maven.modrinth:sophisticated-core:26.2-1.4.79.2130')
 	compileOnly('maven.modrinth:sophisticated-storage:26.2-1.5.88.1938')*/
