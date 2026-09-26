@@ -1,15 +1,15 @@
 package com.tom.storagemod.emi;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -34,12 +34,12 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 
 	@Override
 	public List<Slot> getInputSources(CraftingTerminalMenu handler) {
-		return Collections.emptyList();
+		return handler.slots.subList(1, handler.slots.size());
 	}
 
 	@Override
 	public List<Slot> getCraftingSlots(CraftingTerminalMenu handler) {
-		return Collections.emptyList();
+		return handler.getInputGridSlots();
 	}
 
 	@Override
@@ -65,13 +65,13 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	public boolean craft(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context) {
 		AbstractContainerScreen<CraftingTerminalMenu> screen = context.getScreen();
 		handleRecipe(recipe, screen, false);
-		Minecraft.getInstance().setScreen(screen);
+		Minecraft.getInstance().gui.setScreen(screen);
 		return true;
 	}
 
 	@Override
 	public void render(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context, List<Widget> widgets,
-			GuiGraphics matrices) {
+			GuiGraphicsExtractor matrices) {
 		if (context.getScreen() instanceof AbstractStorageTerminalScreen scr && scr.isSmartItemSearchOn()) {
 			List<Integer> missing = handleRecipe(recipe, context.getScreen(), true);
 			int i = 0;
@@ -130,10 +130,12 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 		}
 
 		if(!simulate) {
-			/*var recipeId = recipe.getId();
-			CompoundTag compound = new CompoundTag();
-			compound.putString("fill", recipeId.location().toString());
-			term.sendMessage(compound);*/
+			Identifier recipeId = recipe.getId();
+			if (recipeId != null) {
+				CompoundTag compound = new CompoundTag();
+				compound.putString("fill", recipeId.toString());
+				term.sendMessage(compound);
+			}
 		}
 		return missing;
 	}

@@ -3,7 +3,7 @@ package com.tom.storagemod.emi;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +42,7 @@ public class EmiGhostIngredientHandler implements EmiDragDropHandler<Screen> {
 	}
 
 	@Override
-	public void render(Screen screen, EmiIngredient dragged, GuiGraphics matrices, int mouseX, int mouseY, float delta) {
+	public void render(Screen screen, EmiIngredient dragged, GuiGraphicsExtractor matrices, int mouseX, int mouseY, float delta) {
 		if(!(screen instanceof AbstractFilteredScreen scr))return;
 		ItemStack stack = getStack(dragged);
 		if(stack.isEmpty())return;

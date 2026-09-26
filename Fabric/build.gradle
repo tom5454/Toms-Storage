@@ -70,6 +70,12 @@ dependencies {
 	compileOnlyApi("mezz.jei:jei-26.3-fabric-api:${project.jei_version}")
 	// at runtime, use the full JEI jar for Fabric
 	runtimeOnly("mezz.jei:jei-26.3-fabric:${project.jei_version}")
+
+	// EMI (SEMI on MC 26.x) crafting terminal integration.
+	// Once SEMI is published to the Modrinth maven, "1.1.24+26.3" should be bumped together with EMI API changes.
+	//compileOnly("maven.modrinth:semi:1.1.24+26.3-fabric")
+	// for local testing against a locally built SEMI jar:
+	compileOnly files("libs/semi-fabric.jar")
 	
 	//compileOnly('maven.modrinth:sodium:mc26.3-0.9.2-fabric')
 	//compileOnly('maven.modrinth:iris:1.11.6+26.3-fabric')
@@ -123,7 +129,7 @@ sourceSets {
 			srcDir "../NeoForge/src/platform-shared/java"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jei/**"
 			/*if(!useLib)*/exclude "com/tom/storagemod/rei/**"
-			/*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
+			//*if(!useLib)*/exclude "com/tom/storagemod/emi/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/jade/**"
 			//*if(!useLib)*/exclude "com/tom/storagemod/ModMenu.java"
 			/*if(!useLib)*/exclude "com/tom/storagemod/polymorph/PolymorphTerminalWidget.java"
