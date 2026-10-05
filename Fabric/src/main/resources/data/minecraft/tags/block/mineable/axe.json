@@ -6,6 +6,7 @@
 	"toms_storage:inventory_cable",
 	"toms_storage:inventory_cable_connector",
 	"toms_storage:inventory_connector",
+	"toms_storage:inventory_proxy",
 	"toms_storage:basic_inventory_hopper",
 	"toms_storage:level_emitter",
 	"toms_storage:open_crate",
