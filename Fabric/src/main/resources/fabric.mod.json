@@ -48,5 +48,8 @@
     "fabricloader": ">=0.7.4",
     "fabric-api": ">=0.145.3",
     "minecraft": ">=26.3 <26.4"
+  },
+  "suggests": {
+    "emi": "*"
   }
 }

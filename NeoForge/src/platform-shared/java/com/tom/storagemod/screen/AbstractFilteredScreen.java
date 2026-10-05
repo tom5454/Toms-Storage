@@ -11,4 +11,12 @@ public abstract class AbstractFilteredScreen<T extends AbstractFilteredMenu> ext
 		super(p_97741_, p_97742_, p_97743_);
 	}
 
+	public int getGuiLeft() {
+		return this.leftPos;
+	}
+
+	public int getGuiTop() {
+		return this.topPos;
+	}
+
 }
