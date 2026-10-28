@@ -29,6 +29,9 @@ public class TerminalCraftingFiller {
 	}
 
 	public void placeRecipe(Recipe<?> recipe) {
+		for (var st : te.getCraftingInv().getItems()) {
+			accountStack(st);
+		}
 		te.clear(player);
 		sync.fillCraftingFiller(this);
 		for (var i : player.getInventory().items) {
