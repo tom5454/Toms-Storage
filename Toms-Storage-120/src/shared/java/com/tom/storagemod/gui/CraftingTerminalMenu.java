@@ -11,6 +11,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultContainer;
@@ -41,6 +42,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 	private final ResultContainer craftResult;
 	private Slot craftingResultSlot;
 	private final List<ContainerListener> listeners = Lists.newArrayList();
+	private boolean refillRecipeGrid = true;
 
 	@Override
 	public void addSlotListener(ContainerListener listener) {
@@ -100,7 +102,7 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 		public void onTake(Player thePlayer, ItemStack stack) {
 			this.checkTakeAchievements(stack);
 			if (!pinv.player.getCommandSenderWorld().isClientSide) {
-				((CraftingTerminalBlockEntity) te).craft(thePlayer);
+				((CraftingTerminalBlockEntity) te).handleCraft(thePlayer, refillRecipeGrid);
 			}
 		}
 	}
@@ -117,6 +119,14 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 
 	@Override
 	public ItemStack shiftClickItems(Player playerIn, int index) {
+		return handleShiftClickItems(playerIn, index, false);
+	}
+
+	public ItemStack batchShiftClickItems(Player playerIn, int index) {
+		return handleShiftClickItems(playerIn, index, true);
+	}
+
+	private ItemStack handleShiftClickItems(Player playerIn, int index, boolean bypassStackLimit) {
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 		if (slot != null && slot.hasItem()) {
@@ -125,7 +135,8 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 			if (index == 0) {
 				if(te == null)return ItemStack.EMPTY;
 
-				if (!((CraftingTerminalBlockEntity)te).canCraft() || !this.moveItemStackTo(itemstack1, 10, 46, true)) {
+				if ((!bypassStackLimit && !((CraftingTerminalBlockEntity)te).canCraft())
+					|| !this.moveItemStackTo(itemstack1, 10, 46, true)) {
 					return ItemStack.EMPTY;
 				}
 
@@ -242,9 +253,59 @@ public class CraftingTerminalMenu extends StorageTerminalMenu implements IAutoFi
 				var recipe = pinv.player.level().getRecipeManager().byKey(id).orElse(null);
 				if (recipe != null) {
 					new TerminalCraftingFiller((CraftingTerminalBlockEntity) te, pinv.player, sync).placeRecipe(recipe);
+					craftToDestination(recipe, CraftDestination.fromMessage(message), message.getInt("amount"));
 				}
 			}
 		}
+	}
+
+	public static enum CraftDestination {
+		NONE, CURSOR, INVENTORY;
+		public static final CraftDestination[] VALUES = values();
+
+		public static CraftDestination fromMessage(CompoundTag msg) {
+			if (!msg.contains("dest")) return NONE;
+			int d = msg.getByte("dest");
+			if (d < 0 || d >= VALUES.length) return NONE;
+			return VALUES[d];
+		}
+	}
+
+	private void craftToDestination(Recipe<?> recipe, CraftDestination dest, int amount)  {
+		switch (dest) {
+			case NONE -> {}
+			case CURSOR -> {
+				if (isResultOf(recipe)) {
+					try {
+						refillRecipeGrid = false;
+						clicked(craftingResultSlot.index, 0, ClickType.PICKUP, pinv.player);
+					} finally {
+						refillRecipeGrid = true;
+					}
+				}
+			}
+			case INVENTORY -> {
+				try {
+					for (int i = 0; i < amount && isResultOf(recipe); i++) {
+						if (i == amount - 1) {
+							refillRecipeGrid = false;
+						}
+
+						if (batchShiftClickItems(pinv.player, craftingResultSlot.index).isEmpty()) {
+							break;
+						}
+					}
+				} finally {
+					refillRecipeGrid = true;
+				}
+			}
+		}
+	}
+
+	// A partial refill can match a different recipe
+	private boolean isResultOf(Recipe<?> recipe) {
+		Recipe<?> used = craftResult.getRecipeUsed();
+		return craftingResultSlot.hasItem() && used != null && used.getId().equals(recipe.getId());
 	}
 
 	@Override

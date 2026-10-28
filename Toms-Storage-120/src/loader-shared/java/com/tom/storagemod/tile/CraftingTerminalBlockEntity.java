@@ -96,6 +96,10 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 	}
 
 	public void craft(Player thePlayer) {
+		handleCraft(thePlayer, true);
+	}
+
+	public void handleCraft(Player thePlayer, boolean allowGridRefill) {
 		if(currentRecipe != null) {
 			NonNullList<ItemStack> remainder = currentRecipe.getRemainingItems(craftMatrix);
 			boolean playerInvUpdate = false;
@@ -109,7 +113,7 @@ public class CraftingTerminalBlockEntity extends StorageTerminalBlockEntity {
 					craftMatrix.removeItem(i, 1);
 					slot = craftMatrix.getItem(i);
 				}
-				if(slot.isEmpty() && !oldItem.isEmpty()) {
+				if(allowGridRefill && slot.isEmpty() && !oldItem.isEmpty()) {
 					StoredItemStack is = pullStack(new StoredItemStack(oldItem), 1);
 					if(is == null && (getSorting() & (1 << 8)) != 0) {
 						for(int j = 0;j<thePlayer.getInventory().getContainerSize();j++) {

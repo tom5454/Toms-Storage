@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import com.tom.storagemod.gui.CraftingTerminalMenu;
+import com.tom.storagemod.gui.CraftingTerminalMenu.CraftDestination;
 import com.tom.storagemod.util.IAutoFillTerminal;
 import com.tom.storagemod.util.StoredItemStack;
 
@@ -58,7 +59,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	@Override
 	public boolean craft(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context) {
 		AbstractContainerScreen<CraftingTerminalMenu> screen = context.getScreen();
-		handleRecipe(recipe, screen, false);
+		handleRecipe(recipe, screen, false, context);
 		Minecraft.getInstance().setScreen(screen);
 		return true;
 	}
@@ -67,7 +68,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 	public void render(EmiRecipe recipe, EmiCraftContext<CraftingTerminalMenu> context, List<Widget> widgets,
 			GuiGraphics matrices) {
 		RenderSystem.enableDepthTest();
-		List<Integer> missing = handleRecipe(recipe, context.getScreen(), true);
+		List<Integer> missing = handleRecipe(recipe, context.getScreen(), true, context);
 		int i = 0;
 		for (Widget w : widgets) {
 			if (w instanceof SlotWidget sw) {
@@ -83,7 +84,7 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 		}
 	}
 
-	private static List<Integer> handleRecipe(EmiRecipe recipe, AbstractContainerScreen<CraftingTerminalMenu> screen, boolean simulate) {
+	private static List<Integer> handleRecipe(EmiRecipe recipe, AbstractContainerScreen<CraftingTerminalMenu> screen, boolean simulate, EmiCraftContext<CraftingTerminalMenu> context) {
 		IAutoFillTerminal term = screen.getMenu();
 		ItemStack[][] stacks = recipe.getInputs().stream().map(i ->
 		i.getEmiStacks().stream().map(EmiStack::getItemStack).filter(s -> !s.isEmpty()).toArray(ItemStack[]::new)
@@ -128,6 +129,14 @@ public class EmiTransferHandler implements StandardRecipeHandler<CraftingTermina
 			if (recipeId != null && !Minecraft.getInstance().level.getRecipeManager().byKey(recipeId).isEmpty()) {
 				CompoundTag compound = new CompoundTag();
 				compound.putString("fill", recipeId.toString());
+
+				compound.putByte("dest", (byte) (switch (context.getDestination()) {
+					case NONE -> CraftDestination.NONE;
+					case CURSOR -> CraftDestination.CURSOR;
+					case INVENTORY -> CraftDestination.INVENTORY;
+				}).ordinal());
+				compound.putInt("amount", context.getAmount());
+
 				term.sendMessage(compound);
 			}
 		}
