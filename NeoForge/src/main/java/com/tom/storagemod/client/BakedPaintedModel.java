@@ -77,8 +77,15 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 			if(layer != null && layer != RenderType.solid())return Collections.emptyList();
 		}
 
-		if(model == null)
+		if (model == null) {
 			model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockstate);
+			if (model instanceof BakedPaintedModel) {
+				return Collections.emptyList();
+			}
+			if (layer != null && !model.getRenderTypes(blockstate, rand, ModelData.EMPTY).contains(layer)) {
+				return Collections.emptyList();
+			}
+		}
 		return model.getQuads(blockstate, side, rand, ModelData.EMPTY, layer);
 	}
 
@@ -90,6 +97,15 @@ public class BakedPaintedModel implements IDynamicBakedModel {
 	@Override
 	public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand,
 			@NotNull ModelData data) {
-		return ChunkRenderTypeSet.all();
+		Supplier<BlockState> blockstateSupp = data.get(PaintedBlockEntity.FACADE_STATE);
+		BlockState blockstate = blockstateSupp != null ? blockstateSupp.get() : null;
+		if (blockstate == null || blockstate == Blocks.AIR.defaultBlockState()) {
+			return ChunkRenderTypeSet.of(RenderType.solid());
+		}
+		BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockstate);
+		if (model instanceof BakedPaintedModel) {
+			return ChunkRenderTypeSet.of(RenderType.solid());
+		}
+		return model.getRenderTypes(blockstate, rand, ModelData.EMPTY);
 	}
 }
